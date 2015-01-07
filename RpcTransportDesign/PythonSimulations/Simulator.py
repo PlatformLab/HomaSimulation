@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 # Copyright (c) 2015 Stanford University
 #
@@ -17,7 +17,6 @@
 """
 Runs a simplified simulations for the credit based transport scheme
 """
-from common import *
 import os
 import sys
 import random
@@ -73,6 +72,10 @@ from optparse import OptionParser
                     the priority that was assigned to that packet and the
                     size of the message. 
 @type   pktOutTime: Dictionary{key(messge_id):value([pkt_info1, pkt_info2, ..])}
+
+@param  msgList: A list of messages that has everh been added to txQueue
+                      along with their sizes. A list[messageId, messageSize]
+@type   msgList: C[int, int]
 """
 
 def generateMsgSize(distMatrix):
@@ -83,10 +86,7 @@ def generateMsgSize(distMatrix):
 
 
 class Scheduler():
-
-    def __init__(self, txQueue = [], rxQueue = [],
-                    delayQueue = [], pktOutTime = {}):
-
+    def __init__(self, txQueue = [], rxQueue = [], delayQueue = []):
         self.txQueue = txQueue
         self.rxQueue = rxQueue
         self.delayQueue= delayQueue 
@@ -96,7 +96,7 @@ class Scheduler():
         msgSize = pkt[1]
         pktPrio = pkt[2]
         delay = np.random.poisson(avgDelay)
-        delayedPkt = list(msgId, msgSize, pktPrio, delay)
+        delayedPkt = list([msgId, msgSize, pktPrio, delay])
         self.delayQueue.append(delayedPkt)
         self.delayQueue.sort(cmp=lambda x, y: cmp(x[3], y[3]))
 
@@ -105,39 +105,68 @@ class Scheduler():
             if (delayPkt[-1] == 0):
                 pkt = delayPkt[0:-1] 
                 self.rxQueue.append(pkt)
+                self.delayQueue.remove(delayPkt)
         self.rxQueue.sort(cmp=lambda x, y: cmp(x[2], y[2]))
 
         for delayPkt in self.delayQueue:
             delayPkt[-1] -= 1
 
-    def simpleScheduler(self, slot):
+    def simpleScheduler(self, slot, pktOutTime):
         prio = 0
         if (len(self.txQueue) > 0):
             highPrioMsg = self.txQueue[0]
-            highPrioPkt = list(highPrioMsg[0], highPrioMsg[1], prio)
+            highPrioPkt = list([highPrioMsg[0], highPrioMsg[1], prio])
             highPrioMsg[1] -= 1
-            addPktToDelayQueue(highPrioPkt, 4)    
-        
-        depleteDelayQueue() 
+            self.addPktToDelayQueue(highPrioPkt, 4)    
+            if (highPrioMsg[1] == 0):
+                self.txQueue.pop(0)
+                
+        self.depleteDelayQueue() 
         if (len(self.rxQueue) > 0):
             pkt = self.rxQueue.pop(0)
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
-            pktOutTime[msgId].append([solt, pktPrio, msgSize])
-                
+            if (msgId in pktOutTime):
+                pktOutTime[msgId].append([slot, pktPrio, msgSize])
+            else:
+                pktOutTime[msgId] = list()
+                pktOutTime[msgId].append([slot, pktPrio, msgSize])
 
-def run(steps, rhoIn, sizeAvg, scheduler):
-    newMsgSize = 0
-    probPerSlot = rhoIn / sizeAvg 
+
+def run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTime):
+    txQueue = list()
+    rxQueue = list() 
+    delayQueue = list()
+    scheduler = Scheduler(txQueue, rxQueue, delayQueue)
+    probPerSlot = rho / sizeAvg 
     msgId = 0
     for slot in range(steps):
         if (random.random() < probPerSlot):
             newMsg = [msgId, generateMsgSize(distMatrix)]
-            txQueue.append(newMsg) 
+            txQueue.append(newMsg[:]) 
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
+            msgDict[msgId] = newMsg[1] 
             msgId += 1
 
-        scheduler.simpleScheduler(slot)
+        scheduler.simpleScheduler(slot, pktOutTime)
             
+if __name__ == '__main__':
+    steps = 10000
+    rho = 0.8
+    #distMatrix = [[0.8, 1], [0.85, 2], [0.88, 3], [0.9, 4], [0.93, 5],
+    #                [0.95, 6], [0.97, 7], [0.98, 8], [0.99, 9], [1.0, 10]]
+    distMatrix = [[0.6, 1], [0.65, 2], [0.7, 3], [0.75, 4], [0.8, 5], [0.84, 6],
+                    [0.88, 7], [0.92, 8], [0.96, 9], [1.0, 10]]
+    sizeAvg = 0
+    prevProb = 0
+    for row in distMatrix:
+        sizeAvg += row[1] * (row[0] - prevProb)
+        prevProb = row[0]                                                       
 
+    pktOutTime = dict() 
+    msgDict = dict()
+    run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTime)
+    for key in msgDict:
+        print "msgId: {}, msgSize: {}, pkts: {}".format(key, 
+                msgDict[key], pktOutTime[key] if key in pktOutTime else [])
