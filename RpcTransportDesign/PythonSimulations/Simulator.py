@@ -64,19 +64,28 @@ from optparse import OptionParser
                     list of [row1, row2, ...]
 @type   distMatrix: C[[float, int], [float, int], ...]
 
-@param  pktOutTime: A dictionary from key:message_id to a value:list[pkt_info].
-                    Each pkt_info is some information for one packet that
-                    belongs to that message. Each pkt_info is a list of two
-                    elements as pkt_info[time_slot, priority, msgSize] that is
-                    the time slot at which the packet has left the rxQueue and
-                    the priority that was assigned to that packet and the
-                    size of the message. 
-@type   pktOutTime: Dictionary{key(messge_id):value([pkt_info1, pkt_info2, ..])}
+@param  pktOutTimes: A dictionary from key:scheduler_type to a value:dict().
+                     Each value itself is a dictionary from key:message_id to a
+                     value:list[pkt_info].  Each pkt_info is some information
+                     for one packet that belongs to that message. Each pkt_info
+                     is a list of three elements as pkt_info[time_slot,
+                     priority, msgSize] that is the time slot at which the
+                     packet has left the rxQueue and the priority that was
+                     assigned to that packet and the size of the message. 
+@type   pktOutTimes: Dict{
+                     key(scheduler):
+                        value( Dict{key(messge_id):value([pkt_info1, pkt_info2,
+                        ..])}
+                     }
 
-@param  msgList: A list of messages that has everh been added to txQueue
-                      along with their sizes. A list[messageId, messageSize]
-@type   msgList: C[int, int]
+@param  msgDict: A dict of messages have ever been added to txQueue along with
+                 their sizes and the time slots they are added to the txQueue.
+                 A dict{key(messageId):value([messageSize, time_slot)]
+@type   msgDict: C{key(int):[int, int]}
 """
+
+avgDelay = 3
+fixedDelay = 1
 
 def generateMsgSize(distMatrix):
     randomNumber = random.random()
@@ -95,7 +104,7 @@ class Scheduler():
         msgId = pkt[0]
         msgSize = pkt[1]
         pktPrio = pkt[2]
-        delay = np.random.poisson(avgDelay)
+        delay = np.random.poisson(avgDelay) + fixedDelay
         delayedPkt = list([msgId, msgSize, pktPrio, delay])
         self.delayQueue.append(delayedPkt)
         self.delayQueue.sort(cmp=lambda x, y: cmp(x[3], y[3]))
@@ -111,13 +120,13 @@ class Scheduler():
         for delayPkt in self.delayQueue:
             delayPkt[-1] -= 1
 
-    def simpleScheduler(self, slot, pktOutTime):
+    def simpleScheduler(self, slot, pktOutTimes):
         prio = 0
         if (len(self.txQueue) > 0):
             highPrioMsg = self.txQueue[0]
             highPrioPkt = list([highPrioMsg[0], highPrioMsg[1], prio])
             highPrioMsg[1] -= 1
-            self.addPktToDelayQueue(highPrioPkt, 4)    
+            self.addPktToDelayQueue(highPrioPkt, avgDelay)    
             if (highPrioMsg[1] == 0):
                 self.txQueue.pop(0)
                 
@@ -127,46 +136,124 @@ class Scheduler():
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
-            if (msgId in pktOutTime):
-                pktOutTime[msgId].append([slot, pktPrio, msgSize])
+            if (msgId in pktOutTimes):
+                pktOutTimes[msgId].append([slot, pktPrio, msgSize])
             else:
-                pktOutTime[msgId] = list()
-                pktOutTime[msgId].append([slot, pktPrio, msgSize])
+                pktOutTimes[msgId] = list()
+                pktOutTimes[msgId].append([slot, pktPrio, msgSize])
 
+    def idealScheduler(self, slot, pktOutTimes):
+        for msg in self.txQueue[:]:
 
-def run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTime):
+            #priority same as the size
+            pkt = list([msg[0], msg[1], msg[1]])
+            self.addPktToDelayQueue(pkt, avgDelay)
+            if (msg[1] == 1):
+                self.txQueue.remove(msg)
+            else:
+                msg[1] -= 1
+            
+        self.depleteDelayQueue() 
+        if (len(self.rxQueue) > 0):
+            pkt = self.rxQueue.pop(0)
+            msgId = pkt[0]
+            msgSize = pkt[1]
+            pktPrio = pkt[2]
+            if (msgId in pktOutTimes):
+                pktOutTimes[msgId].append([slot, pktPrio, msgSize])
+            else:
+                pktOutTimes[msgId] = list()
+                pktOutTimes[msgId].append([slot, pktPrio, msgSize])  
+
+def run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTimes):
+    probPerSlot = rho / sizeAvg 
     txQueue = list()
     rxQueue = list() 
     delayQueue = list()
     scheduler = Scheduler(txQueue, rxQueue, delayQueue)
-    probPerSlot = rho / sizeAvg 
     msgId = 0
+
+    # Run the simple scheduler
     for slot in range(steps):
         if (random.random() < probPerSlot):
             newMsg = [msgId, generateMsgSize(distMatrix)]
             txQueue.append(newMsg[:]) 
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
-            msgDict[msgId] = newMsg[1] 
+            msgDict[msgId] = [newMsg[1], slot] 
             msgId += 1
 
-        scheduler.simpleScheduler(slot, pktOutTime)
-            
+        scheduler.simpleScheduler(slot, pktOutTimes['simple'])
+
+    # Run ideal scheduler for the exact same message distribution as the one we
+    # ran simple scheduler for.
+    txQueue = list()
+    rxQueue = list() 
+    delayQueue = list()
+    scheduler = Scheduler(txQueue, rxQueue, delayQueue)
+    msgId = 0
+    for slot in range(steps):
+        if (msgId in msgDict and msgDict[msgId][1] == slot):
+            newMsg = [msgId, msgDict[msgId][0]]
+            txQueue.append(newMsg[:]) 
+            txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
+            msgId += 1
+        scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
+
 if __name__ == '__main__':
-    steps = 10000
-    rho = 0.8
+    steps = 100000
+    rho = 0.9
     #distMatrix = [[0.8, 1], [0.85, 2], [0.88, 3], [0.9, 4], [0.93, 5],
     #                [0.95, 6], [0.97, 7], [0.98, 8], [0.99, 9], [1.0, 10]]
-    distMatrix = [[0.6, 1], [0.65, 2], [0.7, 3], [0.75, 4], [0.8, 5], [0.84, 6],
-                    [0.88, 7], [0.92, 8], [0.96, 9], [1.0, 10]]
+    #distMatrix =[[0.6, 1], [0.65, 2], [0.7, 3], [0.75, 4], [0.8, 5], [0.84, 6],
+    #                [0.88, 7], [0.92, 8], [0.96, 9], [1.0, 10]]
+    distMatrix = []
+    f = open('SizeDistribution', 'r')
+    for line in f:
+        if (line[0] != '#' and line[0] != '\n'):
+            distMatrix.append(map(float, line.split( )))
+    f.close()
+
     sizeAvg = 0
     prevProb = 0
     for row in distMatrix:
         sizeAvg += row[1] * (row[0] - prevProb)
         prevProb = row[0]                                                       
 
-    pktOutTime = dict() 
+    pktOutTimes = dict()
     msgDict = dict()
-    run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTime)
-    for key in msgDict:
-        print "msgId: {}, msgSize: {}, pkts: {}".format(key, 
-                msgDict[key], pktOutTime[key] if key in pktOutTime else [])
+
+    #run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTimes)
+    #pktOutTimesSimple= pktOutTimesSimple['simple']
+    #for key in msgDict:
+    #    print "msgId: {}, msgSize: {}, beginTime: {}, pkts: {}".format(key, 
+    #            msgDict[key][0], msgDict[key][1],
+    #            pktOutTimesSimple[key] if key in pktOutTimesSimple else [])
+
+    f = open('ideal_vs_simple_penalty', 'w')
+    f.write("\tpenalty\trho\tavg_delay\n")
+    for n, rho in enumerate([x/20.0 for x in range(1,21)]):
+        pktOutTimes = dict() 
+        pktOutTimes['simple'] = dict()
+        pktOutTimes['ideal'] = dict()
+        msgDict = dict()
+        run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTimes)
+        penalty = 0.0
+        pktOutTimesSimple = pktOutTimes['simple']
+        pktOutTimesIdeal = pktOutTimes['ideal']
+        numMsg = 0
+        for key in pktOutTimesSimple:
+            if key in pktOutTimesIdeal:
+                pktTimesSimple = [pkt_inf[0] for pkt_inf in
+                    pktOutTimesSimple[key]]
+                msgCompletionTimeSimple = max(pktTimesSimple) - msgDict[key][1]
+                pktTimesIdeal = [pkt_inf[0] for pkt_inf in
+                    pktOutTimesIdeal[key]]
+                msgCompletionTimeIdeal = max(pktTimesIdeal) - msgDict[key][1]
+                
+                numMsg += 1 
+                penalty += ((msgCompletionTimeSimple -
+                        msgCompletionTimeIdeal) * 1.0 / msgCompletionTimeIdeal)
+        
+        f.write("{}\t{}\t{}\t{}\n".format(n+1, penalty/numMsg,
+                rho, avgDelay+fixedDelay))
+    f.close()
