@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 """
-Runs a simplified simulations for the credit based transport scheme
+Runs a simplified simulations for the credit based transport scheme.
 """
 import os
 import sys
@@ -71,31 +71,32 @@ class Scheduler():
     """
 
     def __init__(self, txQueue = [], rxQueue = [], delayQueue = []):
-    """
-    @param  txQueue: The transmit queue at the input of simulation. A list of
-                     messages as [msg1, msg2, ..] that are sorted by the message
-                     size from smallest to largest. Every time a new messge is
-                     generated for this simulation, it will be added to this
-                     queue. Messgaes are of type @see msg.
-    @type   txQueue: C[msg, msg, msg, ...]
+        """
+        @param  txQueue: The transmit queue at the input of simulation. A list
+                         of messages as [msg1, msg2, ..] that are sorted by the
+                         message size from smallest to largest. Every time a new
+                         messge is generated for this simulation, it will be
+                         added to this queue. Messgaes are of type @see msg.
+        @type   txQueue: C[msg, msg, msg, ...]
 
-    @param  rxQueue: Reperesent a list of pkt that are scheduled and received in
-                     the output (edge) queue of the network. This practically is
-                     a list of packets as [pkt1, pkt2, ...] that are sorted by
-                     the priority from highest priority (smallest value) to
-                     lowest priority.
-    @type   rxQueue: C[pkt, pkt, pkt, ..]
+        @param  rxQueue: Reperesent a list of pkt that are scheduled and
+                         received in the output (edge) queue of the network.
+                         This practically is a list of packets as [pkt1, pkt2,
+                         ...] that are sorted by the priority from highest
+                         priority (smallest value) to lowest priority.
+        @type   rxQueue: C[pkt, pkt, pkt, ..]
 
-    @param  delayQueue: This queue contains all packets that are scheduled and
-                        has left txQueue but has not yet received in rxQueue.
-                        This queue essentially models the network so packets in
-                        this queue are in flight and experiencing some delay
-                        in the network. This is a list of [delayedPkt1,
-                        delayedPkt2, ...] and this list is sorted by the delay
-                        of the packets from lowest to highest. delayedPkts are
-                        of type @see delayedPkt .
-    @type   delayQueue: C[delayedPkt, delayedPkt, ...]
-    """
+        @param  delayQueue: This queue contains all packets that are scheduled
+                            and has left txQueue but has not yet received in
+                            rxQueue.  This queue essentially models the network
+                            so packets in this queue are in flight and
+                            experiencing some delay in the network. This is a
+                            list of [delayedPkt1, delayedPkt2, ...] and this
+                            list is sorted by the delay of the packets from
+                            lowest to highest. delayedPkts are of type @see
+                            delayedPkt .
+        @type   delayQueue: C[delayedPkt, delayedPkt, ...]
+        """
         self.txQueue = txQueue
         self.rxQueue = rxQueue
         self.delayQueue= delayQueue 
@@ -367,10 +368,33 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
         scheduler.idealScheduler(slot, pktOutTimes['ideal'])
 
 if __name__ == '__main__':
-    steps = 1000000
-    rho = 0.9
+    parser = OptionParser(description='Runs a simplified simulations for'
+            ' credit based transport schemes.')
+    parser.adding('--inputDir', metavar='DIR', default='input', dest='inputDir',
+            help='Directory containing input files for this simulation.')
+    parser.adding('--outputDir', metavar='DIR', default='output',
+            dest='outputDir',
+            help='Target directory that will coantain output files after'
+            ' simulation.')
+    parser.add_option('--slots', type=int, metavar='N', default=10000,
+            dest='steps',
+            help='Total number of steps that this simulation should run.')
+    parser.add_option('--inputRate', type=float, metavar='RATE', default=0.5,
+            dest='rho',
+            help='Average Ratio input packet rate to output packet rate')
+    parser.add_option('--sizeDist', metavar='FILE_NAME',
+            default='SizeDistribution', dest='distFileName',
+            help='Name of the input file containing the cumulative distribution'
+            ' of message sizes.')
+    (options, args) = parser.parse_args()
+    inputDir = options.inputDir
+    outputDir = options.outputDir
+    steps = options.steps
+    rho = options.rho
+    distFileName = options.distFileName
+
     distMatrix = []
-    f = open('SizeDistribution', 'r')
+    f = open(inputDir + '/' + distFileName, 'r')
     for line in f:
         if (line[0] != '#' and line[0] != '\n'):
             distMatrix.append(map(float, line.split( )))
@@ -388,14 +412,14 @@ if __name__ == '__main__':
     #            msgDict[key][0], msgDict[key][1],
     #            pktOutTimesSimple[key] if key in pktOutTimesSimple else [])
 
-    f = open('ideal_vs_simple_penalty', 'w')
+    f = open(outputDir + '/' + 'ideal_vs_simple_penalty', 'w')
     f.write("\tpenalty\trho\tavg_delay\n")
-    fd = open('ideal_vs_simple_rho_fixed', 'w')
+    fd = open(outputDir + '/' + 'ideal_vs_simple_rho_fixed', 'w')
     fd.write("\tpenalty\tsize\trho\n")
 
     # Change rho, and calculate penalty of simple scheduler vs ideal
     # scheduler.
-    for n, rho in enumerate([x/20.0 for x in range(1,21)]):
+    for n, rho in enumerate([x/100.0 for x in range(15, 105, 10)]):
         pktOutTimes = dict() 
         pktOutTimes['simple'] = dict()
         pktOutTimes['ideal'] = dict()
@@ -405,9 +429,10 @@ if __name__ == '__main__':
         pktOutTimesSimple = pktOutTimes['simple']
         pktOutTimesIdeal = pktOutTimes['ideal']
         numMsg = 0
-        penaltyPerSize = dict() # Dict{ key(msgSize):
-                                #       value([totalPenalty, msgCount, rho]) }
- 
+
+        # type of penaltyPerSize: 
+        # Dict{ key(msgSize): value([totalPenalty, msgCount, rho]) }
+        penaltyPerSize = dict()  
         for key in pktOutTimesSimple:
             if key in pktOutTimesIdeal:
                 pktTimesSimple = [pkt_inf[0] for pkt_inf in
