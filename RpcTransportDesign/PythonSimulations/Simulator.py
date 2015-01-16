@@ -131,8 +131,8 @@ class Scheduler():
         self.delayQueue.sort(cmp=lambda x, y: cmp(x[3], y[3]))
 
     def depleteDelayQueue(self):
-        """This function practically abstracts out the propagation of the packets
-        out of the network and to the @p rxQueue. Everytime a packet is
+        """This function practically abstracts out the propagation of the
+        packets out of the network and to the @p rxQueue. Everytime a packet is
         completely transmitted through the network, it will add that packet to
         the @p rxQueue and makes sure the rxQueue is kept sorted with respect to
         packet priorities.
@@ -148,15 +148,15 @@ class Scheduler():
             delayedPkt[-1] -= 1
 
     def simpleScheduler(self, slot, pktOutTimes):
-        """Impements the most simple SRPT scheduler scheme. At any simulation round,
-        if there are messages pending for transmission, this module tries to
-        minimize the latency for the shortest messages (SRPT - shortest remaining
-        time first - scheduling) so it takes a packet from the message with the
-        smallest size and propagates it throught the network by appying the
-        simple network model we have implemented in this class.  Subsequently at
-        every round, between all the packets that has completely traveresed the
-        network, this module takes a packet in FIFO mode and puts it out of the
-        simulation.
+        """Impements the most simple SRPT scheduler scheme. At any simulation
+        round, if there are messages pending for transmission, this module tries
+        to minimize the latency for the shortest messages (SRPT - shortest
+        remaining time first - scheduling) so it takes a packet from the message
+        with the smallest size and propagates it throught the network by appying
+        the simple network model we have implemented in this class.
+        Subsequently at every round, between all the packets that has completely
+        traveresed the network, this module takes a packet in FIFO mode and puts
+        it out of the simulation.
 
         ===Additional info===
         This scheduler can only schedule one packet in every scheduling round
@@ -370,9 +370,10 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
 if __name__ == '__main__':
     parser = OptionParser(description='Runs a simplified simulations for'
             ' credit based transport schemes.')
-    parser.adding('--inputDir', metavar='DIR', default='input', dest='inputDir',
+    parser.add_option('--inputDir', metavar='DIR', default='input',
+            dest='inputDir',
             help='Directory containing input files for this simulation.')
-    parser.adding('--outputDir', metavar='DIR', default='output',
+    parser.add_option('--outputDir', metavar='DIR', default='output',
             dest='outputDir',
             help='Target directory that will coantain output files after'
             ' simulation.')
@@ -400,11 +401,8 @@ if __name__ == '__main__':
             distMatrix.append(map(float, line.split( )))
     f.close()
 
-                                                           
-
     pktOutTimes = dict()
     msgDict = dict()
-
     #run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTimes)
     #pktOutTimesSimple= pktOutTimesSimple['simple']
     #for key in msgDict:
