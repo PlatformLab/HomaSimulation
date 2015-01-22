@@ -9,7 +9,7 @@ dev.off()
 cumDist <- read.table("input/SizeDistribution", col.names=c('CDF','message_size'))
 plotDist <- ggplot(cumDist, aes(x = message_size, y = CDF))
 pdf('plots/DistributionPlot.pdf')
-plotDist + geom_line(color = "red", size = 3, alpha = 1/2) + labs(title = "Cumulative Distribution of Message Size")
+plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Cumulative Distribution of Message Size")
 dev.off()
 
 penaltyPerSize <- read.table("output/ideal_vs_simple_rho_fixed_ver1", header=TRUE)

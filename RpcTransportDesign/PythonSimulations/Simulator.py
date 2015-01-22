@@ -51,6 +51,108 @@ def generateMsgSize(distMatrix):
         if (row[0] > randomNumber):
             return row[1]
 
+class RxQueue():
+    """ Reperesent a queue of pkts that are scheduled and received in the output
+    (edge) queue of the network.  This class provides interfaces to add a packet
+    to the queue and remove the packet from the queue and place it out.
+    Within each priority list in the queue datastruct of this class, the packets
+    are served in FIFO order but between priorities, higher priority packets
+    (eg. lowest priority value in the packet) are always served first. 
+    """
+
+    def __init__(self, prioQueue = {}):
+        """ 
+        @param  prioQueue: This is a dictionary from key:priority to value:list
+                           of packets in that priority as [pkt1, pkt2, ...].
+
+        @param  size: The total number of packets in this queue at the moment.
+        """
+
+        self.prioQueue = prioQueue 
+        self.size = 0 
+
+    def enqueue(self, pkt):
+        """Takes a packet as the input argument and place a copy of the packet
+        in the priority queue corresponding to the input queue.
+
+        @param  self: pointer object to this class.
+        @type   self: self type. 
+
+        @param  pkt: packet that is to be queued in this priority queue class.
+                     A list of [message_id, message_size, priority]. Represents
+                     a packet from a message along with the granted priority for
+                     hat packet and the remaining size of message that this
+                     packet blongs to.
+        @type   pkt: list[int, int, int]
+        """
+        self.size += 1
+        prioKey = pkt[2]
+        if (prioKey in self.prioQueue):
+            self.prioQueue[prioKey].append(pkt[:])
+        else:
+            self.prioQueue[prioKey] = list()
+            self.prioQueue[prioKey].append(pkt[:])
+        
+    def dequeue(self, prio = -1):
+        """Removes a packet from the highest priority queue in this class and
+        returns that packet. If the user provides a priority input argument,
+        this method will return a packet from that specific priority.
+
+        @param  self: pointer object to this class.
+        @type   self: self type. 
+
+        @param  prio: The priority from which we want to dequeue a packet.
+        @type   prio: a positive integer
+
+        @return : a packet from the highest priority queue if no input arg. prio
+                  is provided. If prio is provided, returns a packet from that
+                  priority queue.
+        @rtype  : either a @p pkt type or an empty list if no packet is
+                  currently queue in this class.
+        """
+        if (self.size > 0):
+            if (prio == -1):
+                it = iter(sorted(self.prioQueue.iteritems())) 
+                for prio, pktList in it:
+                    if (len(pktList)):
+                        pkt = self.prioQueue[prio].pop(0)
+                        self.size -= 1
+                        return pkt 
+            elif (prio in self.prioQueue and len(self.prioQueue[prio])):
+                self.size -= 1
+                pkt = self.prioQueue[prio].pop(0)
+                return pkt
+        return []
+
+    def getQueueStats(self, prioQueueSizes):
+        """Provides the size of priority queues in this class.
+
+        @param  self: pointer object to this class.
+        @type   self: self type. 
+        
+        @return prioQueueSizes: The input arg. prioQueueSizes is a dictionary
+                                (possibly empty) provided at the call time.
+                                After this function returns, this will contain
+                                the queue size for every priority. a dictionary
+                                from key:priority to value:size of the queue on
+                                that priority
+        @rtype  prioQueueSizes: dict{key(int):value(int)}
+        """
+        for prio, pktList in self.prioQueue.iteritems():
+            prioQueueSizes[prio] = len(pktList)
+    
+    def getSize(self):
+        """Return the the current total size of this queue. (sum of the numver
+        of packets in all priority queues in this class.)
+
+        @param  self: pointer object to this class.
+        @type   self: self type. 
+        
+        @return: total number of packets in this queue.
+        @rtype: An integer
+        """
+        
+        return self.size 
 
 class Scheduler():
     """This class creates the common internal context for an arbitrary scheduler
@@ -70,7 +172,7 @@ class Scheduler():
                         delay is an integer.
     """
 
-    def __init__(self, txQueue = [], rxQueue = [], delayQueue = []):
+    def __init__(self, txQueue = [], rxQueue = RxQueue(), delayQueue = []):
         """
         @param  txQueue: The transmit queue at the input of simulation. A list
                          of messages as [msg1, msg2, ..] that are sorted by the
@@ -79,12 +181,12 @@ class Scheduler():
                          added to this queue. Messgaes are of type @see msg.
         @type   txQueue: C[msg, msg, msg, ...]
 
-        @param  rxQueue: Reperesent a list of pkt that are scheduled and
+        @param  rxQueue: Reperesent a queue of pkt that are scheduled and
                          received in the output (edge) queue of the network.
-                         This practically is a list of packets as [pkt1, pkt2,
-                         ...] that are sorted by the priority from highest
-                         priority (smallest value) to lowest priority.
-        @type   rxQueue: C[pkt, pkt, pkt, ..]
+                         This practically is a dict from key:priority of packets
+                         to a list of packets in that priority as [pkt1, pkt2,
+                         ...]. smallest priority value has the highest priority.
+        @type   rxQueue: Dict{key(pkt_prio):[pkt1, pkt2, ...]}
 
         @param  delayQueue: This queue contains all packets that are scheduled
                             and has left txQueue but has not yet received in
@@ -140,9 +242,8 @@ class Scheduler():
         for delayedPkt in self.delayQueue[:]:
             if (delayedPkt[-1] == 0):
                 pkt = delayedPkt[0:-1] 
-                self.rxQueue.append(pkt)
+                self.rxQueue.enqueue(pkt)
                 self.delayQueue.remove(delayedPkt)
-        self.rxQueue.sort(cmp=lambda x, y: cmp(x[2], y[2]))
 
         for delayedPkt in self.delayQueue:
             delayedPkt[-1] -= 1
@@ -194,8 +295,8 @@ class Scheduler():
         # put them in the rxQueue. Subsequently remove a packet from head of the
         # line in the rxQueue and record its packet info in the @p pktOutTimes.
         self.depleteDelayQueue()
-        if (len(self.rxQueue) > 0):
-            pkt = self.rxQueue.pop(0)
+        pkt = self.rxQueue.dequeue()
+        if pkt:
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
@@ -255,8 +356,8 @@ class Scheduler():
                 msg[1] -= 1
             
         self.depleteDelayQueue() 
-        if (len(self.rxQueue) > 0):
-            pkt = self.rxQueue.pop(0)
+        pkt = self.rxQueue.dequeue()
+        if pkt:
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
@@ -326,7 +427,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     probPerSlot = rho / sizeAvg # The prbability by which new messages will be
                                 # added to the txQueue.
     txQueue = list()
-    rxQueue = list() 
+    rxQueue = RxQueue() 
     delayQueue = list()
     scheduler = Scheduler(txQueue, rxQueue, delayQueue)
     msgId = 0
@@ -344,14 +445,14 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
 
         scheduler.simpleScheduler(slot, pktOutTimes['simple'])
 
-    while len(txQueue) or len(rxQueue) or len(delayQueue):
+    while len(txQueue) or rxQueue.getSize() or len(delayQueue):
         slot += 1
         scheduler.simpleScheduler(slot, pktOutTimes['simple'])
 
     # Run ideal scheduler for the exact same message distribution as the one we
     # ran simple scheduler for in previous loop.
     txQueue = list()
-    rxQueue = list() 
+    rxQueue = RxQueue() 
     delayQueue = list()
     scheduler = Scheduler(txQueue, rxQueue, delayQueue)
     msgId = 0
@@ -363,7 +464,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
             msgId += 1
         scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
     
-    while len(txQueue) or len(rxQueue) or len(delayQueue):
+    while len(txQueue) or rxQueue.getSize() or len(delayQueue):
         slot += 1
         scheduler.idealScheduler(slot, pktOutTimes['ideal'])
 
@@ -388,12 +489,12 @@ if __name__ == '__main__':
             help='Name of the input file containing the cumulative distribution'
             ' of message sizes.')
     (options, args) = parser.parse_args()
+
     inputDir = options.inputDir
     outputDir = options.outputDir
     steps = options.steps
     rho = options.rho
-    distFileName = options.distFileName
-
+    distFileName = options.distFileName 
     distMatrix = []
     f = open(inputDir + '/' + distFileName, 'r')
     for line in f:
@@ -403,13 +504,7 @@ if __name__ == '__main__':
 
     pktOutTimes = dict()
     msgDict = dict()
-    #run(steps, rho, sizeAvg, distMatrix, msgDict, pktOutTimes)
-    #pktOutTimesSimple= pktOutTimesSimple['simple']
-    #for key in msgDict:
-    #    print "msgId: {}, msgSize: {}, beginTime: {}, pkts: {}".format(key, 
-    #            msgDict[key][0], msgDict[key][1],
-    #            pktOutTimesSimple[key] if key in pktOutTimesSimple else [])
-
+    
     f = open(outputDir + '/' + 'ideal_vs_simple_penalty', 'w')
     f.write("\tpenalty\trho\tavg_delay\n")
     fd = open(outputDir + '/' + 'ideal_vs_simple_rho_fixed', 'w')
