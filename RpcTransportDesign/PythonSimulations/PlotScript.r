@@ -1,3 +1,5 @@
+#!/usr/bin/Rscript
+
 library(ggplot2)
 penaltyPerRho <- read.table("output/ideal_vs_simple_penalty_ver1")
 penaltyPerRho$avg_delay <- factor(penaltyPerRho$avg_delay)
