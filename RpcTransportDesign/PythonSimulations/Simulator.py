@@ -370,8 +370,9 @@ class Scheduler():
 def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     """Starts the simulations for different schedulers and returns packet level
     inofrmation after simulation is over. This function works like a wrapper
-    around the simulation scenario so it is the right place to add new
-    simulation experiments. 
+    around the simulation scenario so if a new scheduler is implemented in the
+    Scheduler class, this function is the right place to run the experiment for
+    that scheduler.
     
     @param  steps: Number of rounds for which the simulation will run.
     @type   steps: An integer.
@@ -432,9 +433,10 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     scheduler = Scheduler(txQueue, rxQueue, delayQueue)
     msgId = 0
 
-    # Generate a new message in each step for \p steps and run the simple
-    # scheduler until all packets entered simulations have eventually left the
-    # simulation. Then it return the result in \p pktOutTimes.
+    # Generate a new message in each round of simulation based on the given
+    # distribution of sizes and given input rate of packets. Run this simulation
+    # for total of \p steps rounds. At the end return the result in \p
+    # pktOutTimes.
     for slot in range(steps):
         if (random.random() < probPerSlot):
             newMsg = [msgId, generateMsgSize(distMatrix)]
@@ -443,10 +445,6 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
             msgDict[msgId] = [newMsg[1], slot] 
             msgId += 1
 
-        scheduler.simpleScheduler(slot, pktOutTimes['simple'])
-
-    while len(txQueue) or rxQueue.getSize() or len(delayQueue):
-        slot += 1
         scheduler.simpleScheduler(slot, pktOutTimes['simple'])
 
     # Run ideal scheduler for the exact same message distribution as the one we
@@ -463,10 +461,6 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
             msgId += 1
         scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
-    
-    while len(txQueue) or rxQueue.getSize() or len(delayQueue):
-        slot += 1
-        scheduler.idealScheduler(slot, pktOutTimes['ideal'])
 
 if __name__ == '__main__':
     parser = OptionParser(description='Runs a simplified simulations for'
