@@ -46,7 +46,7 @@ def generateMsgSize(distMatrix):
              distribution.
     @rtype:  An integer.
     """
-    randomNumber = random.random()
+    randomNumber = random.uniform(0,1)
     for row in distMatrix:
         if (row[0] > randomNumber):
             return row[1]
@@ -124,24 +124,25 @@ class RxQueue():
                 return pkt
         return []
 
-    def getQueueStats(self, prioQueueSizes):
+    def getPrioQueueSize(self, prio):
         """Provides the size of priority queues in this class.
 
         @param  self: pointer object to this class.
         @type   self: self type. 
         
-        @return prioQueueSizes: The input arg. prioQueueSizes is a dictionary
-                                (possibly empty) provided at the call time.
-                                After this function returns, this will contain
-                                the queue size for every priority. a dictionary
-                                from key:priority to value:size of the queue on
-                                that priority
-        @rtype  prioQueueSizes: dict{key(int):value(int)}
+        @param  prio: priority at which the caller wants to know the number of
+                      packets queued in the corresponding queue. 
+        @type   prio: A non-negative integer. 
+        
+        @return: The size of priority queue corresponind to priority @p prio  
+        @rtype:  A non-negative integer.
         """
-        for prio, pktList in self.prioQueue.iteritems():
-            prioQueueSizes[prio] = len(pktList)
-    
-    def getSize(self):
+        if prio in self.prioQueue:
+            return len(self.prioQueue[prio])
+        else:
+            return 0
+
+    def getTotalSize(self):
         """Return the the current total size of this queue. (sum of the numver
         of packets in all priority queues in this class.)
 
@@ -216,7 +217,8 @@ class Scheduler():
         @param  pkt: A list of [message_id, message_size, priority]. Represents
                      a packet from a message along with the granted priority for
                      that packet and the remaining size of message that this
-                     packet blongs to.
+                     packet blongs to. The remaining size of the message is
+                     calculated including this pkt.
         @type   pkt: list[int, int, int]
 
         @param  avgDelay: See @see avgDelay
@@ -341,6 +343,7 @@ class Scheduler():
         @param  slot: The simulation round for which this scheduler is run.
         @type   slot: An integer.
 
+
         @retun  pktOutTimes: @see run() 
         @rtype  pktOutTimes: @see run()
 
@@ -367,7 +370,52 @@ class Scheduler():
                 pktOutTimes[msgId] = list()
                 pktOutTimes[msgId].append([slot, pktPrio, msgSize])  
 
-def run(steps, rho, distMatrix, msgDict, pktOutTimes):
+
+def collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist): 
+    """For the input rxQueue, this function gather the size distribution of the
+    rxQueue and also size of distribution of priority queues within that queue.
+
+    @param  prioList: A list containing the priorities values this scheduler
+                      will ever assign to the packets. This is essentially a
+                      list[smallest_msg_size, largest_msg_size] 
+    @type   prioList: list[int, int, int, ...] 
+    
+    @return queueSizeDist: For every priority queue within the rxQueue this
+                           varialbe will contain the distribution of the size of
+                           that queue in the simulation. That is the
+                           number(counts) of rounds of simulation that a
+                           priority queue has had that size.  Must have been
+                           initialized to dict{x:{} for x in prioList}. 
+    @rtype  queueSizeDist: dict{ key(priority) : 
+                                 value(dict{ key(size) : 
+                                             value(counts) }) }
+
+    @return totalSizeDist: This will contain the size distribution of rxQueue.
+                           That is the number of (counts) of rounds that rxQueue
+                           had that size. 
+    @rtype  totalSizeDist: dict{key(size) : value(counts) }
+
+    """
+
+    # For every priority queue in rxQueue find the queue size and update the
+    # distribution for that priority queue
+    for prio, prioQueueDist in queueSizeDist.iteritems():
+        prioQueueSize = rxQueue.getPrioQueueSize(prio)
+        if prioQueueSize in prioQueueDist:
+            prioQueueDist[prioQueueSize] += 1
+        else:
+            prioQueueDist[prioQueueSize] = 1
+    
+    # Update the distribution for total queue size
+    rxQueueSize = rxQueue.getTotalSize() 
+    if rxQueueSize in totalSizeDist:
+        totalSizeDist[rxQueueSize] += 1
+    else:
+        totalSizeDist[rxQueueSize] = 1
+
+def run(steps, rho, distMatrix, msgDict, pktOutTimes,
+        prioQueueSizeDist, rxQueueSizeDist):
+
     """Starts the simulations for different schedulers and returns packet level
     inofrmation after simulation is over. This function works like a wrapper
     around the simulation scenario so if a new scheduler is implemented in the
@@ -401,7 +449,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     @return pktOutTimes: Record the out timeslot for every individual packet
                          within for each message for each scheduler type. This
                          is a dictionary from key:scheduler_type to a
-                         value:dict().  Each value itself is a dictionary from
+                         value:dict(). Each value itself is a dictionary from
                          key:message_id to a value:list[pkt_info]. Each pkt_info
                          in this list is some information for one packet that
                          belongs to that message identified by message_id. Each
@@ -416,6 +464,25 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
                                value( dict{ key(messge_id) : 
                                             value([pkt_info1, pkt_info2,..]) } }
 
+    @return prioQueueSizeDist: For every priority queue within the RxQueue in
+                               the simulation, this varialbe will contain the
+                               distribution of the size of that queue in the
+                               simulation. That is the number(counts) of rounds
+                               of simulation that a priority queue has had that
+                               size. This variable will contain this information
+                               for every single scheduler in this simulation.
+    @rtype  prioQueueSizeDist: dict{key(scheduler_type) : 
+                                    value(dict{ key(priority) : 
+                                                value(dict{ key(size) : 
+                                                            value(counts) }) })}
+
+    @return rxQueueSizeDist: This will contain the size distribution of RxQueue
+                             for every scheduler type this simulation runs. That
+                             is the number (counts) of rounds that RxQueue had
+                             that size.  
+    @rtype  rxQueueSizeDist: dict{key(scheduler_type) :
+                                  value(dict{key(size) : value(counts) })} 
+
     """
     sizeAvg = 0
     prevProb = 0
@@ -424,6 +491,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     for row in distMatrix: 
         sizeAvg += row[1] * (row[0] - prevProb)
         prevProb = row[0]
+    print sizeAvg
 
     probPerSlot = rho / sizeAvg # The prbability by which new messages will be
                                 # added to the txQueue.
@@ -437,8 +505,13 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     # distribution of sizes and given input rate of packets. Run this simulation
     # for total of \p steps rounds. At the end return the result in \p
     # pktOutTimes.
+    # Initialize the stats collecting datastructs
+    prioList = [0]
+    prioQueueSizeDist['simple'] = {x:{} for x in prioList}
+    queueSizeDist = prioQueueSizeDist['simple']
+    totalSizeDist = rxQueueSizeDist['simple']
     for slot in range(steps):
-        if (random.random() < probPerSlot):
+        if (random.uniform(0, 1) < probPerSlot):
             newMsg = [msgId, generateMsgSize(distMatrix)]
             txQueue.append(newMsg[:]) 
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
@@ -447,6 +520,9 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
 
         scheduler.simpleScheduler(slot, pktOutTimes['simple'])
 
+        # Collect the stats after running scheduler
+        collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
+
     # Run ideal scheduler for the exact same message distribution as the one we
     # ran simple scheduler for in previous loop.
     txQueue = list()
@@ -454,6 +530,15 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
     delayQueue = list()
     scheduler = Scheduler(txQueue, rxQueue, delayQueue)
     msgId = 0
+
+    # Initialize the stats collecting datastructs
+    # list of all possible msg sizes
+    prioList = [int(x[1]) for x in distMatrix[1:]]
+    print prioList
+    prioQueueSizeDist['ideal'] = {x:{} for x in prioList}
+    queueSizeDist = prioQueueSizeDist['ideal']
+    totalSizeDist = rxQueueSizeDist['ideal']
+
     for slot in range(steps):
         if (msgId in msgDict and msgDict[msgId][1] == slot):
             newMsg = [msgId, msgDict[msgId][0]]
@@ -461,6 +546,9 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes):
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
             msgId += 1
         scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
+        
+        # Collect the stats after running scheduler
+        collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
 
 if __name__ == '__main__':
     parser = OptionParser(description='Runs a simplified simulations for'
@@ -495,23 +583,45 @@ if __name__ == '__main__':
         if (line[0] != '#' and line[0] != '\n'):
             distMatrix.append(map(float, line.split( )))
     f.close()
-
-    pktOutTimes = dict()
-    msgDict = dict()
+    print distMatrix
     
     f = open(outputDir + '/' + 'ideal_vs_simple_penalty', 'w')
     f.write("\tpenalty\trho\tavg_delay\n")
+
     fd = open(outputDir + '/' + 'ideal_vs_simple_rho_fixed', 'w')
     fd.write("\tpenalty\tsize\trho\n")
 
+    fd1 = open(outputDir + '/' + 'completion_time_distribution', 'w')
+    fd1.write("\trho\tscheduler\tsize\tcomp_time\tcount\n")
+
+    fd2 = open(outputDir + '/' + 'prio_queue_size_dist', 'w')
+    fd2.write("\trho\tscheduler\tprio_queue\tsize\tcount\n")
+
+    fd3 = open(outputDir + '/' + 'rx_queue_total_size_dist', 'w')
+    fd3.write("\trho\tscheduler\tsize\tcount\n")
+
+    fd4 = open(outputDir + '/' + 'output_msg_size_dist', 'w')
+    fd4.write("\tprob\tmsg_size\n")
+
+    msgDict = dict()
+
     # Change rho, and calculate penalty of simple scheduler vs ideal
     # scheduler.
-    for n, rho in enumerate([x/100.0 for x in range(15, 105, 10)]):
+    for n, rho in enumerate([x/100.0 for x in range(15, 105, 20)]):
         pktOutTimes = dict() 
         pktOutTimes['simple'] = dict()
         pktOutTimes['ideal'] = dict()
+        rxQueueSizeDist = dict()
+        rxQueueSizeDist['simple'] = dict()
+        rxQueueSizeDist['ideal'] = dict()
+        prioQueueSizeDist = dict()
+        prioQueueSizeDist['simple'] = dict()
+        prioQueueSizeDist['ideal'] = dict()
+
         msgDict = dict()
-        run(steps, rho, distMatrix, msgDict, pktOutTimes)
+        run(steps, rho, distMatrix, msgDict, pktOutTimes, prioQueueSizeDist,
+                rxQueueSizeDist)
+
         penalty = 0.0
         pktOutTimesSimple = pktOutTimes['simple']
         pktOutTimesIdeal = pktOutTimes['ideal']
@@ -519,34 +629,47 @@ if __name__ == '__main__':
 
         # type of penaltyPerSize: 
         # Dict{ key(msgSize): value([totalPenalty, msgCount, rho]) }
-        penaltyPerSize = dict()  
+        penaltyPerSize = dict()
         for key in pktOutTimesSimple:
             if key in pktOutTimesIdeal:
                 pktTimesSimple = [pkt_inf[0] for pkt_inf in
                     pktOutTimesSimple[key]]
-                msgCompletionTimeSimple = max(pktTimesSimple) - msgDict[key][1]
                 pktTimesIdeal = [pkt_inf[0] for pkt_inf in
                     pktOutTimesIdeal[key]]
-                msgCompletionTimeIdeal = max(pktTimesIdeal) - msgDict[key][1]
-                
-                numMsg += 1 
-                
-                # Total penalty
-                penalty += ((msgCompletionTimeSimple -
-                        msgCompletionTimeIdeal) * 1.0 / msgCompletionTimeIdeal)
-                
-
-                # Record penalty imposed on the current msgSize
                 msgSize = msgDict[key][0]
-                if (msgSize in penaltyPerSize):
-                    penaltyPerSize[msgSize][0] += ((msgCompletionTimeSimple -
-                        msgCompletionTimeIdeal) * 1.0 / msgCompletionTimeIdeal)
-                    penaltyPerSize[msgSize][1] += 1
-                else:
-                    penaltyPerSize[msgSize] = [0.0, 0, rho]
-                    penaltyPerSize[msgSize][0] += ((msgCompletionTimeSimple -
-                        msgCompletionTimeIdeal) * 1.0 / msgCompletionTimeIdeal)
-                    penaltyPerSize[msgSize][1] += 1
+
+                #only calculate the penalty for this message if all packets from
+                #this message has the simulation in both simple and ideal
+                #scheduler simulations.
+                if (msgSize == len(pktTimesSimple) and
+                        msgSize == len(pktTimesIdeal)):
+                    msgCompletionTimeSimple = (max(pktTimesSimple) -
+                            msgDict[key][1])
+
+                    msgCompletionTimeIdeal = (max(pktTimesIdeal) -
+                            msgDict[key][1])
+
+                    numMsg += 1
+
+                    # Total penalty
+                    penalty += (msgCompletionTimeSimple -
+                        msgCompletionTimeIdeal) * 1.0 / msgCompletionTimeIdeal
+
+                    # Record penalty imposed on the current msgSize
+                    if (msgSize in penaltyPerSize):
+                        penaltyPerSize[msgSize][0] += ((msgCompletionTimeSimple
+                                - msgCompletionTimeIdeal) * 1.0 /
+                                msgCompletionTimeIdeal)
+
+                        penaltyPerSize[msgSize][1] += 1
+
+                    else:
+                        penaltyPerSize[msgSize] = [0.0, 0, rho]
+                        penaltyPerSize[msgSize][0] += ((msgCompletionTimeSimple
+                                - msgCompletionTimeIdeal) * 1.0 /
+                                msgCompletionTimeIdeal)
+
+                        penaltyPerSize[msgSize][1] += 1
 
         f.write("{}\t{}\t{}\t{}\n".format(n+1, penalty/numMsg,
                 rho, avgDelay+fixedDelay))
@@ -555,6 +678,104 @@ if __name__ == '__main__':
             fd.write("{}\t{}\t{}\n".format(
                     penaltyPerSize[key][0]/penaltyPerSize[key][1] if
                     penaltyPerSize[key][1] != 0 else 0.0, key, rho))
+
+        # compTimeDist is a dictionary variable that for every rho value,
+        # records the distribution of completion times for every message size
+        # that is generated in this simulation.
+        # dict{key(rho) : 
+        #      value(dict{ key(msgSize) :
+        #                  value(dict{ key(completion_time) : 
+        #                              value(count) }) })}
+        compTimeDist = dict()
+
+        # Now find the rxQueue statistical size distribution for both ideal and
+        # simple scheduler.
+        for key in pktOutTimesSimple:
+            pktTimesSimple = [pkt_inf[0] for pkt_inf in
+                pktOutTimesSimple[key]]
+            msgSize = msgDict[key][0]
+
+            #only calculate the completion time for this message if all packets
+            #from this message have been received in the destination.
+            if (msgSize == len(pktTimesSimple)):
+                completionTime = max(pktTimesSimple) - msgDict[key][1]
+                if msgSize not in compTimeDist:
+                    compTimeDist[msgSize] = {}
+                    compTimeDist[msgSize][completionTime] = 1
+
+                elif completionTime not in compTimeDist[msgSize]:
+                    compTimeDist[msgSize][completionTime] = 1
+
+                else:
+                    compTimeDist[msgSize][completionTime] += 1
+
         
+        for msgSize, val in compTimeDist.iteritems():
+            for compTime, count in val.iteritems():
+                fd1.write("{}\t{}\t{}\t{}\t{}\n".format(rho, 'simple', msgSize,
+                compTime, count))
+                
+        compTimeDist = dict()
+        for key in pktOutTimesIdeal:
+            pktTimesIdeal = [pkt_inf[0] for pkt_inf in
+                pktOutTimesIdeal[key]]
+            msgSize = msgDict[key][0]
+
+            #only calculate the completion time for this message if all packets
+            #from this message have been received in the destination.
+            if (msgSize == len(pktTimesIdeal)):
+                completionTime = max(pktTimesIdeal) - msgDict[key][1]
+                if msgSize not in compTimeDist:
+                    compTimeDist[msgSize] = {}
+                    compTimeDist[msgSize][completionTime] = 1
+
+                elif completionTime not in compTimeDist[msgSize]:
+                    compTimeDist[msgSize][completionTime] = 1
+
+                else:
+                    compTimeDist[msgSize][completionTime] += 1
+        
+        for msgSize, val in compTimeDist.iteritems():
+            for compTime, count in val.iteritems():
+                fd1.write("{}\t{}\t{}\t{}\t{}\n".format(rho, 'ideal', msgSize,
+                compTime, count))
+        
+        # Now record queue size distributions in the file
+        for schdlr, prioQuDist in prioQueueSizeDist.iteritems():
+            for prioQ, sizeDist in prioQuDist.iteritems():
+                for size, count in sizeDist.iteritems():
+                    fd2.write("{}\t{}\t{}\t{}\t{}\n".format(rho, schdlr, 
+                            prioQ, size, count))
+
+        # Now record total rx queue size distribution
+        for schdlr, sizeDist in rxQueueSizeDist.iteritems():
+            for size, count in sizeDist.iteritems():
+                 fd3.write("{}\t{}\t{}\t{}\n".format(rho, schdlr, 
+                            size, count))
+
+        print "Simulation Complete for rho={}".format(rho)
+
+    # Record distribution of generated message sizes only once for the 
+    # last simulation
+    msgSizeDist = {}
+    totalMsgs = 0
+    for msgId, msgInfo in msgDict.iteritems():
+        totalMsgs += 1
+        if msgInfo[0] in msgSizeDist:
+            msgSizeDist[msgInfo[0]] += 1
+        else:
+            msgSizeDist[msgInfo[0]] = 1
+    prevProb = 0
+    fd4.write("{}\t{}\n".format(0.0, 0))
+    for msgSize, count in msgSizeDist.iteritems():
+        currentProb = count*1.0/totalMsgs
+        fd4.write("{}\t{}\n".format(prevProb + currentProb,
+                msgSize))
+        prevProb += currentProb 
+
     fd.close() 
     f.close()
+    fd1.close()
+    fd2.close()
+    fd3.close()
+    fd4.close()

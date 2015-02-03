@@ -1,5 +1,7 @@
 #This File Contains the cumulative probability distribution for the message
 #sizes. Each line has two values, space seperated: @prob    @msg_size
+#this file must have the size 0 in the first line eventhough probability of 
+#generating a message with size 0 is actually zero.
 
 0.0       0   
 0.6       1
