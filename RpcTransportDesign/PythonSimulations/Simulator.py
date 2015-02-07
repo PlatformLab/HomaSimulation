@@ -21,6 +21,7 @@ import os
 import sys
 import random
 import numpy as np
+from operator import sub
 from optparse import OptionParser
 
 """
@@ -28,11 +29,11 @@ from optparse import OptionParser
 
 ## @var avgDelay: The mean value for the delay distribution function. This value
 # is an integer.
-avgDelay = 3
+avgDelay = 5 
 
 ## @var fixedDelay: The constant delay every packet will experience in the
 #  network. This parameter is an integer.
-fixedDelay = 1
+fixedDelay = 0 
 
 def generateMsgSize(distMatrix):
     """A helper function that generates a message size from the cumulative
@@ -60,7 +61,7 @@ class RxQueue():
     (eg. lowest priority value in the packet) are always served first. 
     """
 
-    def __init__(self, prioQueue = {}):
+    def __init__(self):
         """ 
         @param  prioQueue: This is a dictionary from key:priority to value:list
                            of packets in that priority as [pkt1, pkt2, ...].
@@ -68,7 +69,7 @@ class RxQueue():
         @param  size: The total number of packets in this queue at the moment.
         """
 
-        self.prioQueue = prioQueue 
+        self.prioQueue = dict() 
         self.size = 0 
 
     def enqueue(self, pkt):
@@ -236,19 +237,29 @@ class Scheduler():
 
     def depleteDelayQueue(self):
         """This function practically abstracts out the propagation of the
-        packets out of the network and to the @p rxQueue. Everytime a packet is
-        completely transmitted through the network, it will add that packet to
-        the @p rxQueue and makes sure the rxQueue is kept sorted with respect to
-        packet priorities.
+        packets in the network until they are received at @p rxQueue. Everytime
+        a packet is completely transmitted through the network, it will add that
+        packet to the @p rxQueue and makes sure the rxQueue is kept sorted with
+        respect to packet priorities.
+
+        @return pktsArrivedRxQueue: A list of packets that have completely
+                                    traversed the network and removed from
+                                    the @p delayQueue and added to rxQueue.
+        @rtype  pktsArrivedRxQueue: list[pkt1,pkt2, pkt3, ...]
         """
+        
+        pktsArrivedRxQueue = list()
         for delayedPkt in self.delayQueue[:]:
             if (delayedPkt[-1] == 0):
                 pkt = delayedPkt[0:-1] 
                 self.rxQueue.enqueue(pkt)
+                pktsArrivedRxQueue.append(pkt[:])
                 self.delayQueue.remove(delayedPkt)
 
         for delayedPkt in self.delayQueue:
             delayedPkt[-1] -= 1
+
+        return pktsArrivedRxQueue
 
     def simpleScheduler(self, slot, pktOutTimes):
         """Impements the most simple SRPT scheduler scheme. At any simulation
@@ -281,32 +292,52 @@ class Scheduler():
         @retun  pktOutTimes: @see run() 
         @rtype  pktOutTimes: @see run()
         """
-        prio = 0 # The priority of all packets are the same
-        if (len(self.txQueue) > 0):
-
-            # Take the highest priority packet from the txQueueu and propaget it
-            # through the network by adding it to the delayQueue.
-            highPrioMsg = self.txQueue[0]
-            highPrioPkt = list([highPrioMsg[0], highPrioMsg[1], prio])
-            highPrioMsg[1] -= 1
-            self.addPktToDelayQueue(highPrioPkt, avgDelay)    
-            if (highPrioMsg[1] == 0):
-                self.txQueue.pop(0)
-                
-        # For the packets that have completely taransmitted through the network,
-        # put them in the rxQueue. Subsequently remove a packet from head of the
-        # line in the rxQueue and record its packet info in the @p pktOutTimes.
-        self.depleteDelayQueue()
+                        
+        # Remove a packet from head of the line in the rxQueue and record its
+        # packet info in the @p pktOutTimes. Subsequently for the packets that
+        # have completely taransmitted through the network, put them in the
+        # rxQueue and again update their packet info in @p pktOutTimes.
         pkt = self.rxQueue.dequeue()
         if pkt:
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
-            if (msgId in pktOutTimes):
-                pktOutTimes[msgId].append([slot, pktPrio, msgSize])
+            for pktInfo in pktOutTimes[msgId]:
+                if (pktInfo[0] == msgSize):
+                    pktInfo.append(slot)
+                    break
+
+        pktsArrivedRxQueue = self.depleteDelayQueue()
+        for pkt in pktsArrivedRxQueue:
+            msgId = pkt[0]
+            msgSize = pkt[1]
+            pktPrio = pkt[2]
+            for pktInfo in pktOutTimes[msgId]:
+                if (pktInfo[0] == msgSize):
+                    pktInfo.append(slot)
+                    break
+        
+        prio = 0 # The priority of all packets are the same
+        if (len(self.txQueue) > 0):
+
+            # Take the highest priority packet from the txQueueu and propaget it
+            # through the network by adding it to the delayQueue. Also for every
+            # scheduled packet update packet info in @p pktOutTimes. 
+            highPrioMsg = self.txQueue[0]
+            msgId = highPrioMsg[0]
+            msgSize = highPrioMsg[1]
+            highPrioPkt = list([msgId, msgSize, prio])
+            self.addPktToDelayQueue(highPrioPkt, avgDelay)    
+
+            if msgId in pktOutTimes:
+                pktOutTimes[msgId].append([msgSize, prio, slot])
             else:
                 pktOutTimes[msgId] = list()
-                pktOutTimes[msgId].append([slot, pktPrio, msgSize])
+                pktOutTimes[msgId].append([msgSize, prio, slot])
+
+            highPrioMsg[1] -= 1
+            if (highPrioMsg[1] == 0):
+                self.txQueue.pop(0)
 
     def idealScheduler(self, slot, pktOutTimes):
         """Implements the ideal scheduler (Oracle scheduler).
@@ -348,29 +379,48 @@ class Scheduler():
         @rtype  pktOutTimes: @see run()
 
         """
-        for msg in self.txQueue[:]:
 
-            # Set the priority same as the size
-            pkt = list([msg[0], msg[1], msg[1]])
-            self.addPktToDelayQueue(pkt, avgDelay)
-            if (msg[1] == 1):
-                self.txQueue.remove(msg)
-            else:
-                msg[1] -= 1
-            
-        self.depleteDelayQueue() 
         pkt = self.rxQueue.dequeue()
         if pkt:
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
-            if (msgId in pktOutTimes):
-                pktOutTimes[msgId].append([slot, pktPrio, msgSize])
+            for pktInfo in pktOutTimes[msgId]:
+                if (pktInfo[0] == msgSize):
+                    pktInfo.append(slot)
+                    break
+
+        pktsArrivedRxQueue = self.depleteDelayQueue() 
+        for pkt in pktsArrivedRxQueue:
+            msgId = pkt[0]
+            msgSize = pkt[1]
+            pktPrio = pkt[2]
+            for pktInfo in pktOutTimes[msgId]:
+                if (pktInfo[0] == msgSize):
+                    pktInfo.append(slot)
+                    break
+
+        for msg in self.txQueue[:]:
+
+            # Set the priority same as the size
+            msgId = msg[0]
+            msgSize = msg[1]
+            prio = msg[1]
+            pkt = list([msgId, msgSize, msgSize])
+            self.addPktToDelayQueue(pkt, avgDelay)
+
+            if msgId in pktOutTimes:
+                pktOutTimes[msgId].append([msgSize, prio, slot])
             else:
                 pktOutTimes[msgId] = list()
-                pktOutTimes[msgId].append([slot, pktPrio, msgSize])  
+                pktOutTimes[msgId].append([msgSize, prio, slot])
 
-
+            if (msg[1] == 1):
+                self.txQueue.remove(msg)
+            else:
+                msg[1] -= 1
+            
+        
 def collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist): 
     """For the input rxQueue, this function gather the size distribution of the
     rxQueue and also size of distribution of priority queues within that queue.
@@ -491,7 +541,6 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     for row in distMatrix: 
         sizeAvg += row[1] * (row[0] - prevProb)
         prevProb = row[0]
-    print sizeAvg
 
     probPerSlot = rho / sizeAvg # The prbability by which new messages will be
                                 # added to the txQueue.
@@ -534,7 +583,6 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     # Initialize the stats collecting datastructs
     # list of all possible msg sizes
     prioList = [int(x[1]) for x in distMatrix[1:]]
-    print prioList
     prioQueueSizeDist['ideal'] = {x:{} for x in prioList}
     queueSizeDist = prioQueueSizeDist['ideal']
     totalSizeDist = rxQueueSizeDist['ideal']
@@ -583,7 +631,7 @@ if __name__ == '__main__':
         if (line[0] != '#' and line[0] != '\n'):
             distMatrix.append(map(float, line.split( )))
     f.close()
-    print distMatrix
+    print "Comulative Message Size Distribution:\n"+str(distMatrix)
     
     f = open(outputDir + '/' + 'ideal_vs_simple_penalty', 'w')
     f.write("\tpenalty\trho\tavg_delay\n")
@@ -602,6 +650,9 @@ if __name__ == '__main__':
 
     fd4 = open(outputDir + '/' + 'output_msg_size_dist', 'w')
     fd4.write("\tprob\tmsg_size\n")
+
+    fd5 = open(outputDir + '/' + 'delays_break_down', 'w')
+    fd5.write("\trho\tscheduler\tsize\ttotal_delay\tserialization_delay\tscheduling_delay\tnetwork_delay\trxQueue_delay\n")
 
     msgDict = dict()
 
@@ -632,11 +683,14 @@ if __name__ == '__main__':
         penaltyPerSize = dict()
         for key in pktOutTimesSimple:
             if key in pktOutTimesIdeal:
-                pktTimesSimple = [pkt_inf[0] for pkt_inf in
-                    pktOutTimesSimple[key]]
-                pktTimesIdeal = [pkt_inf[0] for pkt_inf in
-                    pktOutTimesIdeal[key]]
+
+                # a list of completion times for the packets of this msg 
+                pktTimesSimple = [pktInf[-1] for pktInf in
+                    pktOutTimesSimple[key] if len(pktInf) == 5]
+                pktTimesIdeal = [pktInf[-1] for pktInf in
+                    pktOutTimesIdeal[key] if len(pktInf) == 5]
                 msgSize = msgDict[key][0]
+                msgBeginSlot = msgDict[key][1]
 
                 #only calculate the penalty for this message if all packets from
                 #this message has the simulation in both simple and ideal
@@ -671,6 +725,50 @@ if __name__ == '__main__':
 
                         penaltyPerSize[msgSize][1] += 1
 
+                    # Record delay break downs
+                    serialDelaySimple = msgSize
+                    schedulingSlotSimple = [pktInf[2] for pktInf in
+                            pktOutTimesSimple[key]]
+                    scheduleDelaySimple = max(map(sub, schedulingSlotSimple, 
+                            range(msgBeginSlot, msgBeginSlot +
+                            int(msgSize))))
+
+                    rxQueueArrivalSlots = [pktInf[3] for pktInf in
+                            pktOutTimesSimple[key]]
+                    destArrivalSlots = [pktInf[4] for pktInf in
+                            pktOutTimesSimple[key]]
+                    rxQueueDelaySimple = (max(destArrivalSlots) -
+                            max(rxQueueArrivalSlots) - 1)
+                    networkDelaySimple = (msgCompletionTimeSimple -
+                            serialDelaySimple - scheduleDelaySimple -
+                            rxQueueDelaySimple)
+                    fd5.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(rho,
+                            'simple',msgSize,msgCompletionTimeSimple,
+                            serialDelaySimple, scheduleDelaySimple,
+                            networkDelaySimple,rxQueueDelaySimple))
+                    
+                    serialDelayIdeal = msgSize
+                    schedulingSlotIdeal = [pktInf[2] for pktInf in
+                            pktOutTimesIdeal[key]]
+                    scheduleDelayIdeal = max(map(sub, schedulingSlotIdeal, 
+                            range(msgBeginSlot, msgBeginSlot +
+                            int(msgSize))))
+
+                    rxQueueArrivalSlots = [pktInf[3] for pktInf in
+                            pktOutTimesIdeal[key]]
+                    destArrivalSlots = [pktInf[4] for pktInf in
+                            pktOutTimesIdeal[key]]
+                    rxQueueDelayIdeal = (max(destArrivalSlots) -
+                            max(rxQueueArrivalSlots) - 1)
+                    networkDelayIdeal = (msgCompletionTimeIdeal -
+                            serialDelayIdeal - scheduleDelayIdeal -
+                            rxQueueDelayIdeal)
+                    fd5.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(rho,
+                            'ideal',msgSize,msgCompletionTimeIdeal,
+                            serialDelayIdeal, scheduleDelayIdeal,
+                            networkDelayIdeal,rxQueueDelayIdeal))
+
+
         f.write("{}\t{}\t{}\t{}\n".format(n+1, penalty/numMsg,
                 rho, avgDelay+fixedDelay))
 
@@ -691,8 +789,8 @@ if __name__ == '__main__':
         # Now find the rxQueue statistical size distribution for both ideal and
         # simple scheduler.
         for key in pktOutTimesSimple:
-            pktTimesSimple = [pkt_inf[0] for pkt_inf in
-                pktOutTimesSimple[key]]
+            pktTimesSimple = [pktInf[-1] for pktInf in
+                pktOutTimesSimple[key] if len(pktInf) == 5]
             msgSize = msgDict[key][0]
 
             #only calculate the completion time for this message if all packets
@@ -717,8 +815,8 @@ if __name__ == '__main__':
                 
         compTimeDist = dict()
         for key in pktOutTimesIdeal:
-            pktTimesIdeal = [pkt_inf[0] for pkt_inf in
-                pktOutTimesIdeal[key]]
+            pktTimesIdeal = [pktInf[-1] for pktInf in
+                pktOutTimesIdeal[key] if len(pktInf) == 5]
             msgSize = msgDict[key][0]
 
             #only calculate the completion time for this message if all packets
@@ -779,3 +877,4 @@ if __name__ == '__main__':
     fd2.close()
     fd3.close()
     fd4.close()
+    fd5.close()
