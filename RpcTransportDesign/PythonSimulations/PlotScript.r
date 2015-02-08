@@ -22,75 +22,50 @@ pdf("plots/PenaltyPerSize.pdf")
 plotPenaltyPerSize + geom_line(aes(color = rho), size = 3, alpha = 1/2) + labs(title = expression(frac(1,N)*Sigma*frac(CompletionTime[simple]-CompletionTime[ideal], CompletionTime[ideal]) * "   VS.  Message Sizes"))
 dev.off()
 
-compTimeDist <- read.table("output/completion_time_distribution", col.names=c('rho','scheduler','msgSize','compTime','count'))
+compTimeDist <- read.table("output/completion_time_distribution", col.names=c('rho','scheduler','msgSize','compTime','count'), header=TRUE)
 compTimeDist$rho <- factor(compTimeDist$rho)
 compTimeDist$scheduler <- factor(compTimeDist$scheduler)
 compTimeDist$msgSize <- factor(compTimeDist$msgSize)
-summary(compTimeDist)
 
-compDist <- read.table("output/compTime_rho15_simple_size1", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y = cumsum(count)))
-pdf('plots/compTime_rho15_simple_size1.pdf')
-plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.15, simple scheduler, size=1pkt")
-dev.off()
+compTimeDist.filtered = list()
+rhos = c(0.15, 0.55, .95)
+msgSize = c(1, 2, 5, 9, 10)
+i = 1
+for (rho in rhos){
+    scheduler <- c()
+    compTime <- c()
+    count <- c()
+    messageSize <- c()
+    for (sizeMsg in msgSize){
+        scheduler<-c(scheduler, as.vector(compTimeDist$scheduler[compTimeDist$rho == rho & compTimeDist$msgSize == sizeMsg]))
+        compTime<-c(compTime, compTimeDist$compTime[compTimeDist$rho == rho & compTimeDist$msgSize == sizeMsg])
+        count<-c(count, compTimeDist$count[compTimeDist$rho == rho & compTimeDist$msgSize == sizeMsg])
+        messageSize<-c(messageSize, compTimeDist$msgSize[compTimeDist$rho == rho & compTimeDist$msgSize == sizeMsg])
+    }
+    compTimeDist.filtered[[i]] <- data.frame(scheduler, messageSize, compTime, count)
+    compTimeDist.filtered[[i]]$scheduler <- factor(compTimeDist.filtered[[i]]$scheduler)
+    compTimeDist.filtered[[i]]$messageSize <- factor(compTimeDist.filtered[[i]]$messageSize)
 
-compDist <- read.table("output/compTime_rho15_ideal_size1", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho15_ideal_size1.pdf')
-plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.15, ideal scheduler, size=1pkt")
-dev.off()
+    #order the dataframe by the scheduler and compTime 
+    compTimeDist.filtered[[i]] <- compTimeDist.filtered[[i]][with(compTimeDist.filtered[[i]], order(scheduler, messageSize, compTime)),]
+    
+    #calculate the cumulative distribution of the completion times and add it to
+    #as a new column to the compTimeDist.filtered dataframe
+    compTime.distribution <- tapply(compTimeDist.filtered[[i]]$count, list(compTimeDist.filtered[[i]]$messageSize, compTimeDist.filtered[[i]]$scheduler), function(x) cumsum(x)/sum(x))
+    tmp <- c()
+    for (cumDistVec in compTime.distribution) {
+        tmp <- c(tmp, cumDistVec)
+    }
+    compTimeDist.filtered[[i]]$compTime.distribution <- tmp
+    
+    #plot the completion time distribution
+    plotDist <- ggplot(compTimeDist.filtered[[i]], aes(x=compTime, y=compTime.distribution))
+    pdf(sprintf("plots/compTimeDistribution_rho%d.pdf", floor(rho*100)), width=10, height=20 )
+    print(plotDist + geom_step(aes(color=scheduler), size = 1, alpha = 1/2) + labs(title = sprintf("Distribution of completion time, rho=%f",rho)) + facet_grid(messageSize~scheduler, scales="free_x"))
+    dev.off()
 
-compDist <- read.table("output/compTime_rho95_simple_size1", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho95_simple_size1.pdf')
-plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.95, simple scheduler, size=1pkt")
-dev.off()
-
-compDist <- read.table("output/compTime_rho95_ideal_size1", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho95_ideal_size1.pdf')
-plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.95, ideal scheduler, size=1pkt")
-dev.off()
-
-compDist <- read.table("output/compTime_rho15_simple_size8", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho15_simple_size8.pdf')
-plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.15, simple scheduler, size=8pkt")
-dev.off()
-
-compDist <- read.table("output/compTime_rho15_ideal_size8", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho15_ideal_size8.pdf')
-plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.15, ideal scheduler, size=8pkt")
-dev.off()
-
-compDist <- read.table("output/compTime_rho95_simple_size8", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho95_simple_size8.pdf')
-plotDist + geom_line(color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.95, simple scheduler, size=8pkt")
-dev.off()
-
-compDist <- read.table("output/compTime_rho95_ideal_size8", col.names=c('compTime','count'), header=TRUE)
-compDist$count <- (compDist$count)/sum(compDist$count)
-compDist <- compDist[with(compDist,order(compTime)),]
-plotDist <- ggplot(compDist, aes(x = compTime, y=cumsum(count)))
-pdf('plots/compTime_rho95_ideal_size8.pdf')
-plotDist + geom_line( color = "red", size = 1, alpha = 1/2) + labs(title = "Distribution of completion time, rho=0.95, ideal scheduler, size=8pkt")
-dev.off()
+    i = i+1
+}
 
 rxQueueDist <- read.table("output/queueDist_rho35_simple", col.names=c('queueSize','count'), header=TRUE)
 rxQueueDist$count <- (rxQueueDist$count)/sum(rxQueueDist$count)
