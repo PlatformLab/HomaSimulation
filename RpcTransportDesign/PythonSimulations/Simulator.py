@@ -503,13 +503,16 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
                          key:message_id to a value:list[pkt_info]. Each pkt_info
                          in this list is some information for one packet that
                          belongs to that message identified by message_id. Each
-                         pkt_info is a list of three elements as
-                         pkt_info[time_slot, priority, msgSize] that is the time
-                         slot at which the packet has left the rxQueue
-                         (completed the simulation cycle) and the priority that
-                         was assigned to that packet by the scheduler and the
-                         remaining size of the message when that packet was
-                         scheduled. 
+                         pkt_info is a list of five elements as
+                         pkt_info[msgSize, priority, scheduling_slot,
+                         rxQueue_arrival_slot, destination_arrival_slot] that is
+                         the remaining size of the message when that packet was
+                         scheduled, the priority that was assigned to that
+                         packet by the scheduler, the time slot at which the
+                         packet has left the txQueue, the time slot at which the
+                         packet left delayQueue and arrived at rxQueue, and the
+                         time slot at which the packet left rxQueue (arrived at
+                         destination and completed the simulation cycle). 
     @rtype  pktOutTimes: dict{ key(scheduler) :
                                value( dict{ key(messge_id) : 
                                             value([pkt_info1, pkt_info2,..]) } }
