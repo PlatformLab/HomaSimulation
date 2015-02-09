@@ -144,7 +144,7 @@ class RxQueue():
             return 0
 
     def getTotalSize(self):
-        """Return the the current total size of this queue. (sum of the numver
+        """Return the the current total size of this queue. (sum of the number
         of packets in all priority queues in this class.)
 
         @param  self: pointer object to this class.
@@ -555,8 +555,9 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
 
     # Generate a new message in each round of simulation based on the given
     # distribution of sizes and given input rate of packets. Run this simulation
-    # for total of \p steps rounds. At the end return the result in \p
-    # pktOutTimes.
+    # for total of \p steps rounds and then continue runnig the simulation until
+    # all packets in the system are arrived at the destination. At the end
+    # return the result in \p pktOutTimes.
     # Initialize the stats collecting datastructs
     prioList = [0]
     prioQueueSizeDist['simple'] = {x:{} for x in prioList}
@@ -574,6 +575,16 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
 
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
+
+    while (rxQueue.getTotalSize() > 0 or len(txQueue) > 0 or
+            len(delayQueue) > 0):
+
+        slot += 1
+        scheduler.idealScheduler(slot, pktOutTimes['simple'])   
+
+        # Collect the stats after running scheduler
+        collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
+
 
     # Run ideal scheduler for the exact same message distribution as the one we
     # ran simple scheduler for in previous loop.
@@ -598,6 +609,14 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
             msgId += 1
         scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
         
+        # Collect the stats after running scheduler
+        collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
+
+    while (rxQueue.getTotalSize() > 0 or len(txQueue) > 0 or
+            len(delayQueue) > 0):
+        slot += 1
+        scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
+
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
 
