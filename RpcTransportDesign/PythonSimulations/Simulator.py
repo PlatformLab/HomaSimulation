@@ -646,7 +646,7 @@ if __name__ == '__main__':
     fd2.write("\trho\tscheduler\tprio_queue\tsize\tcount\n")
 
     fd3 = open(outputDir + '/' + 'rx_queue_total_size_dist', 'w')
-    fd3.write("\trho\tscheduler\tsize\tcount\n")
+    fd3.write("\trho\tscheduler\tqueue_size\tcount\n")
 
     fd4 = open(outputDir + '/' + 'output_msg_size_dist', 'w')
     fd4.write("\tprob\tmsg_size\n")
