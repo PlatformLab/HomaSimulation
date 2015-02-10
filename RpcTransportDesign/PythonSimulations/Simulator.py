@@ -560,7 +560,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     # return the result in \p pktOutTimes.
     # Initialize the stats collecting datastructs
     prioList = [0]
-    prioQueueSizeDist['simple'] = {x:{} for x in prioList}
+    prioQueueSizeDist['simple'] = dict((x, dict()) for x in prioList)
     queueSizeDist = prioQueueSizeDist['simple']
     totalSizeDist = rxQueueSizeDist['simple']
     for slot in range(steps):
@@ -597,7 +597,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     # Initialize the stats collecting datastructs
     # list of all possible msg sizes
     prioList = [int(x[1]) for x in distMatrix[1:]]
-    prioQueueSizeDist['ideal'] = {x:{} for x in prioList}
+    prioQueueSizeDist['ideal'] = dict((x,dict()) for x in prioList)
     queueSizeDist = prioQueueSizeDist['ideal']
     totalSizeDist = rxQueueSizeDist['ideal']
 
