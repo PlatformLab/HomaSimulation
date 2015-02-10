@@ -764,7 +764,7 @@ if __name__ == '__main__':
                     networkDelaySimple = (msgCompletionTimeSimple -
                             serialDelaySimple - scheduleDelaySimple -
                             rxQueueDelaySimple)
-                    fd5.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(rho,
+                    fd5.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n".format(rho,
                             'simple',msgSize,msgCompletionTimeSimple,
                             serialDelaySimple, scheduleDelaySimple,
                             networkDelaySimple,rxQueueDelaySimple))
@@ -785,17 +785,17 @@ if __name__ == '__main__':
                     networkDelayIdeal = (msgCompletionTimeIdeal -
                             serialDelayIdeal - scheduleDelayIdeal -
                             rxQueueDelayIdeal)
-                    fd5.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(rho,
+                    fd5.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n".format(rho,
                             'ideal',msgSize,msgCompletionTimeIdeal,
                             serialDelayIdeal, scheduleDelayIdeal,
                             networkDelayIdeal,rxQueueDelayIdeal))
 
 
-        f.write("{}\t{}\t{}\t{}\n".format(n+1, penalty/numMsg,
+        f.write("{0}\t{1}\t{2}\t{3}\n".format(n+1, penalty/numMsg,
                 rho, avgDelay+fixedDelay))
 
         for key in penaltyPerSize:
-            fd.write("{}\t{}\t{}\n".format(
+            fd.write("{0}\t{1}\t{2}\n".format(
                     penaltyPerSize[key][0]/penaltyPerSize[key][1] if
                     penaltyPerSize[key][1] != 0 else 0.0, key, rho))
 
@@ -832,7 +832,7 @@ if __name__ == '__main__':
         
         for msgSize, val in compTimeDist.iteritems():
             for compTime, count in val.iteritems():
-                fd1.write("{}\t{}\t{}\t{}\t{}\n".format(rho, 'simple', msgSize,
+                fd1.write("{0}\t{1}\t{2}\t{3}\t{4}\n".format(rho, 'simple', msgSize,
                 compTime, count))
                 
         compTimeDist = dict()
@@ -857,23 +857,23 @@ if __name__ == '__main__':
         
         for msgSize, val in compTimeDist.iteritems():
             for compTime, count in val.iteritems():
-                fd1.write("{}\t{}\t{}\t{}\t{}\n".format(rho, 'ideal', msgSize,
+                fd1.write("{0}\t{1}\t{2}\t{3}\t{4}\n".format(rho, 'ideal', msgSize,
                 compTime, count))
         
         # Now record queue size distributions in the file
         for schdlr, prioQuDist in prioQueueSizeDist.iteritems():
             for prioQ, sizeDist in prioQuDist.iteritems():
                 for size, count in sizeDist.iteritems():
-                    fd2.write("{}\t{}\t{}\t{}\t{}\n".format(rho, schdlr, 
+                    fd2.write("{0}\t{1}\t{2}\t{3}\t{4}\n".format(rho, schdlr, 
                             prioQ, size, count))
 
         # Now record total rx queue size distribution
         for schdlr, sizeDist in rxQueueSizeDist.iteritems():
             for size, count in sizeDist.iteritems():
-                 fd3.write("{}\t{}\t{}\t{}\n".format(rho, schdlr, 
+                 fd3.write("{0}\t{1}\t{2}\t{3}\n".format(rho, schdlr, 
                             size, count))
 
-        print "Simulation Complete for rho={}".format(rho)
+        print "Simulation Complete for rho={0}".format(rho)
 
     # Record distribution of generated message sizes only once for the 
     # last simulation
@@ -886,10 +886,10 @@ if __name__ == '__main__':
         else:
             msgSizeDist[msgInfo[0]] = 1
     prevProb = 0
-    fd4.write("{}\t{}\n".format(0.0, 0))
+    fd4.write("{0}\t{1}\n".format(0.0, 0))
     for msgSize, count in msgSizeDist.iteritems():
         currentProb = count*1.0/totalMsgs
-        fd4.write("{}\t{}\n".format(prevProb + currentProb,
+        fd4.write("{0}\t{1}\n".format(prevProb + currentProb,
                 msgSize))
         prevProb += currentProb 
 
