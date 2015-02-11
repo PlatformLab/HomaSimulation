@@ -93,7 +93,7 @@ for (rho_ in rhos) {
     }
     rxQueueDist[[i]]$queue_size_distribution <- tmp
     plotList[[i]] <- ggplot(rxQueueDist[[i]], aes(x=queue_size, y=queue_size_distribution)) + geom_step(aes(color=scheduler), size = 1, alpha = 1/2) +
-            labs(title = sprintf("Distribution of rxQueue Size, rho=%.2f", rho)) + facet_wrap(~scheduler, scales="free_x", ncol=2)
+            labs(title = sprintf("Distribution of rxQueue Size, rho=%.2f", rho_)) + facet_wrap(~scheduler, scales="free_x", ncol=2)
 }
 pdf("plots/rxQueue_size_distribution.pdf", width=20, height=20 )
 do.call(grid.arrange, plotList)

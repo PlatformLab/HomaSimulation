@@ -552,7 +552,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     delayQueue = list()
     scheduler = Scheduler(txQueue, rxQueue, delayQueue)
     msgId = 0
-
+    totalPkts = 0
     # Generate a new message in each round of simulation based on the given
     # distribution of sizes and given input rate of packets. Run this simulation
     # for total of \p steps rounds and then continue runnig the simulation until
@@ -570,6 +570,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
             msgDict[msgId] = [newMsg[1], slot] 
             msgId += 1
+            totalPkts += newMsg[1]
 
         scheduler.simpleScheduler(slot, pktOutTimes['simple'])
 
@@ -585,6 +586,8 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
 
+    print ("Finished running simple scheduler for rho={0} in {1}"+
+            " slots").format(rho, slot+1)
 
     # Run ideal scheduler for the exact same message distribution as the one we
     # ran simple scheduler for in previous loop.
@@ -600,6 +603,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     prioQueueSizeDist['ideal'] = dict((x,dict()) for x in prioList)
     queueSizeDist = prioQueueSizeDist['ideal']
     totalSizeDist = rxQueueSizeDist['ideal']
+
 
     for slot in range(steps):
         if (msgId in msgDict and msgDict[msgId][1] == slot):
@@ -619,6 +623,11 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
 
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
+
+    print ("Finished running ideal scheduler for rho={0} in {1}"+
+            " slots").format(rho, slot+1)
+    print (("Finished simulation for rho={0}, for total of {1} messages" +
+            " comprised of total of {2} packets.").format(rho, msgId, totalPkts))
 
 if __name__ == '__main__':
     parser = OptionParser(description='Runs a simplified simulations for'
@@ -715,8 +724,8 @@ if __name__ == '__main__':
                 msgBeginSlot = msgDict[key][1]
 
                 #only calculate the penalty for this message if all packets from
-                #this message has the simulation in both simple and ideal
-                #scheduler simulations.
+                #this message has completed the simulation in both simple and
+                #ideal scheduler simulations.
                 if (msgSize == len(pktTimesSimple) and
                         msgSize == len(pktTimesIdeal)):
                     msgCompletionTimeSimple = (max(pktTimesSimple) -
@@ -764,8 +773,8 @@ if __name__ == '__main__':
                     networkDelaySimple = (msgCompletionTimeSimple -
                             serialDelaySimple - scheduleDelaySimple -
                             rxQueueDelaySimple)
-                    fd5.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n".format(rho,
-                            'simple',msgSize,msgCompletionTimeSimple,
+                    fd5.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n".format(
+                            rho, 'simple',msgSize,msgCompletionTimeSimple,
                             serialDelaySimple, scheduleDelaySimple,
                             networkDelaySimple,rxQueueDelaySimple))
                     
@@ -872,8 +881,6 @@ if __name__ == '__main__':
             for size, count in sizeDist.iteritems():
                  fd3.write("{0}\t{1}\t{2}\t{3}\n".format(rho, schdlr, 
                             size, count))
-
-        print "Simulation Complete for rho={0}".format(rho)
 
     # Record distribution of generated message sizes only once for the 
     # last simulation
