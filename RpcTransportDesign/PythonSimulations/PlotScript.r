@@ -25,6 +25,52 @@ plotPenaltyPerSize + geom_line(aes(color = rho), size = 3, alpha = 1/2) +
         labs(title = expression(frac(1,N)*Sigma*frac(CompletionTime[simple]-CompletionTime[ideal], CompletionTime[ideal]) * "   VS.  Message Sizes"))
 dev.off()
 
+#plot dupplicate of penaltyPerRho and penaltyPerSize graphs based on the data
+#from delay_break_down output files. This is just a sanity check that verifies
+#we generate same plot from two different data
+delays <- read.table("output/delays_break_down", col.names=c('rho', 'scheduler', 'size', 'totalDelay','serializationDelay', 'schedulingDelay', 'networkDelay','rxQueueDelay'), header=TRUE)
+delaySubset <- subset(delays, TRUE, c('rho', 'scheduler', 'size', 'totalDelay'))
+delaySubset$rho <- factor(delaySubset$rho)
+delaySubset$scheduler <- factor(delaySubset$scheduler)
+
+totalAvgPenalty <- c() 
+rhos <- c()
+msgSize <- c()
+penaltyPerSize <- c()
+for (rho_ in levels(delaySubset$rho)) {
+    delayList <- list()
+    for (scheduler_ in levels(delaySubset$scheduler)){
+        delayList[[scheduler_]] <- subset(delaySubset, rho == rho_ & scheduler == scheduler_, c('size', 'totalDelay'))
+    }
+    delayPenalty <- c()
+    delayPenalty <- ((delayList$simple$totalDelay - delayList$ideal$totalDelay) / delayList$ideal$totalDelay)
+    totalAvgPenalty <- c(totalAvgPenalty, sum(delayPenalty)/length(delayPenalty))
+    sizes <- delayList$ideal$size
+    delayPenalty <- data.frame(sizes, delayPenalty)
+    delayPenalty$sizes <- factor(delayPenalty$sizes)
+    for (size in levels(delayPenalty$sizes)) {
+        rhos <- c(rhos, rho_) 
+        msgSize <- c(msgSize, size)
+        delayPenaltySub <- subset(delayPenalty, sizes==size, c('delayPenalty'))$delayPenalty
+        penaltyPerSize <- c(penaltyPerSize, sum(delayPenaltySub)/length(delayPenaltySub))
+    }
+}
+penaltyPerSize <- data.frame(penalty=penaltyPerSize, size=as.numeric(msgSize), rho=rhos)
+penaltyPerSize$rho <- factor(penaltyPerSize$rho)
+penaltyPerRho <- data.frame(rho=as.numeric(levels(delaySubset$rho)), penalty=totalAvgPenalty)
+plotPenaltyPerRho <- ggplot(penaltyPerRho, aes(x = rho, y = penalty))
+
+pdf('plots/PenaltyPerRho_Dupplicate.pdf')
+plotPenaltyPerRho + geom_line(color = "red", size = 3, alpha = 1/2) + 
+    labs(title = expression(frac(1,N)*Sigma*frac(CompletionTime[simple]-CompletionTime[ideal], CompletionTime[ideal]) * "   VS.   Average Load (Dupplicate Plot)"))
+dev.off()
+
+plotPenaltyPerSize <- ggplot(penaltyPerSize, aes(x = size, y = penalty))
+pdf("plots/PenaltyPerSize_Dupplicate.pdf")
+plotPenaltyPerSize + geom_line(aes(color = rho), size = 3, alpha = 1/2) + 
+        labs(title = expression(frac(1,N)*Sigma*frac(CompletionTime[simple]-CompletionTime[ideal], CompletionTime[ideal]) * "   VS.  Message Sizes (Dupplicate Plot)"))
+dev.off()
+
 #plot completion time distribution for different message sizes and rho values
 compTimeDist <- read.table("output/completion_time_distribution", col.names=c('rho','scheduler','msgSize','compTime','count'), header=TRUE)
 compTimeDist$rho <- factor(compTimeDist$rho)
@@ -100,7 +146,6 @@ do.call(grid.arrange, plotList)
 dev.off()
 
 #plot delay breakdown distribution
-delays <- read.table("output/delays_break_down", col.names=c('rho', 'scheduler', 'size', 'totalDelay','serializationDelay', 'schedulingDelay', 'networkDelay','rxQueueDelay'), header=TRUE)
 delays$rho <- factor(delays$rho)
 delays$scheduler <- factor(delays$scheduler)
 rhos = c()
