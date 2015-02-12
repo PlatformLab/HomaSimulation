@@ -629,6 +629,16 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     print (("Finished simulation for rho={0}, for total of {1} messages" +
             " comprised of total of {2} packets.").format(rho, msgId, totalPkts))
 
+def writeToFile(fd, rowVector, width = 12):
+    """prints the elements in rowVector to a line in the file with the
+    descriptor fd and adjust the the space between all elements in that line to
+    be equal to width. Note that fd must be already open and writable before it
+    is given to this function otherwise this function will throw exception.
+
+    @param
+    """
+    fd.write(''.join(str(element).rjust(width) for element in rowVector) + '\n')
+
 if __name__ == '__main__':
     parser = OptionParser(description='Runs a simplified simulations for'
             ' credit based transport schemes.')
@@ -665,25 +675,27 @@ if __name__ == '__main__':
     print "Comulative Message Size Distribution:\n"+str(distMatrix)
     
     f = open(outputDir + '/' + 'ideal_vs_simple_penalty', 'w')
-    f.write("\tpenalty\trho\tavg_delay\n")
+    writeToFile(f, ["penalty", "rho", "avg_delay"], 12)
 
     fd = open(outputDir + '/' + 'ideal_vs_simple_rho_fixed', 'w')
-    fd.write("\tpenalty\tsize\trho\n")
+    writeToFile(fd, ["penalty", "size", "rho"])
 
     fd1 = open(outputDir + '/' + 'completion_time_distribution', 'w')
-    fd1.write("\trho\tscheduler\tsize\tcomp_time\tcount\n")
+    writeToFile(fd1, ['rho', 'scheduler', 'size', 'comp_time', 'count'], 12)
 
     fd2 = open(outputDir + '/' + 'prio_queue_size_dist', 'w')
-    fd2.write("\trho\tscheduler\tprio_queue\tsize\tcount\n")
+    writeToFile(fd2, ['rho', 'scheduler', 'prio_queue', 'size', 'count'], 12)
 
     fd3 = open(outputDir + '/' + 'rx_queue_total_size_dist', 'w')
-    fd3.write("\trho\tscheduler\tqueue_size\tcount\n")
+    writeToFile(fd3, ['rho', 'scheduler', 'queue_size', 'count'])
 
     fd4 = open(outputDir + '/' + 'output_msg_size_dist', 'w')
-    fd4.write("\tprob\tmsg_size\n")
+    writeToFile(fd4, ['prob', 'msg_size'])
 
     fd5 = open(outputDir + '/' + 'delays_break_down', 'w')
-    fd5.write("\trho\tscheduler\tsize\ttotal_delay\tserialization_delay\tscheduling_delay\tnetwork_delay\trxQueue_delay\n")
+    writeToFile(fd5, ['rho', 'scheduler', 'size', 'total_delay',
+            'serialization_delay', 'scheduling_delay', 'network_delay',
+            'rxQueue_delay'], 20)
 
     msgDict = dict()
 
@@ -773,10 +785,10 @@ if __name__ == '__main__':
                     networkDelaySimple = (msgCompletionTimeSimple -
                             serialDelaySimple - scheduleDelaySimple -
                             rxQueueDelaySimple)
-                    fd5.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n".format(
-                            rho, 'simple',msgSize,msgCompletionTimeSimple,
-                            serialDelaySimple, scheduleDelaySimple,
-                            networkDelaySimple,rxQueueDelaySimple))
+                    writeToFile(fd5, [rho, 'simple', msgSize,
+                            msgCompletionTimeSimple, serialDelaySimple,
+                            scheduleDelaySimple, networkDelaySimple,
+                            rxQueueDelaySimple], 20)
                     
                     serialDelayIdeal = msgSize
                     schedulingSlotIdeal = [pktInf[2] for pktInf in
@@ -794,19 +806,17 @@ if __name__ == '__main__':
                     networkDelayIdeal = (msgCompletionTimeIdeal -
                             serialDelayIdeal - scheduleDelayIdeal -
                             rxQueueDelayIdeal)
-                    fd5.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n".format(rho,
-                            'ideal',msgSize,msgCompletionTimeIdeal,
-                            serialDelayIdeal, scheduleDelayIdeal,
-                            networkDelayIdeal,rxQueueDelayIdeal))
+                    writeToFile(fd5, [rho, 'ideal', msgSize,
+                            msgCompletionTimeIdeal, serialDelayIdeal,
+                            scheduleDelayIdeal, networkDelayIdeal,
+                            rxQueueDelayIdeal], 20)
 
 
-        f.write("{0}\t{1}\t{2}\t{3}\n".format(n+1, penalty/numMsg,
-                rho, avgDelay+fixedDelay))
+        writeToFile(f, ['{0:6f}'.format(penalty/numMsg), rho, avgDelay+fixedDelay], 12)
 
         for key in penaltyPerSize:
-            fd.write("{0}\t{1}\t{2}\n".format(
-                    penaltyPerSize[key][0]/penaltyPerSize[key][1] if
-                    penaltyPerSize[key][1] != 0 else 0.0, key, rho))
+            writeToFile(fd, ['{0:6f}'.format(penaltyPerSize[key][0]/penaltyPerSize[key][1] if
+                    penaltyPerSize[key][1] != 0 else 0.0), key, rho])
 
         # compTimeDist is a dictionary variable that for every rho value,
         # records the distribution of completion times for every message size
@@ -841,8 +851,7 @@ if __name__ == '__main__':
         
         for msgSize, val in compTimeDist.iteritems():
             for compTime, count in val.iteritems():
-                fd1.write("{0}\t{1}\t{2}\t{3}\t{4}\n".format(rho, 'simple', msgSize,
-                compTime, count))
+                writeToFile(fd1, [rho, 'simple', msgSize, compTime, count], 12)
                 
         compTimeDist = dict()
         for key in pktOutTimesIdeal:
@@ -866,21 +875,18 @@ if __name__ == '__main__':
         
         for msgSize, val in compTimeDist.iteritems():
             for compTime, count in val.iteritems():
-                fd1.write("{0}\t{1}\t{2}\t{3}\t{4}\n".format(rho, 'ideal', msgSize,
-                compTime, count))
+                writeToFile(fd1, [rho, 'ideal', msgSize, compTime, count], 12)
         
         # Now record queue size distributions in the file
         for schdlr, prioQuDist in prioQueueSizeDist.iteritems():
             for prioQ, sizeDist in prioQuDist.iteritems():
                 for size, count in sizeDist.iteritems():
-                    fd2.write("{0}\t{1}\t{2}\t{3}\t{4}\n".format(rho, schdlr, 
-                            prioQ, size, count))
+                    writeToFile(fd2, [rho, schdlr, prioQ, size, count], 12 )
 
         # Now record total rx queue size distribution
         for schdlr, sizeDist in rxQueueSizeDist.iteritems():
             for size, count in sizeDist.iteritems():
-                 fd3.write("{0}\t{1}\t{2}\t{3}\n".format(rho, schdlr, 
-                            size, count))
+                writeToFile(fd3, [rho, schdlr, size, count])
 
     # Record distribution of generated message sizes only once for the 
     # last simulation
@@ -893,11 +899,10 @@ if __name__ == '__main__':
         else:
             msgSizeDist[msgInfo[0]] = 1
     prevProb = 0
-    fd4.write("{0}\t{1}\n".format(0.0, 0))
+    writeToFile(fd4, [0.0, 0])
     for msgSize, count in msgSizeDist.iteritems():
         currentProb = count*1.0/totalMsgs
-        fd4.write("{0}\t{1}\n".format(prevProb + currentProb,
-                msgSize))
+        writeToFile(fd4, ['{0:6f}'.format(prevProb + currentProb), msgSize])
         prevProb += currentProb 
 
     fd.close() 

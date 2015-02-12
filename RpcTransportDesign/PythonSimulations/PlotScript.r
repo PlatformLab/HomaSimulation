@@ -3,7 +3,7 @@
 library(reshape2)
 library(ggplot2)
 library(gridExtra)
-penaltyPerRho <- read.table("output/ideal_vs_simple_penalty")
+penaltyPerRho <- read.table("output/ideal_vs_simple_penalty", col.names=c('penalty', 'rho', 'avg_delay'), header=TRUE)
 penaltyPerRho$avg_delay <- factor(penaltyPerRho$avg_delay)
 plotPenaltyPerRho <- ggplot(penaltyPerRho, aes(x = rho, y = penalty))
 pdf('plots/PenaltyPerRho.pdf')
@@ -17,7 +17,7 @@ pdf('plots/DistributionPlot.pdf')
 plotDist + geom_bar(stat = "identity", color = "red", size = 1, alpha = 1/2) + labs(title = "Cumulative Distribution of Message Size")
 dev.off()
 
-penaltyPerSize <- read.table("output/ideal_vs_simple_rho_fixed", header=TRUE)
+penaltyPerSize <- read.table("output/ideal_vs_simple_rho_fixed", col.names=c('penalty', 'size', 'rho'), header=TRUE)
 penaltyPerSize$rho = factor(penaltyPerSize$rho)
 plotPenaltyPerSize <- ggplot(penaltyPerSize, aes(x = size, y = penalty))
 pdf("plots/PenaltyPerSize.pdf")
@@ -69,6 +69,56 @@ plotPenaltyPerSize <- ggplot(penaltyPerSize, aes(x = size, y = penalty))
 pdf("plots/PenaltyPerSize_Dupplicate.pdf")
 plotPenaltyPerSize + geom_line(aes(color = rho), size = 3, alpha = 1/2) + 
         labs(title = expression(frac(1,N)*Sigma*frac(CompletionTime[simple]-CompletionTime[ideal], CompletionTime[ideal]) * "   VS.  Message Sizes (Dupplicate Plot)"))
+dev.off()
+
+#plot delay breakdown distribution
+delays$rho <- factor(delays$rho)
+delays$scheduler <- factor(delays$scheduler)
+rhos = c()
+schedulers = c()
+serialDel = c()
+schedulingDel = c()  
+networkDel = c()
+rxqueueDel = c()
+for (rho in levels(delays$rho)){
+    for (scheduler in levels(delays$scheduler)){
+        rhos <- c(rhos, rho)
+        schedulers <- c(schedulers, scheduler)
+        serialDel <- c(serialDel, ave(delays$serializationDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
+        schedulingDel <- c(schedulingDel, ave(delays$schedulingDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
+        networkDel <- c(networkDel, ave(delays$networkDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
+        rxqueueDel <- c(rxqueueDel, ave(delays$rxQueueDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
+    }
+}
+delaysAvg <- data.frame(rhos,schedulers, serialDel, schedulingDel, networkDel, rxqueueDel)
+delaysAvg <- melt(delaysAvg, id.var=c("schedulers", "rhos"))
+plotDelayAvg <- ggplot(delaysAvg, aes(x=schedulers, y=value, fill=variable))
+pdf('plots/average_delay_breakdown.pdf')
+plotDelayAvg + facet_wrap(~rhos) + geom_bar(stat="identity")
+dev.off()
+
+rho = levels(delays$rho)[ceiling(length(levels(delays$rho))/2)] #for the center value of rho
+sizes = c()
+schedulers = c()
+serialDel = c()
+schedulingDel = c()  
+networkDel = c()
+rxqueueDel = c()
+for (size in c(1,2,5,6,9,10)){
+    for (scheduler in levels(delays$scheduler)){
+        sizes <- c(sizes, size)
+        schedulers <- c(schedulers, scheduler)
+        serialDel <- c(serialDel, ave(delays$serializationDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
+        schedulingDel <- c(schedulingDel, ave(delays$schedulingDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
+        networkDel <- c(networkDel, ave(delays$networkDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
+        rxqueueDel <- c(rxqueueDel, ave(delays$rxQueueDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
+    }
+}
+delaysAvg <- data.frame(sizes, schedulers, serialDel, schedulingDel, networkDel, rxqueueDel)
+delaysAvg <- melt(delaysAvg, id.var=c("schedulers", "sizes"))
+plotDelayAvg <- ggplot(delaysAvg, aes(x=schedulers, y=value, fill=variable))
+pdf('plots/average_delay_breakdown_rho_fixed.pdf')
+plotDelayAvg + facet_wrap(~sizes) + geom_bar(stat="identity")
 dev.off()
 
 #plot completion time distribution for different message sizes and rho values
@@ -145,52 +195,23 @@ pdf("plots/rxQueue_size_distribution.pdf", width=20, height=20 )
 do.call(grid.arrange, plotList)
 dev.off()
 
-#plot delay breakdown distribution
-delays$rho <- factor(delays$rho)
-delays$scheduler <- factor(delays$scheduler)
+#plot average completion times per rho value
 rhos = c()
 schedulers = c()
-serialDel = c()
-schedulingDel = c()  
-networkDel = c()
-rxqueueDel = c()
-for (rho in levels(delays$rho)){
-    for (scheduler in levels(delays$scheduler)){
-        rhos <- c(rhos, rho)
-        schedulers <- c(schedulers, scheduler)
-        serialDel <- c(serialDel, ave(delays$serializationDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
-        schedulingDel <- c(schedulingDel, ave(delays$schedulingDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
-        networkDel <- c(networkDel, ave(delays$networkDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
-        rxqueueDel <- c(rxqueueDel, ave(delays$rxQueueDelay[delays$rho == rho & delays$scheduler == scheduler])[1])
+avgCompTime = c()
+for (rho_ in levels(compTimeDist$rho)){
+    for (schdl in levels(compTimeDist$scheduler)){
+        compTime <- data.frame()
+        compTime <- subset(compTimeDist, rho == rho_ & scheduler == schdl, c('compTime', 'count'))
+        avgTime <- sum(compTime$compTime * compTime$count)/sum(compTime$count)
+        rhos <- c(rhos, rho_)
+        schedulers <- c(schedulers, schdl)
+        avgCompTime <- c(avgCompTime, avgTime)
     }
 }
-delaysAvg <- data.frame(rhos,schedulers, serialDel, schedulingDel, networkDel, rxqueueDel)
-delaysAvg <- melt(delaysAvg, id.var=c("schedulers", "rhos"))
-plotDelayAvg <- ggplot(delaysAvg, aes(x=schedulers, y=value, fill=variable))
-pdf('plots/average_delay_breakdown.pdf')
-plotDelayAvg + facet_wrap(~rhos) + geom_bar(stat="identity")
-dev.off()
-
-rho = levels(delays$rho)[ceiling(length(levels(delays$rho))/2)]
-sizes = c()
-schedulers = c()
-serialDel = c()
-schedulingDel = c()  
-networkDel = c()
-rxqueueDel = c()
-for (size in c(1,2,5,8)){
-    for (scheduler in levels(delays$scheduler)){
-        sizes <- c(sizes, size)
-        schedulers <- c(schedulers, scheduler)
-        serialDel <- c(serialDel, ave(delays$serializationDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
-        schedulingDel <- c(schedulingDel, ave(delays$schedulingDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
-        networkDel <- c(networkDel, ave(delays$networkDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
-        rxqueueDel <- c(rxqueueDel, ave(delays$rxQueueDelay[delays$rho == rho & delays$scheduler == scheduler & delays$size == size])[1])
-    }
-}
-delaysAvg <- data.frame(sizes, schedulers, serialDel, schedulingDel, networkDel, rxqueueDel)
-delaysAvg <- melt(delaysAvg, id.var=c("schedulers", "sizes"))
-plotDelayAvg <- ggplot(delaysAvg, aes(x=schedulers, y=value, fill=variable))
-pdf('plots/average_delay_breakdown_rho_fixed.pdf')
-plotDelayAvg + facet_wrap(~sizes) + geom_bar(stat="identity")
+avgCompTimeDF <- data.frame(scheduler=schedulers, rho=rhos, avgCompTime)
+plotAvgCompTime <- ggplot(avgCompTimeDF, aes(x=as.numeric(rho), y=avgCompTime))
+pdf("avg_completion_time.pdf")
+plotAvgCompTime + geom_line(aes(color = scheduler), size = 1.5, alpha = 1/2) + 
+        labs(title = "Average Completion Time Over All Message Sizes")
 dev.off()
