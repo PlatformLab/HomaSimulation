@@ -97,7 +97,8 @@ pdf('plots/average_delay_breakdown.pdf')
 plotDelayAvg + facet_wrap(~rhos) + geom_bar(stat="identity")
 dev.off()
 
-rho = levels(delays$rho)[ceiling(length(levels(delays$rho))/2)] #for the center value of rho
+#rho = levels(delays$rho)[ceiling(length(levels(delays$rho))/2)] #for the center value of rho
+rho = levels(delays$rho)[length(levels(delays$rho))] #for the max value of rho
 sizes = c()
 schedulers = c()
 serialDel = c()
@@ -211,7 +212,7 @@ for (rho_ in levels(compTimeDist$rho)){
 }
 avgCompTimeDF <- data.frame(scheduler=schedulers, rho=rhos, avgCompTime)
 plotAvgCompTime <- ggplot(avgCompTimeDF, aes(x=as.numeric(rho), y=avgCompTime))
-pdf("avg_completion_time.pdf")
+pdf("plots/avg_completion_time.pdf")
 plotAvgCompTime + geom_line(aes(color = scheduler), size = 1.5, alpha = 1/2) + 
         labs(title = "Average Completion Time Over All Message Sizes")
 dev.off()
