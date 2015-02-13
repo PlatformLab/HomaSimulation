@@ -445,7 +445,7 @@ class Scheduler():
             else:
                 prio = msgDict[msgId][0] # priority equal the original size of
                                          # message
-                activeMsgsPrio[prio] = msgDict[msgId][0] 
+                activeMsgsPrio[msgId] = prio 
 
             pkt = list([msgId, msgSize, prio])
             self.addPktToDelayQueue(pkt, avgDelay)
@@ -652,6 +652,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
             txQueue.append(newMsg[:]) 
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
             msgId += 1
+
         scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict,
                 activeMsgsPrio)   
         
