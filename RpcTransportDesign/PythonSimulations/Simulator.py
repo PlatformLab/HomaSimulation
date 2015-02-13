@@ -339,7 +339,7 @@ class Scheduler():
             if (highPrioMsg[1] == 0):
                 self.txQueue.pop(0)
 
-    def idealScheduler(self, slot, pktOutTimes):
+    def idealScheduler(self, slot, pktOutTimes, msgDict):
         """Implements the ideal scheduler (Oracle scheduler).
         Because the network delay is a random variable, the simple scheduler
         might not lead to the best latency. For example, a packet from a smaller
@@ -405,8 +405,11 @@ class Scheduler():
             # Set the priority same as the size
             msgId = msg[0]
             msgSize = msg[1]
-            prio = msg[1]
-            pkt = list([msgId, msgSize, msgSize])
+            #prio = msg[1] # priority equal the remaining size of message in
+                           # sender
+            prio = msgDict[msgId][0] # priority equal the original size of
+                                     # message
+            pkt = list([msgId, msgSize, prio])
             self.addPktToDelayQueue(pkt, avgDelay)
 
             if msgId in pktOutTimes:
@@ -581,7 +584,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
             len(delayQueue) > 0):
 
         slot += 1
-        scheduler.idealScheduler(slot, pktOutTimes['simple'])   
+        scheduler.simpleScheduler(slot, pktOutTimes['simple'])   
 
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
@@ -611,7 +614,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
             txQueue.append(newMsg[:]) 
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
             msgId += 1
-        scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
+        scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict)   
         
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
@@ -619,7 +622,7 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     while (rxQueue.getTotalSize() > 0 or len(txQueue) > 0 or
             len(delayQueue) > 0):
         slot += 1
-        scheduler.idealScheduler(slot, pktOutTimes['ideal'])   
+        scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict)   
 
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
@@ -635,7 +638,18 @@ def writeToFile(fd, rowVector, width = 12):
     be equal to width. Note that fd must be already open and writable before it
     is given to this function otherwise this function will throw exception.
 
-    @param
+    @param  fd: file descriptor for the file that rowVector data will be written
+                to.
+    @type   fd: file decriptor (integer)
+
+    @param  rowVector: A list containing the elements that shoudl be written
+                       into a line of the the file.
+    @type   rowVector: list[elem1, elem2, ..] and each elem is either an
+                       integer, float or string of characters.
+
+    @param  width: The space in terms of characters taht each element will take
+                   on each line of the file.
+    @type   width: an integer.
     """
     fd.write(''.join(str(element).rjust(width) for element in rowVector) + '\n')
 
