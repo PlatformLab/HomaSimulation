@@ -125,6 +125,22 @@ class RxQueue():
                 return pkt
         return []
 
+    def updatePktsPrio(self, oldPrio, newPrio, msgId):
+        """For all packets belonging to message with msgId with priority
+        oldPrio, this function updates the priority to newPrio.
+        """
+        if (oldPrio in self.prioQueue):
+            pktList = self.prioQueue[oldPrio]
+            for pkt in pktList[:]:
+                if (pkt[0] == msgId):
+                    newPkt = [pkt[0], pkt[1], newPrio] 
+                    pktList.remove(pkt[:])
+                    if (newPrio in self.prioQueue):
+                        self.prioQueue[newPrio].append(newPkt[:])
+                    else:
+                        self.prioQueue[newPrio] = list()
+                        self.prioQueue[newPrio].append(newPkt[:])
+
     def getPrioQueueSize(self, prio):
         """Provides the size of priority queues in this class.
 
@@ -235,7 +251,7 @@ class Scheduler():
         self.delayQueue.append(delayedPkt)
         self.delayQueue.sort(cmp=lambda x, y: cmp(x[3], y[3]))
 
-    def depleteDelayQueue(self):
+    def depleteDelayQueue(self, updatePrio = False, activeMsgsPrio = {}):
         """This function practically abstracts out the propagation of the
         packets in the network until they are received at @p rxQueue. Everytime
         a packet is completely transmitted through the network, it will add that
@@ -250,14 +266,21 @@ class Scheduler():
         
         pktsArrivedRxQueue = list()
         for delayedPkt in self.delayQueue[:]:
-            if (delayedPkt[-1] == 0):
+            if (delayedPkt[-1] == 0):#deplete pkts
                 pkt = delayedPkt[0:-1] 
+                if (updatePrio) :#update priorities if requiered
+                    msgId = pkt[0]
+                    pkt[2] = activeMsgsPrio[msgId]
+
                 self.rxQueue.enqueue(pkt)
                 pktsArrivedRxQueue.append(pkt[:])
                 self.delayQueue.remove(delayedPkt)
 
-        for delayedPkt in self.delayQueue:
+        for delayedPkt in self.delayQueue:#update delays
             delayedPkt[-1] -= 1
+            if (updatePrio) :#update priorities if requiered
+                msgId = delayedPkt[0]
+                delayedPkt[2] = activeMsgsPrio[msgId]
 
         return pktsArrivedRxQueue
 
@@ -339,7 +362,7 @@ class Scheduler():
             if (highPrioMsg[1] == 0):
                 self.txQueue.pop(0)
 
-    def idealScheduler(self, slot, pktOutTimes, msgDict):
+    def idealScheduler(self, slot, pktOutTimes, msgDict, activeMsgsPrio):
         """Implements the ideal scheduler (Oracle scheduler).
         Because the network delay is a random variable, the simple scheduler
         might not lead to the best latency. For example, a packet from a smaller
@@ -382,6 +405,7 @@ class Scheduler():
 
         pkt = self.rxQueue.dequeue()
         if pkt:
+            #Update pktOutTimes
             msgId = pkt[0]
             msgSize = pkt[1]
             pktPrio = pkt[2]
@@ -390,7 +414,17 @@ class Scheduler():
                     pktInfo.append(slot)
                     break
 
-        pktsArrivedRxQueue = self.depleteDelayQueue() 
+            #Update activeMsgsPrio and update prio of the rest pkts belonging to
+            #msgId in rxQueue
+            if (pktPrio == 1): #this packet was the last pkt of msg
+                activeMsgsPrio.pop(msgId)
+            else:
+                newPrio = pktPrio - 1
+                activeMsgsPrio[msgId] = newPrio 
+                self.rxQueue.updatePktsPrio(pktPrio, newPrio, msgId)
+
+        #deplete pkts and update priorities
+        pktsArrivedRxQueue = self.depleteDelayQueue(True, activeMsgsPrio) 
         for pkt in pktsArrivedRxQueue:
             msgId = pkt[0]
             msgSize = pkt[1]
@@ -401,15 +435,19 @@ class Scheduler():
                     break
 
         for msg in self.txQueue[:]:
-
             # Set the priority same as the size
             msgId = msg[0]
             msgSize = msg[1]
-            #prio = msg[1] # priority equal the remaining size of message in
-                           # sender
-            prio = msgDict[msgId][0] # priority equal the original size of
-                                     # message
-            pkt = list([msgId, msgSize, msgSize])
+            prio = 0
+
+            if (msgId in activeMsgsPrio):
+                prio = activeMsgsPrio[msgId]
+            else:
+                prio = msgDict[msgId][0] # priority equal the original size of
+                                         # message
+                activeMsgsPrio[prio] = msgDict[msgId][0] 
+
+            pkt = list([msgId, msgSize, prio])
             self.addPktToDelayQueue(pkt, avgDelay)
 
             if msgId in pktOutTimes:
@@ -607,14 +645,15 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     queueSizeDist = prioQueueSizeDist['ideal']
     totalSizeDist = rxQueueSizeDist['ideal']
 
-
+    activeMsgsPrio = dict()
     for slot in range(steps):
         if (msgId in msgDict and msgDict[msgId][1] == slot):
             newMsg = [msgId, msgDict[msgId][0]]
             txQueue.append(newMsg[:]) 
             txQueue.sort(cmp=lambda x, y: cmp(x[1], y[1]))
             msgId += 1
-        scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict)   
+        scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict,
+                activeMsgsPrio)   
         
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
@@ -622,7 +661,8 @@ def run(steps, rho, distMatrix, msgDict, pktOutTimes,
     while (rxQueue.getTotalSize() > 0 or len(txQueue) > 0 or
             len(delayQueue) > 0):
         slot += 1
-        scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict)   
+        scheduler.idealScheduler(slot, pktOutTimes['ideal'], msgDict,
+                activeMsgsPrio)   
 
         # Collect the stats after running scheduler
         collectRxQueueStats(rxQueue, queueSizeDist, totalSizeDist)
