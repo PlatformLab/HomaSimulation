@@ -193,7 +193,7 @@ for (rho in rhos){
         plotDist[[i]] <- ggplot(compTimeDist.filtered[[i]], aes(x=compTime, y=compTime.distribution)) + 
                 geom_step(aes(color=scheduler), size = 1, alpha = 1/2) +
                 labs(title = sprintf("Distribution of completion time, rho=%.2f, msgSize=%d", rho, floor(sizeMsg))) +
-                facet_wrap(~scheduler, scales="free_x", ncol=2)
+                aes(color=scheduler)
         plotList[[length(plotList) + 1]] <- plotDist[[i]]
     }
     pdf(sprintf("plots/compTimeDistribution_rho%d.pdf", floor(rho*100)), width=20, height=20 )
