@@ -1,0 +1,8 @@
+*.o
+tclcl
+otcl
+bin/
+include/
+lib/
+share/
+

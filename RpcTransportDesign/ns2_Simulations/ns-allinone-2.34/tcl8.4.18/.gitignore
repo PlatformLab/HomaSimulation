@@ -1,0 +1,9 @@
+unix/Makefile
+unix/autom4te.cache/
+unix/config.log
+unix/config.status
+unix/dltest/Makefile
+unix/libtcl8.4.a
+unix/libtclstub8.4.a
+unix/tclConfig.sh
+unix/tclsh

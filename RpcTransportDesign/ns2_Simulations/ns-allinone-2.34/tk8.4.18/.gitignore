@@ -1,0 +1,8 @@
+unix/Makefile
+unix/autom4te.cache/
+unix/config.log
+unix/config.status
+unix/libtk8.4.a
+unix/libtkstub8.4.a
+unix/tkConfig.sh
+unix/wish

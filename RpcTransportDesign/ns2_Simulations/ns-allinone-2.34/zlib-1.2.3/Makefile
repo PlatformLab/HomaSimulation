@@ -16,17 +16,17 @@
 # To install in $HOME instead of /usr/local, use:
 #    make install prefix=$HOME
 
-CC=cc
+CC=gcc
 
-CFLAGS=-O
+CFLAGS=-O3 -DUSE_MMAP
 #CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
 #CFLAGS=-g -DDEBUG
 #CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
 #           -Wstrict-prototypes -Wmissing-prototypes
 
-LDFLAGS=libz.a
-LDSHARED=$(CC)
-CPP=$(CC) -E
+LDFLAGS=-L. libz.a
+LDSHARED=gcc
+CPP=gcc -E
 
 LIBS=libz.a
 SHAREDLIB=libz.so
@@ -39,11 +39,11 @@ TAR=tar
 SHELL=/bin/sh
 EXE=
 
-prefix = /usr/local
-exec_prefix = ${prefix}
-libdir = ${exec_prefix}/lib
-includedir = ${prefix}/include
-mandir = ${prefix}/share/man
+prefix =../
+exec_prefix =../
+libdir =${exec_prefix}/lib
+includedir =${prefix}/include
+mandir =${prefix}/share/man
 man3dir = ${mandir}/man3
 
 OBJS = adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
