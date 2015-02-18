@@ -2,6 +2,7 @@ Makefile
 config.log
 config.status
 libtool
+autom4te.cache/
 m4/Makefile
 samples/Makefile
 src/.deps/
