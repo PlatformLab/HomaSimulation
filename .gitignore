@@ -1,3 +1,0 @@
-#ignore the pfabric simulation directory from research git repo because we don't
-#want the changes in ns2_pfabric directory to be pushed to the remote repo.
-pFabric_ns2.34Simulation

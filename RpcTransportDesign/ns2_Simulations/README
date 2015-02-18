@@ -1,0 +1,114 @@
+installation of ns-2.34 on Debian Jessie:
+
+Install required libraries for ns2 using terminal
+            sudo apt-get install build-essential autoconf automake libxmu-dev
+ Then, sudo ./install
+
+For errors,
+
+
+1.
+ld: libotcl.so: hidden symbol `__stack_chk_fail_local' isn't defined
+ld: final link failed: Bad value
+make: *** [libotcl.so] Error 1
+otcl-1.13 make failed! Exiting ...
+Solution:
+In otcl-1.13/configure, line number 6304
+
+-SHLIB_LD="ld -shared"
++SHLIB_LD="gcc -shared"
+
+2.
+tools/ranvar.cc: In member function ‘virtual double GammaRandomVariable::value()’:
+tools/ranvar.cc:219:70: error: cannot call constructor ‘GammaRandomVariable::GammaRandomVariable’ directly [-fpermissive]
+tools/ranvar.cc:219:70: error:   for a function-style cast, remove the redundant ‘::GammaRandomVariable’ [-fpermissive]
+make: *** [tools/ranvar.o] Error 1
+
+Solution:
+In ns-2.34/tools/ranvar.cc, line 219
+
+-return GammaRandomVariable::GammaRandomVariable(1.0 + alpha_, beta_).value() * pow (u, 1.0 / alpha_);
++return GammaRandomVariable(1.0 + alpha_, beta_).value() * pow (u, 1.0 / alpha_);
+
+3.
+In file included from mac/mac-802_11Ext.cc:66:0:
+mac/mac-802_11Ext.h: In member function ‘u_int32_t PHY_MIBExt::getHdrLen11()’:
+mac/mac-802_11Ext.h:175:19: error: expected primary-expression before ‘struct’
+mac/mac-802_11Ext.h:175:41: error: ‘dh_body’ was not declared in this scope
+mac/mac-802_11Ext.h:175:51: error: ‘offsetof’ was not declared in this scope
+mac/mac-802_11Ext.h:177:3: warning: control reaches end of non-void function [-Wreturn-type]
+make: *** [mac/mac-802_11Ext.o] Error 1
+Ns make failed!
+
+Solution:
+In mac/mac-802_Ext.h, line 65
+
++#include<cstddef>
+
+4.
+mobile/nakagami.cc: In member function ‘virtual double Nakagami::Pr(PacketStamp*, PacketStamp*, WirelessPhy*)’:
+mobile/nakagami.cc:183:73: error: cannot call constructor ‘ErlangRandomVariable::ErlangRandomVariable’ directly [-fpermissive]
+mobile/nakagami.cc:183:73: error:   for a function-style cast, remove the redundant ‘::ErlangRandomVariable’ [-fpermissive]
+mobile/nakagami.cc:185:67: error: cannot call constructor ‘GammaRandomVariable::GammaRandomVariable’ directly [-fpermissive]
+mobile/nakagami.cc:185:67: error:   for a function-style cast, remove the redundant ‘::GammaRandomVariable’ [-fpermissive]
+make: *** [mobile/nakagami.o] Error 1
+
+Solution:
+In ns-2.34/mobile/nakagami.cc, Line no.
+
+-if (int_m == m) {
+-             resultPower = ErlangRandomVariable::ErlangRandomVariable(Pr/m, int_m).value();
+-         } else {
+-             resultPower = GammaRandomVariable::GammaRandomVariable(m, Pr/m).value();
+-         }
+-         return resultPower;
+-    }
+
+ +if (int_m == m) {
+ +           resultPower = ErlangRandomVariable(Pr/m, int_m).value();
+ +        } else {
+ +            resultPower = GammaRandomVariable(m, Pr/m).value();
+ +        }
+ +       return resultPower;
+ +   }
+
+5.
+linkstate/ls.h: In instantiation of ‘void LsMap<Key, T>::eraseAll() [with Key = int; T = LsIdSeq]’:
+linkstate/ls.cc:396:28:   required from here
+linkstate/ls.h:137:58: error: ‘erase’ was not declared in this scope, and no declarations were found by argument-dependent lookup at the point of instantiation [-fpermissive]
+  void eraseAll() { erase(baseMap::begin(), baseMap::end()); }
+                                                          ^
+linkstate/ls.h:137:58: note: declarations in dependent base ‘std::map<int, LsIdSeq, std::less<int>, std::allocator<std::pair<const int, LsIdSeq> > >’ are not found by unqualified lookup
+
+Solution:
+edit the line number 137 of ns-2.35/linkstate/ls.h from
+
+void eraseAll() { erase(baseMap::begin(), baseMap::end()); }
+
+to
+
+void eraseAll() { this->erase(baseMap::begin(), baseMap::end()); }
+
+
+
+Path Setup:
+In terminal vim ~/.bashrc
+Then update the environmrnt variable
+
+# LD_LIBRARY_PATH
+OTCL_LIB=/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/otcl-1.13
+NS2_LIB=/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/lib
+X11_LIB=/usr/X11R6/lib
+USR_LOCAL_LIB=/usr/local/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OTCL_LIB:$NS2_LIB:$X11_LIB:$USR_LOCAL_LIB
+
+# TCL_LIBRARY
+TCL_LIB=/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/tcl8.4.18/library
+USR_LIB=/usr/lib
+export TCL_LIBRARY=$TCL_LIB:$USR_LIB
+
+# PATH
+XGRAPH=/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/bin:/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/tcl8.4.18/unix:/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/tk8.4.18/unix
+NS=/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/ns-2.34/
+NAM=/home/neverhood/Research/pFabric_ns2.34Simulation/ns-allinone-2.34/nam-1.14/
+PATH=$PATH:$XGRAPH:$NS:$NAM
