@@ -62,6 +62,7 @@
 #define GET_ETHER_TYPE(x)		GET2BYTE((x))
 #define SET_ETHER_TYPE(x,y)            {u_int16_t t = (y); STORE2BYTE(x,&t);}
 #include "wireless-phyExt.h"
+#include<cstddef>
 
 /* ======================================================================
  Frame Formats
