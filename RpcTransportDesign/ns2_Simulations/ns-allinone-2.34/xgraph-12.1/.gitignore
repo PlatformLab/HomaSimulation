@@ -1,6 +1,8 @@
+aclocal.m4
 Makefile
 autoconf.h
 config.cache
 config.log
 config.status
 stamp-h
+autom4te.cache/

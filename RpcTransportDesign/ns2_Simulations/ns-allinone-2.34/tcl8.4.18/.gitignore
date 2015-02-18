@@ -1,3 +1,4 @@
+unix/configure
 unix/Makefile
 unix/autom4te.cache/
 unix/config.log
