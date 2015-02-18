@@ -1,0 +1,30 @@
+GRAPH (#nodes #edges id uu vv ww xx yy zz):
+10 28 geo(0,{10,10,3,0.200,0.000,0.000}) 10 
+
+VERTICES (index name u v w x y z):
+0 0 3 4 
+1 1 8 6 
+2 2 7 6 
+3 3 6 0 
+4 4 8 1 
+5 5 0 3 
+6 6 4 0 
+7 7 3 6 
+8 8 1 5 
+9 9 7 2 
+
+EDGES (from-node to-node length a b):
+0 9 4 0 
+0 4 6 0 
+0 2 4 0 
+1 8 7 0 
+2 6 7 0 
+3 9 2 0 
+3 8 7 0 
+3 5 7 0 
+4 7 7 0 
+4 6 4 0 
+5 9 7 0 
+5 7 4 0 
+7 9 6 0 
+8 9 7 0 

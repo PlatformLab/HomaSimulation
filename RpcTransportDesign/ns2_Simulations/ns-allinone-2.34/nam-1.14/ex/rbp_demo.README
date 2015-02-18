@@ -1,0 +1,87 @@
+
+
+The attached nam file (rbp_demo.nam) attemptes to illustrate three TCP
+slow-start restart algorithms described in ``Improving Restart of Idle
+TCP Connections'' at
+<http://www.isi.edu/~johnh/PAPERS/Visweswaraiah97a.html> (submitted
+for publication).
+
+There are three groups of nodes.  Each group has 10 clients (colored
+circles on the left) and one server (the black circle on the right)
+joined by two routers (hexagons) and a bottleneck link.
+The clients make web requests at random times (uniformly distributed
+around a central point), causing the server to send a burst of 10KB
+(=10 packets) of data.  We do this twice, first at about 9.0s and then
+again at about 29s.
+
+The point of the experiment is to illustrate TCP behavior after the
+connection goes idle.  It does this by showing a different algorithm
+in each group of nodes.
+
+The TOP group illustrates ``no slow-start restart'' (NSSR):  after an idle
+period the TCP at node 112 does nothing special and so it sends a
+window-sized burst of data on the second request.   NSSR is the policy
+implemented by SunOS for all connections and by all BSD-derived TCP's
+for web style traffic (due to an interaction between idle detection
+and HTTP-style traffic).
+
+The BOTTOM group illustrates ``slow-start restart'' (SSR):  are an
+idle period, TCP resets itself and does a full slow-start.  This is
+the policy advocated in the appendix of the 1990 revision of
+Jacobson's paper ``Congestion Avoidance and Control'' (with Mike
+Karels).  Although 4.4BSD implements this policy, it is not used for
+web traffic because of an interaction between idle detection and
+HTTP-style traffic.
+
+The MIDDLE group illustrates ``rate-based pacing'' (RBP): a new
+algorithm proposed in the paper ``Improving Restart of Idle TCP
+Connections'' by Visweswaraiah and Heidemann.
+
+
+The animation is broken down into three phases, 9-12s and 29-32s,
+and 49-54s.
+
+In the FIRST PHASE (9-12s), all algorithms should behave identically.
+They do, for the most part, but as an implementation artifact, RBP
+sends packets with a slightly different schedule than the other
+algorithsm.  This difference is because RBP (shown here) is based on
+Vegas while the others are Reno.  We plan to redo the simulation with
+a Reno-based RBP.
+
+In the SECOND PHASE (29-32s), we see clear differences in the
+algorithms.
+
+- NSSR (on the top) sends large bursts of packets and has
+large queues at the router.  As a result of bursts sent at nearly the
+same time, these queues cause NSSR to drop some packets.
+
+- SSR (on the bottom) has very conservative behavior.  All connections
+slow start and so there are never large router queues and no lost
+packets, but it much longer than NSSR to completely send a response.
+
+- RBP (in the middle) illustrates median behavior.  There are no large
+bursts, but instead of slow-starting, RBP uses existing information
+about the prior transmission rate to pace data packets instead of
+slow-starting.  We can see that three lavendar packets are paced at
+times 29.0175, 29.1295 and 29.2495, before the ACK from the first
+returns to the source (at about 29.3215s).  Because of this pacing,
+RBP is able to send the final packet of the lavendar request at about
+29.59s where SSR sends it at about 30.05, about 80% faster.  RBP
+acheives this performance gain without the large queues and burstiness
+of NSSR.
+
+
+In the THIRD PHASE (59-54s) we have another round of the experiment.
+This time NSSR has fewer packet drops (4 instead of 12) because the
+loses in the second phase caused some flows to be less agressive.
+
+
+Comments or suggestions about rate-based pacing are encouraged; send
+mail to {johnh,visweswa}@isi.edu.  These traces are from the RBP
+implementation in ns-2.0.  The simulation is in post-ns-2.0
+distributions as tcl/ex/rbp_demo.tcl, or at http://www.isi.edu.
+
+   -John Heidemann,  6-Oct-97
+
+
+

@@ -1,0 +1,50 @@
+[ August 1999 ]
+
+Following tcl files are ns-scripts for Directed Research with Dr.Heidemann. 
+You could see the explanation about those files 
+at http://www-scf.usc.edu/~hyunahpa/D-Research/DR-home.html
+
+There are 3 kinds of files per each mechanism, which are xx.tcl, xx.nam, and xx.tr.
+
+
+FILE NAME	 	DESCRIPTION
+---------------------------------------------------------------------------------------
+
+C0-README		This file
+
+In C1-slow-start and C2-sliding-window, the network parameters are changing to set the environment where the network bandwidth is not fixed like in the Internet.
+
+C1-slow-start		It shows how TCP can transmit its data in the Internet environment
+			feature	: label, annotation, nam-graph, and cwnd monitor
+			  	  To see nam-graph, click 'Active Sessions' under 
+                          	  'Analysis' in the nam menu, then click 'TCP session' 
+
+C2-sliding-window	It shows how Sliding window acts in the Internet environment
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+C2-sliding-color	Same as C2-sliding-window but it doesn't provide nam-graph
+                        to support coloring. 
+                        Use "syn" option in nam menu to see both of them simultaneously
+
+----------------------------------------------------------------------------------------
+In C3-slow-start and C4-sliding-window, the network parameters are not changing. 
+
+C3-slow-start		It shows how TCP can transmit its data in a fixed environment
+			feature	: label, annotation, nam-graph, and cwnd monitor
+			  	  To see nam-graph, click 'Active Sessions' under 
+                          	  'Analysis' in the nam menu, then click 'TCP session' 
+
+C4-sliding-window	It shows how Sliding window acts in a fixed environment
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+C4-sliding-color	Same as C4-sliding-window but it doesn't provide nam-graph
+                        to support coloring. 
+                        Use "syn" option in nam menu to see both of them simultaneously
+
+---------------------------------------------------------------------------------------
+
+written by Hyunah Park ( hyunahpa@usc.edu )

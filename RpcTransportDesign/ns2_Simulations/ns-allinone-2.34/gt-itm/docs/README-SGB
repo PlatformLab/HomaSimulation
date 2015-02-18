@@ -1,0 +1,104 @@
+
+
+	Very Brief Overview of the Stanford GraphBase 
+
+                Ken Calvert and Ellen Zegura       
+                    College of Computing
+                        Georgia Tech
+
+$Id: README-SGB,v 1.1 1996/10/04 13:28:20 ewz Exp $
+
+The Georgia Tech Internetwork Topology Models (GT-ITM) are
+built on top of the Stanford GraphBase (SGB), a platform of data
+structures and routines for representing and manipulating 
+graphs.  SGB was developed by Donald Knuth and is described
+in detail in the (fun) book:
+
+"The Stanford GraphBase: A Platform for Combinatorial Computing,"
+D. Knuth, Addison-Wesley, 1994.
+
+Code is available at the following sites:
+
+http://www-cs-staff.stanford.edu/~knuth/sgb.html
+
+ftp://labrea.stanford.edu/pub/sgb
+
+
+You do not need to know much about SGB in order to use
+the topology modeling code, however a brief overview will
+be helpful.  We have provided a routine that converts from
+the SGB file format to an alternate file format (src/sgb2alt.c).
+The alternate format may be easier to parse for some users.
+
+If you want to modify or more deeply understand the topology
+modeling code, you will probably need more information about
+SGB than is provided here.
+
+-------------------------------------------------------------
+
+A graph is represented by a structure containing seven dedicated 
+fields and six utility fields (utility fields are explained
+in more detail below):
+
+g->vertices	Pointer to array of vertices
+g->n		Long integer - number of vertices
+g->m		Long integer - number of edges
+g->id		Character string for graph id
+g->util_types	Character string indicating which utility
+		fields are used and in what form (see below)
+g->data		Space used for graph data 
+g->aux_data	Auxiliary space used for graph data
+		(Note that data and aux_data are not typically
+		read or written by application programs.)
+g->uu,vv,ww,	Utility fields
+   xx,yy,zz
+
+Each vertex is represented by a structure containing
+two dedicated fields and six utility fields:
+
+v->arcs		Pointer to first arc out of this vertex
+v->name		Character string for vertex name
+v->u,v,w,x,y,z	Utility fields
+
+Each arc is represented by a structure containing three
+dedicated fields and two utility fields:
+
+a->tip		Pointer to vertex at tip of arc
+a->next		Pointer to next arc in linked list
+a->len		Long integer - length
+a->a,b		Utility fields
+
+Note that the arc representation is directed; the platform
+supports undirected edges by representing each edge as
+two arcs.  
+
+The utility fields may be used by the application program to 
+associate additional information with vertices and edges.
+Each utility field is a union containing five types:
+
+u.V		Pointer to vertex
+u.A		Pointer to arc
+u.G		Pointer to graph
+u.S		Character string
+u.I		Long integer
+
+The util_types field in the graph structure indicates
+which utility fields in the graph, vertex and arc structures
+are used, and what types are used.  util_types contains
+15 characters; each character is one of V, A, G, S or I
+(corresponding to the types above) or Z (indicating that the
+field is unused.  The first six characters are for the vertex
+utility fields, the next two are for the arc and the next six 
+are for the graph.  (That leaves one more character...I don't 
+know what that is for.)
+
+You can examine the details of SGB representation by
+perusing the file gb_graph.h.  Note, however, that this is
+C code generated from CWEB, Knuth's system for structured 
+programming and documentation.  As such, it is not intended
+for human reading and looks somewhat different than 
+standard C code.
+
+
+
+

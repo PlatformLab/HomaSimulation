@@ -1,0 +1,17 @@
+n -t * -s 3 -v circle -c yellow -z 0.136459  -S UP
+n -t * -s 7 -v circle -c green -z 0.136459  -S UP
+n -t * -s 2 -v circle -c orange -z 0.136459  -S UP
+n -t * -s 6 -v circle -c chocolate -z 0.136459  -S UP
+n -t * -s 1 -v circle -c magenta -z 0.136459  -S UP
+n -t * -s 5 -v circle -c gold -z 0.136459  -S UP
+n -t * -s 0 -v circle -c red -z 0.136459  -S UP
+n -t * -s 4 -v circle -c purple -z 0.136459  -S UP
+n -t * -s 8 -v circle -c cyan -z 0.136459  -S UP
+l -t * -s 3 -d 6 -r 1000000.000000 -D 0.010000 -o 231.7deg -l 0.146653 -S UP
+l -t * -s 3 -d 5 -r 1000000.000000 -D 0.010000 -o 322.7deg -l 0.157533 -S UP
+l -t * -s 6 -d 8 -r 1000000.000000 -D 0.010000 -o 313.6deg -l 0.267327 -S UP
+l -t * -s 6 -d 7 -r 1000000.000000 -D 0.010000 -o 225.4deg -l 0.260444 -S UP
+l -t * -s 1 -d 4 -r 1000000.000000 -D 0.010000 -o 320.6deg -l 0.159083 -S UP
+l -t * -s 1 -d 3 -r 1000000.000000 -D 0.010000 -o 220.9deg -l 0.216952 -S UP
+l -t * -s 0 -d 1 -r 1000000.000000 -D 0.010000 -o 343.2deg -l 0.361585 -S UP
+l -t * -s 0 -d 2 -r 1000000.000000 -D 0.010000 -o 203.1deg -l 0.360207 -S UP

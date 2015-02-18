@@ -1,0 +1,33 @@
+
+TODO LIST
+
+- channel sensing  should be performed with respect to
+  power+interference, not power only. Suppose our node sees several
+  transmissions from users which are very far, and that the received
+  power we see separately from each is below the sensing threshold. If
+  the sum of all these powers is above the sensing threshold, the
+  receiver should attempt reception (which will likely fail), and the
+  channel should be sensed busy so that we don't start transmission in
+  this case. 
+  NOTE: porting dei80211mr to MPhy would allow an easy solution
+
+
+- Validate new idle timeslot counter (idle2slots) and eventually
+  remove the old, buggy one (idleslots)	 
+
+- in order to be coherent with the 802.11 standard, we should change
+  the current CWmin/max implementation (which anyway provides correct
+  behaviour) so that CWmin and CWmax are 31 and 1023 respectively (not 32
+  and 1024).
+
+- should check if PER interface is  suitable for
+  extensions and/or re-implementation of the module
+
+- Fix indentation style
+
+- Add comments, especially in header files
+
+- check and eventually remove old code which has been commented out
+
+
+

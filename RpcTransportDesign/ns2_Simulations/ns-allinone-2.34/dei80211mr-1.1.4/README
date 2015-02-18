@@ -1,0 +1,109 @@
+ -*- Mode: text -*- 
+
+
+------------------
+ About dei80211mr
+------------------
+
+The dei80211mr library - nicknamed "multirate" for short - provides a
+802.11 implementation for the Network Simulator Version 2. This
+implementations is derived from the 802.11 implementation included in
+NS 2.29 and aims at solving some known bugs as well as providing
+enhanced functionality. 
+
+The dei80211mr library uses the Dynamic Library patch [2]. Thanks to
+the functionalities introduced by this patch, dei80211mr can be used
+with different versions of ns2. We have tested it with ns-2.29 and
+ns-2.31, and we expect it to work with future ns2 releases as well.
+
+
+
+-----------------------
+ Authors
+----------------------
+
+The dei80211mr library for the Network Simulator 2 has been developed
+by (in alfabetical order):
+
+Nicola Baldo         (baldo@dei.unipd.it)
+Federico Maguolo     (maguolof@dei.unipd.it)
+Simone Merlin        (merlo@dei.unipd.it)
+
+At the time of this release (May 2007), all authors are with the
+Department of Information Engineering, University of Padova, Italy. 
+
+
+
+--------------------------------------------------------------
+ Improvements with respect to the 802.11 implementation in NS
+--------------------------------------------------------------
+
+- support for multiple PHY modes is included; in particolar,
+  dei80211mr simulation of the different transmission rates, modulation
+  and coding schemes defined in the IEEE802.11b/g standards. 
+
+- a SINR-based packet level error model is introduced:
+  + the RX Threshold variable which was used in the 802.11
+    implementation included in standard NS to determine successful
+    receptions has been removed. Instead, Packet Error Rate (PER) is
+    used to determine random packet losses.
+  + PER is calculated using pre-determined curves (PER
+    vs SINR and packet size); the curves can be specified by the user
+    via TCL. Some default curves for both 802.11g and 802.11b are provided. 
+  + SINR is calculated using received signal strength, noise and
+    interference 
+  + interference is calculated using a gaussian model to account for
+    all transmissions which happen simultaneously to the one which is
+    considered for reception
+  + noise power is set via TCL
+
+- the capture model, i.e. the determination of whether a packet can be
+  received when there are other concurrent transmissions are
+  simultaneously ogoing, is now embedded in the above mentioned
+  interference model (no more Capture Threshold).
+
+- Some well-known bugs of the 802.11 implementation in NS have been
+  resolved. With reference to [1], we solved the following bugs:
+  + direct access denial
+  + random backoff time
+  + capture model (note: this is different from the point above since,
+    as per the description in [1], it is actually a synchronization issue)
+
+- In the wireless channel, the affected nodes distance is no more
+  determined using the CS threshold, but we used a fixed value in
+  meters (distInterference_) which can be set at the beginning of the
+  simulation. The reason is that, since we use a gaussian interference
+  model, nodes well below the CS threshold often still provide a
+  non-negligible contribution to interference. The default value for
+  the affected nodes distance (distInterference_) is very
+  conservative, so that all nodes are considered for interference
+  calculation. This default value therefore yields accurate but
+  computationally intensive simulations. The value can be adjusted via
+  TCL to achieve different trade-offs between computational load and
+  simulation accuracy.
+
+
+--------------------------------
+Origin of the name "dei80211mr":
+--------------------------------
+
+dei   -> Developed at the Department of Information Engineering (DEI),
+	 University of Padova
+80211 -> IEEE 802.11
+mr    -> multirate
+
+
+-----------
+References:
+-----------
+
+[1] Ilango Purushotaman and Sumit Roy, 
+"IEEE802.11 implementation Issues in Network Simulator 2", 
+Dept. of Electrical Engineering, University of Washington, US 
+http://ee.washington.edu/research/funlab/
+
+[2] Patch for Loading Dynamic Modules in ns-2,
+    http://www.dei.unipd.it/~rossi/ns2-patch.html
+
+[3] ns-MIRACLE: Multi InteRfAce Cross Layer Extension for
+    ns-2, http://www.dei.unipd.it/~rossi/miracle.html

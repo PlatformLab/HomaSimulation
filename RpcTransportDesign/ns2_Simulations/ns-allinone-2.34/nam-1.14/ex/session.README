@@ -1,0 +1,45 @@
+Trace file: 
+	session.nam.gz
+
+Purpose:
+	demonstrate the difference in between regular (detailed) packet 
+	forwarding and session level packet scheduling
+
+Topology: 
+	255 nodes and 266 links partial MBone topology 
+	equal link bandwidth (512bps) and delay (10ms)
+	obtained by Mark Handley's(mjh@east.isi.edu) MBone trace tools
+
+Source:
+	node 209
+	noted in red
+
+Members:
+	30 of them 
+	randomly selected
+	noted in black
+
+Traffic:
+	1 pkt every 37.5ms
+	210 bytes per packet
+	starting at simulation time 1.0
+
+
+Graph on the left:
+	- regular/detailed multicast packet forwarding
+	- packets traverse through nodes and links (basically a multicast
+	tree) to reach group members.
+
+Graph on the right:
+	- session level packet scheduling
+	- the delay to transfer a packet from the source to its 
+	receiver is computed and a receive(pkt) event is directly 
+	scheduled to happen after the delay at the receiver
+	- number of red dots attached to group receivers represents the
+	number of packets that have been sent and waiting to be received.
+	- the larger the (delay x bandwidth) in between the source and 
+	receiver, the higher the queue of red dots.
+
+
+Polly Huang, Mon Mar 16 15:52:40 PST 1998
+huang@isi.edu

@@ -1,0 +1,439 @@
+<!-- @(#) $Header: /cvsroot/otcl-tclcl/otcl/CHANGES.html,v 1.51 2007/03/10 23:29:08 tom_henderson Exp $-->
+<html>
+<head><title>OTcl Change Log</title></head>
+<body>
+<h1>Change History since version 0.96 (otcl)</h1>
+
+<hr>
+<h3>otcl-1.14
+<b>PENDING</h3>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=22199">otcl-1.13</a>
+<b>Released Sat Mar 10 2007</h3>
+    <li> Refresh packages, Sun OS compilation patch </li>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=22199">otcl-1.12</a>
+<b>Released Sat Sep 24 2006</h3>
+    <li> Refresh packages </li>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=22199&release_id=364716">otcl-1.11</a>
+<b>Released Wed Oct 19 21:04:00 PDT 2005</h3>
+<ul>
+    <li> One change from otcl-1.10-- reverting the removal of X libs and headers from the configure files, to support building on Cygwin.
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=22199&release_id=360698">otcl-1.10</a>
+<b>Released Sun Oct 2 15:00:00 PDT 2005</h3>
+
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Mon Sep 26 21:58:00 PDT 2005</b></li>
+      <br> Bumping up version numbers: configure.in.TclCL, configure.in.tcl, configure.in.tk 
+</ul>
+		
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Sun Sep 25 22:22:00 PDT 2005</b></li>
+      <br> Remove configure.in.Tcl because it is in the way for HFS+ file systems. Slight mod to the Tcl include path for Fedora Core 4
+</ul>
+		
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Tue Sep 6 21:53:00 PDT 2005</b></li>
+      <br>  Patch for Mac OS X (XCode 2.1). Contributed by Francesco Gringoli.
+</ul>
+		
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Wed Aug 31 18:54:00 PDT 2005</b></li>
+      <br>  patches for Debian pre-installed Tcl/Tk, and for building with -Wall
+ and -Werror on gcc-4.0.1 (mainly autoconf fixes).  Contributed by Georg 
+ Wittenburg and Mathieu Lacage, respectively.
+</ul>
+		
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.isi.edu/~xuanc/">[xuanc]</a></b> <b>Tue Feb 10 21:07:17 PST 2004</b></li>
+      <br> Change the default versions in conf/configure.in.{tcl,tk,otcl,TclCL}
+</ul>
+		
+<ul>
+<li><b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Feb 10 17:16:59 PST 2004</b></li>
+<br> Change configure support for Fedora's /usr/share/tcl8.3.
+</ul>
+
+<hr>
+<h3>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=22199&release_id=298323">otcl-1.9</a>
+<b>Released Wed Jan 19 11:55:01 PST 2005</h3>
+<hr>
+<h3>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=22199&release_id=208746">otcl-1.0a9[OLD]/otcl-1.8[NEW]</a>
+<b>Released Fri Jan  9 12:04:50 PST 2004 </h3>
+
+<ul>
+<li><b><a href="http://www.isi.edu/~xuanc/">[xuanc]</a></b> <b>Tue Jul 29 11:16:14 PDT 2003
+</b></li>
+<br> 
+Changes to make otcl build with tcl/tk 8.4.4.
+<ul>
+    <li>Define macros CONST84 and CONST84_RETURN in otcl.h 
+    <li>Change char* to CONST84 char* (or CONST84_RETRUN char * if it is a
+        function return) in otcl.c
+    <li>test hangs for lib/test.tcl (autoload), see comments in lib/test.tcl
+</ul>
+
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=83951">otcl-1.0a8[OLD]/otcl-1.7[NEW]</a>
+<b>Released on Wed Apr 10 14:12:36 PDT 2002</h3>
+
+<ul>
+<li><b><a href="http://sourceforge.net/users/lloydlim/">[lloydlim]</a></b>
+    <b>Thu Aug 30 00:55:33 PDT 2001</b></li>
+    Changes to makefile.vc:
+<ul>
+    <li>Now it will actually work with a standard Visual C++ installation.
+    <li>Added flexibility in determining location of Tcl/Tk directories.
+    <li>Updated for Tcl/Tk 8.3.3.
+    <li>Updated for new Tcl/Tk static build support. See Tcl patch #456759 and
+        Tk patch #456761.
+    <li>Eliminated warning messages.
+</ul>
+<p>
+
+<li><b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Jun 26 11:49:20 PDT 2001</b></li>
+<br> Updated README.html with more details about finding tclInt.h.
+</ul>
+  
+
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49078">otcl-1.0a7[OLD]/otcl-1.6[NEW]</a>
+<b>Released on Wed May 30 10:07:21 PDT 2001</b></h3>
+<ul>
+  <li>
+<b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Dec 12 10:36:34 PST 2000</b></li>
+<br> Updated config.guess to autoconf's current one.
+
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49076">otcl-1.0a6[OLD]/otcl-1.5[NEW]</a>
+<b>Released on Mon Oct 16 21:01:42 PDT 2000</b></h3>
+
+<ul>
+<li><b><a href="http://www.isi.edu/~yaxu">[yaxu]</a></b>
+<b>Mon Oct 16 21:01:42 PDT 2000</b><br>
+Otcl 1.0a6 released
+
+<li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a></b>
+<b>Thu Oct  5 10:59:59 PDT 2000</b><br>
+Patch for instvar in global scope by 
+<a href="mailto:O.Hodson@cs.ucl.ac.uk">Orion Hodson</a>.
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49075">otcl-1.0a5[OLD]/otcl-1.4[NEW]</a>
+<b>Released on Tue Jan 18 16:06:34 PST 2000</b></h3>
+<ul>
+<li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a></b>
+<b>Mon Jul 12 12:59:09 PDT 1999</b><br>
+ The strategy for making otcl work with a range of tcl versions
+ is to pull out all incompatibilities into this section.
+ The main-line code should basicly follow the current Tcl
+ interfaces.  Where those interfaces don't work with older versions,
+ replace the interface with compat_Tcl_<function> and add work-around
+ code here.<br>
+
+ Guidelines on porting otcl to newer versions of TCL:<br>
+<ul>
+<li> Data structure changes: define a macro to wrap around the 
+   data structure names for different versions, and define access macros
+   to provide a uniform interface to different fields. 
+   If there are drastically different data structure changes that require
+   control logic changes, see below. <br>
+<li> Control logic changes: define a macro for the new initialization or 
+   processing and set it to empty for the older versions.
+</ul>
+<p>
+
+<li> <b><a href="http://www.isi.edu/~haoboy">[haoboy]</a></b>
+<b>Thu May 27 19:17:51 PDT 1999</b><br>
+Corrected compiling directives so that it works with tcl/tk 8.1.1.
+<p>
+
+<li> <b><a href=http://www.isi.edu/~haoboy>[haoboy]</a></b>
+<b>Thu May 13 16:46:14 PDT 1999</b><br>
+Bug report, NOT fixed:
+
+OTcl does not allow any variables with name 'p1' and 'p2' in the
+global name space, however, all other names seem to be fine.
+
+<pre>
+yym:src/otcl(140): otclsh
+% Class B
+B
+% B p1
+couldn't find result of alloc
+% B p2
+couldn't find result of alloc
+% B p3
+p3
+% B p0
+p0
+</pre>
+<p>
+
+  <li> <b><a href=mailto:yuri@isi.edu>[YP]</a></b>
+<b>
+Mon Jan 4 5:00:00 PST 1999
+</b><br>
+       BUG REPORT(NOT FIXED): validation test of autoload
+       fails to pass under Linux and FreeBSD.  Here is the upper part
+       of the stack (Linux, which results in a segmentation fault): 
+       <pre>
+    #0  0x4011378d in __libc_free (mem=0xbffed744) at malloc.c:2861
+    #1  0x804a84b in AutoLoaderDP (cd=0xbffed744) at otcl.c:492
+    #2  0x804aa35 in RemoveMethod (methods=0x80fc514, nm=0x8100920 "1", cd=0x80fc4c0) at otcl.c:571
+    #3  0x804c9e0 in OTclCInstProcMethod (cd=0x80fc4c0, in=0x8099f90, argc=7, argv=0xbfff00f4) at otcl.c:1769
+    #4  0x804a674 in OTclDispatch (cd=0x80fc4c0, in=0x8099f90, argc=5, argv=0xbfff0144) at otcl.c:421
+    #5  0x804e523 in TclInvokeStringCommand ()
+       </pre>
+       This does not appear to be critical for ns, because it does not
+       uses autoloading.
+       <br>
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49074">
+otcl-1.0a4[OLD]/otcl1.3[NEW]</a>
+<b>Released on Mon Feb 22 17:50:15 PST 1999</b></h3>
+<ul>
+<li><b><a href=http://www.isi.edu/~haoboy>[haoboy]</a></b>
+<b>Thu May 13 16:46:14 PDT 1999</b><br>
+Added the following patch to not let OTcl crash when it's not able to 
+create a variable:
+
+<pre>
+--- otcl.c~     1998/09/07 18:53:43     
++++ otcl.c      1999/05/13 23:30:13     
+@@ -1,6 +1,6 @@
+ /* -*- Mode: c++ -*-
+  *
+- *  $Id: CHANGES.html,v 1.51 2007/03/10 23:29:08 tom_henderson Exp $
++ *  $Id: CHANGES.html,v 1.51 2007/03/10 23:29:08 tom_henderson Exp $
+  *  
+  *  Copyright 1993 Massachusetts Institute of Technology
+  * 
+@@ -1522,7 +1522,8 @@
+   if (result != TCL_OK) return result;
+ 
+   obj = OTclGetObject(in, argv[4]);
+-  if (obj == 0) OTclErrMsg(in, "couldn't find result of alloc",
+TCL_STATIC);
++  if (obj == 0) 
++         return OTclErrMsg(in, "couldn't find result of alloc",
+TCL_STATIC);
+   (void)RemoveInstance(obj, obj->cl);
+   AddInstance(obj, cl);
+</pre>
+
+  <li> <b><a href=http://www.isi.edu/~johnh>[johnh]</a></b>
+<b>
+Thu Jul 23 10:26:54 PDT 1998
+</b><br>
+       tcl-7.6 support was broken; fixes inspired by Lloyd Wood should restore it.
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49073">
+otcl-1.0a3[OLD]/otcl-1.2[NEW]</a>
+<b>Released on Tue July 7 13:10:00 PST 1998</b></h3>
+<ul>
+
+  <li><b><a href=http://www.isi.edu/~johnh>[johnh]</a></b>
+<b>
+Tue Jun 30 09:49:53 PDT 1998
+</b><br>
+     classinstvars support turned on by default
+     (and the ifdef's removed).
+
+<li><b><a href=http://www.isi.edu/~johnh>[johnh]</a></b>
+<b>
+Tue Jun  9 13:42:06 PDT 1998
+</b><br>
+     <ul>
+       <li> Added support code for delayed binding (in tclcl).
+	    Currently this code is only turned on if you
+	    do --enable-tclcl-classinstvars when configuring.
+       <li> re-autoconf'ed
+       <li> condesed some of the tcl7/tcl8 compatibility code
+	    with #define ObjVarTablePtr
+     </ul>
+
+<li><b><a href=http://www.isi.edu/~johnh>[johnh]</a></b>
+<b>
+Thu May 21 21:49:34 PDT 1998
+</b><br>
+<ul>
+<li> Fixed a case in OTclDispatch error handling where clobbered
+     arguments (in the buggy callee) lead to a segfault.
+</ul>
+
+<li><b><a href=http://www.isi.edu/~johnh>[johnh]</a></b>
+<b>
+Mon May 18 16:46:51 PDT 1998
+</b><br>
+<ul>
+<li> install targets were backwards.
+</ul>
+
+</ul>
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49072">
+otcl-1.0a2[OLD]/otcl-1.1[NEW]</a>
+<b>Fri Jan 23 11:54:21 PST 1998</b></h3>
+<ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+<b>
+Mon Dec 22 12:59:21 PST 1997
+</b><br>
+<ul>
+<li> Fixed exactly the same bug as last rev.  Only difference is
+it occurred in another place.
+</ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+<b>
+Sun Dec 21 22:11:14 PST 1997
+</b><br>
+<ul>
+<li> Fixed a bug in OTclDispatch that caused core dump when
+an error conditrion occured evaluating an instproc with more than 8 args.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a>
+Wed Dec 17 15:22:49 GMT-8:00 1997</b>
+<ul>
+<li> Added additional stack trace info when there is an error in
+OTclDispatch. This gives "resolved_class procname ..." in addition to the
+"_o? procname" line.
+</ul>
+
+
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49070">
+otcl-1.0a1[OLD]/otcl-1.0[NEW]</a>
+<b>Mon Dec 15 20:13:00 PST 1997</b></h3>
+
+<i> Non-publicized test release. </i>
+
+<ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+<b>
+Mon Dec 15 20:13:00 PST 1997
+</b><br>
+<ul>
+<li> Converted configure to use mash/ns configure infratructure.
+<li> Cleaned up this change history.
+<li> Fixed things up for test release of 1.0a1
+(need to clear with Wetherall, though he gave a preliminary "okay").
+</ul>
+
+<li><b><a href="http://www.isi.edu/~kannan">[KVa]</a>
+Mon Dec  8 09:51:16 PST 1997</b>
+<ul>
+<li>Linux uses libdl.a (not libdld.a).<br>
+Fix configure, configure.in.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a>
+Sat Nov 15 18:29:41 GMT-8:00 1997</b>
+<ul>
+<li> changed makefile to compile functions with static library
+<li> changed otcl procedures to use a single "::otcl" namespace. This
+removes the need for the previous kludge in otcl, whereby a tcl procedure
+is created using TclProjCmd, and then deleted from the interpreter so
+that only otcl knows about it. For the deletion to work, we have to
+use a hack which increment the reference count before deleting
+it. Besides the high chance that this hack will not work with future
+versions of tcl, the deletion also invalidates the byte compilation
+and as a result each proc is byte-compiled twice.
+
+<p> In AddMethod(), procedures are now created as <tt>::otcl::p<i>n</i></tt>
+where <i>n</i> is a running number. The deleteproc of the created
+procedure (OTclDeleteProc) now uses Tcl_FindCommand() to delete the procedure
+from tcl if it still exists. 
+
+<p> Some simple experiments show that the impact on speed and memory is
+small. 
+</ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~elan>[EA]</a></b>
+<b>
+Tue Oct 28 11:50:08 PST 1997
+</b><br>
+<ul>
+<li> Fixed problem in ListProcArgs since tcl8 now appends instvars and 
+     arguments to ame list, but adds a flag.
+</ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~tecklee>[TLT]</a></b>
+<b>
+Sat Oct 25 19:49:19 PDT 1997
+</b><br>
+<ul>
+<li> fix problem where some variables are freed multiple times. The variable
+flags is a bitmap now, so that (vp->flags != VAR_UNDEFINED) is not correct.
+</ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~tecklee>[TLT]</a></b>
+<b>
+Mon Oct  6 14:46:51 PDT 1997
+</b><br>
+<ul>
+<li> Merged in patch for Tcl/Tk8.0 from <a
+href="http://catarina.usc.edu/~haoboy/otcl-0.96.patch">http://catarina.usc.edu/~haoboy/otcl-0.96.patch</a>.
+<li> (Bug fix) PrimitiveCDestory attempts to delete the instances hash
+table after its contents have been free in PrimitiveODestory. Created new
+function PrimitiveODestoryNoFree that does not free the memory itself.
+<li> (Bug fix) <tt>MakeProc</tt> creates a new procedure, then calls
+<tt>Tcl_DeleteCommand</tt> with a null deleteproc to create a Tcl-invisible
+proc. With 8.0, <tt>Tcl_DeleteCommand</tt> frees the <tt>cmdPtr</tt> structure
+also, which renders the "invisible proc" unusable. Added code to prevent the
+deletion of <tt>cmdPtr</tt> and free it up when the procedure is
+destoryed.<br>
+<i> Check that this kludge works when we move to a new version! </i>
+</ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~tecklee>[TLT]</a></b>
+<b>Thu Aug  7 13:26:18 PDT 1997</b><br>
+Checkin of makefile.vc for win32. otcl.lib and tclsh.exe now compiles under
+WinNT 4.0. It should run/compile on win95 as well (not tested yet).
+
+<li><b><a href=http://www.cs.berkeley.edu/~tecklee>[TLT]</a></b>
+<b>July 97</b>
+Merged in changes from <a href="http://www.cs.berkeley.edu/~mccanne">Steve
+Mccanne</a> to fix the bug that causes tcl to remove and free some instvars
+twice. 
+
+</ul>
+
+<hr>
+</body>
+</html>

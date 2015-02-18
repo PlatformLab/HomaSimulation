@@ -1,0 +1,109 @@
+#! /bin/sh
+#
+# Copyright (c) 1995 The Regents of the University of California.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. All advertising materials mentioning features or use of this software
+#    must display the following acknowledgement:
+#	This product includes software developed by the Network Research
+#	Group at Lawrence Berkeley National Laboratory.
+# 4. Neither the name of the University nor of the Laboratory may be used
+#    to endorse or promote products derived from this software without
+#    specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+
+file=$1; shift
+directory=$1; shift
+
+if [ -f testview ]; then
+   rm -r testview
+fi
+
+new=false
+alltests=true
+
+while test $# -ge 1
+do
+	case $1 in
+	new|NEW) new=true;;
+	*) alltests=false; tlist="$tlist $1";;
+	esac
+	shift
+done
+
+datafile="testview"
+NAM=${NAM:-../../nam}
+
+if $alltests
+then
+	:
+else
+	tests=$tlist
+fi
+
+if [ ! -d $directory ]; then
+	if $new
+		then
+				mkdir $directory
+		else
+				echo "no saved test output.  do cvs update -d"
+				echo "or re-run your test with \"new\" as the last argument."
+				exit 1
+		fi
+fi
+
+success="true"
+
+echo $NAM -z $file 
+$NAM -z $file
+
+if [ -f $datafile ]; then
+	 if [ ! -f $directory/$file.Z ]; then
+			 echo saving output for future validation
+			 success="unknown"
+			 cp $datafile $datafile.bk; compress $datafile  
+			 mv $datafile.bk $directory/$file.test
+			 mv $datafile.Z $directory/$file.Z
+	 else
+			 gzip -dc $directory/$file.Z | cmp -s - $datafile
+			 if [ $? != 0 ]; then
+				 	success="false"
+				 	mv $datafile $directory/$file.test
+				 	gzip -dc $directory/$file.Z > $directory/$file.org
+			 		echo "Diagnose with: diff $directory/$file.test $directory/$file.org"
+			 fi
+	 fi
+else
+		success="unknown"
+fi
+
+# sucess can be true, false, or unknown
+if "$success" = true; then
+		echo test output agrees with reference output.
+		exit 0
+else
+		echo test failed.
+		exit 1
+fi
+
+

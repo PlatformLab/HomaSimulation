@@ -1,0 +1,1082 @@
+V -t * -v 1.0a5 -a 1 -c 1 -F 1 -M 2
+c -t * -i 0 -n black
+N -t * -S 0 -n {TCP session  between node 0.0 and node 4.0} -p TCP  -m {}
+N -t * -S 0 -h 30
+N -t * -F 0 -M 0 -n tcp
+N -t * -F 0 -M 1 -n ack
+A -t * -n 1 -p 0 -o 255 -c 15 -a 1
+A -t * -h 1 -m 127 -s 8
+n -t * -a 4 -s 4 -S UP -v circle -c black
+n -t * -a 0 -s 0 -S UP -v circle -c black
+n -t * -a 5 -s 5 -S UP -v circle -c red
+n -t * -a 1 -s 1 -S UP -v circle -c red
+n -t * -a 2 -s 2 -S UP -v rectangular -c blue
+n -t * -a 3 -s 3 -S UP -v rectangular -c blue
+l -t * -s 0 -d 2 -S UP -r 500000 -D 0.02 -c black -o right-down
+l -t * -s 1 -d 2 -S UP -r 500000 -D 0.02 -c black -o right-up
+l -t * -s 2 -d 3 -S UP -r 500000 -D 0.02 -c black -o right
+l -t * -s 3 -d 4 -S UP -r 500000 -D 0.02 -c black -o right-up
+l -t * -s 3 -d 5 -S UP -r 500000 -D 0.02 -c black -o right-down
+q -t * -s 3 -d 2 -a 0.5
+q -t * -s 2 -d 3 -a 0.5
+a -t 0.00000000000000000 -s 0 -d 4 -n tcp
+f -t 0.00000000000000000 -s 0 -d 4 -n cwnd_ -a tcp -v 1.000000 -T v
+v -t 0.00000000000000000 monitor_agent 0 tcp
+n -t 0 -s 0 -S DLABEL -l TCP2-Sender -L ""
+n -t 0 -s 1 -S DLABEL -l CBR2-Sender -L ""
+n -t 0 -s 4 -S DLABEL -l TCP2-Receiver -L ""
+n -t 0 -s 5 -S DLABEL -l CBR2-Receiver -L ""
+v -t 0 sim_annotation 0 1 Normal operation of <Slow Start> with max window size, 8
++ -t 0.1 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -f 0 -m 0 -y {0 0}
+- -t 0.1 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
+h -t 0.1 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {-1 -1}
++ -t 0.1 -s 1 -d 2 -p cbr -e 500 -c 3 -i 1 -a 3
+- -t 0.1 -s 1 -d 2 -p cbr -e 500 -c 3 -i 1 -a 3
+h -t 0.1 -s 1 -d 2 -p cbr -e 500 -c 3 -i 1 -a 3
+v -t 0.10000000000000001 sim_annotation 0.10000000000000001 2 FTP starts at 0.1
+v -t 0.10000000000000001 sim_annotation 0.10000000000000001 3 CBR starts at 0.1
+v -t 0.11 sim_annotation 0.11 4 Initial window size is 1
+r -t 0.128 -s 1 -d 2 -p cbr -e 500 -c 3 -i 1 -a 3
++ -t 0.128 -s 2 -d 3 -p cbr -e 500 -c 3 -i 1 -a 3
+- -t 0.128 -s 2 -d 3 -p cbr -e 500 -c 3 -i 1 -a 3
+h -t 0.128 -s 2 -d 3 -p cbr -e 500 -c 3 -i 1 -a 3
+r -t 0.136 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
++ -t 0.136 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
+- -t 0.136 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
+h -t 0.136 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {-1 -1}
++ -t 0.15 -s 1 -d 2 -p cbr -e 500 -c 3 -i 2 -a 3
+- -t 0.15 -s 1 -d 2 -p cbr -e 500 -c 3 -i 2 -a 3
+h -t 0.15 -s 1 -d 2 -p cbr -e 500 -c 3 -i 2 -a 3
+r -t 0.156 -s 2 -d 3 -p cbr -e 500 -c 3 -i 1 -a 3
++ -t 0.156 -s 3 -d 5 -p cbr -e 500 -c 3 -i 1 -a 3
+- -t 0.156 -s 3 -d 5 -p cbr -e 500 -c 3 -i 1 -a 3
+h -t 0.156 -s 3 -d 5 -p cbr -e 500 -c 3 -i 1 -a 3
+r -t 0.172 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
++ -t 0.172 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
+- -t 0.172 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
+h -t 0.172 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {-1 -1}
+r -t 0.178 -s 1 -d 2 -p cbr -e 500 -c 3 -i 2 -a 3
++ -t 0.178 -s 2 -d 3 -p cbr -e 500 -c 3 -i 2 -a 3
+- -t 0.178 -s 2 -d 3 -p cbr -e 500 -c 3 -i 2 -a 3
+h -t 0.178 -s 2 -d 3 -p cbr -e 500 -c 3 -i 2 -a 3
+r -t 0.184 -s 3 -d 5 -p cbr -e 500 -c 3 -i 1 -a 3
++ -t 0.2 -s 1 -d 2 -p cbr -e 500 -c 3 -i 3 -a 3
+- -t 0.2 -s 1 -d 2 -p cbr -e 500 -c 3 -i 3 -a 3
+h -t 0.2 -s 1 -d 2 -p cbr -e 500 -c 3 -i 3 -a 3
+r -t 0.206 -s 2 -d 3 -p cbr -e 500 -c 3 -i 2 -a 3
++ -t 0.206 -s 3 -d 5 -p cbr -e 500 -c 3 -i 2 -a 3
+- -t 0.206 -s 3 -d 5 -p cbr -e 500 -c 3 -i 2 -a 3
+h -t 0.206 -s 3 -d 5 -p cbr -e 500 -c 3 -i 2 -a 3
+r -t 0.208 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 0 -a 0 -S 0 -y {0 0}
++ -t 0.208 -s 4 -d 3 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
+- -t 0.208 -s 4 -d 3 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
+h -t 0.208 -s 4 -d 3 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {-1 -1}
+v -t 0.22 sim_annotation 0.22 5 1 ack is coming
+r -t 0.228 -s 1 -d 2 -p cbr -e 500 -c 3 -i 3 -a 3
++ -t 0.228 -s 2 -d 3 -p cbr -e 500 -c 3 -i 3 -a 3
+- -t 0.228 -s 2 -d 3 -p cbr -e 500 -c 3 -i 3 -a 3
+h -t 0.228 -s 2 -d 3 -p cbr -e 500 -c 3 -i 3 -a 3
+r -t 0.22864 -s 4 -d 3 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
++ -t 0.22864 -s 3 -d 2 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
+- -t 0.22864 -s 3 -d 2 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
+h -t 0.22864 -s 3 -d 2 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {-1 -1}
+r -t 0.234 -s 3 -d 5 -p cbr -e 500 -c 3 -i 2 -a 3
+r -t 0.24928 -s 3 -d 2 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
++ -t 0.24928 -s 2 -d 0 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
+- -t 0.24928 -s 2 -d 0 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -f 0 -m 1 -y {0 0}
+h -t 0.24928 -s 2 -d 0 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {-1 -1}
++ -t 0.25 -s 1 -d 2 -p cbr -e 500 -c 3 -i 5 -a 3
+- -t 0.25 -s 1 -d 2 -p cbr -e 500 -c 3 -i 5 -a 3
+h -t 0.25 -s 1 -d 2 -p cbr -e 500 -c 3 -i 5 -a 3
+r -t 0.256 -s 2 -d 3 -p cbr -e 500 -c 3 -i 3 -a 3
++ -t 0.256 -s 3 -d 5 -p cbr -e 500 -c 3 -i 3 -a 3
+- -t 0.256 -s 3 -d 5 -p cbr -e 500 -c 3 -i 3 -a 3
+h -t 0.256 -s 3 -d 5 -p cbr -e 500 -c 3 -i 3 -a 3
+v -t 0.26000000000000001 sim_annotation 0.26000000000000001 6 Increase window size to 2
+r -t 0.26992 -s 2 -d 0 -p ack -e 40 -c 2 -i 4 -a 0 -S 0 -y {0 0}
+f -t 0.26991999999999999 -s 0 -d 4 -n cwnd_ -a tcp -v 2.000000 -o 1.000000 -T v
++ -t 0.26992 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -f 0 -m 0 -y {1 1}
+- -t 0.26992 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
+h -t 0.26992 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {-1 -1}
++ -t 0.26992 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -f 0 -m 0 -y {2 2}
+r -t 0.278 -s 1 -d 2 -p cbr -e 500 -c 3 -i 5 -a 3
++ -t 0.278 -s 2 -d 3 -p cbr -e 500 -c 3 -i 5 -a 3
+- -t 0.278 -s 2 -d 3 -p cbr -e 500 -c 3 -i 5 -a 3
+h -t 0.278 -s 2 -d 3 -p cbr -e 500 -c 3 -i 5 -a 3
+r -t 0.284 -s 3 -d 5 -p cbr -e 500 -c 3 -i 3 -a 3
+- -t 0.28592 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
+h -t 0.28592 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {-1 -1}
++ -t 0.3 -s 1 -d 2 -p cbr -e 500 -c 3 -i 8 -a 3
+- -t 0.3 -s 1 -d 2 -p cbr -e 500 -c 3 -i 8 -a 3
+h -t 0.3 -s 1 -d 2 -p cbr -e 500 -c 3 -i 8 -a 3
+r -t 0.30592 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
++ -t 0.30592 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
+- -t 0.30592 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
+h -t 0.30592 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {-1 -1}
+r -t 0.306 -s 2 -d 3 -p cbr -e 500 -c 3 -i 5 -a 3
++ -t 0.306 -s 3 -d 5 -p cbr -e 500 -c 3 -i 5 -a 3
+- -t 0.306 -s 3 -d 5 -p cbr -e 500 -c 3 -i 5 -a 3
+h -t 0.306 -s 3 -d 5 -p cbr -e 500 -c 3 -i 5 -a 3
+r -t 0.32192 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
++ -t 0.32192 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
+- -t 0.32192 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
+h -t 0.32192 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {-1 -1}
+r -t 0.328 -s 1 -d 2 -p cbr -e 500 -c 3 -i 8 -a 3
++ -t 0.328 -s 2 -d 3 -p cbr -e 500 -c 3 -i 8 -a 3
+r -t 0.334 -s 3 -d 5 -p cbr -e 500 -c 3 -i 5 -a 3
+- -t 0.33792 -s 2 -d 3 -p cbr -e 500 -c 3 -i 8 -a 3
+h -t 0.33792 -s 2 -d 3 -p cbr -e 500 -c 3 -i 8 -a 3
+r -t 0.34192 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
++ -t 0.34192 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
+- -t 0.34192 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
+h -t 0.34192 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {-1 -1}
++ -t 0.35 -s 1 -d 2 -p cbr -e 500 -c 3 -i 9 -a 3
+- -t 0.35 -s 1 -d 2 -p cbr -e 500 -c 3 -i 9 -a 3
+h -t 0.35 -s 1 -d 2 -p cbr -e 500 -c 3 -i 9 -a 3
+r -t 0.35792 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
++ -t 0.35792 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
+- -t 0.35792 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
+h -t 0.35792 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {-1 -1}
+r -t 0.36592 -s 2 -d 3 -p cbr -e 500 -c 3 -i 8 -a 3
++ -t 0.36592 -s 3 -d 5 -p cbr -e 500 -c 3 -i 8 -a 3
+- -t 0.36592 -s 3 -d 5 -p cbr -e 500 -c 3 -i 8 -a 3
+h -t 0.36592 -s 3 -d 5 -p cbr -e 500 -c 3 -i 8 -a 3
+r -t 0.37792 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 6 -a 0 -S 0 -y {1 1}
++ -t 0.37792 -s 4 -d 3 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
+- -t 0.37792 -s 4 -d 3 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
+h -t 0.37792 -s 4 -d 3 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {-1 -1}
+r -t 0.378 -s 1 -d 2 -p cbr -e 500 -c 3 -i 9 -a 3
++ -t 0.378 -s 2 -d 3 -p cbr -e 500 -c 3 -i 9 -a 3
+- -t 0.378 -s 2 -d 3 -p cbr -e 500 -c 3 -i 9 -a 3
+h -t 0.378 -s 2 -d 3 -p cbr -e 500 -c 3 -i 9 -a 3
+v -t 0.38 sim_annotation 0.38 7 2 acks are coming
+r -t 0.39392 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 7 -a 0 -S 0 -y {2 2}
++ -t 0.39392 -s 4 -d 3 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
+- -t 0.39392 -s 4 -d 3 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
+h -t 0.39392 -s 4 -d 3 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {-1 -1}
+r -t 0.39392 -s 3 -d 5 -p cbr -e 500 -c 3 -i 8 -a 3
+r -t 0.39856 -s 4 -d 3 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
++ -t 0.39856 -s 3 -d 2 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
+- -t 0.39856 -s 3 -d 2 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
+h -t 0.39856 -s 3 -d 2 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {-1 -1}
++ -t 0.4 -s 1 -d 2 -p cbr -e 500 -c 3 -i 12 -a 3
+- -t 0.4 -s 1 -d 2 -p cbr -e 500 -c 3 -i 12 -a 3
+h -t 0.4 -s 1 -d 2 -p cbr -e 500 -c 3 -i 12 -a 3
+r -t 0.406 -s 2 -d 3 -p cbr -e 500 -c 3 -i 9 -a 3
++ -t 0.406 -s 3 -d 5 -p cbr -e 500 -c 3 -i 9 -a 3
+- -t 0.406 -s 3 -d 5 -p cbr -e 500 -c 3 -i 9 -a 3
+h -t 0.406 -s 3 -d 5 -p cbr -e 500 -c 3 -i 9 -a 3
+r -t 0.41456 -s 4 -d 3 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
++ -t 0.41456 -s 3 -d 2 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
+- -t 0.41456 -s 3 -d 2 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
+h -t 0.41456 -s 3 -d 2 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {-1 -1}
+r -t 0.4192 -s 3 -d 2 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
++ -t 0.4192 -s 2 -d 0 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
+- -t 0.4192 -s 2 -d 0 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -f 0 -m 1 -y {1 1}
+h -t 0.4192 -s 2 -d 0 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {-1 -1}
+v -t 0.41999999999999998 sim_annotation 0.41999999999999998 8 Increase window size to 4
+r -t 0.428 -s 1 -d 2 -p cbr -e 500 -c 3 -i 12 -a 3
++ -t 0.428 -s 2 -d 3 -p cbr -e 500 -c 3 -i 12 -a 3
+- -t 0.428 -s 2 -d 3 -p cbr -e 500 -c 3 -i 12 -a 3
+h -t 0.428 -s 2 -d 3 -p cbr -e 500 -c 3 -i 12 -a 3
+r -t 0.434 -s 3 -d 5 -p cbr -e 500 -c 3 -i 9 -a 3
+r -t 0.4352 -s 3 -d 2 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
++ -t 0.4352 -s 2 -d 0 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
+- -t 0.4352 -s 2 -d 0 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -f 0 -m 1 -y {2 2}
+h -t 0.4352 -s 2 -d 0 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {-1 -1}
+r -t 0.43984 -s 2 -d 0 -p ack -e 40 -c 2 -i 10 -a 0 -S 0 -y {1 1}
+f -t 0.43984000000000001 -s 0 -d 4 -n cwnd_ -a tcp -v 3.000000 -o 2.000000 -T v
++ -t 0.43984 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -f 0 -m 0 -y {3 3}
+- -t 0.43984 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
+h -t 0.43984 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {-1 -1}
++ -t 0.43984 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -f 0 -m 0 -y {4 4}
++ -t 0.45 -s 1 -d 2 -p cbr -e 500 -c 3 -i 15 -a 3
+- -t 0.45 -s 1 -d 2 -p cbr -e 500 -c 3 -i 15 -a 3
+h -t 0.45 -s 1 -d 2 -p cbr -e 500 -c 3 -i 15 -a 3
+r -t 0.45584 -s 2 -d 0 -p ack -e 40 -c 2 -i 11 -a 0 -S 0 -y {2 2}
+f -t 0.45584000000000002 -s 0 -d 4 -n cwnd_ -a tcp -v 4.000000 -o 3.000000 -T v
++ -t 0.45584 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -f 0 -m 0 -y {5 5}
++ -t 0.45584 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -f 0 -m 0 -y {6 6}
+- -t 0.45584 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
+h -t 0.45584 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {-1 -1}
+r -t 0.456 -s 2 -d 3 -p cbr -e 500 -c 3 -i 12 -a 3
++ -t 0.456 -s 3 -d 5 -p cbr -e 500 -c 3 -i 12 -a 3
+- -t 0.456 -s 3 -d 5 -p cbr -e 500 -c 3 -i 12 -a 3
+h -t 0.456 -s 3 -d 5 -p cbr -e 500 -c 3 -i 12 -a 3
+- -t 0.47184 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
+h -t 0.47184 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {-1 -1}
+r -t 0.47584 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
++ -t 0.47584 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
+- -t 0.47584 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
+h -t 0.47584 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {-1 -1}
+r -t 0.478 -s 1 -d 2 -p cbr -e 500 -c 3 -i 15 -a 3
++ -t 0.478 -s 2 -d 3 -p cbr -e 500 -c 3 -i 15 -a 3
+r -t 0.484 -s 3 -d 5 -p cbr -e 500 -c 3 -i 12 -a 3
+- -t 0.48784 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
+h -t 0.48784 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {-1 -1}
+r -t 0.49184 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
++ -t 0.49184 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
+- -t 0.49184 -s 2 -d 3 -p cbr -e 500 -c 3 -i 15 -a 3
+h -t 0.49184 -s 2 -d 3 -p cbr -e 500 -c 3 -i 15 -a 3
+- -t 0.49984 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
+h -t 0.49984 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {-1 -1}
++ -t 0.5 -s 1 -d 2 -p cbr -e 500 -c 3 -i 18 -a 3
+- -t 0.5 -s 1 -d 2 -p cbr -e 500 -c 3 -i 18 -a 3
+h -t 0.5 -s 1 -d 2 -p cbr -e 500 -c 3 -i 18 -a 3
+r -t 0.50784 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
++ -t 0.50784 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
+r -t 0.51184 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
++ -t 0.51184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
+- -t 0.51184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
+h -t 0.51184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {-1 -1}
+- -t 0.51584 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
+h -t 0.51584 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {-1 -1}
+r -t 0.51984 -s 2 -d 3 -p cbr -e 500 -c 3 -i 15 -a 3
++ -t 0.51984 -s 3 -d 5 -p cbr -e 500 -c 3 -i 15 -a 3
+- -t 0.51984 -s 3 -d 5 -p cbr -e 500 -c 3 -i 15 -a 3
+h -t 0.51984 -s 3 -d 5 -p cbr -e 500 -c 3 -i 15 -a 3
+r -t 0.52384 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
++ -t 0.52384 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
+r -t 0.528 -s 1 -d 2 -p cbr -e 500 -c 3 -i 18 -a 3
++ -t 0.528 -s 2 -d 3 -p cbr -e 500 -c 3 -i 18 -a 3
+- -t 0.53184 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
+h -t 0.53184 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {-1 -1}
+r -t 0.53584 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
++ -t 0.53584 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
+- -t 0.53584 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
+h -t 0.53584 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {-1 -1}
+r -t 0.54784 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 13 -a 0 -S 0 -y {3 3}
++ -t 0.54784 -s 4 -d 3 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
+- -t 0.54784 -s 4 -d 3 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
+h -t 0.54784 -s 4 -d 3 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {-1 -1}
+r -t 0.54784 -s 3 -d 5 -p cbr -e 500 -c 3 -i 15 -a 3
+- -t 0.54784 -s 2 -d 3 -p cbr -e 500 -c 3 -i 18 -a 3
+h -t 0.54784 -s 2 -d 3 -p cbr -e 500 -c 3 -i 18 -a 3
++ -t 0.55 -s 1 -d 2 -p cbr -e 500 -c 3 -i 20 -a 3
+- -t 0.55 -s 1 -d 2 -p cbr -e 500 -c 3 -i 20 -a 3
+h -t 0.55 -s 1 -d 2 -p cbr -e 500 -c 3 -i 20 -a 3
+v -t 0.55000000000000004 sim_annotation 0.55000000000000004 9 4 acks are coming
+r -t 0.55184 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
++ -t 0.55184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
+- -t 0.55184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
+h -t 0.55184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {-1 -1}
+r -t 0.56784 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
++ -t 0.56784 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
+- -t 0.56784 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
+h -t 0.56784 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {-1 -1}
+r -t 0.56848 -s 4 -d 3 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
++ -t 0.56848 -s 3 -d 2 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
+- -t 0.56848 -s 3 -d 2 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
+h -t 0.56848 -s 3 -d 2 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {-1 -1}
+r -t 0.57184 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 14 -a 0 -S 0 -y {4 4}
++ -t 0.57184 -s 4 -d 3 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
+- -t 0.57184 -s 4 -d 3 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
+h -t 0.57184 -s 4 -d 3 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {-1 -1}
+r -t 0.57584 -s 2 -d 3 -p cbr -e 500 -c 3 -i 18 -a 3
++ -t 0.57584 -s 3 -d 5 -p cbr -e 500 -c 3 -i 18 -a 3
+- -t 0.57584 -s 3 -d 5 -p cbr -e 500 -c 3 -i 18 -a 3
+h -t 0.57584 -s 3 -d 5 -p cbr -e 500 -c 3 -i 18 -a 3
+r -t 0.578 -s 1 -d 2 -p cbr -e 500 -c 3 -i 20 -a 3
++ -t 0.578 -s 2 -d 3 -p cbr -e 500 -c 3 -i 20 -a 3
+- -t 0.578 -s 2 -d 3 -p cbr -e 500 -c 3 -i 20 -a 3
+h -t 0.578 -s 2 -d 3 -p cbr -e 500 -c 3 -i 20 -a 3
+r -t 0.58784 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 16 -a 0 -S 0 -y {5 5}
++ -t 0.58784 -s 4 -d 3 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
+- -t 0.58784 -s 4 -d 3 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
+h -t 0.58784 -s 4 -d 3 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {-1 -1}
+r -t 0.58912 -s 3 -d 2 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
++ -t 0.58912 -s 2 -d 0 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
+- -t 0.58912 -s 2 -d 0 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -f 0 -m 1 -y {3 3}
+h -t 0.58912 -s 2 -d 0 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {-1 -1}
+v -t 0.58999999999999997 sim_annotation 0.58999999999999997 10 Increase window size to 8
+r -t 0.59248 -s 4 -d 3 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
++ -t 0.59248 -s 3 -d 2 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
+- -t 0.59248 -s 3 -d 2 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
+h -t 0.59248 -s 3 -d 2 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {-1 -1}
++ -t 0.6 -s 1 -d 2 -p cbr -e 500 -c 3 -i 23 -a 3
+- -t 0.6 -s 1 -d 2 -p cbr -e 500 -c 3 -i 23 -a 3
+h -t 0.6 -s 1 -d 2 -p cbr -e 500 -c 3 -i 23 -a 3
+r -t 0.60384 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 17 -a 0 -S 0 -y {6 6}
++ -t 0.60384 -s 4 -d 3 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
+- -t 0.60384 -s 4 -d 3 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
+h -t 0.60384 -s 4 -d 3 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {-1 -1}
+r -t 0.60384 -s 3 -d 5 -p cbr -e 500 -c 3 -i 18 -a 3
+r -t 0.606 -s 2 -d 3 -p cbr -e 500 -c 3 -i 20 -a 3
++ -t 0.606 -s 3 -d 5 -p cbr -e 500 -c 3 -i 20 -a 3
+- -t 0.606 -s 3 -d 5 -p cbr -e 500 -c 3 -i 20 -a 3
+h -t 0.606 -s 3 -d 5 -p cbr -e 500 -c 3 -i 20 -a 3
+r -t 0.60848 -s 4 -d 3 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
++ -t 0.60848 -s 3 -d 2 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
+- -t 0.60848 -s 3 -d 2 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
+h -t 0.60848 -s 3 -d 2 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {-1 -1}
+r -t 0.60976 -s 2 -d 0 -p ack -e 40 -c 2 -i 19 -a 0 -S 0 -y {3 3}
+f -t 0.60976000000000008 -s 0 -d 4 -n cwnd_ -a tcp -v 5.000000 -o 4.000000 -T v
++ -t 0.60976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -f 0 -m 0 -y {7 7}
+- -t 0.60976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
+h -t 0.60976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {-1 -1}
++ -t 0.60976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -f 0 -m 0 -y {8 8}
+r -t 0.61312 -s 3 -d 2 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
++ -t 0.61312 -s 2 -d 0 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
+- -t 0.61312 -s 2 -d 0 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -f 0 -m 1 -y {4 4}
+h -t 0.61312 -s 2 -d 0 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {-1 -1}
+r -t 0.62448 -s 4 -d 3 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
++ -t 0.62448 -s 3 -d 2 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
+- -t 0.62448 -s 3 -d 2 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
+h -t 0.62448 -s 3 -d 2 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {-1 -1}
+- -t 0.62576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
+h -t 0.62576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {-1 -1}
+r -t 0.628 -s 1 -d 2 -p cbr -e 500 -c 3 -i 23 -a 3
++ -t 0.628 -s 2 -d 3 -p cbr -e 500 -c 3 -i 23 -a 3
+- -t 0.628 -s 2 -d 3 -p cbr -e 500 -c 3 -i 23 -a 3
+h -t 0.628 -s 2 -d 3 -p cbr -e 500 -c 3 -i 23 -a 3
+r -t 0.62912 -s 3 -d 2 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
++ -t 0.62912 -s 2 -d 0 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
+- -t 0.62912 -s 2 -d 0 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -f 0 -m 1 -y {5 5}
+h -t 0.62912 -s 2 -d 0 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {-1 -1}
+r -t 0.63376 -s 2 -d 0 -p ack -e 40 -c 2 -i 21 -a 0 -S 0 -y {4 4}
+f -t 0.63376000000000010 -s 0 -d 4 -n cwnd_ -a tcp -v 6.000000 -o 5.000000 -T v
++ -t 0.63376 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -f 0 -m 0 -y {9 9}
++ -t 0.63376 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -f 0 -m 0 -y {10 10}
+r -t 0.634 -s 3 -d 5 -p cbr -e 500 -c 3 -i 20 -a 3
+- -t 0.64176 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
+h -t 0.64176 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {-1 -1}
+r -t 0.64512 -s 3 -d 2 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
++ -t 0.64512 -s 2 -d 0 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
+- -t 0.64512 -s 2 -d 0 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -f 0 -m 1 -y {6 6}
+h -t 0.64512 -s 2 -d 0 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {-1 -1}
+r -t 0.64576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
++ -t 0.64576 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
+- -t 0.64576 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
+h -t 0.64576 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {-1 -1}
+r -t 0.64976 -s 2 -d 0 -p ack -e 40 -c 2 -i 22 -a 0 -S 0 -y {5 5}
+f -t 0.64976000000000012 -s 0 -d 4 -n cwnd_ -a tcp -v 7.000000 -o 6.000000 -T v
++ -t 0.64976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -f 0 -m 0 -y {11 11}
++ -t 0.64976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -f 0 -m 0 -y {12 12}
++ -t 0.65 -s 1 -d 2 -p cbr -e 500 -c 3 -i 31 -a 3
+- -t 0.65 -s 1 -d 2 -p cbr -e 500 -c 3 -i 31 -a 3
+h -t 0.65 -s 1 -d 2 -p cbr -e 500 -c 3 -i 31 -a 3
+r -t 0.656 -s 2 -d 3 -p cbr -e 500 -c 3 -i 23 -a 3
++ -t 0.656 -s 3 -d 5 -p cbr -e 500 -c 3 -i 23 -a 3
+- -t 0.656 -s 3 -d 5 -p cbr -e 500 -c 3 -i 23 -a 3
+h -t 0.656 -s 3 -d 5 -p cbr -e 500 -c 3 -i 23 -a 3
+- -t 0.65776 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
+h -t 0.65776 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {-1 -1}
+r -t 0.66176 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
++ -t 0.66176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
+- -t 0.66176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
+h -t 0.66176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {-1 -1}
+r -t 0.66576 -s 2 -d 0 -p ack -e 40 -c 2 -i 24 -a 0 -S 0 -y {6 6}
+f -t 0.66576000000000013 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 7.000000 -T v
++ -t 0.66576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -f 0 -m 0 -y {13 13}
++ -t 0.66576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -f 0 -m 0 -y {14 14}
+- -t 0.67376 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
+h -t 0.67376 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {-1 -1}
+r -t 0.67776 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
++ -t 0.67776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
+- -t 0.67776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
+h -t 0.67776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {-1 -1}
+r -t 0.678 -s 1 -d 2 -p cbr -e 500 -c 3 -i 31 -a 3
++ -t 0.678 -s 2 -d 3 -p cbr -e 500 -c 3 -i 31 -a 3
+r -t 0.68176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
++ -t 0.68176 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
+- -t 0.68176 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
+h -t 0.68176 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {-1 -1}
+r -t 0.684 -s 3 -d 5 -p cbr -e 500 -c 3 -i 23 -a 3
+- -t 0.68976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
+h -t 0.68976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {-1 -1}
+r -t 0.69376 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
++ -t 0.69376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
+- -t 0.69376 -s 2 -d 3 -p cbr -e 500 -c 3 -i 31 -a 3
+h -t 0.69376 -s 2 -d 3 -p cbr -e 500 -c 3 -i 31 -a 3
+r -t 0.69776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
++ -t 0.69776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
+- -t 0.69776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
+h -t 0.69776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {-1 -1}
++ -t 0.7 -s 1 -d 2 -p cbr -e 500 -c 3 -i 34 -a 3
+- -t 0.7 -s 1 -d 2 -p cbr -e 500 -c 3 -i 34 -a 3
+h -t 0.7 -s 1 -d 2 -p cbr -e 500 -c 3 -i 34 -a 3
+- -t 0.70176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
+h -t 0.70176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {-1 -1}
+- -t 0.70576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
+h -t 0.70576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {-1 -1}
+r -t 0.70976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
++ -t 0.70976 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
+r -t 0.71376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
++ -t 0.71376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
+- -t 0.71376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
+h -t 0.71376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {-1 -1}
+r -t 0.71776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 25 -a 0 -S 0 -y {7 7}
++ -t 0.71776 -s 4 -d 3 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
+- -t 0.71776 -s 4 -d 3 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
+h -t 0.71776 -s 4 -d 3 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {-1 -1}
+- -t 0.71776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
+h -t 0.71776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {-1 -1}
+r -t 0.72176 -s 2 -d 3 -p cbr -e 500 -c 3 -i 31 -a 3
++ -t 0.72176 -s 3 -d 5 -p cbr -e 500 -c 3 -i 31 -a 3
+- -t 0.72176 -s 3 -d 5 -p cbr -e 500 -c 3 -i 31 -a 3
+h -t 0.72176 -s 3 -d 5 -p cbr -e 500 -c 3 -i 31 -a 3
+- -t 0.72176 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
+h -t 0.72176 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {-1 -1}
+r -t 0.72576 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
++ -t 0.72576 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
+r -t 0.728 -s 1 -d 2 -p cbr -e 500 -c 3 -i 34 -a 3
++ -t 0.728 -s 2 -d 3 -p cbr -e 500 -c 3 -i 34 -a 3
+r -t 0.73376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 26 -a 0 -S 0 -y {8 8}
++ -t 0.73376 -s 4 -d 3 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
+- -t 0.73376 -s 4 -d 3 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
+h -t 0.73376 -s 4 -d 3 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {-1 -1}
+- -t 0.73376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
+h -t 0.73376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {-1 -1}
+r -t 0.73776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
++ -t 0.73776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
+- -t 0.73776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
+h -t 0.73776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {-1 -1}
+r -t 0.7384 -s 4 -d 3 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
++ -t 0.7384 -s 3 -d 2 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
+- -t 0.7384 -s 3 -d 2 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
+h -t 0.7384 -s 3 -d 2 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {-1 -1}
+r -t 0.74176 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
++ -t 0.74176 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
+r -t 0.74976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 27 -a 0 -S 0 -y {9 9}
++ -t 0.74976 -s 4 -d 3 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
+- -t 0.74976 -s 4 -d 3 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
+h -t 0.74976 -s 4 -d 3 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {-1 -1}
+r -t 0.74976 -s 3 -d 5 -p cbr -e 500 -c 3 -i 31 -a 3
+- -t 0.74976 -s 2 -d 3 -p cbr -e 500 -c 3 -i 34 -a 3
+h -t 0.74976 -s 2 -d 3 -p cbr -e 500 -c 3 -i 34 -a 3
+v -t 0.75 sim_annotation 0.75 11 8 acks are coming
++ -t 0.75 -s 1 -d 2 -p cbr -e 500 -c 3 -i 38 -a 3
+- -t 0.75 -s 1 -d 2 -p cbr -e 500 -c 3 -i 38 -a 3
+h -t 0.75 -s 1 -d 2 -p cbr -e 500 -c 3 -i 38 -a 3
+r -t 0.75376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
++ -t 0.75376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
+- -t 0.75376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
+h -t 0.75376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {-1 -1}
+r -t 0.7544 -s 4 -d 3 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
++ -t 0.7544 -s 3 -d 2 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
+- -t 0.7544 -s 3 -d 2 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
+h -t 0.7544 -s 3 -d 2 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {-1 -1}
+r -t 0.75776 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
++ -t 0.75776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
+- -t 0.75776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
+h -t 0.75776 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {-1 -1}
+r -t 0.75904 -s 3 -d 2 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
++ -t 0.75904 -s 2 -d 0 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
+- -t 0.75904 -s 2 -d 0 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -f 0 -m 1 -y {7 7}
+h -t 0.75904 -s 2 -d 0 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {-1 -1}
+r -t 0.76976 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
++ -t 0.76976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
+- -t 0.76976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
+h -t 0.76976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {-1 -1}
+v -t 0.77000000000000002 sim_annotation 0.77000000000000002 12 Keep maximum cwnd size, 8
+r -t 0.7704 -s 4 -d 3 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
++ -t 0.7704 -s 3 -d 2 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
+- -t 0.7704 -s 3 -d 2 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
+h -t 0.7704 -s 3 -d 2 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {-1 -1}
+r -t 0.77376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 28 -a 0 -S 0 -y {10 10}
++ -t 0.77376 -s 4 -d 3 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
+- -t 0.77376 -s 4 -d 3 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
+h -t 0.77376 -s 4 -d 3 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {-1 -1}
+- -t 0.77376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
+h -t 0.77376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {-1 -1}
+r -t 0.77504 -s 3 -d 2 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
++ -t 0.77504 -s 2 -d 0 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
+- -t 0.77504 -s 2 -d 0 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -f 0 -m 1 -y {8 8}
+h -t 0.77504 -s 2 -d 0 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {-1 -1}
+r -t 0.77776 -s 2 -d 3 -p cbr -e 500 -c 3 -i 34 -a 3
++ -t 0.77776 -s 3 -d 5 -p cbr -e 500 -c 3 -i 34 -a 3
+- -t 0.77776 -s 3 -d 5 -p cbr -e 500 -c 3 -i 34 -a 3
+h -t 0.77776 -s 3 -d 5 -p cbr -e 500 -c 3 -i 34 -a 3
+r -t 0.778 -s 1 -d 2 -p cbr -e 500 -c 3 -i 38 -a 3
++ -t 0.778 -s 2 -d 3 -p cbr -e 500 -c 3 -i 38 -a 3
+r -t 0.77968 -s 2 -d 0 -p ack -e 40 -c 2 -i 35 -a 0 -S 0 -y {7 7}
+f -t 0.77968000000000015 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.77968000000000015 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.77968 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -f 0 -m 0 -y {15 15}
+- -t 0.77968 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
+h -t 0.77968 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {-1 -1}
+r -t 0.78976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 29 -a 0 -S 0 -y {11 11}
++ -t 0.78976 -s 4 -d 3 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
+- -t 0.78976 -s 4 -d 3 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
+h -t 0.78976 -s 4 -d 3 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {-1 -1}
+- -t 0.78976 -s 2 -d 3 -p cbr -e 500 -c 3 -i 38 -a 3
+h -t 0.78976 -s 2 -d 3 -p cbr -e 500 -c 3 -i 38 -a 3
+r -t 0.79104 -s 3 -d 2 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
++ -t 0.79104 -s 2 -d 0 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
+- -t 0.79104 -s 2 -d 0 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -f 0 -m 1 -y {9 9}
+h -t 0.79104 -s 2 -d 0 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {-1 -1}
+r -t 0.79376 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
++ -t 0.79376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
+- -t 0.79376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
+h -t 0.79376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {-1 -1}
+r -t 0.7944 -s 4 -d 3 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
++ -t 0.7944 -s 3 -d 2 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
+- -t 0.7944 -s 3 -d 2 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
+h -t 0.7944 -s 3 -d 2 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {-1 -1}
+r -t 0.79568 -s 2 -d 0 -p ack -e 40 -c 2 -i 36 -a 0 -S 0 -y {8 8}
+f -t 0.79568000000000016 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.79568000000000016 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.79568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -f 0 -m 0 -y {16 16}
+- -t 0.79568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
+h -t 0.79568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {-1 -1}
++ -t 0.8 -s 1 -d 2 -p cbr -e 500 -c 3 -i 43 -a 3
+- -t 0.8 -s 1 -d 2 -p cbr -e 500 -c 3 -i 43 -a 3
+h -t 0.8 -s 1 -d 2 -p cbr -e 500 -c 3 -i 43 -a 3
+r -t 0.80576 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 30 -a 0 -S 0 -y {12 12}
++ -t 0.80576 -s 4 -d 3 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
+- -t 0.80576 -s 4 -d 3 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
+h -t 0.80576 -s 4 -d 3 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {-1 -1}
+r -t 0.80576 -s 3 -d 5 -p cbr -e 500 -c 3 -i 34 -a 3
+r -t 0.80976 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
++ -t 0.80976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
+- -t 0.80976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
+h -t 0.80976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {-1 -1}
+r -t 0.8104 -s 4 -d 3 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
++ -t 0.8104 -s 3 -d 2 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
+- -t 0.8104 -s 3 -d 2 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
+h -t 0.8104 -s 3 -d 2 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {-1 -1}
+r -t 0.81168 -s 2 -d 0 -p ack -e 40 -c 2 -i 37 -a 0 -S 0 -y {9 9}
+f -t 0.81168000000000018 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.81168000000000018 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.81168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -f 0 -m 0 -y {17 17}
+- -t 0.81168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
+h -t 0.81168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {-1 -1}
+r -t 0.81504 -s 3 -d 2 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
++ -t 0.81504 -s 2 -d 0 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
+- -t 0.81504 -s 2 -d 0 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -f 0 -m 1 -y {10 10}
+h -t 0.81504 -s 2 -d 0 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {-1 -1}
+r -t 0.81568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
++ -t 0.81568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
+- -t 0.81568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
+h -t 0.81568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {-1 -1}
+r -t 0.81776 -s 2 -d 3 -p cbr -e 500 -c 3 -i 38 -a 3
++ -t 0.81776 -s 3 -d 5 -p cbr -e 500 -c 3 -i 38 -a 3
+- -t 0.81776 -s 3 -d 5 -p cbr -e 500 -c 3 -i 38 -a 3
+h -t 0.81776 -s 3 -d 5 -p cbr -e 500 -c 3 -i 38 -a 3
+r -t 0.8264 -s 4 -d 3 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
++ -t 0.8264 -s 3 -d 2 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
+- -t 0.8264 -s 3 -d 2 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
+h -t 0.8264 -s 3 -d 2 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {-1 -1}
+r -t 0.828 -s 1 -d 2 -p cbr -e 500 -c 3 -i 43 -a 3
++ -t 0.828 -s 2 -d 3 -p cbr -e 500 -c 3 -i 43 -a 3
+r -t 0.82976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 32 -a 0 -S 0 -y {13 13}
++ -t 0.82976 -s 4 -d 3 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
+- -t 0.82976 -s 4 -d 3 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
+h -t 0.82976 -s 4 -d 3 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {-1 -1}
+r -t 0.83104 -s 3 -d 2 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
++ -t 0.83104 -s 2 -d 0 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
+- -t 0.83104 -s 2 -d 0 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -f 0 -m 1 -y {11 11}
+h -t 0.83104 -s 2 -d 0 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {-1 -1}
+r -t 0.83168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
++ -t 0.83168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
+- -t 0.83168 -s 2 -d 3 -p cbr -e 500 -c 3 -i 43 -a 3
+h -t 0.83168 -s 2 -d 3 -p cbr -e 500 -c 3 -i 43 -a 3
+r -t 0.83568 -s 2 -d 0 -p ack -e 40 -c 2 -i 39 -a 0 -S 0 -y {10 10}
+f -t 0.83568000000000020 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.83568000000000020 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.83568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -f 0 -m 0 -y {18 18}
+- -t 0.83568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
+h -t 0.83568 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {-1 -1}
+- -t 0.83968 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
+h -t 0.83968 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {-1 -1}
+r -t 0.84576 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 33 -a 0 -S 0 -y {14 14}
++ -t 0.84576 -s 4 -d 3 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
+- -t 0.84576 -s 4 -d 3 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
+h -t 0.84576 -s 4 -d 3 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {-1 -1}
+r -t 0.84576 -s 3 -d 5 -p cbr -e 500 -c 3 -i 38 -a 3
+r -t 0.84704 -s 3 -d 2 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
++ -t 0.84704 -s 2 -d 0 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
+- -t 0.84704 -s 2 -d 0 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -f 0 -m 1 -y {12 12}
+h -t 0.84704 -s 2 -d 0 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {-1 -1}
+r -t 0.84768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
++ -t 0.84768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
++ -t 0.85 -s 1 -d 2 -p cbr -e 500 -c 3 -i 49 -a 3
+- -t 0.85 -s 1 -d 2 -p cbr -e 500 -c 3 -i 49 -a 3
+h -t 0.85 -s 1 -d 2 -p cbr -e 500 -c 3 -i 49 -a 3
+r -t 0.8504 -s 4 -d 3 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
++ -t 0.8504 -s 3 -d 2 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
+- -t 0.8504 -s 3 -d 2 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
+h -t 0.8504 -s 3 -d 2 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {-1 -1}
+r -t 0.85168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
++ -t 0.85168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
+- -t 0.85168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
+h -t 0.85168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {-1 -1}
+r -t 0.85168 -s 2 -d 0 -p ack -e 40 -c 2 -i 41 -a 0 -S 0 -y {11 11}
+f -t 0.85168000000000021 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.85168000000000021 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.85168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -f 0 -m 0 -y {19 19}
+- -t 0.85168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
+h -t 0.85168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {-1 -1}
+- -t 0.85568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
+h -t 0.85568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {-1 -1}
+r -t 0.85968 -s 2 -d 3 -p cbr -e 500 -c 3 -i 43 -a 3
++ -t 0.85968 -s 3 -d 5 -p cbr -e 500 -c 3 -i 43 -a 3
+- -t 0.85968 -s 3 -d 5 -p cbr -e 500 -c 3 -i 43 -a 3
+h -t 0.85968 -s 3 -d 5 -p cbr -e 500 -c 3 -i 43 -a 3
+r -t 0.8664 -s 4 -d 3 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
++ -t 0.8664 -s 3 -d 2 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
+- -t 0.8664 -s 3 -d 2 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
+h -t 0.8664 -s 3 -d 2 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {-1 -1}
+r -t 0.86768 -s 2 -d 0 -p ack -e 40 -c 2 -i 44 -a 0 -S 0 -y {12 12}
+f -t 0.86768000000000023 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.86768000000000023 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.86768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -f 0 -m 0 -y {20 20}
+- -t 0.86768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
+h -t 0.86768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {-1 -1}
+r -t 0.87104 -s 3 -d 2 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
++ -t 0.87104 -s 2 -d 0 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
+- -t 0.87104 -s 2 -d 0 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -f 0 -m 1 -y {13 13}
+h -t 0.87104 -s 2 -d 0 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {-1 -1}
+r -t 0.87168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
++ -t 0.87168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
+- -t 0.87168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
+h -t 0.87168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {-1 -1}
+r -t 0.87568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
++ -t 0.87568 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
+- -t 0.87568 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
+h -t 0.87568 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {-1 -1}
+r -t 0.878 -s 1 -d 2 -p cbr -e 500 -c 3 -i 49 -a 3
++ -t 0.878 -s 2 -d 3 -p cbr -e 500 -c 3 -i 49 -a 3
+r -t 0.88704 -s 3 -d 2 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
++ -t 0.88704 -s 2 -d 0 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
+- -t 0.88704 -s 2 -d 0 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -f 0 -m 1 -y {14 14}
+h -t 0.88704 -s 2 -d 0 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {-1 -1}
+r -t 0.88768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 40 -a 0 -S 0 -y {15 15}
++ -t 0.88768 -s 4 -d 3 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
+- -t 0.88768 -s 4 -d 3 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
+h -t 0.88768 -s 4 -d 3 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {-1 -1}
+r -t 0.88768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
++ -t 0.88768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
+r -t 0.88768 -s 3 -d 5 -p cbr -e 500 -c 3 -i 43 -a 3
+- -t 0.88768 -s 2 -d 3 -p cbr -e 500 -c 3 -i 49 -a 3
+h -t 0.88768 -s 2 -d 3 -p cbr -e 500 -c 3 -i 49 -a 3
+r -t 0.89168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
++ -t 0.89168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
+r -t 0.89168 -s 2 -d 0 -p ack -e 40 -c 2 -i 46 -a 0 -S 0 -y {13 13}
+f -t 0.89168000000000025 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.89168000000000025 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.89168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -f 0 -m 0 -y {21 21}
+- -t 0.89168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
+h -t 0.89168 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {-1 -1}
+- -t 0.89168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
+h -t 0.89168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {-1 -1}
+- -t 0.89568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
+h -t 0.89568 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {-1 -1}
++ -t 0.9 -s 1 -d 2 -p cbr -e 500 -c 3 -i 54 -a 3
+- -t 0.9 -s 1 -d 2 -p cbr -e 500 -c 3 -i 54 -a 3
+h -t 0.9 -s 1 -d 2 -p cbr -e 500 -c 3 -i 54 -a 3
+r -t 0.90368 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
++ -t 0.90368 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
+r -t 0.90768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
++ -t 0.90768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
+r -t 0.90768 -s 2 -d 0 -p ack -e 40 -c 2 -i 48 -a 0 -S 0 -y {14 14}
+f -t 0.90768000000000026 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.90768000000000026 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.90768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -f 0 -m 0 -y {22 22}
+- -t 0.90768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
+h -t 0.90768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {-1 -1}
+- -t 0.90768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
+h -t 0.90768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {-1 -1}
+r -t 0.90832 -s 4 -d 3 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
++ -t 0.90832 -s 3 -d 2 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
+- -t 0.90832 -s 3 -d 2 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
+h -t 0.90832 -s 3 -d 2 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {-1 -1}
+r -t 0.91168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 42 -a 0 -S 0 -y {16 16}
++ -t 0.91168 -s 4 -d 3 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
+- -t 0.91168 -s 4 -d 3 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
+h -t 0.91168 -s 4 -d 3 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {-1 -1}
+- -t 0.91168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
+h -t 0.91168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {-1 -1}
+r -t 0.91568 -s 2 -d 3 -p cbr -e 500 -c 3 -i 49 -a 3
++ -t 0.91568 -s 3 -d 5 -p cbr -e 500 -c 3 -i 49 -a 3
+- -t 0.91568 -s 3 -d 5 -p cbr -e 500 -c 3 -i 49 -a 3
+h -t 0.91568 -s 3 -d 5 -p cbr -e 500 -c 3 -i 49 -a 3
+r -t 0.92768 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
++ -t 0.92768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
+r -t 0.92768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 45 -a 0 -S 0 -y {17 17}
++ -t 0.92768 -s 4 -d 3 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
+- -t 0.92768 -s 4 -d 3 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
+h -t 0.92768 -s 4 -d 3 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {-1 -1}
+- -t 0.92768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
+h -t 0.92768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {-1 -1}
+r -t 0.928 -s 1 -d 2 -p cbr -e 500 -c 3 -i 54 -a 3
++ -t 0.928 -s 2 -d 3 -p cbr -e 500 -c 3 -i 54 -a 3
+r -t 0.92896 -s 3 -d 2 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
++ -t 0.92896 -s 2 -d 0 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
+- -t 0.92896 -s 2 -d 0 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -f 0 -m 1 -y {15 15}
+h -t 0.92896 -s 2 -d 0 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {-1 -1}
+r -t 0.93168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
++ -t 0.93168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
+- -t 0.93168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
+h -t 0.93168 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {-1 -1}
+r -t 0.93232 -s 4 -d 3 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
++ -t 0.93232 -s 3 -d 2 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
+- -t 0.93232 -s 3 -d 2 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
+h -t 0.93232 -s 3 -d 2 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {-1 -1}
+r -t 0.94368 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
++ -t 0.94368 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
+r -t 0.94368 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 47 -a 0 -S 0 -y {18 18}
++ -t 0.94368 -s 4 -d 3 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
+- -t 0.94368 -s 4 -d 3 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
+h -t 0.94368 -s 4 -d 3 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {-1 -1}
+r -t 0.94368 -s 3 -d 5 -p cbr -e 500 -c 3 -i 49 -a 3
+- -t 0.94368 -s 2 -d 3 -p cbr -e 500 -c 3 -i 54 -a 3
+h -t 0.94368 -s 2 -d 3 -p cbr -e 500 -c 3 -i 54 -a 3
+r -t 0.94768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
++ -t 0.94768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
+- -t 0.94768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
+h -t 0.94768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {-1 -1}
+r -t 0.94832 -s 4 -d 3 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
++ -t 0.94832 -s 3 -d 2 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
+- -t 0.94832 -s 3 -d 2 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
+h -t 0.94832 -s 3 -d 2 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {-1 -1}
+r -t 0.9496 -s 2 -d 0 -p ack -e 40 -c 2 -i 52 -a 0 -S 0 -y {15 15}
+f -t 0.94960000000000022 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.94960000000000022 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.9496 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -f 0 -m 0 -y {23 23}
+- -t 0.9496 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
+h -t 0.9496 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {-1 -1}
++ -t 0.95 -s 1 -d 2 -p cbr -e 500 -c 3 -i 60 -a 3
+- -t 0.95 -s 1 -d 2 -p cbr -e 500 -c 3 -i 60 -a 3
+h -t 0.95 -s 1 -d 2 -p cbr -e 500 -c 3 -i 60 -a 3
+- -t 0.95168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
+h -t 0.95168 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {-1 -1}
+r -t 0.95296 -s 3 -d 2 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
++ -t 0.95296 -s 2 -d 0 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
+- -t 0.95296 -s 2 -d 0 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -f 0 -m 1 -y {16 16}
+h -t 0.95296 -s 2 -d 0 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {-1 -1}
+r -t 0.96368 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
++ -t 0.96368 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
+- -t 0.96368 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
+h -t 0.96368 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {-1 -1}
+r -t 0.96432 -s 4 -d 3 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
++ -t 0.96432 -s 3 -d 2 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
+- -t 0.96432 -s 3 -d 2 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
+h -t 0.96432 -s 3 -d 2 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {-1 -1}
+r -t 0.96768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 50 -a 0 -S 0 -y {19 19}
++ -t 0.96768 -s 4 -d 3 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
+- -t 0.96768 -s 4 -d 3 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
+h -t 0.96768 -s 4 -d 3 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {-1 -1}
+r -t 0.96896 -s 3 -d 2 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
++ -t 0.96896 -s 2 -d 0 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
+- -t 0.96896 -s 2 -d 0 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -f 0 -m 1 -y {17 17}
+h -t 0.96896 -s 2 -d 0 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {-1 -1}
+r -t 0.97168 -s 2 -d 3 -p cbr -e 500 -c 3 -i 54 -a 3
++ -t 0.97168 -s 3 -d 5 -p cbr -e 500 -c 3 -i 54 -a 3
+- -t 0.97168 -s 3 -d 5 -p cbr -e 500 -c 3 -i 54 -a 3
+h -t 0.97168 -s 3 -d 5 -p cbr -e 500 -c 3 -i 54 -a 3
+r -t 0.9736 -s 2 -d 0 -p ack -e 40 -c 2 -i 56 -a 0 -S 0 -y {16 16}
+f -t 0.97360000000000024 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.97360000000000024 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.9736 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -f 0 -m 0 -y {24 24}
+- -t 0.9736 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
+h -t 0.9736 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {-1 -1}
+r -t 0.978 -s 1 -d 2 -p cbr -e 500 -c 3 -i 60 -a 3
++ -t 0.978 -s 2 -d 3 -p cbr -e 500 -c 3 -i 60 -a 3
+- -t 0.978 -s 2 -d 3 -p cbr -e 500 -c 3 -i 60 -a 3
+h -t 0.978 -s 2 -d 3 -p cbr -e 500 -c 3 -i 60 -a 3
+r -t 0.98368 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 51 -a 0 -S 0 -y {20 20}
++ -t 0.98368 -s 4 -d 3 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
+- -t 0.98368 -s 4 -d 3 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
+h -t 0.98368 -s 4 -d 3 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {-1 -1}
+r -t 0.98496 -s 3 -d 2 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
++ -t 0.98496 -s 2 -d 0 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
+- -t 0.98496 -s 2 -d 0 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -f 0 -m 1 -y {18 18}
+h -t 0.98496 -s 2 -d 0 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {-1 -1}
+r -t 0.9856 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
++ -t 0.9856 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
+- -t 0.986 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
+h -t 0.986 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {-1 -1}
+r -t 0.98768 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
++ -t 0.98768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
+- -t 0.98768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
+h -t 0.98768 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {-1 -1}
+r -t 0.98832 -s 4 -d 3 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
++ -t 0.98832 -s 3 -d 2 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
+- -t 0.98832 -s 3 -d 2 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
+h -t 0.98832 -s 3 -d 2 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {-1 -1}
+r -t 0.9896 -s 2 -d 0 -p ack -e 40 -c 2 -i 57 -a 0 -S 0 -y {17 17}
+f -t 0.98960000000000026 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 0.98960000000000026 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 0.9896 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -f 0 -m 0 -y {25 25}
+- -t 0.9896 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
+h -t 0.9896 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {-1 -1}
+r -t 0.99968 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 53 -a 0 -S 0 -y {21 21}
++ -t 0.99968 -s 4 -d 3 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
+- -t 0.99968 -s 4 -d 3 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
+h -t 0.99968 -s 4 -d 3 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {-1 -1}
+r -t 0.99968 -s 3 -d 5 -p cbr -e 500 -c 3 -i 54 -a 3
++ -t 1 -s 1 -d 2 -p cbr -e 500 -c 3 -i 66 -a 3
+- -t 1 -s 1 -d 2 -p cbr -e 500 -c 3 -i 66 -a 3
+h -t 1 -s 1 -d 2 -p cbr -e 500 -c 3 -i 66 -a 3
+r -t 1.00432 -s 4 -d 3 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
++ -t 1.00432 -s 3 -d 2 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
+- -t 1.00432 -s 3 -d 2 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
+h -t 1.00432 -s 3 -d 2 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {-1 -1}
+r -t 1.0056 -s 2 -d 0 -p ack -e 40 -c 2 -i 58 -a 0 -S 0 -y {18 18}
+f -t 1.00560000000000027 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.00560000000000027 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 1.0056 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -f 0 -m 0 -y {26 26}
+- -t 1.0056 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
+h -t 1.0056 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {-1 -1}
+r -t 1.006 -s 2 -d 3 -p cbr -e 500 -c 3 -i 60 -a 3
++ -t 1.006 -s 3 -d 5 -p cbr -e 500 -c 3 -i 60 -a 3
+- -t 1.006 -s 3 -d 5 -p cbr -e 500 -c 3 -i 60 -a 3
+h -t 1.006 -s 3 -d 5 -p cbr -e 500 -c 3 -i 60 -a 3
+r -t 1.00896 -s 3 -d 2 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
++ -t 1.00896 -s 2 -d 0 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
+- -t 1.00896 -s 2 -d 0 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -f 0 -m 1 -y {19 19}
+h -t 1.00896 -s 2 -d 0 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {-1 -1}
+r -t 1.0096 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
++ -t 1.0096 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
+- -t 1.0096 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
+h -t 1.0096 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {-1 -1}
+r -t 1.02032 -s 4 -d 3 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
++ -t 1.02032 -s 3 -d 2 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
+- -t 1.02032 -s 3 -d 2 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
+h -t 1.02032 -s 3 -d 2 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {-1 -1}
+r -t 1.022 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
++ -t 1.022 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
+- -t 1.022 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
+h -t 1.022 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {-1 -1}
+r -t 1.02368 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 55 -a 0 -S 0 -y {22 22}
++ -t 1.02368 -s 4 -d 3 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
+- -t 1.02368 -s 4 -d 3 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
+h -t 1.02368 -s 4 -d 3 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {-1 -1}
+r -t 1.02496 -s 3 -d 2 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
++ -t 1.02496 -s 2 -d 0 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
+- -t 1.02496 -s 2 -d 0 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -f 0 -m 1 -y {20 20}
+h -t 1.02496 -s 2 -d 0 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {-1 -1}
+r -t 1.0256 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
++ -t 1.0256 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
+- -t 1.0256 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
+h -t 1.0256 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {-1 -1}
+r -t 1.028 -s 1 -d 2 -p cbr -e 500 -c 3 -i 66 -a 3
++ -t 1.028 -s 2 -d 3 -p cbr -e 500 -c 3 -i 66 -a 3
+r -t 1.0296 -s 2 -d 0 -p ack -e 40 -c 2 -i 61 -a 0 -S 0 -y {19 19}
+f -t 1.02960000000000029 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.02960000000000029 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 1.0296 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -f 0 -m 0 -y {27 27}
+- -t 1.0296 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
+h -t 1.0296 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {-1 -1}
+r -t 1.034 -s 3 -d 5 -p cbr -e 500 -c 3 -i 60 -a 3
+r -t 1.04096 -s 3 -d 2 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
++ -t 1.04096 -s 2 -d 0 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
+- -t 1.04096 -s 2 -d 0 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -f 0 -m 1 -y {21 21}
+h -t 1.04096 -s 2 -d 0 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {-1 -1}
+r -t 1.0416 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
++ -t 1.0416 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
+- -t 1.0416 -s 2 -d 3 -p cbr -e 500 -c 3 -i 66 -a 3
+h -t 1.0416 -s 2 -d 3 -p cbr -e 500 -c 3 -i 66 -a 3
+r -t 1.04432 -s 4 -d 3 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
++ -t 1.04432 -s 3 -d 2 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
+- -t 1.04432 -s 3 -d 2 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
+h -t 1.04432 -s 3 -d 2 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {-1 -1}
+r -t 1.0456 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
++ -t 1.0456 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
+- -t 1.0456 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
+h -t 1.0456 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {-1 -1}
+r -t 1.0456 -s 2 -d 0 -p ack -e 40 -c 2 -i 63 -a 0 -S 0 -y {20 20}
+f -t 1.04560000000000031 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.04560000000000031 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 1.0456 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -f 0 -m 0 -y {28 28}
+- -t 1.0456 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
+h -t 1.0456 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {-1 -1}
+- -t 1.0496 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
+h -t 1.0496 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {-1 -1}
++ -t 1.05 -s 1 -d 2 -p cbr -e 500 -c 3 -i 71 -a 3
+- -t 1.05 -s 1 -d 2 -p cbr -e 500 -c 3 -i 71 -a 3
+h -t 1.05 -s 1 -d 2 -p cbr -e 500 -c 3 -i 71 -a 3
+r -t 1.058 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 59 -a 0 -S 0 -y {23 23}
++ -t 1.058 -s 4 -d 3 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
+- -t 1.058 -s 4 -d 3 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
+h -t 1.058 -s 4 -d 3 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {-1 -1}
+r -t 1.0616 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
++ -t 1.0616 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
+r -t 1.0616 -s 2 -d 0 -p ack -e 40 -c 2 -i 65 -a 0 -S 0 -y {21 21}
+f -t 1.06160000000000032 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.06160000000000032 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 1.0616 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -f 0 -m 0 -y {29 29}
+- -t 1.0616 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
+h -t 1.0616 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {-1 -1}
+- -t 1.0616 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
+h -t 1.0616 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {-1 -1}
+r -t 1.06496 -s 3 -d 2 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
++ -t 1.06496 -s 2 -d 0 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
+- -t 1.06496 -s 2 -d 0 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -f 0 -m 1 -y {22 22}
+h -t 1.06496 -s 2 -d 0 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {-1 -1}
+r -t 1.0656 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
++ -t 1.0656 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
+- -t 1.0656 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
+h -t 1.0656 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {-1 -1}
+r -t 1.0696 -s 2 -d 3 -p cbr -e 500 -c 3 -i 66 -a 3
++ -t 1.0696 -s 3 -d 5 -p cbr -e 500 -c 3 -i 66 -a 3
+- -t 1.0696 -s 3 -d 5 -p cbr -e 500 -c 3 -i 66 -a 3
+h -t 1.0696 -s 3 -d 5 -p cbr -e 500 -c 3 -i 66 -a 3
+r -t 1.078 -s 1 -d 2 -p cbr -e 500 -c 3 -i 71 -a 3
++ -t 1.078 -s 2 -d 3 -p cbr -e 500 -c 3 -i 71 -a 3
+r -t 1.07864 -s 4 -d 3 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
++ -t 1.07864 -s 3 -d 2 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
+- -t 1.07864 -s 3 -d 2 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
+h -t 1.07864 -s 3 -d 2 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {-1 -1}
+r -t 1.0816 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 62 -a 0 -S 0 -y {24 24}
++ -t 1.0816 -s 4 -d 3 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
+- -t 1.0816 -s 4 -d 3 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
+h -t 1.0816 -s 4 -d 3 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {-1 -1}
+r -t 1.0816 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
++ -t 1.0816 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
+- -t 1.0816 -s 2 -d 3 -p cbr -e 500 -c 3 -i 71 -a 3
+h -t 1.0816 -s 2 -d 3 -p cbr -e 500 -c 3 -i 71 -a 3
+r -t 1.0856 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
++ -t 1.0856 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
+- -t 1.0856 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
+h -t 1.0856 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {-1 -1}
+r -t 1.0856 -s 2 -d 0 -p ack -e 40 -c 2 -i 68 -a 0 -S 0 -y {22 22}
+f -t 1.08560000000000034 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.08560000000000034 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
++ -t 1.0856 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -f 0 -m 0 -y {30 30}
+- -t 1.0856 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
+h -t 1.0856 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {-1 -1}
+- -t 1.0896 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
+h -t 1.0896 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {-1 -1}
+r -t 1.0976 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 64 -a 0 -S 0 -y {25 25}
++ -t 1.0976 -s 4 -d 3 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
+- -t 1.0976 -s 4 -d 3 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
+h -t 1.0976 -s 4 -d 3 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {-1 -1}
+r -t 1.0976 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
++ -t 1.0976 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
+r -t 1.0976 -s 3 -d 5 -p cbr -e 500 -c 3 -i 66 -a 3
+r -t 1.09928 -s 3 -d 2 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
++ -t 1.09928 -s 2 -d 0 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
+- -t 1.09928 -s 2 -d 0 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -f 0 -m 1 -y {23 23}
+h -t 1.09928 -s 2 -d 0 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {-1 -1}
+v -t 1.1000000000000001 sim_annotation 1.1000000000000001 13 FTP stops at 1.1
+v -t 1.1000000000000001 sim_annotation 1.1000000000000001 14 CBR stops at 1.1
+r -t 1.1016 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
++ -t 1.1016 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
+- -t 1.1016 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
+h -t 1.1016 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {-1 -1}
+r -t 1.10224 -s 4 -d 3 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
++ -t 1.10224 -s 3 -d 2 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
+- -t 1.10224 -s 3 -d 2 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
+h -t 1.10224 -s 3 -d 2 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {-1 -1}
+- -t 1.1056 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
+h -t 1.1056 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {-1 -1}
+r -t 1.1096 -s 2 -d 3 -p cbr -e 500 -c 3 -i 71 -a 3
++ -t 1.1096 -s 3 -d 5 -p cbr -e 500 -c 3 -i 71 -a 3
+- -t 1.1096 -s 3 -d 5 -p cbr -e 500 -c 3 -i 71 -a 3
+h -t 1.1096 -s 3 -d 5 -p cbr -e 500 -c 3 -i 71 -a 3
+r -t 1.11824 -s 4 -d 3 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
++ -t 1.11824 -s 3 -d 2 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
+- -t 1.11824 -s 3 -d 2 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
+h -t 1.11824 -s 3 -d 2 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {-1 -1}
+r -t 1.11992 -s 2 -d 0 -p ack -e 40 -c 2 -i 72 -a 0 -S 0 -y {23 23}
+f -t 1.11992000000000025 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.11992000000000025 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.1216 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 67 -a 0 -S 0 -y {26 26}
++ -t 1.1216 -s 4 -d 3 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
+- -t 1.1216 -s 4 -d 3 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
+h -t 1.1216 -s 4 -d 3 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {-1 -1}
+r -t 1.1216 -s 0 -d 2 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
++ -t 1.1216 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
+- -t 1.1216 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
+h -t 1.1216 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {-1 -1}
+r -t 1.12288 -s 3 -d 2 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
++ -t 1.12288 -s 2 -d 0 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
+- -t 1.12288 -s 2 -d 0 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -f 0 -m 1 -y {24 24}
+h -t 1.12288 -s 2 -d 0 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {-1 -1}
+r -t 1.1256 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
++ -t 1.1256 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
+- -t 1.1256 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
+h -t 1.1256 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {-1 -1}
+r -t 1.1376 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 69 -a 0 -S 0 -y {27 27}
++ -t 1.1376 -s 4 -d 3 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
+- -t 1.1376 -s 4 -d 3 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
+h -t 1.1376 -s 4 -d 3 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {-1 -1}
+r -t 1.1376 -s 3 -d 5 -p cbr -e 500 -c 3 -i 71 -a 3
+r -t 1.13888 -s 3 -d 2 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
++ -t 1.13888 -s 2 -d 0 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
+- -t 1.13888 -s 2 -d 0 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -f 0 -m 1 -y {25 25}
+h -t 1.13888 -s 2 -d 0 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {-1 -1}
+r -t 1.1416 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
++ -t 1.1416 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
+- -t 1.1416 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
+h -t 1.1416 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {-1 -1}
+r -t 1.14224 -s 4 -d 3 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
++ -t 1.14224 -s 3 -d 2 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
+- -t 1.14224 -s 3 -d 2 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
+h -t 1.14224 -s 3 -d 2 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {-1 -1}
+r -t 1.14352 -s 2 -d 0 -p ack -e 40 -c 2 -i 74 -a 0 -S 0 -y {24 24}
+f -t 1.14352000000000031 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.14352000000000031 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.1576 -s 2 -d 3 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
++ -t 1.1576 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
+- -t 1.1576 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
+h -t 1.1576 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {-1 -1}
+r -t 1.15824 -s 4 -d 3 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
++ -t 1.15824 -s 3 -d 2 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
+- -t 1.15824 -s 3 -d 2 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
+h -t 1.15824 -s 3 -d 2 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {-1 -1}
+r -t 1.15952 -s 2 -d 0 -p ack -e 40 -c 2 -i 76 -a 0 -S 0 -y {25 25}
+f -t 1.15952000000000033 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.15952000000000033 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.1616 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 70 -a 0 -S 0 -y {28 28}
++ -t 1.1616 -s 4 -d 3 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
+- -t 1.1616 -s 4 -d 3 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
+h -t 1.1616 -s 4 -d 3 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {-1 -1}
+r -t 1.16288 -s 3 -d 2 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
++ -t 1.16288 -s 2 -d 0 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
+- -t 1.16288 -s 2 -d 0 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -f 0 -m 1 -y {26 26}
+h -t 1.16288 -s 2 -d 0 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {-1 -1}
+r -t 1.1776 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 73 -a 0 -S 0 -y {29 29}
++ -t 1.1776 -s 4 -d 3 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
+- -t 1.1776 -s 4 -d 3 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
+h -t 1.1776 -s 4 -d 3 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {-1 -1}
+r -t 1.17888 -s 3 -d 2 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
++ -t 1.17888 -s 2 -d 0 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
+- -t 1.17888 -s 2 -d 0 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -f 0 -m 1 -y {27 27}
+h -t 1.17888 -s 2 -d 0 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {-1 -1}
+r -t 1.18224 -s 4 -d 3 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
++ -t 1.18224 -s 3 -d 2 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
+- -t 1.18224 -s 3 -d 2 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
+h -t 1.18224 -s 3 -d 2 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {-1 -1}
+r -t 1.18352 -s 2 -d 0 -p ack -e 40 -c 2 -i 77 -a 0 -S 0 -y {26 26}
+f -t 1.18352000000000035 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.18352000000000035 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.1936 -s 3 -d 4 -p tcp -e 1000 -c 2 -i 75 -a 0 -S 0 -y {30 30}
++ -t 1.1936 -s 4 -d 3 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
+- -t 1.1936 -s 4 -d 3 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
+h -t 1.1936 -s 4 -d 3 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {-1 -1}
+r -t 1.19824 -s 4 -d 3 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
++ -t 1.19824 -s 3 -d 2 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
+- -t 1.19824 -s 3 -d 2 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
+h -t 1.19824 -s 3 -d 2 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {-1 -1}
+r -t 1.19952 -s 2 -d 0 -p ack -e 40 -c 2 -i 78 -a 0 -S 0 -y {27 27}
+f -t 1.19952000000000036 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.19952000000000036 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.20288 -s 3 -d 2 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
++ -t 1.20288 -s 2 -d 0 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
+- -t 1.20288 -s 2 -d 0 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -f 0 -m 1 -y {28 28}
+h -t 1.20288 -s 2 -d 0 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {-1 -1}
+r -t 1.21424 -s 4 -d 3 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
++ -t 1.21424 -s 3 -d 2 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
+- -t 1.21424 -s 3 -d 2 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
+h -t 1.21424 -s 3 -d 2 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {-1 -1}
+r -t 1.21888 -s 3 -d 2 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
++ -t 1.21888 -s 2 -d 0 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
+- -t 1.21888 -s 2 -d 0 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -f 0 -m 1 -y {29 29}
+h -t 1.21888 -s 2 -d 0 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {-1 -1}
+r -t 1.22352 -s 2 -d 0 -p ack -e 40 -c 2 -i 79 -a 0 -S 0 -y {28 28}
+f -t 1.22352000000000039 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.22352000000000039 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.23488 -s 3 -d 2 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
++ -t 1.23488 -s 2 -d 0 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
+- -t 1.23488 -s 2 -d 0 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -f 0 -m 1 -y {30 30}
+h -t 1.23488 -s 2 -d 0 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {-1 -1}
+r -t 1.23952 -s 2 -d 0 -p ack -e 40 -c 2 -i 80 -a 0 -S 0 -y {29 29}
+f -t 1.23952000000000040 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.23952000000000040 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+r -t 1.25552 -s 2 -d 0 -p ack -e 40 -c 2 -i 81 -a 0 -S 0 -y {30 30}
+f -t 1.25552000000000041 -s 0 -d 4 -n cwnd_ -a tcp -v 9.000000 -o 8.000000 -T v
+f -t 1.25552000000000041 -s 0 -d 4 -n cwnd_ -a tcp -v 8.000000 -o 9.000000 -T v
+f -t 1.75552000000000041 -s 0 -d 4 -n cwnd_ -a tcp -v 1.000000 -o 8.000000 -T v

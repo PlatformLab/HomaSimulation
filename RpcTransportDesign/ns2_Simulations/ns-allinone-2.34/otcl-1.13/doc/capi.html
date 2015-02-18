@@ -1,0 +1,266 @@
+<html>
+<head>
+<title>OTcl C API (Version 0.96, September 95)</title>
+</head>
+
+<body>
+
+<h1><a href="../README.html">OTcl</a> C API (Version 0.96, September 95)</h1>
+
+<h2>Overview</h2>
+
+<p>This reference page describes the C application programmer
+interface (API) for manipulating OTcl classes and objects. See <a
+href="../otclAppInit.c">otclAppInit.c</a> for an example of a
+<tt>Timer</tt> class written in C; <tt>Timer</tt> is included in the
+shells if the symbol <tt>TESTCAPI</tt> is defined.</p>
+
+<p>OTcl's C API is designed to complement the OTcl language in much
+the same way that Tcl allows commands written in C to be added to an
+interpreter. It is a minimal interface, suitable for migrating methods
+to C for performance, or for manipulating complex (ie. non-string)
+data structures. It is not a general package for binding C++ classes
+and methods to Tcl commands.</p>
+
+<p>See the <a href="tutorial.html">tutorial</a> for an introduction to
+Tcl-level programming in OTcl.</p>
+
+
+<h2>Working with the C API</h2>
+
+<p>To access the C API, include <tt>otcl.h</tt>. This header defines
+the externally visible interfaces, including the data structures
+required to use them.</p>
+
+<h3>Object and Class Structures</h3>
+
+<p>Objects and classes are always manipulated through pointers to
+opaque structures:</p>
+
+<blockquote><pre>struct OTclObject;
+struct OTclClass;</pre></blockquote>
+
+<p>Actually, you can cast a class pointer to an object pointer (since
+all classes are objects too) with no ill-effects, but you shouldn't
+need to.</p>
+
+<p>Two utility functions convert string names to object and class
+pointers:</p>
+
+<blockquote><pre>
+struct OTclObject*
+OTclGetObject(Tcl_Interp* in, char* name);
+
+struct OTclClass*
+OTclGetClass(Tcl_Interp* in, char* name);
+</pre></blockquote>
+
+<p>These functions are useful for getting handles to <tt>Object</tt>
+and <tt>Class</tt> (the system provided classes) for use in creating
+new classes, etc.</p>
+
+<p>Two utility functions convert clientdata to object and class
+pointers:</p>
+
+<blockquote><pre>
+struct OTclObject*
+OTclAsObject(Tcl_Interp* in, ClientData cd);
+
+struct OTclClass*
+OTclAsClass(Tcl_Interp* in, ClientData cd);
+</pre></blockquote>
+
+<p>These functions are useful within method definitions when you have
+installed the method to pass the current object via the clientdata;
+see the section on Methods below. They perform a safe cast.</p>
+
+<h3>Initialization</h3>
+
+<p>OTcl is initialized for an interpreter with a standard module
+initialization routine, called from an AppInit or through dynamic
+loading.</p>
+
+<blockquote><pre>
+int
+Otcl_Init(Tcl_Interp* in);
+</pre></blockquote>
+
+<p>Calls through the C API must be arranged to occur after OTcl
+initialization.</p>
+
+<h2>Objects and Classes</h2>
+
+<p>Objects and classes can be created and destroyed from C as well as
+Tcl without distinction. That is, classes created in C can be
+destroyed from Tcl, and vice versa.</p>
+
+<h3>Creation</h3>
+
+<p>Objects and classes are created in an interpreter through class
+pointers. Use a pointer to <tt>Class</tt> to create a generic class,
+and a pointer to <tt>Object</tt> to create a generic object.</p>
+
+<blockquote><pre>
+struct OTclObject* 
+OTclCreateObject(Tcl_Interp* in, char* name, struct OTclClass* cl);
+
+struct OTclClass*
+OTclCreateClass(Tcl_Interp* in, char* name, struct OTclClass* cl);
+</pre></blockquote>
+
+<p>Both calls are conceptually equivalent to <tt>"cl create name"</tt>
+in Tcl, but return either a pointer value or <tt>NULL</tt> to indicate
+failure.</p>
+
+<h3>Deletion</h3>
+
+<p>Object and classes are deleted from an interpreter through their
+pointers.</p>
+
+<blockquote><pre>
+int
+OTclDeleteObject(Tcl_Interp* in, struct OTclObject* obj);
+
+int
+OTclDeleteClass(Tcl_Interp* in, struct OTclClass* cl);
+</pre></blockquote>
+
+<p>Both calls are conceptually equivalent to <tt>"obj destroy"</tt> or
+<tt>"cl destroy"</tt>, and return a Tcl call code.</p>
+
+<h2>Methods</h2>
+
+<p>Methods can be added and combined from C as well as from Tcl
+without distinction. For example, C methods can be called from Tcl
+transparently, and C methods can combine with Tcl methods
+automatically.</p>
+
+<h3>Interface Conventions</h3>
+
+<p>In terms of interface, methods are analogous to Tcl commands, with
+two important differences.</p>
+
+<ol>
+
+<li>The argc/argv array is passed in "expanded form", having three extra
+arguments. argv[0] contains the name of the object, just as Tcl's
+first argument contains the name of the invoking command. The next
+three arguments contain values for extra method context variables:
+<tt>self</tt>, <tt>class</tt>, and <tt>proc</tt>. The remaining
+arguments (argv[4] and higher) contain the arguments passed to the
+method.
+
+<li>The clientData may be used to obtain a pointer to the object on
+behalf of which the method is being invoked. If the method was created
+with a clientData of <tt>NULL</tt>, then the dispatcher fills the
+clientData with an object pointer. Otherwise, the dispatcher passes
+the specified clientData. To convert the clientData to an object or
+class pointer, you can use the typed casting functions
+<tt>OTclAsObject</tt> and <tt>OTclAsClass</tt>.
+
+</ol>
+
+<h3>Adding Methods</h3>
+
+<p>Two functions add methods to objects and classes, serving as the C
+equivalent of the <tt>proc</tt> and <tt>instproc</tt> methods. The
+types of the last three arguments are the same as for Tcl
+commands.</p>
+
+<blockquote><pre>
+void
+OTclAddPMethod(struct OTclObject* obj, char* nm, Tcl_CmdProc* proc,
+	       ClientData cd, Tcl_CmdDeleteProc* dp);
+
+void
+OTclAddIMethod(struct OTclClass* cl, char* nm, Tcl_CmdProc* proc,
+	       ClientData cd, Tcl_CmdDeleteProc* dp);
+</pre></blockquote>
+
+
+<h3>Removing Methods</h3>
+
+<p>Two functions remove methods from objects and classes. If a
+deleteProc callback was registered to clean up the method, then it is
+passed the original non-NULL clientdata. If the original clientdata
+was NULL, however, then a pointer to the object or class from which
+the method is being removed is passed instead.</p>
+
+<blockquote><pre>
+int
+OTclRemovePMethod(struct OTclObject* obj, char* nm);
+
+int
+OTclRemoveIMethod(struct OTclClass* cl, char* nm);
+</pre></blockquote>
+
+<h3>Combining Methods</h3>
+
+<p>An executing methods can be automatically combined with the
+next-most specific method with the following function. It is
+equivalent to <tt>"obj next ..args.."</tt>. argc/argv is passed in
+expanded form, and should carry the context of the currently executing
+method. It returns a Tcl return code.</p>
+ 
+<blockquote><pre>
+int
+OTclNextMethod(struct OTclObject* obj, Tcl_Interp* in, int argc, char*argv[]);
+</pre></blockquote>
+
+<h2>Instance Variables</h2>
+
+<p>Tcl accessible instance variables (stored as strings) can be
+manipulated from C. In addition, objects can store a handle to private
+auxilliary data.</p>
+
+<h3>*InstVar</h3>
+
+<p>OTclSetInstVar, OTclGetInstVar, and OTclUnsetInstVar mimic
+Tcl_SetVar, Tcl_GetVar, and Tcl_UnsetVar for instance variables. The
+return values and codes for parameters such as <tt>flgs</tt> match Tcl
+conventions.</p>
+ 
+<blockquote><pre>
+char*
+OTclSetInstVar(struct OTclObject* obj, Tcl_Interp* in,
+	       char* name, char* value, int flgs);
+char*
+OTclGetInstVar(struct OTclObject* obj, Tcl_Interp* in,
+               char* name, int flgs);
+
+int
+OTclUnsetInstVar(struct OTclObject* obj, Tcl_Interp* in,
+                 char* name, int flgs);
+</pre></blockquote>
+
+<h3>Auxilliary Data</h3>
+
+<p>OTclSetObjectData, OTclGetObjectData and OTclUnsetObjectData
+manipulate private object clientdata, such as a pointer to an
+auxilliary data region. ObjectData is a per object and per class
+resource to allow for inheritance. Typically, it is manipulated on
+behalf of the invoking object in each class method by using the
+directly associated class. In this manner specializations of a class
+may each store their own ObjectData.</p>
+
+<blockquote><pre>
+int
+OTclGetObjectData(struct OTclObject* obj,struct OTclClass* cl,
+		  ClientData* data);
+
+void
+OTclSetObjectData(struct OTclObject* obj, struct OTclClass* cl,
+		  ClientData data);
+
+int
+OTclUnsetObjectData(struct OTclObject* obj, struct OTclClass* cl);
+</pre></blockquote>
+
+<p>Get fills the <tt>data</tt> value passed by reference, and returns
+<tt>0</tt> or <tt>1</tt> depending on whether the ObjectData
+existed. If it didn't, then data is filled with <tt>NULL</tt>. Set
+overwrites existing ObjectData without error. Unset returns <tt>0</tt>
+or <tt>1</tt> depending on whether the ObjectData existed.</p>
+
+</body>
+</html>

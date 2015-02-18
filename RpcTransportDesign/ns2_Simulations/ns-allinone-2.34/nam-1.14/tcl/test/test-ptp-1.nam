@@ -1,0 +1,79 @@
+V -t * -v 1.0a5 -a 0
+A -t * -n 1 -p 0 -o 0xffffffff -c 31 -a 1
+A -t * -h 1 -m 2147483647 -s 0
+n -t * -a 0 -s 0 -S UP -v circle -c black -i black
+n -t * -a 1 -s 1 -S UP -v circle -c black -i black
+l -t * -s 0 -d 1 -S UP -r 200000 -D 0.20000000000000001 -c black -O right
+n -t 0 -s 0 -S DLABEL -l "Sender" -L ""
+n -t 0 -s 1 -S DLABEL -l "Receiver" -L ""
+v -t 0 -e take_snapshot
+v -t 0 -e sim_annotation 0 1 Simple Stop-and-Wait protocol
++ -t 0.01 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 0 -a 0 -x {0.0 1.0 0 ------- null}
+- -t 0.01 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 0 -a 0 -x {0.0 1.0 0 ------- null}
+h -t 0.01 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 0 -a 0 -x {0.0 1.0 -1 ------- null}
+v -t 0.01 -e sim_annotation 0.01 2 FTP starts at 0.1
+r -t 0.25 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 0 -a 0 -x {0.0 1.0 0 ------- null}
++ -t 0.25 -s 1 -d 0 -p ack -e 40 -c 0 -i 1 -a 0 -x {1.0 0.0 0 ------- null}
+- -t 0.25 -s 1 -d 0 -p ack -e 40 -c 0 -i 1 -a 0 -x {1.0 0.0 0 ------- null}
+h -t 0.25 -s 1 -d 0 -p ack -e 40 -c 0 -i 1 -a 0 -x {1.0 0.0 -1 ------- null}
+v -t 0.29999999999999999 -e take_snapshot
+r -t 0.4516 -s 1 -d 0 -p ack -e 40 -c 0 -i 1 -a 0 -x {1.0 0.0 0 ------- null}
++ -t 0.4516 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 2 -a 0 -x {0.0 1.0 1 ------- null}
+- -t 0.4516 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 2 -a 0 -x {0.0 1.0 1 ------- null}
+h -t 0.4516 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 2 -a 0 -x {0.0 1.0 -1 ------- null}
+v -t 0.59999999999999998 -e take_snapshot
+r -t 0.6916 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 2 -a 0 -x {0.0 1.0 1 ------- null}
++ -t 0.6916 -s 1 -d 0 -p ack -e 40 -c 0 -i 3 -a 0 -x {1.0 0.0 1 ------- null}
+- -t 0.6916 -s 1 -d 0 -p ack -e 40 -c 0 -i 3 -a 0 -x {1.0 0.0 1 ------- null}
+h -t 0.6916 -s 1 -d 0 -p ack -e 40 -c 0 -i 3 -a 0 -x {1.0 0.0 -1 ------- null}
+r -t 0.8932 -s 1 -d 0 -p ack -e 40 -c 0 -i 3 -a 0 -x {1.0 0.0 1 ------- null}
++ -t 0.8932 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 4 -a 0 -x {0.0 1.0 2 ------- null}
+- -t 0.8932 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 4 -a 0 -x {0.0 1.0 2 ------- null}
+h -t 0.8932 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 4 -a 0 -x {0.0 1.0 -1 ------- null}
+v -t 0.90000000000000002 -e take_snapshot
+r -t 1.1332 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 4 -a 0 -x {0.0 1.0 2 ------- null}
++ -t 1.1332 -s 1 -d 0 -p ack -e 40 -c 0 -i 5 -a 0 -x {1.0 0.0 2 ------- null}
+- -t 1.1332 -s 1 -d 0 -p ack -e 40 -c 0 -i 5 -a 0 -x {1.0 0.0 2 ------- null}
+h -t 1.1332 -s 1 -d 0 -p ack -e 40 -c 0 -i 5 -a 0 -x {1.0 0.0 -1 ------- null}
+v -t 1.2 -e take_snapshot
+v -t 1.25 -e playing_forward
+v -t 1.3 -e take_snapshot
+r -t 1.3348 -s 1 -d 0 -p ack -e 40 -c 0 -i 5 -a 0 -x {1.0 0.0 2 ------- null}
++ -t 1.3348 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 6 -a 0 -x {0.0 1.0 3 ------- null}
+- -t 1.3348 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 6 -a 0 -x {0.0 1.0 3 ------- null}
+h -t 1.3348 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 6 -a 0 -x {0.0 1.0 -1 ------- null}
+v -t 1.3999999999999999 -e take_snapshot
+v -t 1.5 -e take_snapshot
+r -t 1.5748 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 6 -a 0 -x {0.0 1.0 3 ------- null}
++ -t 1.5748 -s 1 -d 0 -p ack -e 40 -c 0 -i 7 -a 0 -x {1.0 0.0 3 ------- null}
+- -t 1.5748 -s 1 -d 0 -p ack -e 40 -c 0 -i 7 -a 0 -x {1.0 0.0 3 ------- null}
+h -t 1.5748 -s 1 -d 0 -p ack -e 40 -c 0 -i 7 -a 0 -x {1.0 0.0 -1 ------- null}
+v -t 1.6000000000000001 -e take_snapshot
+v -t 1.7 -e take_snapshot
+r -t 1.7764 -s 1 -d 0 -p ack -e 40 -c 0 -i 7 -a 0 -x {1.0 0.0 3 ------- null}
++ -t 1.7764 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 8 -a 0 -x {0.0 1.0 4 ------- null}
+- -t 1.7764 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 8 -a 0 -x {0.0 1.0 4 ------- null}
+h -t 1.7764 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 8 -a 0 -x {0.0 1.0 -1 ------- null}
+v -t 1.8 -e take_snapshot
+v -t 1.8999999999999999 -e take_snapshot
+v -t 2 -e take_snapshot
+r -t 2.0164 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 8 -a 0 -x {0.0 1.0 4 ------- null}
++ -t 2.0164 -s 1 -d 0 -p ack -e 40 -c 0 -i 9 -a 0 -x {1.0 0.0 4 ------- null}
+- -t 2.0164 -s 1 -d 0 -p ack -e 40 -c 0 -i 9 -a 0 -x {1.0 0.0 4 ------- null}
+h -t 2.0164 -s 1 -d 0 -p ack -e 40 -c 0 -i 9 -a 0 -x {1.0 0.0 -1 ------- null}
+v -t 2.1000000000000001 -e take_snapshot
+v -t 2.2000000000000002 -e take_snapshot
+v -t 2.2000000000000002 -e playing_backward
+r -t 2.218 -s 1 -d 0 -p ack -e 40 -c 0 -i 9 -a 0 -x {1.0 0.0 4 ------- null}
++ -t 2.218 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 10 -a 0 -x {0.0 1.0 5 ------- null}
+- -t 2.218 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 10 -a 0 -x {0.0 1.0 5 ------- null}
+h -t 2.218 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 10 -a 0 -x {0.0 1.0 -1 ------- null}
+v -t 2.2999999999999998 -e take_snapshot
+v -t 2.3999999999999999 -e take_snapshot
+r -t 2.458 -s 0 -d 1 -p tcp -e 1000 -c 0 -i 10 -a 0 -x {0.0 1.0 5 ------- null}
++ -t 2.458 -s 1 -d 0 -p ack -e 40 -c 0 -i 11 -a 0 -x {1.0 0.0 5 ------- null}
+- -t 2.458 -s 1 -d 0 -p ack -e 40 -c 0 -i 11 -a 0 -x {1.0 0.0 5 ------- null}
+h -t 2.458 -s 1 -d 0 -p ack -e 40 -c 0 -i 11 -a 0 -x {1.0 0.0 -1 ------- null}
+v -t 2.4900000000000002 -e sim_annotation 2.4900000000000002 3 FTP stops
+v -t 2.5 -e take_snapshot
+v -t 2.5499999999999998 -e terminating_nam

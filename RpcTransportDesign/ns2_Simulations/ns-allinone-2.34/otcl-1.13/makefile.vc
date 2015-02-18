@@ -1,0 +1,176 @@
+# Generated automatically from Makefile.in by configure.
+
+#
+# try ./configure first to fill in all the definitions corresponding
+# to your system, but you always can edit the sections below manually.
+#
+APPVER=4.0
+TARGETOS=BOTH
+TOOLS32	= 	C:\Program Files\Microsoft Visual Studio\VC98
+cc32=		"$(TOOLS32)\bin\cl"
+link32=         "$(TOOLS32)\bin\link"
+CFLAGS=		-Zi -W3
+LIB= 		lib
+INSTALL=	
+OTCL_DIR=	..\otcl
+
+!include    <win32.mak>
+
+#
+# where to find tcl/tk source (for includes) and binaries (for libraries)
+#
+
+STATIC_TCLTK = 1
+
+TCLPATCHLEVEL = 8.4.11
+TCLDOTVERSION = 8.3
+TCLVERSION = $(TCLDOTVERSION:.=)
+
+!if exist(..\tcl$(TCLPATCHLEVEL))
+TCLSUFFIX = $(TCLPATCHLEVEL)
+!else if exist(..\tcl$(TCLDOTVERSION))
+TCLSUFFIX = $(TCLDOTVERSION)
+!else
+TCLSUFFIX =
+!endif
+
+TCLINC=		-I..\tcl$(TCLSUFFIX)\generic
+TKINC=		-I..\tk$(TCLSUFFIX)\generic
+# Where X headers are located
+TKXINC=		-I..\tk$(TCLSUFFIX)\xlib
+
+!ifdef STATIC_TCLTK
+TCLLIB=		..\tcl$(TCLSUFFIX)\win\Release\tcl$(TCLVERSION)s.lib
+TKLIB=		..\tk$(TCLSUFFIX)\win\Release\tk$(TCLVERSION)s.lib
+!else
+TCLLIB=		..\tcl$(TCLSUFFIX)\win\Release\tcl$(TCLVERSION).lib
+TKLIB=		..\tk$(TCLSUFFIX)\win\Release\tk$(TCLVERSION).lib
+!endif
+
+!ifdef STATIC_TCLTK
+OTCLSH_LIBS= $(conlibsmt)
+OWISH_LIBS=  $(guilibsmt) imm32.lib
+!else
+OTCLSH_LIBS= $(conlibsdll)
+OWISH_LIBS=  $(guilibsdll)
+!endif
+
+#
+# X11 and other libraries from tcl/tk make as needed to link tclsh and wish
+#
+XINC=$(TKXINC)
+XLIB=
+OTHER_TCL_LIBS= 
+OTHER_TK_LIBS=
+
+#
+# where to install shells, libraries, and includes
+#
+
+INST_OTCLSH=	
+INST_OWISH=	
+INST_OLIB=	
+INST_OLIBSH=	
+INST_OINC=	
+
+
+#
+# ------------ you shouldn't need to configure below here -----------------
+#
+.SUFFIXES : .cc
+
+!ifdef STATIC_TCLTK
+CVARS= $(cvarsmt) -DSTATIC_BUILD=1
+!else
+CVARS= $(cvarsdll)
+!endif
+
+CINCLUDES= -I. $(TCLINC) $(TKINC) $(XINC)
+OTCLLIB= otcl.lib
+
+.c.o:
+	$(CC) $(cdebug:-Z7=) $(cflags) $(CVARS) -c $(CFLAGS) $(CINCLUDES) -Fo$@ $<
+
+all: $(OTCLLIB) otclsh.exe owish.exe
+
+#
+# compile an appinit with tcl and otcl and link against
+# libotcl.a plus required tcl libs to give a standalone binary
+#
+
+otclsh.exe: otclAppInit.o  $(OTCLLIB)
+	set LIB="$(TOOLS32)\lib"
+	$(link32) $(ldebug) $(conlflags) -out:$@ \
+                otclAppInit.o $(OTCLLIB) \
+                $(TCLLIB) $(OTHER_TCL_LIBS) $(OTCLSH_LIBS) user32.lib
+
+#
+# compile an appinit with tcl/tk and otcl and link against
+# libotcl.a plus required tcl/tk libs to give a standalone binary
+owish.exe: otkAppInit.o $(OTCLLIB)
+	set LIB="$(TOOLS32)\lib"
+	$(link32) $(ldebug) $(conlflags) -out:$@ \
+	otkAppInit.o $(OTCLLIB) $(TKLIB) $(TCLLIB) $(XLIB) $(DL_LIBS) \
+	$(OTHER_TK_LIBS) $(OTHER_TCL_LIBS) $(OWISH_LIBS) user32.lib
+
+#
+# compile otcl.c and link it into a library archive
+# INCLUDES give a path to tclInt.h (plus tk and X11)
+#
+
+$(OTCLLIB): otcl.o
+	$(LIB) /nologo /name:$(OTCLLIB) /OUT:$(OTCLLIB) otcl.o
+
+#
+# compile otcl.c and link it into a shared object
+# INCLUDES give a path to tclInt.h (plus tk and X11)
+#
+
+libotcl$(SHLIB_SUFFIX): otcl.c
+	rm -f libotcl$(SHLIB_SUFFIX) otcl.o so_locations
+	$(CC) -c $(CFLAGS) $(SHLIB_CFLAGS) $(INCLUDES) otcl.c
+	$(SHLIB_LD) -o libotcl$(SHLIB_SUFFIX) otcl.o
+
+test: otclsh.exe owish.exe
+	$(OTCL_DIR)\otclsh.exe lib/test.tcl
+	$(OTCL_DIR)\owish.exe lib/test.tcl
+
+install: owish otclsh libotcl.a libotcl$(SHLIB_SUFFIX) otcl.h
+	$(INSTALL) $(INST_OWISH) owish
+	$(INSTALL) $(INST_OTCLSH) otclsh
+	$(INSTALL) $(INST_OLIB) libotcl.a
+	$(INSTALL) $(INST_OLIBSH) libotcl$(SHLIB_SUFFIX)
+	$(INSTALL) $(INST_OINC) otcl.h
+
+clean:
+	@if exist otclsh.exe    del otclsh.exe
+	@if exist owish.exe     del owish.exe
+	@if exist otcl.lib      del otcl.lib
+	@if exist otcl.o        del otcl.o
+	@if exist otkAppInit.o  del otkAppInit.o
+	@if exist otclAppInit.o del otclAppInit.o
+
+binclean:
+	@if exist otcl.o        del otcl.o
+	@if exist otkAppInit.o  del otkAppInit.o
+	@if exist otclAppInit.o del otclAppInit.o
+	@if exist config.status del config.status
+	@if exist config.log    del config.log
+	@if exist config.cache  del config.cache
+
+srctar:
+	@cwd=`pwd` ; dir=`basename $$cwd` ; \
+	    name=otcl-`cat VERSION | tr A-Z a-z` ; \
+	    tar=otcl-`cat VERSION`.tar.gz ; \
+	    list="" ; \
+	    for i in `cat FILES` ; do list="$$list $$name/$$i" ; done; \
+	    echo \
+	    "(rm -f $$tar; cd .. ; ln -s $$dir $$name)" ; \
+	     (rm -f $$tar; cd .. ; ln -s $$dir $$name) ; \
+	    echo \
+	    "(cd .. ; tar cfh $$tar [lots of files])" ; \
+	     (cd .. ; tar cfh - $$list) | gzip -c > $$tar ; \
+	    echo \
+	    "rm ../$$name; chmod 444 $$tar" ;  \
+	     rm ../$$name; chmod 444 $$tar
+

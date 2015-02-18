@@ -1,0 +1,106 @@
+Tracefile: losspatterns.nam
+
+This animation shows the loss distribution in an Mbone session over
+time.  Color indicates the loss on a particular link as follows:
+
+  red: loss > 10%
+  orange: 2% < loss <= 10%
+  brown: 0% < loss <= 2%
+  black: no loss
+  blue: possible duplication
+
+The data was gathered using mtrace by monitoring RTCP session
+messages, and periodically initiating an mtrace from every current
+receiver back to the data source.  The data source in this case was
+node 0, which is sending audio to the Mbone session "KWAX Classical
+Radio" between 14:30 and 18:30 on Tuesday 17th Feb 1998.
+
+When one set of mtraces finish a new set are initiated, which results
+in us sampling the loss about every 3 to 4 minutes.  Where multiple
+mtraces include the same link in the same interval, the number of
+received packets and number of lost packets are added, so towards the
+sender, results tend to be based on more data and longer averages than
+towards the receivers.
+
+Frequently links and nodes grey out - this indicates that either the
+receiver left the group (which was rare) or the mtrace failed.  
+
+The reason for performing this monitoring was to get some kind of
+indication of how stable loss points are over time - whether the
+points of congestion move around or not.  
+
+For those interested, the mapping from node number to IP address is
+given below.
+
+Mark Handley - 17th Feb 1998
+
+----------
+0 = 128.223.32.1 (cisco3-gw.uoregon.edu)
+1 = 128.223.3.7 (cisco7-gw.uoregon.edu)
+2 = 128.223.32.151 (pythia.uoregon.edu)
+3 = 207.98.66.11 (eugene-hub.nero.net)
+4 = 207.98.64.6 (eugene-isp.nero.net)
+5 = 204.70.158.61 (dec3800-2-fddi-0.SanFrancisco.mci.net)
+6 = 203.183.255.106 (sw01.TokyoNet.AD.JP)
+7 = 192.42.110.249 (paloalto-mbone1.bbnplanet.net)
+8 = 204.70.170.29 (dec3800-1-fddi-0.LosAngeles.mci.net)
+9 = 203.178.136.234 (mbone.otemachi.wide.ad.jp)
+10 = 199.94.207.2 (cambridge1-mbone1.bbnplanet.net)
+11 = 204.140.133.12 (mbone.ln.net)
+12 = 203.178.136.193 (sun1.tokyo.wide.ad.jp)
+13 = 204.70.64.61 (dec3800-2-fddi-0.WestOrange.mci.net)
+14 = 204.140.133.8 (mb204.isi.edu)
+15 = 192.41.197.21 (mbone.nc.u-tokyo.ac.jp)
+16 = 204.70.74.77 (dec3800-2-fddi-1.Washington.mci.net)
+17 = 128.9.160.33 (slate.isi.edu)
+18 = 157.82.76.11 (shiva.race.u-tokyo.ac.jp)
+19 = 193.174.226.254 (mr-stuttgart1.win-ip.dfn.de)
+20 = 140.173.4.9 (140.173.4.9)
+21 = 157.82.76.3 (berkeley.race.u-tokyo.ac.jp)
+22 = 193.174.226.34 (mr-nuernberg1.win-ip.dfn.de)
+23 = 140.173.4.30 (140.173.4.30)
+24 = 193.174.226.18 (mr-leipzig1.win-ip.dfn.de)
+25 = 18.26.64.1 (video-room-mrouter.lcs.mit.edu)
+26 = 134.109.2.250 (134.109.2.250)
+27 = 18.26.0.4 (north.lcs.mit.edu)
+28 = 134.109.2.244 (134.109.2.244)
+29 = 134.109.192.17 (134.109.192.17)
+30 = 131.188.6.3 (ds9.gate.uni-erlangen.de)
+31 = 129.187.53.117 (sunemil.lrz-muenchen.de)
+32 = 131.159.0.81 (tuminfo2.informatik.tu-muenchen.de)
+33 = 131.159.1.8 (sunrbg5.informatik.tu-muenchen.de)
+34 = 128.9.128.75 (liberty.isi.edu)
+36 = 4.0.35.20 (atlanta1-mbone1.bbnplanet.net)
+37 = 130.207.244.30 (feta-fddi.gatech.edu)
+38 = 130.207.251.3 (130.207.251.3)
+39 = 199.77.154.23 (199.77.154.23)
+40 = 192.215.245.10 (192.215.245.10)
+41 = 198.17.46.39 (mbone.sdsc.edu)
+42 = 198.17.46.43 (cs-f-vbns.sdsc.edu)
+43 = 204.147.129.94 (204.147.129.94)
+44 = 205.189.33.233 (205.189.33.233)
+45 = 205.189.32.157 (205.189.32.157)
+46 = 132.214.6.112 (132.214.6.112)
+47 = 205.158.0.60 (205.158.0.60)
+48 = 207.126.96.172 (207.126.96.172)
+49 = 207.126.96.234 (207.126.96.234)
+50 = 206.251.5.98 (206.251.5.98)
+51 = 204.71.197.209 (204.71.197.209)
+52 = 128.125.247.32 (dmz-gw.usc.edu)
+53 = 129.4.51.2 (achtung.sp.TRW.COM)
+54 = 129.4.50.202 (129.4.50.202)
+55 = 128.9.160.81 (ra2.isi.edu)
+56 = 204.70.114.45 (204.70.114.45)
+57 = 204.70.104.77 (204.70.104.77)
+58 = 12.0.1.7 (12.0.1.7)
+59 = 12.0.1.25 (12.0.1.25)
+60 = 128.9.160.26 (bah.isi.edu)
+61 = 128.9.128.8 (128.9.128.8)
+62 = 204.70.164.29 (dec3800-1-fddi-0.Sacramento.mci.net)
+63 = 140.142.116.1 (mcast.cac.washington.edu)
+64 = 192.220.249.66 (seamr2-gw.nwnet.net)
+65 = 192.220.238.129 (seamr1-gw.nwnet.net)
+66 = 131.107.1.249 (pogo.microsoft.com)
+67 = 131.107.1.201 (bernarda.microsoft.com)
+68 = 128.9.160.8 (mb160.isi.edu)
+69 = 166.48.14.6 (166.48.14.6)

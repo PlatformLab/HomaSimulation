@@ -1,0 +1,1282 @@
+<HTML>
+<HEAD>
+   <TITLE>nam Change Log</TITLE>
+<!-- @(#) $Header: /cvsroot/nsnam/nam-1/CHANGES.html,v 1.107 2007/03/11 00:07:19 tom_henderson Exp $-->
+</HEAD>
+<BODY>
+
+<HR>
+<H1>
+Change History (nam)</H1>
+<!--
+ This ChangeLog is updated in the reverse order
+  with the most recent changes coming first.
+  -->
+<hr>
+<h3>nam-1.14
+<b>Released June 17 2009</b></h3>
+    <li> Refresh packages, Sun OS compilation patch </li>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=149743&package_id=169585">nam-1.13</a>
+<b>Released Sat Mar 10 2007</h3>
+    <li> Refresh packages, Sun OS compilation patch </li>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=149743&package_id=169585">nam-1.12</a>
+<b>Released Sat Sep 24 2006</h3>
+    <li> Refresh packages </li>
+
+<HR>
+<H3><B>nam-1.11 Released Nov 15 2005</B></h3>
+
+<ul>
+<p><li><b>[haldar]</b>Mon Jan 24 12:04:47 PST 2005
+Added changes from mac802.15.4 contributed code from Jianliang Zheng
+(zheng@ee.ccny.cuny.edu) and Myung J. Lee (lee@ccny.cuny.edu).
+Also updated the otcl and tclcl version numbers in files under conf and
+VERSION to match newer versions.
+</ul>
+
+<P>
+<HR>
+<H3><B>nam-1.10 Release</B>
+Fri Jan  9 15:25:03 PST 2004
+</h3>
+
+<UL>
+    <li><p><b><a href="mailto:xuanc@isi.edu">[Xuan Chen]</a></b>
+    Sat Oct 11 23:08:29 PDT 2003
+    <ul>
+        <li> removed the hard-coded tcl/tk library path in main.cc and 
+	     tkUnixInit.c
+	 <li>Added support for building nam under tcl/tk8.4.4 and new otcl/tclcl
+	     (commited in cvs, release pending).
+	     In tkcompat.h, defined two new macros: CONST84 and 
+	     CONST84_RETURN for old tcl/tk versions (before 8.4).
+	     NOTE: need to change configure at next release so that tcl/tk
+	           8.4.4 will become default.
+    </ul>
+</ul>
+
+<HR>
+<H3><B>nam-1.0a12[OLD VERSION NO].nam1.9[NEW VERSION NO] released</H3></B>
+Feb 23, 2003
+
+  <li><p><b><a href="http://www.isi.edu/~buchheim/">[Tim Buchheim]</a>Mon Feb 10 14:17:40 PST 2003</b><br>
+  More updates for wireless animations:
+
+  <ul>
+  <li>wireless broadcast packets now use "r" events when animating in reverse, just like non-broadcast packets.  (previously they used the "h" event even when going backwards)
+  <li>wireless and wired nodes can now be mixed with better results.  This requires using the "W" event as well as supplying X and Y coordinates for all nodes in the scenario.
+  <li>The range and duration of the animation of wireless packets can now be specified on either a per-packet basis or by setting global parameters.
+  </ul>
+  
+  <li><p><b><a href="http://www.isi.edu/~buchheim/">[Tim Buchheim]</a>Tue Dec 10 19:02:19 PST 2002</b><br>
+  Two changes to the animation of broadcast packets in wireless scenarios:
+  </P>
+
+  <UL>
+  <LI>bcast packets used to be animate in real time, not virtual time.  so
+   if you changed the playback speed (or even paused it) the circles would
+   always expand at the same real rate.  Now, the animation is done in
+   virtual time, like all other objects.  So if you slow down the playback
+   rate, the circles will move slower.  If you increase playback rate, they
+   move faster.
+   </LI>
+
+   <LI><P>you can now set the speed for broadcast packets. (previously they
+   ran at a hardcoded speed.)  Use something like the following:</P>
+
+   <P><TT>v -t 0.0 -e set_bcast_duration 0.02</TT></P>
+
+   <P>The default is currently set to 0.01 (units are seconds)</P>
+   </LI>
+   </UL>
+
+<P>
+<HR>
+<H3><B><a href="http://www.isi.edu/nsnam/dist/nam-src-1.0a11a.tar.gz">nam-1.0a11a[OLD].nam-1.8a[NEW]</A> released on Wed Jul  3 18:00:00 PDT 2002</H3></B>
+<UL>
+  <li><p><b><a href="http://www.isi.edu/~buchheim/">[Tim Buchheim]</a>Wed Jul  3 18:00:00 PDT 2002</b><br>
+  Fixed to make it work on Windows again.
+  </p>
+  <li><p><b><a href="http://www.isi.edu/~buchheim/">[Tim Buchheim]</a>Tue Apr 30 01:18:48 PST 2002</b><br>
+  Restored old behavior for default link length (proportional to delay).
+  </p>
+</UL>
+
+<P>
+<HR>
+<H3><B><a href="http://www.isi.edu/nsnam/dist/nam-src-1.0a11.tar.gz">nam-1.0a11[OLD}.nam-1.8[NEW]</A> released on Mon Apr 15 14:59:08 PDT 2002</H3></B>
+<UL>
+  <LI>
+     <P>
+      <B><A href="mailto:buchheim@isi.edu">[buchheim]</A> Mon April 15 2002</B>
+      <BR>
+      Added workaround to parsing code in order prevent namgraph flags from triggering unnecessary warnings.
+     </p>
+  </LI>
+  <LI>
+     <B><A HREF="mailto:mehringe@isi.edu">[mehringe]</A> Thu August 30 2001</B>
+     <UL>
+       <LI>Added ability to input Node movement information into the nam editor.  This is useful for quickly creating wireless node movement paths.  To use just set the time slider to the time at which you want the node to be at it's next destination and then drag the node to that destination.
+       <LI>Fixed a couple of small problems with wireless animation display.
+     </UL>
+  </LI>
+</UL>
+<UL>
+  <LI>
+     <B><A HREF="mailto:mehringe@isi.edu">[mehringe]</A> Fri July 6 2001</B>
+     <UL>
+       <LI>Added Loss Models and Queue Types to the nam editor.
+       <LI>Added Exponential, Pareto, and Telnet traffic sources.
+     </UL>
+  </LI>
+</UL>
+
+<P>
+<HR>
+<H3>
+<B><A href="http://www.isi.edu/nsnam/dist/nam-src-1.0a10.tar.gz">nam-1.0a10[OLD].nam-1.7[NEW]</A>
+   released on Jun  6 14:17 PDT 2001</B>
+</H3>
+
+<ul>
+  <li>
+       <b><a href="mailto:mehringe@isi.edu">[mehringe]</a></b> <b>Wed May 9 2001</b>
+       <br>More nam editor updates, it is staring to look nice now. 
+       <ul>
+         <li> Moved object properties to a popup window instead of a side pane.
+         <li> Fixed save and save as dialog boxes and removed unecessary
+              use of a temp file.
+         <li> Fixed the color popup window to place the color value
+              in the proper text box when double click upon.
+         <li> Removed the unused stop, fast-forward, play, reverse buttons.
+         <li> Disabled the edit menu commands until those are finished.
+       </ul>
+
+  <li>
+       <b><a href="mailto:mehringe@isi.edu">[mehringe]</a></b> <b>Fri Mar 23 2001</b></li>
+       <br>I added saving and opening of nam editor ns scripts,  added modification of different object properties, and added the time slider for setting start and stop times for traffic sources
+  <li>
+       <b><a href="mailto:mehringe@isi.edu">[mehringe]</a></b> <b>Wed Feb 7 17:20:15 PST 2001</b>
+       <br>Major updates to the nam editor.  Currently it only has a small subset of the total functionality but basic scripts can be created and run. More things will be filled in over the next couple of months.
+  <li>
+       <b><a href="mailto:mehringe@isi.edu">[mehringe]</a></b> <b>Thu Dec 14 16:45:48 PST 2000</b>
+       <br> Rewrote parsing code to be table driven and more stable.  Cleaned up nam trace file syntax 
+            to remove trace event language ambiguities but tried to keep backwards compatibility.
+            Added files parser.h and parser.cc.
+  <li>
+       <b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Dec 12 10:36:34 PST 2000</b>
+       <br> Updated config.guess to autoconf's current one.
+
+  <li>
+       <b><a href="http://netweb.usc.edu/~difa/">[difa]</a></b> <b>Fri Dec 08 17:32:34 PST 2000</b>
+       <br> Modify nam_stream.cc so that nam can use non-blocking I/O to handle pipe input.
+
+</ul>
+
+<hr>
+
+<h3><b><a href="http://www.isi.edu/dist/nam-src-1.0a9.tar.gz">nam-1.0a9[OLD].nam-1.6[NEW]</a> released on Mon Oct 16 21:01:42 PDT 2000 </b>
+</h3>
+
+<ul>
+
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Fri Oct  6 20:28:20 PDT 2000
+</b><br>
+       Another few compile problems for redhat 7.0/gcc 2.96.
+
+  <li> <b><a href="mailto:mehringe@isi.edu">[mehringe]</a>Fri Oct 6 07:59:55 PDT 2000</b><br>
+       Nam now allows you to dynamically add nodes and links.  You still have to define the node but you can do it at any time during the simulation.  Before all nodes and link had to be defined at -t *.
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Thu Aug 10 15:15:55 PDT 2000</b><br>
+       Nam now builds on redhat linux 7.0 with gcc 2.96 (and with
+       other compilers than allow ANSI's xor keyword).
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Thu May 18 11:12:20 CDT 2000 </b><br> 
+  Added nam option and ns commands for nam validation test. <br>
+	- nam -z            : to play nam as soon as it starts <br>
+	- $ns snapshot      : to take a snapshot <br>
+	- $ns rewind-nam    : to play back <br>
+	- $ns re-rewind-nam : to play forward after play back <br>
+	- $ns terminate-nam : to exit nam <br>
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Sun Apr 9 8:18:54 PDT 2000 </b><br>
+  nam validation test was added. 
+  <p>
+
+  <li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a>
+  Mon Apr  3 15:28:44 PDT 2000</b><br>
+  Fixed bug in wireless trace. Basically NetModel::layout_node{} did
+  not pass parameters in the correct order. Now dlabel becomes the
+  last parameter and it should work for all cases.
+  <p>
+
+  <li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a>
+  Thu Mar 23 19:38:29 PST 2000</b><br>
+  <ul>
+  <li> Currently autolayout does not work due to some mysterious reasons as 
+  I explain below. 
+  Everything happened between Feb 27 and March 1st,
+  2000. Specifically, it's due to changes in netmodel.cc v1.74 to
+  v1.75, and tcl/netModel.cc v1.10 and v1.11.
+  If the lines 174-178 in tcl/netModel.tcl does not contain $dlabel
+  stuff, auto layout works fine. But when they are added, it's messed
+  up even if the dlabel processing code in netmodel.cc is never called
+  due to the default empty dlabel string. I suspected it was a memory
+  problem but purify did not give anything. 
+  Therefore, I changed those lines in tcl/netModel.tcl to only add the
+  $dlabel arguments when it's not empty. Thus done, auto layout now
+  works for existing trace files. However, I still don't understand
+  why it behaves this way. It smells suspicious of something wrong
+  somewhere else, and it must be fixed before new code should be
+  added. 
+  <li> Fixed the route entry stuff; now it works when node zooms or
+  auto layout.
+  <li> Fixed indentation in various places to the default 8. 
+  <li> Changed three class member variables to carry the underscore
+  suffix so they conforms to coding convention and it's easy to
+  distinguish between class member variables and other auto
+  variables. 
+  </ul>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Sun Mar 19 21:24:08 PST 2000 </b><br>
+	* removing duplicate code (draw stuff for PSView). Using View instead. <br>
+  * nam editor <br>
+  - adding "runNs" command so that users don't need to type "ns xxx.nam" explicitly <br>
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Tue Feb 29 15:41:27 PST 2000 </b><br>
+  * nam editor <br>
+  - add agent information of reloading function <br>
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Tue Feb 15 17:45:38 CST 2000 </b><br>
+  * nam + nam editor <br>
+  - adding icon explaining box
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~kclan/"> [kclan]</a>
+  Mon Feb 14 20:23:31 PST 2000 </b><br>
+  adding interactive control for coloring packet flow on the fly
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Thu Feb 10 15:36:56 PST 2000 </b><br>
+  * nam editor <br>
+  - adding Application option to AgentProperty such as starting/ending
+  time
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Wed Feb  9 15:57:20 PST 2000 </b><br>
+  * nam editor <br>
+    - modifying "link" for backward-compatibility.<br>
+      (making link either by click-&-drag or click-&-click) <br>
+    - adding tcl script for FullTcp destination agent
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Tue Feb  8 19:46:04 PST 2000 </b><br>
+  * nam editor <br>
+    - adding AgentProperty to support Agent Options such as <br>
+      windowInit_, cwnd_ in TCP and packetSize_ in CBR. 
+  <p> 
+
+  <li> <b><a href="http://www.isi.edu/~kclan/"> [kclan]</a>
+  Mon Feb 07 12:23:31 PST 2000 </b><br>
+  adding interactive control to filter packet on the fly
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Mon Feb  7 14:43:43 PST 2000 </b><br>
+  * nam editor <br>
+    - adding click_and_draggable link between nodes, and between
+    agents <br>
+    - adding CBR connection<br>
+    - adding fid (0~4) to provide different color per flow<br>
+    - fixing bug to have consistent view between editor and normal nam
+    window <br>
+    - supporting multiple TCP conenctions<br>
+    - inserting "open" command <br>
+    - fixing bugs related to "cut" function, node numbering, and
+    attaching agent on nodes.<br>
+
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Thu Jan 27 14:53:52 PST 2000 </b><br>
+  Adding graphical interface on attaching agent in nam editor 
+  <p>
+  
+  <li> <b><a href="http://www.isi.edu/~kclan/"> [kclan]</a>
+  Tue Jan 25 19:06:18 PST 2000 </b><br>
+  Fix bugs in using hierarchical routing for wireless(using
+  node id instread of node address for animation)
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Tue Jan 25 17:56:58 PST 2000 </b><br>
+  Modifying an outline of nam editor  
+  <p>
+ 
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Mon Jan 24 19:35:34 PST 2000 </b><br>
+  Modifying nam editor view to accommodate the new function, which is replacing
+  editview entry with toolbar. 
+  <p>
+</ul>
+
+<hr>
+<H3>
+<A HREF="www-mash.cs.berkeley.edu/nam/">nam-1.0a8[OLD].nam-1.5[NEW]</A> Releaseed Tue
+Jan 10 15:10:05 2000</H3>
+
+<ul>
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Tue Jan 18 19:51:06 PST 2000 </b><br>
+  Added agents to nam editor <br>
+  (works for one pair of TCP and TCPSink agents) 
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Wed Dec 22 14:33:05 PST 1999</b><br>
+  Added node size scale up/down buttons in the zoom bar. 
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Mon Dec 13 16:21:21 PST 1999</b><br>
+  Replace the edit view menu entry with a toolbar button so that
+  topology editing can be turned on at any time without opening a new
+  view.
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Thu Dec  9 14:38:02 PST 1999</b><br>
+  Fix the node (inner) label color so that it can be set to background color.
+  Basically add new color parameter to Paint::text_gc() so we can allocate
+  a font GC with a specific color.<br>
+  <i>Remaining Problem</i>: PSView still cannot handle this node label
+  color correctly.
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Fri Dec  3 10:23:18 PST 1999</b><br>
+  Added support for large flow id and color ids. 
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~kclan/">[kunchan]</a>
+  Thu Nov 16 17:00:37 PDT 1999</b><br>
+  Adding mechanism for visualization of packet flow in wireless simulation.
+  <p>
+
+  <li> <b><a href="http://www-scf.usc.edu/~hyunahpa/"> [hyunah]</a>
+  Fri Oct 29 19:20:03 PDT 1999</b><br>
+  Several features of labels both on node and edge are added such as
+  color and position. <br> The examples of new commands are following <br>
+      $ns at 0.0 "$n(0) label-color yellow" <br>
+      $ns at 0.0 "$n(0) label-at NORTH" <br>
+      $ns at 0.0 "$ns duplex-link-op $n(0) $n(1) label cost=1" <br>
+      $ns at 0.0 "$ns duplex-link-op $n(0) $n(1) color green" <br>
+      $ns at 0.0 "$ns duplex-link-op $n(0) $n(1) label-at WEST" <br>
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Thu Jun 17 17:02:37 PDT 1999</b><br>
+  Changed ns-developers in www.tcl to ns-users.
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Thu Apr 15 11:14:20 PDT 1999</b><br>
+  Re-instated options '-j' and '-r' to control the startup time and
+  animation rate.
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Wed Apr 14 13:36:42 PDT 1999</b><br>
+  Changed tcldbg library initialization so that it works with tcldbg
+  1.7 through 1.9.
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Sat Apr  3 14:43:10 PST 1999</b><br>
+  Allow user to provide initialization file for every source
+  file. However, the initialization that can be done in these files
+  (i.e., provided by -f or -u options) is limited, because sourcing of
+  these files is done inside a instproc{}. Currently, it is
+  recommended that only operations to be included in these
+  initialization files are to reset class variables; redefinition of
+  existing OTcl methods in these files does not seem to work. <br>
+
+  One example of the initialization file is to define initial
+  animation rate. This can be done by including the following line
+  into a file, say, n1.tcl: <code>Animator set INIT_RATE_
+  2ms</code>. Then run nam like this: <code>nam -u n1.tcl a.nam</code>
+  <p>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Mon Mar 29 15:50:01 PST 1999</b><br>
+  After "reset" button is pressed, nam should redraw screen to reflect
+  the changes in layout. Modified files: anetmodel.{cc,h}.
+</ul>
+
+
+<hr>
+<H3>a6
+<A HREF="http://www-mash.cs.berkeley.edu/nam/">nam-1.0a7[OLD].nam-1.4[NEW] Released</A> 
+Mar 16 16:45:30 PST 1999</H3>
+<ul>
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Sat Mar 13 15:16:56 PST 1999</b><br>
+  Added startup option '-k <initial port number>' to allow users to
+  specify the initial port address to search from. 
+  
+  <li> <b><a href="http://www.isi.edu/~salehi">[salehi]</a>Fri Mar 12
+  12:40:10 PST 1999</b><br>
+  Configured with the new versions of Tcl, TK, OTcl, and TclCl.
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+  Wed Mar 10 19:17:59 PST 1999</b><br>
+  Fixed WIN32 incompatibilities in nam_stream.{cc,h}. Changed
+  conf/makefile.win to allow generating debugging version under win32. 
+  Updated source file list in makefile.vc.
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Fri Mar  5 15:03:03 PST 1999</b><br>
+       Make now complains if you need to run configure.
+       (Based on Adam Costello's ns fix.)
+
+  <li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>Tue Jan 12
+12:43:44 PST 1999</b><br>
+<ul>
+<li>
+  Removed msgbox.tcl and tkfbox.tcl from tcl/. They belong to tk
+  distribution and shouldn't be included here. Tclcl was modified to
+  handle embedded XBM files inside tcl script; msgbox.tcl and
+  tkfbox.tcl were embedded into tclcl. 
+<li> Modified all codes related to timeslider so that if
+  maxtime==mintime, the timeslider code will still work instead of
+  producing a coredump.
+</ul>
+
+  <li> <b><a href="http://www.isi.edu/~yaxu/">[Ya]</a>Fri Dec 11 17:04:52 PST 1998</b><br>
+An Editor is added to nam to allow the user to interactively edit the
+simulation 
+topology in a WYSIWYG style. Current new features include:
+<ul>
+<li> Create simulation topology
+<li> Edit Object's properties in the topology
+     Node: Color, Size, Label, Agents
+     Link: Color, Bandwidth, Delay
+<li> Add/Delete node and link object
+<il> Export the result to a tcl file (*.nstcl) which can be excuted under ns
+<li> Save as an editable nam file (*.enam) 
+</ul><p>
+
+  <li> <b><a href="http://www.isi.edu/~yaxu/">[Ya]</a>Thurs Nov  12 17:04:52 PST 1998</b><br>
+       Autoconf support for zlib is added.
+       self-adjusted timeslider works with zlib support.
+<p>
+       
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Fri Nov  6 17:04:52 PST 1998</b><br>
+       Nam will now play compressed files (files ending in .Z or .gz,
+       if nam is built with -DHAVE_ZLIB)
+       and from pipes (use the filename ``-'').
+       Autoconf support for zlib is still needed.
+       Compressed files play very slowly backwards.
+       Playing from a pipe buffers trace data in a file in /tmp.
+</ul>
+
+<p>
+<hr>
+<H3>
+<A HREF="http://www-mash.cs.berkeley.edu/nam/">Nam 1.0a6[OLD].nam-1.3[NEW] released </a></H3>
+Oct 22 17:31 PDT 1998<A HREF="http://www.isi.edu/~yaxu">[Ya]</A>
+<br>
+<ul>
+<li> Preliminary mobility support (under active development)
+<li> Node lable support
+<li> Support for simplex links
+<li> Various bug fixes.
+</ul>
+Released with ns-2.1b4 and ns-allinone-2.1b4
+
+<p>
+<hr>
+<H3>
+<A HREF="http://www-mash.cs.berkeley.edu/nam">Nam 1.0a5[OLD].nam-1.2[NEW] released </a></H3>
+Sep 2 17:31 PDT 1998<A HREF="http://www.isi.edu/~yaxu">[Ya]</A>
+<br>
+<ul>
+<li>Namgraph for high-level drill-down analysis
+<li>Nam console with multi-model support
+<li> Layout editor
+<li>LAN visualization support ( Need ns-2.1b4 to create tracefile for the
+    feature. Ns-2.1b4 is not released yet at this moment )
+<li>Compatible with Tcl/TK 8.0, Win32.
+<li>Some new examples to demonstrate these new features including 
+nam-1/ex/tcpsrm.nam, tcpecn.nam and lantest.nam. 
+<li>Various bug fixes.
+<li> A win32 version is provided in reponse to heavy request from ns-users.
+</ul>
+<ul>
+<li>
+<B><A HREF="http://www.isi.edu/~yaxu">[Ya]</A></B> <B>
+Aug 5 15:15 PDT 1998</b><br>
+Ready for new Nam 1.0a5 release
+
+<ul>
+<li>LAN support 
+<li>Namgraph for tcp and srm event graph
+<li>Layout editor
+<li>Multi-model support
+</ul>
+
+<li>
+<B><A HREF="http://www.sis.edu/~yaxu">[Ya]</A></B> <B>
+Apr 22 20:15 PDT 1998</b><br>
+ 
+<ul>
+<li>First cut for nam with analysis views(tcp).
+</ul>
+
+
+<li><h><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+Tue Mar 31 09:29:53 PST 1998
+</h><br>
+
+<ul>
+<li> Bug fix for Edge's bounding box. It should have two bounding boxes. One 
+for calculating screen to world transform, the other to compute Edge::inside().
+</ul>
+
+<li>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> <B>
+Mar 30 20:15 PDT 1997</b><br>
+
+<ul>
+<li>Make windows build work again.
+</ul>
+
+<li><h><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+Thu Feb 26 16:33:59 PST 1998
+</h><br>
+<ul>
+<li>Bug fix for Trace::settime(). Previously it falls into infinite loop when
+first forward to the end, then backward to the start for the trace file whose 
+first 'real' events does not start at time 0.
+<li>Bug fix for BoxAgent's bound box. It should have its own update_bb().
+</ul>
+
+<li><A HREF="mailto:breslau@parc.xerox.com">[LB]</A>
+     <B>Thu Feb 26 16:00:44 PST 1998</B><br>Added ability to skip over
+     quiescent periods in the animation.<br>
+  
+<li><h><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+Tue Feb 24 18:20:52 PST 1998
+</h><br>
+<ul>
+<li>Change NetModel::scale_estimate() to use Edge::length() instead of 
+Edge::delay(). Otherwise it has problem when using a pre-made layout.
+<li>Manage node marks with a linear list instead of Tcl's hash table. The 
+latter results in random traverse order w.r.t. the input order.
+<li>Add Packet::CheckPoints() to limit the minimum length of packets. Otherwise
+some packets may disappear if too small (reported by Kannan).
+</ul>
+
+<li><h><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>Mon Feb 23 18:20:41 PST 1998
+</h><br>
+Now node marks can have 3 shapes: circle, square and hexagon.
+
+<li><h><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+</h><br>
+First cut of topology editor. Added various reconfigure methods to 
+all Animation objects. Added selection mechanism to NetModel and 
+AutoNetModel. The editor only works with auto layout because in fixed 
+layout all edges are proportional to delay
+<br>
+To use the editor, open an edit view using the menu button "Edit view" 
+under "Edit". In the new edit view, clicking left button on a node
+will select it, then it can be moved by dragging it around. Rubber band 
+is supported by clicking and dragging the left mouse button. Shift-click 
+an object will add it to the current selection. 
+<br>
+Currently there is a cosmetic bug related to moving a selection around
+in the edit view, and many necessary editing features have not been
+added yet. Because this editor involves many other files, I decided to
+check it in when it's mainly working. Otherwise it'll be very hard to
+keep all these changes up-to-date.
+
+<li><h><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>Wed Feb 18 20:48:02 PST 1998
+</h><br>
+Bug fix: Init nymin_ nymax_ in AutoNetworkModel::placeEverything().
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Wed Feb 18 14:26:23 PST 1998</b><br>
+       Added drag-scrolling support (mouse-2 in a window lets you drag it around).
+
+<li> <b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a>
+Thu Feb 12 20:54:59 PST 1998
+</b><br>
+<ul>
+<li> Added reset button to auto-layout.
+<li> Added ex/mbone.nam - a map of the mbone done on 8/6/96.
+</ul>
+
+<li> <b><a href="http://www.isi.edu/~haoboy">[haoboy]</a>
+Fri Jan 30 13:36:25 PST 1998</b><br>
+<ul>
+<li> Focus on the next annotation while using time slider.
+<li> nam_prelayout() and nam_layout() now skip all events which doesn't 
+have <code>-t*</code> from the beginning of the trace file.
+<li> Install all Tk options with the real application name as class, so that
+<i>peer</i> functions appropriately. Affected: non-www fonts options in 
+nam.tcl and Tk_GetOption() in paint.cc.
+<li> Initialize <code>views_</code> as NULL in netgraph.cc.
+<li> Problem: sim_annotation in nam.tcl cannot handle well multiple 
+annotations happening at the same time.
+</ul>
+
+</UL>
+
+<P>
+<HR>
+<H3>
+<A HREF="www-mash.cs.berkeley.edu/ns/nam.html">nam-1.0a4[OLD].nam-1.1[NEW]</A> </H3>
+<P> Release with ns-2.1b2 Jan 21 1998 [haoboy].
+<br>
+Version 1.0a4 skipped because when 1.0a2 was released the directory name 
+was mistaken by nam-1.0a3. To avoid the confusion, we skipped 1.0a3.
+<P>
+
+<P>
+<HR>
+<H3>
+<A HREF="www-mash.cs.berkeley.edu/ns/nam.html">nam-1.0a3</A> </H3>
+<P> Release with ns-2.1b2 Jan 21 1998 [haoboy]<P>
+
+<UL>
+
+<li> <b><a href="http://www.isi.edu/~haoboy">[haoboy]</a>
+Wed Jan 21 17:40:37 PST 1998</b><br>
+<ul>
+<li> Added XWDFile.h because xwd.c doesn't compile with obsolete XWDFile.h
+     of openwin in some old sunos 4.
+<li> Added link flags into Makefile.in so that it will recognize -static flag.
+</ul>
+
+<li> <b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a>
+Wed Jan 21 13:04:38 PST 1998
+</b><br>
+<ul>
+<li> Fixed bug in reverse link angle calculation in nam.tcl.
+<li> Removed Tcl_Init from main.cc since this is not needed with TclCl and 
+     it causes nam to break if tcl is not installed.
+</ul>
+
+<li> <b><a href="http://www.isi.edu/~haoboy/">[haoboy]</a>Tue Jan 13 15:31:34 PST 1998</b><br>
+<ul>
+<li> Reinstate the peer functionality for two nam instances. Mainly changing 
+[winfo name .] to [tk appname] and add new option "-N" to let user specify 
+specific app name for every instance.
+<li> Add/delete annotations during animation. But they can not be saved into
+the trace files. Detailed description included in the man page.
+<li> Include tcl-debug support into main.cc. Changed library order in 
+Makefile.in so that X libs are included last. Changed 
+conf/configure.in.tcldebug to include paths for Dbg.h
+</ul>
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Tue Dec 16 10:14:30 PST 1997</b><br>
+       Man page info for animation saving.
+       (Also, see build.menus in nam.tcl for a list of desired enhancements.
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Mon Dec 15 22:38:15 PST 1997</b><br>
+       An animation can now be saved into a series of files (namXXX.xwd)
+       for post-processing into an mpeg or animated gif.
+
+<LI><B><A HREF="http://www.cs.berkeley.edu/~elan">[EA]</A>
+Fri Nov 28 17:35:02 PST 1997
+</B>
+<UL>
+<li> Fixed annotation listbox so that current annotation is always displayed
+     at bottom.  Ultimately, we want to highlight this with a "window" that 
+     stays centered on the current annotation.  Get to this later.
+</ul>
+
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a>
+Sat Nov 22 14:48:21 GMT-8:00 1997</b>
+<ul>
+<li> [win32] edits to make it compile under win32 again
+<li> edits to remove some warnings
+<li> [win32] [bug fix] reverse scans wasn't working because in windows
+the default file mode is text and not binary. They are working now.
+<li> [win32] mods to compile with static tcltk
+<li> [temp bug fix] when views are destroyed offsreen_ are not freed, this
+caused subsequent draws onto a non-mapped window. For now, I freed the
+offsreen bitmap and set it to zero. The <i>real fix</i> should be to free up
+the view entirely.
+</ul>
+
+<LI><B><A HREF="http://www.cs.berkeley.edu/~elan">[EA]</A>
+Sat Nov 22 13:08:58 PST 1997
+</B>
+<UL>
+<li> Added tkUnixInit.c to override dynamic loading of tk scripts since
+     we get them from tclcl.
+</ul>
+
+</UL>
+
+<P>
+<HR>
+<H3>
+<A HREF="www-mash.cs.berkeley.edu/nam/unavail.html">nam-1.0a2[OLD].nam-1.0[NEW]</A> </H3>
+&nbsp;
+<P> Release with ns-2.1b1 <P>
+
+<UL>
+
+<LI><B><A HREF="http://www.cs.berkeley.edu/~elan">[EA]</A>
+Sat Nov 15 15:54:10 PST 1997
+</B>
+<UL>
+<li> Ported to tcl8.0.  Added tkcompat.h for backward compat.
+<li> Generated new configure script for autodetecting of tcl/tk versions
+     (<a href="http://www.isi.edu/~johnh/">John Heidemann's</a> revision).
+</ul>
+
+<LI><B><A HREF="http://www.isi.edu/~haoboy/">[haoboy]</A>
+Mon Nov 10 10:14:23 PST 1997
+</B>
+<UL>
+<LI> Fixed bugs in packet.{cc,h} caused by setting edge length != delay. </LI>
+<LI> Updated scripts in ex/</LI>
+<LI> Updated nam man page. </LI>
+<LI> Fixed bugs in monitoring dropped packets</LI>
+</UL>
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Tue Oct 28 17:00:05 PST 1997</b><br>
+       Re-autoconf'ed with configure.in.TclCL.
+       Extra code from nam.tcl removed.
+
+<LI>
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Wed Oct 8 1997</B></LI>
+<UL>
+<LI>Moved all view zoom and pan code from Tcl to view object to allow us
+to have multiple views.
+<LI>Fixed all code that assumes only a single view of the netmodel
+<LI>Implemented multiple views - currently in a separate window but might change this soon.
+</UL>
+<LI>
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Sun Oct 5 1997</B></LI>
+<UL>
+<LI>Added code to display the current time in timeline graphs
+<LI>Support for bi-directional and loss timeline graphs added.
+<LI>Assorted minor bug fixes
+</UL>
+<LI>
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Sat Oct 4 1997</B></LI>
+<UL>
+<LI>Separated netview into a general purpose view and a special purpose.
+netview.
+<LI>Added new classes to support producing graphs of various parameters.
+<LI>Integrated graphs into UI (click on a link to see them).
+<LI>Fixed minor bugs in netview zooming and X Event handling.
+<LI>Changed tracefile format to be more TCL-like to make it easier to
+handle events with text fields or embedded TCL.
+</UL>
+
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Thu Oct 2 1997</B></LI>
+<UL>
+<LI>activated John's view menu and added code to hide or show the
+monitors, annotations and autolayout panels</LI>
+</UL>
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Wed Oct  1 19:34:40 PDT 1997
+</b><br>
+       Menubar and about dialog added.
+
+
+<li>
+<B><a href="http://www.isi.edu/~haoboy">[haoboy]</a> Wed Oct  1 19:20:53 pdt 1997
+</b><br>
+Added annotation list box. 
+
+
+<LI>
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Wed Oct 1 1997</B></LI>
+
+<UL>
+<LI>
+fixed incorrect value of M_PI in sincos.h</LI>
+
+<LI>
+improved placement of agents so they don't overlap lines and don't often
+overlap each other if possible.</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://www.isi.edu/~haoboy">[haoboy]</A> Tue Oct 1 11:14:00
+PDT 1997</B></LI>
+
+<UL>
+<LI>
+"Return" key is no longer associated with 'single-step'.</LI>
+
+<LI>
+Use right button to add monitor, instead of left button. Left button will
+be used later to move nodes or node groups.</LI>
+
+<LI>
+Implemented automatic graph layout.</LI>
+
+<LI>
+Add a control bar to adjust automatic layout parameters.</LI>
+
+<LI>
+Default configuration file is .nam.tcl in current directory. A sample .nam.tcl
+is included as ex/sample.nam.tcl, together with short explainations.</LI>
+
+<LI>
+Copied config.h, random.{cc,h}, rng.{cc,h} from ns-2.</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Tue Sep 30 1997</B></LI>
+
+<UL>
+<LI>
+added zoom functionality to netview (mostly added in tcl, but could easily
+be moved to c++ later if we think it necessary)</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://north.east.isi.edu/~mjh/">[mjh]</A> Mon Sep 29 1997</B></LI>
+
+<UL>
+<LI>
+replaced old time slider with one based on a canvas to make it more obvious
+what does what (expecially when we add scrollbars for zooming)</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A> Tue Sep 16 14:49:30
+PDT 1997</B></LI>
+
+<BR>ns_to_nam.tcl "h" support improved, examples directory added.
+<LI>
+<B><A HREF="http://www.isi.edu/~haoboy">[haoboy]</A> Wed Sep 3 19:56:34
+pdt 1997</B></LI>
+
+<BR>Minor bug fixes. Now nodes can start with different colors and change
+color later on.
+<LI>
+<B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A>Wed Sep 3</B></LI>
+
+<BR>Extended nam_angle to support arbitrary angles with ``180deg'' syntax.
+Patch from Vikram Visewswariah&nbsp;<visweswa@isi.edu>.
+<LI>
+<B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A> Fri Aug 15 10:44:22
+PDT 1997</B></LI>
+
+<BR>Updated configuration code to current ns-2 status (but not merged)
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~elan">[EA]</A></B> <B>Thu Aug 14
+11:15:01 PDT 1997</B></LI>
+
+<BR>Added session level annotation.
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> <B>Thu Aug
+14 09:52:14 PDT 1997</B></LI>
+
+<UL>
+<LI>
+Removed "gen" directory and contents from repository since these files
+are automatically generated.</LI>
+
+<LI>
+Added Nam.suppressMonitors configuration resource which if set to ``true''
+suppresses the display of the monitor subpanel in the user interface (to
+save screen real estate when not needed). The user should be able to insert
+and remove dynamically this panel from the GUI.</LI>
+
+<LI>
+Added a hook to source $HOME/.nam.tcl if it exists.</LI>
+
+<LI>
+Added "yesno" and "resource" helper procs.</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> <B>Sun Aug
+10 15:11:27 PDT 1997</B></LI>
+
+<UL>
+<LI>
+First cut at port to win32 API (should work under both Windows 95 and NT).
+Seems to work okay except for an infinite loop that occurs fairly often
+when manipulating time in the backward direction.</LI>
+
+<LI>
+Added a number of workarounds for Visual C++. It treats classes and structures
+different for example and can produce link errors if a type is referred
+to both ways.</LI>
+
+<LI>
+Cleaned up code in netview.cc to use more Tkisms in place of Xisms. It
+previously compiled under windows but didn't work. Tk shielding made it
+work.</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> <B>Spring
+1997</B></LI>
+
+<UL>
+<LI>
+Somewhere in here Mark Handley added a bunch of nice features and improved
+the file format.</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> <B>Fri Dec
+27 1996</B></LI>
+
+<UL>
+<LI>
+Ported to our local autoconf environment; we now share configure.in.* files
+across all of our research software.</LI>
+</UL>
+
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> Eliminated
+<I>pt.h</I> since wired-in packet types no longer used.</LI>
+
+<LI>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> Ported to
+MIT's <A HREF="ftp://ftp.tns.lcs.mit.edu/pub/otcl/README.html">Object Tcl</A>
+framework and eliminate <I>CommandTable</I> class etc. Eliminated <I>time_atof</I>
+and <I>bw_atof</I>, whose functions are now handled in tcl.</LI>
+</UL>
+
+<HR>
+<UL>
+<H3>
+nam-0.5a</H3>
+<B>[Jacobson]</B> <I>Tue Sep 12 04:41:15 PDT 1995</I>
+<UL>
+<LI>
+Re-do trace format yet again: all packet related records (h + - d) now
+have same format:</LI>
+
+<CENTER><I>time src dst size attr type conv id</I></CENTER>
+where src &amp; dst are the immediate src &amp; dst node names, size is
+the size in bytes, attr are drawing attributes (color # in lower 8 bits,
+bit 8 set if should be drawn hollow rather than filled), type is a 7 char
+'type' string, conv is a 31 character 'conversation' identifier and id
+is an integer packet identifier.
+<LI>
+can now right click on anything (packet, queue item, drop) &amp; get info
+about it.</LI>
+
+<LI>
+added 'ncolor' and 'ecolor' commands to set node &amp; edge colors</LI>
+
+<LI>
+made 'v' command just execute it's text as a tcl expr as suggested by McCanne.</LI>
+</UL>
+
+<HR>
+<H3>
+nam-0.4a</H3>
+<B>[Orayani]</B> <I>Summer 1995</I>
+<UL>
+<LI>
+add support for graphing, packet id's, and synchronized animations.</LI>
+</UL>
+
+<HR>
+<H3>
+nam-0.3a</H3>
+<B><A HREF="http://www.cs.berkeley.edu/~mccanne">[SM]</A></B> <I>Decemeber
+1994</I>
+<UL>
+<LI>
+Changed trace file input format. New format is identical to format output
+by <A HREF="http://www-mash.cs.berkeley.edu/ns/">ns</A>.</LI>
+
+<LI>
+Eliminated pic-style language parses. Now topology and layout are created
+by user-defined tcl procedure (nam_config).</LI>
+
+<LI>
+Reworked layout traversal to operate on native objects instead of temporary
+ones.</LI>
+
+<LI>
+Changed node/edge object interface so that you first create them and later
+place and adjust their size.</LI>
+
+<LI>
+Changed links so that they explicitly know their bandwidth and can map
+a packet size into a transmission time (so we don't need trasmission times
+in the trace file anymore).</LI>
+
+<LI>
+Made many improvements to user interface.</LI>
+</UL>
+
+<HR>
+<H3>
+Origin</H3>
+Although development of the LBNL Network Animator <I>nam</I> began in 1991,
+it was not widely released for many years because the project was consistently
+superceded by a number of our other research/development efforts. <A HREF="http://www.cs.berkeley.edu/~mccanne/">Steven
+McCanne</A> wrote the original version of the nam in February 1991 during
+his year off from school (between undergraduate and graduate degrees) when
+he worked full-time as a staff scientist in the <A HREF="http://www-nrg.ee.lbl.gov/">Network
+Research Group</A> at the <A HREF="http://www.lbl.gov/">Lawrence Berkeley
+National Laboratory</A>. This early version of nam was first prototyped
+in C using <I>Tango</I>, an environment for algorithm animation from Brown
+University. Shortly thereafter, McCanne ported nam to C++ and the Stanford
+<A HREF="ftp://interviews.stanford.edu/pub/">Interviews</A> graphics library.
+Within this C++/Interviews framework, the principal application design
+and architecture was experimented with, refined, and developed. In winter
+1991, McCanne ported nam to Interviews-3.0, and improved the underlying
+design to support multiple views of a single animation. In fall 1993, McCanne
+ported nam to <A HREF="http://www.sunlabs.com/research/tcl/">Tcl/Tk</A>
+and further improved the software architecture and user interface. In winter
+1994, McCanne once again re-visited the nam design, this time to improve
+its interaction with his network simulator <A HREF="http://www-mash.cs.berkeley.edu/ns/">ns</A>
+(version 0.3a above). In summer 1995, Marylou Orayani enhanced nam with
+a number of features to carry our her U.C. Berkeley Master's project, which
+involved the automatic animation of real TCP/IP conversations and detailed
+case studies of a number of actual pathological traffic patterns (version
+0.4a above). Throughout this time, Van Jacobson contibuted a number of
+improvements to the user inteface and trace file format and added new features.
+
+<P>This change history was not consistently maintained until winter 1996,
+when we first created the web-page form of this document.&nbsp;
+<HR><A HREF="xxx">[Return to ?]</A></UL>
+
+<ul>
+
+<LI><B><a href="http://www.isi.edu/~haoboy">[haoboy]</a> 
+</b><br>
+<ul>
+<li> "Return" key is no longer associated with 'single-step'.
+<li> Use right button to add monitor, instead of left button. Left button will
+be used later to move nodes or node groups.
+<li> Implemented automatic graph layout.
+<li> Add a control bar to adjust automatic layout parameters.
+<li> Default configuration file is .nam.tcl in current directory. A sample 
+.nam.tcl is included as sample.nam.tcl.
+<li> Copied config.h, random.{cc,h}, rng.{cc,h} from ns-2.
+</LI>
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a> Tue Sep 16 14:49:30 PDT 1997</b><br>
+       ns_to_nam.tcl "h" support improved, examples directory added.
+
+<LI><B><a href="http://www.isi.edu/~haoboy">[haoboy]</A>
+Wed Sep  3 19:56:34 pdt 1997
+</b><br>
+Minor bug fixes. Now nodes can start with different colors and change color
+later on.
+</LI>
+
+  <li> <b><a href="http://www.isi.edu/~johnh/">[johnh]</a>Wed Sep 3</b><br>
+         Extended nam_angle to support arbitrary angles with
+       ``180deg'' syntax.
+       Patch from Vikram Visewswariah <visweswa@isi.edu>.
+
+<LI><B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A> Fri Aug 15 10:44:22 PDT 1997<br>
+</B>Updated configuration code to current ns-2 status (but not merged)
+     </LI>
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>Thu Aug 14 11:15:01 PDT 1997</b><br>
+Added session level annotation.
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Thu Aug 14 09:52:14 PDT 1997
+</b><br>
+<ul>
+<li> Removed "gen" directory and contents from repository since these
+files are automatically generated.
+<li> Added Nam.suppressMonitors configuration resource which if set
+to ``true'' suppresses the display of the monitor subpanel
+in the user interface (to save screen real estate when not needed).
+The user should be able to insert and remove dynamically this panel
+from the GUI.
+<li> Added a hook to source $HOME/.nam.tcl if it exists.
+<li> Added "yesno" and "resource" helper procs.
+</ul> 
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>Sun Aug 10 15:11:27 PDT 1997</b><br>
+<ul>
+<li>First cut at port to win32 API (should work under both Windows 95 and NT).
+Seems to work okay except for an infinite loop that occurs fairly
+often when manipulating time in the backward direction.
+<li>Added a number of workarounds for Visual C++.  It treats classes
+and structures different for example and can produce link errors
+if a type is referred to both ways.
+<li> Cleaned up code in netview.cc to use more Tkisms in place of Xisms.
+It previously compiled under windows but didn't work.  Tk shielding
+made it work.
+</ul> 
+
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+<b>Spring 1997</b>
+<ul>
+<li> Somewhere in here Mark Handley added a bunch of nice
+features and improved the file format.
+</ul>
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+<b>Fri Dec 27 1996</b>
+<ul>
+<li>
+Ported to our local autoconf environment; we now share
+configure.in.* files across all of our research software.
+</ul>
+
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+Eliminated <i>pt.h</i> since wired-in packet types no longer used.
+
+<li><b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+Ported to MIT's
+<a href=ftp://ftp.tns.lcs.mit.edu/pub/otcl/README.html>Object Tcl</a>
+framework and eliminate <i>CommandTable</i> class etc.
+Eliminated <i>time_atof</i> and <i>bw_atof</i>, whose functions
+are now handled in tcl.
+
+</ul>
+
+<hr>
+<h3>nam-0.5a</h3>
+<strong>[Jacobson]</strong> <i>Tue Sep 12 04:41:15 PDT 1995</i>
+
+<ul>
+<li>Re-do trace format yet again:
+all packet related records (h + - d) now have same format:<br>
+<center><i>
+  time src dst size attr type conv id<br>
+</i></center>
+where src & dst are the immediate src & dst node names, size is
+the size in bytes, attr are drawing attributes (color # in lower
+8 bits, bit 8 set if should be drawn hollow rather than filled),
+type is a 7 char 'type' string, conv is a 31 character 'conversation'
+identifier and id is an integer packet identifier.
+
+<li>can now right click on anything (packet, queue item, drop) & get
+info about it.
+
+<li>added 'ncolor' and 'ecolor' commands to set node & edge colors
+
+<li>made 'v' command just execute it's text as a tcl expr as
+suggested by McCanne.
+
+</ul>
+
+<hr>
+<h3>nam-0.4a</h3>
+<strong>[Orayani]</strong> <i>Summer 1995</i>
+
+<ul>
+
+<li>add support for graphing, packet id's, and synchronized animations.
+
+</ul>
+
+<hr>
+<h3>nam-0.3a</h3>
+<b><a href=http://www.cs.berkeley.edu/~mccanne>[SM]</a></b>
+<i>Decemeber 1994</i>
+
+<ul>
+
+<li>Changed trace file input format.  New format is identical to format
+output by <a href=http://www-mash.cs.berkeley.edu/ns/>ns</a>.
+
+<li>Eliminated pic-style language parses.  Now topology and layout are
+created by user-defined tcl procedure (nam_config).
+
+<li>Reworked layout traversal to operate on native objects instead of 
+temporary ones.
+
+<li>Changed node/edge object interface so that you first create them and
+later place and adjust their size.
+
+<li>Changed links so that they explicitly know their bandwidth and can
+map a packet size into a transmission time (so we don't need trasmission
+times in the trace file anymore).
+
+<li>Made many improvements to user interface.
+
+</ul>
+
+<hr>
+<h3>Origin</h3>
+
+Although development of the
+LBNL Network Animator <i>nam</i>
+began in 1991, it was not widely released
+for many years because the project was consistently
+superceded by a number of our other research/development efforts.
+<a href=http://www.cs.berkeley.edu/~mccanne/>Steven McCanne</a>
+wrote the original version of the nam
+in February 1991
+during his year off from school (between undergraduate and
+graduate degrees) when he worked full-time as a staff scientist
+in the
+<a href=http://www-nrg.ee.lbl.gov/>Network Research Group</a>
+at the
+<a href=http://www.lbl.gov/>Lawrence Berkeley National Laboratory</a>.
+This early version of nam was first prototyped in C using
+<i>Tango</i>, an environment
+for algorithm animation from Brown University.
+Shortly thereafter, McCanne ported nam to C++ and
+the Stanford
+<a href=ftp://interviews.stanford.edu/pub/>Interviews</a>
+graphics library.  Within this C++/Interviews framework,
+the principal application
+design and architecture was experimented with, refined,
+and developed.
+In winter 1991, McCanne ported nam to Interviews-3.0,
+and improved the underlying design to support multiple
+views of a single animation.
+In fall 1993, McCanne ported nam to
+<a href=http://www.sunlabs.com/research/tcl/>Tcl/Tk</a>
+and further improved the software architecture
+and user interface.
+In winter 1994, McCanne once again re-visited the nam
+design, this time to improve its interaction with
+his network simulator <a href=http://www-mash.cs.berkeley.edu/ns/>ns</a>
+(version 0.3a above).
+In summer 1995, Marylou Orayani enhanced nam with a number
+of features to carry our her U.C. Berkeley Master's project,
+which involved the automatic animation of real TCP/IP
+conversations and detailed case studies of a number
+of actual pathological traffic patterns (version 0.4a above).
+Throughout this time, Van Jacobson contibuted a number
+of improvements to the user inteface and trace file format
+and added new features.
+
+<p>
+This change history was not consistently maintained
+until winter 1996, when we first created
+the web-page form of this document.
+
+<hr>
+<a href=xxx>[Return to ?]</a>
+</BODY>
+</HTML>

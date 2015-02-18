@@ -1,0 +1,36 @@
+@(#) $Header: /cvsroot/nsnam/nam-1/README,v 1.2 1999/08/26 16:06:13 haoboy Exp $
+
+MASH Research Group
+University of California, Berkeley
+ns@mash.cs.berkeley.edu
+<http://www-mash.cs.berkeley.edu/ns/>
+
+VINT Project
+A collaboration among USC/ISI, Xerox PARC, LBNL, and UCB 
+<http://netweb.usc.edu/vint/>
+
+This directory contains a source code or binary distribution of nam,
+the UCB/LBNL Network AniMator. 
+Nam is intended to be used with the UCB/LBNL Network Simulator, NS. 
+Nam should configure with GNU autoconfigure.
+Additional information:
+
+QUICK START:  try
+	./configure
+
+DOWNLOADING AND BUILDING NAM:
+	<http://www-mash.cs.berkeley.edu/ns/ns-build.html>
+
+INSTALLATION PROBLEMS AND BUG FIXES:
+	<http://www-mash.cs.berkeley.edu/nam/nam-problems.html>
+
+DOCUMENTATION:
+	<http://www-mash.cs.berkeley.edu/ns/>
+	nam.1   (the nam man page, included in this distribution)
+
+INFORMATION ABOUT NS:
+	<http://www-mash.cs.berkeley.edu/ns/>
+
+LATEST INFORMATION:
+	<http://www-mash.cs.berkeley.edu/nam/>
+

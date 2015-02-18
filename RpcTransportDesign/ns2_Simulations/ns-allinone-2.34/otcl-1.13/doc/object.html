@@ -1,0 +1,571 @@
+<html>
+<head>
+<title>OTcl Objects (Version 0.96, September 95)</title>
+</head>
+
+<body>
+
+<h1><a href="../README.html">OTcl</a> Objects (Version 0.96, September 95)</h1>
+
+<h2>Overview</h2>
+
+<p>This reference page describes the functionality provided for all
+objects by methods on the <tt>Object</tt> class. See the <a
+href="tutorial.html">tutorial</a> for an introduction to programming
+in OTcl, and the <a href="capi.html">C API</a> page for details of
+manipulating objects from C.</p>
+
+<p>Objects in OTcl are instances of classes. They are created through
+class objects either implicitly, with a widget command syntax, or
+explicitly, by calling a creation method. After defining a class Bagel
+with instprocs flavor and size below, a new bagel object called abagel
+is created and initialized by calling its flavor and size
+instprocs. The creation process may be customized for any class. See
+<a href="class.html">OTcl Classes</a> for details.</p>
+
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Bagel instproc flavor {args} {
+  $self set flavors $args
+}
+% Bagel instproc size {s} {    
+  $self set bites $s
+}
+% Bagel abagel -flavor Sesame -size 12
+abagel
+% abagel info vars
+flavors bites
+% abagel set flavors
+Sesame
+% abagel set bites
+12
+</pre></blockquote>
+
+
+<p>Once created, objects are manipulated through methods placed on
+them directly, and methods they inherit from their class object and
+its superclasses. The former methods are called procs, the latter
+instprocs. As in Tcl, there is no distinction between system provided
+methods (such as info and set) and user provided methods (such as
+flavor and size). Procs take precedence over instprocs, and the order
+of inheritance for instprocs is discussed under the
+<tt>superclass</tt> instproc in <a href="class.html">OTcl
+Classes</a>.</p>
+
+<p>All methods are called through the object by using a widget-like
+syntax. The method name is used as the first argument, with the
+method's arguments as subsequent arguments. The most specific method
+that is found either on the object or in its inheritance ordering will
+be invoked. The flavor and size methods are called on bagels as
+follows.</p>
+
+
+<blockquote><pre>
+% abagel flavor Sesame Onion
+Sesame Onion
+% abagel size 10
+10
+% abagel set flavors
+Sesame Onion
+% abagel set bites
+10
+</pre></blockquote>
+
+<p>Generic objects may be created with the <tt>Object</tt>
+class. <tt>Object</tt> is the repository for the behavior common to
+all objects. It includes methods for defining new methods and instance
+variables, initializing and destroying objects, querying them, and so
+forth. The remainder of this reference page describes these
+methods. Their functionality can be customized for particular classes
+or objects by using the standard inheritance mechanisms, or changed
+directly for all objects by rewriting the methods on <tt>Object</tt>
+in Tcl or C.</p>
+
+
+<h2>Alloc</h2>
+
+<p>The <tt>alloc</tt> proc is used to allocate a fresh object that is
+an instance of class <tt>Object</tt>. It is normally called by the system as
+part of object creation, but may be called by the user.</p>
+
+<p>The system <tt>create</tt> instproc on <tt>Class</tt> expects all
+<tt>alloc</tt> procs to take the name of the object to allocate, and a
+list of arguments. It expects them to allocate the object, install it
+in the interpreter, and return the list of unprocessed arguments. For
+the case of the <tt>Object</tt> <tt>alloc</tt> proc, no additional arguments
+are processed, and so they are all returned.</p>
+
+<p>To customize object creation, write an <tt>init</tt> instproc, not
+an <tt>alloc</tt> proc. New <tt>alloc</tt> procs will typically be
+written in C to allocate structurally different types of object.</p>
+
+<blockquote><pre>
+% Object alloc foo bar baz
+bar baz
+% foo info class
+Object
+% foo info procs
+% foo info vars
+</pre></blockquote>
+
+<h2>Array</h2>
+
+<p>The <tt>array</tt> instproc returns information about array
+instance variables. It mirrors the Tcl array command. See the Tcl
+array command for options. Array is conceptually defined as
+follows.</p>
+
+<blockquote><pre>
+Object instproc array {opt ary args} {
+  $self instvar $ary
+  eval array [list $opt] [list $ary] $args
+}
+</pre></blockquote>
+
+
+<h2>Class</h2>
+
+<p>The <tt>class</tt> instproc changes the class of an object, where
+the notion of class is expressed using the names of class objects. The
+class of an object may be changed at any time, with a run-time type
+checking system enforcing safety as subsequent methods are
+executed.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Bagel instproc what {} { $self info class }
+% Class NewBagel
+NewBagel
+% Bagel abagel
+abagel
+% abagel info class
+Bagel
+% abagel what
+Bagel
+% abagel set foo bar
+bar
+% abagel info vars
+foo
+% abagel class NewBagel
+% abagel info class
+NewBagel
+% abagel what
+abagel: unable to dispatch method what
+% abagel info vars
+foo
+</pre></blockquote>
+
+<p>Changing the class of an object does not change the instance
+variables and procs it contains, only the instprocs accessible through
+it. This may be customized with the standard inheritance
+mechanisms.</p>
+
+
+<h2>Destroy</h2>
+
+<p>The <tt>destroy</tt> instproc tears down the object, removes it
+from the interpreter, and releases its memory. Unset traces on
+instance varaibles are triggered in the process. It takes no
+arguments, and returns the empty string.</p>
+
+<p>User defined teardown code may be added to objects and classes with
+the standard inheritance mechanisms.</p>
+
+<p>If the object is also a class, then its instances are destroyed,
+and classes that depend on it as superclasses have it removed from
+their superclass list.</p>
+
+<p>There is only one user visible <tt>destroy</tt> method for both
+objects and classes. The real teardown work is performed below the
+method level, through deletion callbacks issued by the Tcl
+interpreter. This ensures that cleanup will be invoked if the command
+corresponding to the object is deleted from the interpreter in any
+manner, including calls to <tt>Tcl_DeleteCommand</tt> and renaming the
+command to {}.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Bagel instproc destroy {} {
+  puts "zap!"
+  $self next 
+}
+% Bagel abagel
+abagel
+% abagel proc destroy {} {
+  puts "poof!"
+  $self next
+}
+% abagel destroy
+poof!
+zap!
+% info commands abagel
+</pre></blockquote>
+
+<p>While cleanup (including user defined teardown) occurs even if the
+command is renamed to {}, calling the <tt>destroy</tt> method is the
+preferable way to dispose of an object, since error codes cannot be
+returned if <tt>Tcl_DeleteCommand</tt> is triggered directly.</p>
+
+
+<h2>Info</h2>
+
+<p>The <tt>info</tt> instproc is used to query the object and retrieve
+information about its current state. It mirrors the Tcl info command,
+and has the following options.</p>
+
+<ul>
+
+<li><tt>class</tt> returns the class of the object. With an additional
+argument that is the name of a class, it returns 1 if the object is a
+direct or indirect instance of that class, and 0 otherwise.
+
+<li><tt>procs</tt> returns a list of the names of proc methods defined
+on the object. An additional argument is taken to be a string match
+pattern which filters the result list.
+
+<li><tt>commands</tt> returns a list of the names of both Tcl and C
+proc methods defined on the object. An additional argument is taken to
+be a string match pattern which filters the result list.
+
+<li><tt>args</tt> is used to query the argument list of a Tcl proc
+method. It functions in the same manner as the Tcl info args command.
+
+<li><tt>body</tt> is used to query the body of a Tcl proc method. It
+functions in the same manner as the Tcl info body command.
+
+<li><tt>default</tt> is used to query the default value of an argument
+of a Tcl proc method. It functions in the same manner as the Tcl info
+default command.
+
+<li><tt>vars</tt> returns a list of the names of instance variables
+defined on the object. An additional argument is taken to be a string
+match pattern which filters the result list.
+
+</ul>
+
+<p>In conjunction with other methods such as <tt>array</tt> and
+<tt>set</tt>, these options can recover most information about the
+state of an object. As an example, the following proc reverse
+engineers Tcl procs. This is its output when run on itself.</p>
+
+<blockquote><pre>
+Object proc retrieve {p} {
+   set txt [list $self proc $p]
+   set al [$self info args $p]
+   set dft {}
+   for {set i 0} {$i < [llength $al]} {incr i} {
+     set av [lindex $al $i]
+     if {[$self info default $p $av dft]} then {
+       set al [lreplace $al $i $i [list $av $dft]]
+     }
+   }
+   lappend txt $al
+   lappend txt [$self info body $p]
+   return $txt
+}
+</pre></blockquote>
+
+
+<h2>Init</h2>
+
+<p>The <tt>init</tt> instproc is used to initialize a freshly
+allocated object that is a direct or indirect instance of the class
+<tt>Object</tt>. It is normally called by the system (perhaps from more
+specialized <tt>init</tt> instprocs) as part of object creation, but
+may be called by the user.</p>
+
+<p><tt>init</tt> interprets its arguments as pairs of option keys and
+option values. Each option key should be the name of a valid method
+for the object, preceded by a dash. The method should take one
+argument. For each option key and option value pair, init calls the
+method on the object, with the option value as its argument. It
+returns the empty string.</p>
+
+<p>To customize object creation, write an <tt>init</tt> instproc for a
+class, not an <tt>alloc</tt> proc. If the option key and option value
+creation syntax is still desired, then call the <tt>Object</tt> <tt>init</tt>
+instproc by using <tt>next</tt>. This is discussed in the
+<tt>create</tt> instproc in <a href="class.html">OTcl Classes</a>.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% foreach i {1 2 3 4} {                    
+  Bagel instproc $i {v} {puts $v}
+}
+% Bagel abagel
+abagel
+% abagel init -1 one -2 two -3 three -4 four!
+one
+two
+three
+four!
+</pre></blockquote>
+
+<p><tt>init</tt> is conceptually equivalent to the following.</p>
+
+<blockquote><pre>
+Object instproc init {args} {                   
+  if {[llength $args]%2 != 0} then {            
+    error {uneven number of arguments}          
+  }                                             
+  while {$args != {}} {                         
+    set key [lindex $args 0]                    
+    if {[string match {-*} $key]} then {        
+      set key [string range $key 1 end]         
+    }                                           
+    set val [lindex $args 1]                    
+    if {[catch {$self $key $val} msg]!=0} then {
+      set opt [list $self $key $val]            
+      error "$msg during $opt"                
+    }                                           
+    set args [lrange $args 2 end]               
+  }                                             
+  return {}                                     
+}
+</pre></blockquote>
+
+<h2>Instvar</h2>
+
+<p>The <tt>instvar</tt> instproc is used within the body of a method
+to map instance variables to local variables. It mirrors the Tcl upvar
+command (and is implemented in terms of it).</p>
+
+<p>Multiple instance variables may be declared at once. The instance
+variables may be scalars or arrays (but see below), and need not be
+previously defined. By default the local alias for an instance
+variable is the same as the name of the instance variable. Renaming in
+the style of upvar is specified using a two element lists in the
+declaration. This departs from Tcl upvar syntax, but allows a simple
+declaration for the majority of cases, with access to the full
+functionality of upvar when necessary.</p>
+
+
+<blockquote><pre>
+% Class Bagel; Bagel abagel
+abagel
+% abagel set flavor sesame
+sesame
+% abagel set size {12 bites}
+12 bites
+% abagel proc taste {} {
+  $self instvar flavor
+  return $flavor
+}
+% abagel taste
+sesame
+% abagel proc query {} {
+  $self instvar size {flavor f} 
+  return "$f, $size"
+}
+% abagel query
+sesame, 12 bites
+</pre></blockquote>
+
+<p>Note that the renaming syntax is required to access individual
+array elements directly. This is because Tcl's upvar does not allow a
+remote array element to be locally accessed as an array
+element. Instead, it is often easier to map the whole array for
+access.</p>
+
+<h2>Next</h2>
+
+<p>The <tt>next</tt> instproc is used within the body of a method to
+call the next-most shadowed method. It is used to combine inherited
+methods without depending on explicitly knowing their location. For
+example, it is typically used as part of <tt>init</tt>
+instprocs for classes to form an aggregate initialization
+method. <tt>next</tt> is analogous to call-next-method in CLOS. See
+the <tt>superclass</tt> instproc in <a href="class.html">OTcl
+Classes</a> for a discussion of the order of inheritance.
+
+<p><tt>next</tt> searches for an instproc method with the same name as
+the current method. It begins its search after the position in the
+precedence ordering where the current method was found, if the current
+method is an instproc, or from the beginning of the precedence
+ordering of the object's class, if the current method is a proc. The
+position information between calls to <tt>next</tt> is recovered from
+the <tt>class</tt> variable. If no next method is found, then an empty
+string is returned without error. Otherwise, the next method is called
+with the arguments that were passed to <tt>next</tt>.</p>
+
+
+<h2>Proc</h2>
+
+<p>The <tt>proc</tt> instproc is used to install proc methods on an
+object, for sole use by that object. Use <tt>proc</tt> to customize
+individual objects beyond the functionality provided by via their
+class, not for inheritance. With particular argument forms,
+<tt>proc</tt> can also remove proc methods from an object, or specify
+an autoload script for demand loading of the proc method.</p>
+
+<p>The arguments and body of a proc method are of the same form as a
+Tcl procedure, with two exceptions. If both args and body are empty,
+then an existing proc method with the specified name is removed from
+the object. If args is <tt>{auto}</tt>, then the body is interpreted
+as an autoload script as described below.</p>
+
+<p>Within the body of the proc and instproc methods, three special
+variables are defined. These variables are for reading only. Instance
+variables may be accessed as local variables by using the
+<tt>instvar</tt> instproc.</p>
+
+<ul>
+
+<li><tt>self</tt> is bound to the name of the object on whose behalf
+the method is executing. It may be used to invoke further methods. It
+is the equivalent of this in C++.
+
+<li><tt>class</tt> is bound to the name of the class object on which
+the method that is executing is defined, if the method is an instproc,
+and the empty string if the method is a proc. It does not contain the
+class of the object, which may be retrieved with the <tt>info</tt>
+instproc.
+
+<li><tt>proc</tt> is bound to the name of the proc or instproc method
+that is executing.
+
+</ul>
+
+<blockquote><pre>
+% Class Bagel; Bagel abagel
+abagel
+% abagel info procs
+% abagel proc flavor {f} {  
+  $self instvar flavor
+  set flavor $f
+  return "called $self $proc $f"
+}
+% abagel info procs
+flavor
+% abagel flavor sesame
+called abagel flavor sesame
+</pre></blockquote>
+
+
+<p>Proc and instproc methods may also be declared to autoload. This
+function is usually accessed through the higher level demand loading
+scheme described in <a href="autoload.html">OTcl Autoloading</a>.</p>
+
+<p>If the argument list is <tt>{auto}</tt>, then the body is taken to
+be a script for demand loading of the method. When the method is
+invoked, the script will be executed (and should cause the real method
+to be loaded) and then the method will be restarted. While the stub is
+waiting to load the method body, the method is recognized as a
+<tt>proc</tt> by the <tt>info</tt> method, but cannot be queried for
+its body or arguments.</p>
+
+<blockquote><pre>
+% set tmp [open "tmp" w] 
+file3
+% puts $tmp {abagel proc bagel {} { return "bagel" }}
+% close $tmp
+% Class Bagel; Bagel abagel
+abagel
+% abagel proc bagel auto {
+    puts -nonewline "loading... "
+    source tmp
+  }
+% abagel bagel 
+loading... bagel
+% abagel bagel  
+bagel
+</pre></blockquote>
+
+
+<h2>Set</h2>
+
+<p>The <tt>set</tt> instproc is used to place instance variables on an
+object as well as to access them. It mirrors the Tcl set command (and
+is implemented in terms of it). It returns the value of the instance
+variable. Instance variables may be scalar or array variables. They
+are stored in separate slots than methods, and so are distinct from
+methods with the same name.</p>
+
+<blockquote><pre>
+% Class Bagel; Bagel abagel
+abagel
+% abagel info vars
+% abagel set avar aval
+aval
+% abagel set avar
+aval
+% abagel set foo(bar) baz
+baz
+% abagel set foo(bar)
+baz
+% abagel info vars
+foo avar
+</pre></blockquote>
+
+
+<h2>Unknown</h2>
+
+<p>The <tt>unknown</tt> method, if defined for an object, is invoked
+by the system when no matching method can be found for regular
+dispatch. By default, it is not defined for <tt>Object</tt>, but
+exists as a hook for user defined handlers, such as abbreviations,
+load monitoring, error reporting, etc. An <tt>unknown</tt> instproc
+that implements implicit creation is defined for <tt>Class</tt>; see
+its reference page.</p>
+
+<p>Like Tcl's <tt>unknown</tt> proc, the <tt>unknown</tt> method
+receives as its arguments the name of the method that could not be
+invoked, along with that method's arguments. The result it returns is
+returned as the overall result of the call.</p>
+
+<p>As an example, the following <tt>unknown</tt> instproc implements
+abbreviations and verbose error messsages.</p>
+
+<blockquote><pre>
+% Object instproc unknown {m args} {
+  foreach i [$self info commands] {
+    lappend meth($i) {}
+  }
+  set cl [$self info class]
+  foreach i [concat $cl [$cl info heritage]] {   
+    foreach j [$i info instcommands] {
+     lappend meth($j) {}
+    }
+  }
+  set abbrev [array names meth "$m*"]
+  switch -exact [llength $abbrev] {
+     0 { error "$self: invalid method \"$m\": [lsort [array names meth]]" }
+     1 { eval [list $self] $abbrev $args }
+     default { error "$self: ambiguous method \"$m\": [lsort $abbrev]" }
+  }
+}
+% Object obj    
+obj
+% obj f
+obj: invalid method "f": array class destroy info init instvar next proc set unknown unset
+% obj i
+obj: ambiguous method "i": info init instvar
+% obj d
+</pre></blockquote>
+
+<h2>Unset</h2>
+
+<p>The <tt>unset</tt> instproc is used to remove instance variables
+from an object. It mirrors the Tcl unset command (and is implemented
+in terms of it).</p>
+
+<blockquote><pre>
+% Class Bagel; Bagel abagel
+abagel
+% abagel set foo bar
+bar
+% abagel info vars
+foo
+% abagel unset foo
+% abagel info vars
+</pre></blockquote>
+
+</body>
+</html>
+
+<!-- $Date: 1997/07/19 02:08:53 $ -->

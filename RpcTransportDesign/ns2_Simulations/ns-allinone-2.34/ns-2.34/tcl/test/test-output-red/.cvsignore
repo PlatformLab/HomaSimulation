@@ -1,0 +1,15 @@
+*.test
+ecn
+flows_combined
+flows_forced
+flows_unforced
+red1
+red2
+red_twoway
+red_twowaybytes
+red_twowaybytes.Z
+gentleBadParams
+gentleEcn
+ungentleBadParams
+gentle
+ungentle

@@ -1,0 +1,752 @@
+W -t * -x 670 -y 670
+n -t * -s 0  -x 143.43750921878001 -y 94.217567273200004 -Z 0 -z 20  -v circle -c black
+n -t * -s 1  -x 304.65324424678403 -y 167.07632596983501 -Z 0 -z 20  -v circle -c black
+n -t * -s 2  -x 81.810723227699 -y 152.82536050561001 -Z 0 -z 20  -v circle -c black
+n -t * -s 3  -x 325.834153339995 -y 354.615563074325 -Z 0 -z 20  -v circle -c black
+n -t * -s 4  -x 23.768638624379001 -y 159.50938100993099 -Z 0 -z 20  -v circle -c black
+V -t * -v 1.0a5 -a 0
+A -t * -n 1 -p 0 -o 0xffffffff -c 31 -a 1
+A -t * -h 1 -m 2147483647 -s 0
+v -t 0 -e take_snapshot
++ -t 0.15702374 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 0 -k AGT
+- -t 0.15702374 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 0 -k AGT
+n -t 0.15702374 -s 2 -S COLOR -c green -o black
+h -t 0.15702374 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 0 -k AGT
++ -t 0.15709874 -s 2 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+- -t 0.15709874 -s 2 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.15709874 -s 2 -S COLOR -c green -o black
+h -t 0.15709874 -s 2 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.15751494 -s 4 -S COLOR -c green -o black
+r -t 0.15751494 -s 4 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.15751503 -s 0 -S COLOR -c green -o black
+r -t 0.15751503 -s 0 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.15751549 -s 1 -S COLOR -c green -o black
+r -t 0.15751549 -s 1 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+v -t 0.15752000 -e take_snapshot
+n -t 0.15753994 -s 4 -S COLOR -c green -o black
+d -t 0.15753994 -s 4 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k RTR
+n -t 0.15754003 -s 0 -S COLOR -c green -o black
+d -t 0.15754003 -s 0 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k RTR
+n -t 0.15754049 -s 1 -S COLOR -c green -o black
+d -t 0.15754049 -s 1 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k RTR
+v -t 0.15762400 -e take_snapshot
++ -t 0.20075000 -s 2 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+- -t 0.20075000 -s 2 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.20075000 -s 2 -S COLOR -c green -o black
+h -t 0.20075000 -s 2 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+v -t 0.20078200 -e take_snapshot
+n -t 0.20491195 -s 4 -S COLOR -c green -o black
+r -t 0.20491195 -s 4 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.20491283 -s 0 -S COLOR -c green -o black
+r -t 0.20491283 -s 0 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.20491744 -s 1 -S COLOR -c green -o black
+r -t 0.20491744 -s 1 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
++ -t 0.22781336 -s 1 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+- -t 0.22781336 -s 1 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.22781336 -s 1 -S COLOR -c green -o black
+h -t 0.22781336 -s 1 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+v -t 0.22783700 -e take_snapshot
+n -t 0.23197926 -s 0 -S COLOR -c green -o black
+r -t 0.23197926 -s 0 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23197965 -s 3 -S COLOR -c green -o black
+r -t 0.23197965 -s 3 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23198081 -s 2 -S COLOR -c green -o black
+r -t 0.23198081 -s 2 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23198273 -s 4 -S COLOR -c green -o black
+r -t 0.23198273 -s 4 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+v -t 0.23202300 -e take_snapshot
++ -t 0.23277965 -s 3 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+- -t 0.23277965 -s 3 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23277965 -s 3 -S COLOR -c green -o black
+h -t 0.23277965 -s 3 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23598594 -s 1 -S COLOR -c green -o black
+r -t 0.23598594 -s 1 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
++ -t 0.23653594 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.23653594 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23653594 -s 1 -S COLOR -c green -o black
+h -t 0.23653594 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23830224 -s 3 -S COLOR -c green -o black
+r -t 0.23830224 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.23840224 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.23840224 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23840224 -s 3 -S COLOR -c green -o black
+h -t 0.23840224 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.23992853 -s 1 -S COLOR -c green -o black
+r -t 0.23992853 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.24042853 -s 1 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+- -t 0.24042853 -s 1 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.24042853 -s 1 -S COLOR -c green -o black
+h -t 0.24042853 -s 1 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+v -t 0.24060000 -e take_snapshot
+n -t 0.24363482 -s 3 -S COLOR -c green -o black
+r -t 0.24363482 -s 3 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
++ -t 0.24373482 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.24373482 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.24373482 -s 3 -S COLOR -c green -o black
+h -t 0.24373482 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.24526111 -s 1 -S COLOR -c green -o black
+r -t 0.24526111 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.24995482 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.24995482 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.24995482 -s 3 -S COLOR -c green -o black
+h -t 0.24995482 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+v -t 0.24997900 -e take_snapshot
+n -t 0.25172111 -s 1 -S COLOR -c green -o black
+r -t 0.25172111 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.25182111 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.25182111 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.25182111 -s 1 -S COLOR -c green -o black
+h -t 0.25182111 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.25334740 -s 3 -S COLOR -c green -o black
+r -t 0.25334740 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.25384740 -s 3 -d 1 -p AODV -e 96 -c 2 -a 0 -i 0 -k MAC
+- -t 0.25384740 -s 3 -d 1 -p AODV -e 96 -c 2 -a 0 -i 0 -k MAC
+n -t 0.25384740 -s 3 -S COLOR -c green -o black
+h -t 0.25384740 -s 3 -d 1 -p AODV -e 96 -c 2 -a 0 -i 0 -k MAC
+n -t 0.25769369 -s 1 -S COLOR -c green -o black
+r -t 0.25769369 -s 1 -d 1 -p AODV -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.25779369 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.25779369 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.25779369 -s 1 -S COLOR -c green -o black
+h -t 0.25779369 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.25931998 -s 3 -S COLOR -c green -o black
+r -t 0.25931998 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.25936400 -e take_snapshot
++ -t 0.26307800 -s 0 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+- -t 0.26307800 -s 0 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.26307800 -s 0 -S COLOR -c green -o black
+h -t 0.26307800 -s 0 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.26724083 -s 2 -S COLOR -c green -o black
+r -t 0.26724083 -s 2 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.26724254 -s 4 -S COLOR -c green -o black
+r -t 0.26724254 -s 4 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.26724389 -s 1 -S COLOR -c green -o black
+r -t 0.26724389 -s 1 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
++ -t 0.26914254 -s 4 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+- -t 0.26914254 -s 4 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.26914254 -s 4 -S COLOR -c green -o black
+h -t 0.26914254 -s 4 -d -1 -p AODV -e 104 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27330449 -s 2 -S COLOR -c green -o black
+r -t 0.27330449 -s 2 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27330708 -s 0 -S COLOR -c green -o black
+r -t 0.27330708 -s 0 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27331191 -s 1 -S COLOR -c green -o black
+r -t 0.27331191 -s 1 -d -1 -p AODV -e 52 -c 2 -a 0 -i 0 -k MAC
++ -t 0.27441191 -s 1 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+- -t 0.27441191 -s 1 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27441191 -s 1 -S COLOR -c green -o black
+h -t 0.27441191 -s 1 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27761780 -s 0 -S COLOR -c green -o black
+r -t 0.27761780 -s 0 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27761820 -s 3 -S COLOR -c green -o black
+r -t 0.27761820 -s 3 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27761935 -s 2 -S COLOR -c green -o black
+r -t 0.27761935 -s 2 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27762127 -s 4 -S COLOR -c green -o black
+r -t 0.27762127 -s 4 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
++ -t 0.27816935 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.27816935 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27816935 -s 2 -S COLOR -c green -o black
+h -t 0.27816935 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.27993679 -s 1 -S COLOR -c green -o black
+r -t 0.27993679 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.28003679 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.28003679 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28003679 -s 1 -S COLOR -c green -o black
+h -t 0.28003679 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28156424 -s 2 -S COLOR -c green -o black
+r -t 0.28156424 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.28206424 -s 2 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+- -t 0.28206424 -s 2 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28206424 -s 2 -S COLOR -c green -o black
+h -t 0.28206424 -s 2 -d -1 -p ARP -e 80 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28527168 -s 1 -S COLOR -c green -o black
+r -t 0.28527168 -s 1 -d -1 -p ARP -e 28 -c 2 -a 0 -i 0 -k MAC
++ -t 0.28537168 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.28537168 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28537168 -s 1 -S COLOR -c green -o black
+h -t 0.28537168 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28689912 -s 2 -S COLOR -c green -o black
+r -t 0.28689912 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.28700000 -e take_snapshot
++ -t 0.28919168 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.28919168 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.28919168 -s 1 -S COLOR -c green -o black
+h -t 0.28919168 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29095912 -s 2 -S COLOR -c green -o black
+r -t 0.29095912 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.29105912 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.29105912 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29105912 -s 2 -S COLOR -c green -o black
+h -t 0.29105912 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29258657 -s 1 -S COLOR -c green -o black
+r -t 0.29258657 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.29300000 -e take_snapshot
++ -t 0.29308657 -s 1 -d 2 -p AODV -e 96 -c 2 -a 0 -i 0 -k MAC
+- -t 0.29308657 -s 1 -d 2 -p AODV -e 96 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29308657 -s 1 -S COLOR -c green -o black
+h -t 0.29308657 -s 1 -d 2 -p AODV -e 96 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29693401 -s 2 -S COLOR -c green -o black
+r -t 0.29693401 -s 2 -d 2 -p AODV -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.29703401 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.29703401 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29703401 -s 2 -S COLOR -c green -o black
+h -t 0.29703401 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.29856145 -s 1 -S COLOR -c green -o black
+r -t 0.29856145 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.310265401 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.310265401 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.310265401 -s 2 -S COLOR -c green -o black
+h -t 0.310265401 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.310442145 -s 1 -S COLOR -c green -o black
+r -t 0.310442145 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.310452145 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.310452145 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.310452145 -s 1 -S COLOR -c green -o black
+h -t 0.310452145 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.310604890 -s 2 -S COLOR -c green -o black
+r -t 0.310604890 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.310654890 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 0 -k MAC
+- -t 0.310654890 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 0 -k MAC
+n -t 0.310654890 -s 2 -S COLOR -c green -o black
+h -t 0.310654890 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 0 -k MAC
+n -t 0.312991634 -s 1 -S COLOR -c green -o black
+r -t 0.312991634 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 0 -k MAC
++ -t 0.313001634 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.313001634 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.313001634 -s 1 -S COLOR -c green -o black
+h -t 0.313001634 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.313154378 -s 2 -S COLOR -c green -o black
+r -t 0.313154378 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.313303634 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.313303634 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.313303634 -s 1 -S COLOR -c green -o black
+h -t 0.313303634 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.313480263 -s 3 -S COLOR -c green -o black
+r -t 0.313480263 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.313490263 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.313490263 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.313490263 -s 3 -S COLOR -c green -o black
+h -t 0.313490263 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.313516000 -e take_snapshot
+n -t 0.313642892 -s 1 -S COLOR -c green -o black
+r -t 0.313642892 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.313692892 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 0 -k MAC
+- -t 0.313692892 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 0 -k MAC
+n -t 0.313692892 -s 1 -S COLOR -c green -o black
+h -t 0.313692892 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 0 -k MAC
+n -t 0.316029521 -s 3 -S COLOR -c green -o black
+r -t 0.316029521 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 0 -k MAC
++ -t 0.316039521 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.316039521 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.316039521 -s 3 -S COLOR -c green -o black
+h -t 0.316039521 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.316054521 -s 3 -S COLOR -c green -o black
+r -t 0.316054521 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 0 -k AGT
+n -t 0.316192150 -s 1 -S COLOR -c green -o black
+r -t 0.316192150 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.357039399 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 1 -k AGT
+- -t 0.357039399 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 1 -k AGT
+n -t 0.357039399 -s 2 -S COLOR -c green -o black
+h -t 0.357039399 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 1 -k AGT
++ -t 0.357114399 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.357114399 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.357114399 -s 2 -S COLOR -c green -o black
+h -t 0.357114399 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.357291143 -s 1 -S COLOR -c green -o black
+r -t 0.357291143 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.357301143 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.357301143 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.357301143 -s 1 -S COLOR -c green -o black
+h -t 0.357301143 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.357453888 -s 2 -S COLOR -c green -o black
+r -t 0.357453888 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.357503888 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 1 -k MAC
+- -t 0.357503888 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 1 -k MAC
+n -t 0.357503888 -s 2 -S COLOR -c green -o black
+h -t 0.357503888 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 1 -k MAC
+n -t 0.359840632 -s 1 -S COLOR -c green -o black
+r -t 0.359840632 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 1 -k MAC
++ -t 0.359850632 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.359850632 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.359850632 -s 1 -S COLOR -c green -o black
+h -t 0.359850632 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.360003376 -s 2 -S COLOR -c green -o black
+v -t 0.360003376 -e take_snapshot
+r -t 0.360003376 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.360212632 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.360212632 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.360212632 -s 1 -S COLOR -c green -o black
+h -t 0.360212632 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.360389261 -s 3 -S COLOR -c green -o black
+r -t 0.360389261 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.360399261 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.360399261 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.360399261 -s 3 -S COLOR -c green -o black
+h -t 0.360399261 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.360551890 -s 1 -S COLOR -c green -o black
+r -t 0.360551890 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.360601890 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 1 -k MAC
+- -t 0.360601890 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 1 -k MAC
+n -t 0.360601890 -s 1 -S COLOR -c green -o black
+h -t 0.360601890 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 1 -k MAC
+n -t 0.362938519 -s 3 -S COLOR -c green -o black
+r -t 0.362938519 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 1 -k MAC
++ -t 0.362948519 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.362948519 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.362948519 -s 3 -S COLOR -c green -o black
+h -t 0.362948519 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.362963519 -s 3 -S COLOR -c green -o black
+r -t 0.362963519 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 1 -k AGT
+v -t 0.36299000 -e take_snapshot
+n -t 0.36310114 -s 1 -S COLOR -c green -o black
+r -t 0.36310114 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.40584824 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 2 -k AGT
+- -t 0.40584824 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 2 -k AGT
+n -t 0.40584824 -s 2 -S COLOR -c green -o black
+h -t 0.40584824 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 2 -k AGT
++ -t 0.40659824 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.40659824 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.40659824 -s 2 -S COLOR -c green -o black
+h -t 0.40659824 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.40836568 -s 1 -S COLOR -c green -o black
+r -t 0.40836568 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.40846568 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.40846568 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.40846568 -s 1 -S COLOR -c green -o black
+h -t 0.40846568 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.40999312 -s 2 -S COLOR -c green -o black
+r -t 0.40999312 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.41007000 -e take_snapshot
++ -t 0.41049312 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 2 -k MAC
+- -t 0.41049312 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 2 -k MAC
+n -t 0.41049312 -s 2 -S COLOR -c green -o black
+h -t 0.41049312 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 2 -k MAC
+n -t 0.43386057 -s 1 -S COLOR -c green -o black
+r -t 0.43386057 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 2 -k MAC
++ -t 0.43396057 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.43396057 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.43396057 -s 1 -S COLOR -c green -o black
+h -t 0.43396057 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.43548801 -s 2 -S COLOR -c green -o black
+r -t 0.43548801 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.43678057 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.43678057 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.43678057 -s 1 -S COLOR -c green -o black
+h -t 0.43678057 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.43854686 -s 3 -S COLOR -c green -o black
+r -t 0.43854686 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.43864686 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.43864686 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.43864686 -s 3 -S COLOR -c green -o black
+h -t 0.43864686 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.44017315 -s 1 -S COLOR -c green -o black
+r -t 0.44017315 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.44067315 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 2 -k MAC
+- -t 0.44067315 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 2 -k MAC
+n -t 0.44067315 -s 1 -S COLOR -c green -o black
+h -t 0.44067315 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 2 -k MAC
+v -t 0.44100000 -e take_snapshot
+v -t 0.45000000 -e take_snapshot
+n -t 0.46403944 -s 3 -S COLOR -c green -o black
+r -t 0.46403944 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 2 -k MAC
++ -t 0.46413944 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.46413944 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.46413944 -s 3 -S COLOR -c green -o black
+h -t 0.46413944 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.46428944 -s 3 -S COLOR -c green -o black
+r -t 0.46428944 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 2 -k AGT
+n -t 0.46566573 -s 1 -S COLOR -c green -o black
+r -t 0.46566573 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.524442379 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 3 -k AGT
+- -t 0.524442379 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 3 -k AGT
+n -t 0.524442379 -s 2 -S COLOR -c green -o black
+h -t 0.524442379 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 3 -k AGT
++ -t 0.524517379 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.524517379 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.524517379 -s 2 -S COLOR -c green -o black
+h -t 0.524517379 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.524694123 -s 1 -S COLOR -c green -o black
+r -t 0.524694123 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.524704123 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.524704123 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.524704123 -s 1 -S COLOR -c green -o black
+h -t 0.524704123 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.524750000 -e take_snapshot
+n -t 0.524856867 -s 2 -S COLOR -c green -o black
+r -t 0.524856867 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.524906867 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 3 -k MAC
+- -t 0.524906867 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 3 -k MAC
+n -t 0.524906867 -s 2 -S COLOR -c green -o black
+h -t 0.524906867 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 3 -k MAC
+n -t 0.527243612 -s 1 -S COLOR -c green -o black
+r -t 0.527243612 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 3 -k MAC
++ -t 0.527253612 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.527253612 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.527253612 -s 1 -S COLOR -c green -o black
+h -t 0.527253612 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.527406356 -s 2 -S COLOR -c green -o black
+r -t 0.527406356 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.527575612 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.527575612 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.527575612 -s 1 -S COLOR -c green -o black
+h -t 0.527575612 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.527752241 -s 3 -S COLOR -c green -o black
+r -t 0.527752241 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.527762241 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.527762241 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.527762241 -s 3 -S COLOR -c green -o black
+h -t 0.527762241 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.527914870 -s 1 -S COLOR -c green -o black
+r -t 0.527914870 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.527964870 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 3 -k MAC
+- -t 0.527964870 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 3 -k MAC
+n -t 0.527964870 -s 1 -S COLOR -c green -o black
+h -t 0.527964870 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 3 -k MAC
+v -t 0.530000000 -e take_snapshot
+n -t 0.550301499 -s 3 -S COLOR -c green -o black
+r -t 0.550301499 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 3 -k MAC
++ -t 0.550311499 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.550311499 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.550311499 -s 3 -S COLOR -c green -o black
+h -t 0.550311499 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.550326499 -s 3 -S COLOR -c green -o black
+r -t 0.550326499 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 3 -k AGT
+n -t 0.550464128 -s 1 -S COLOR -c green -o black
+r -t 0.550464128 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.656823568 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 4 -k AGT
+- -t 0.656823568 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 4 -k AGT
+n -t 0.656823568 -s 2 -S COLOR -c green -o black
+h -t 0.656823568 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 4 -k AGT
++ -t 0.656898568 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.656898568 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.656898568 -s 2 -S COLOR -c green -o black
+h -t 0.656898568 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.657075312 -s 1 -S COLOR -c green -o black
+r -t 0.657075312 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.657085312 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.657085312 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.657085312 -s 1 -S COLOR -c green -o black
+h -t 0.657085312 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.657238056 -s 2 -S COLOR -c green -o black
+r -t 0.657238056 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.657288056 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 4 -k MAC
+- -t 0.657288056 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 4 -k MAC
+n -t 0.657288056 -s 2 -S COLOR -c green -o black
+h -t 0.657288056 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 4 -k MAC
+n -t 0.659624801 -s 1 -S COLOR -c green -o black
+r -t 0.659624801 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 4 -k MAC
++ -t 0.659634801 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.659634801 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.659634801 -s 1 -S COLOR -c green -o black
+h -t 0.659634801 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.659787545 -s 2 -S COLOR -c green -o black
+r -t 0.659787545 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.660000000 -e take_snapshot
++ -t 0.700236801 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.700236801 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.700236801 -s 1 -S COLOR -c green -o black
+h -t 0.700236801 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.700413430 -s 3 -S COLOR -c green -o black
+r -t 0.700413430 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.700423430 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.700423430 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.700423430 -s 3 -S COLOR -c green -o black
+h -t 0.700423430 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.700576059 -s 1 -S COLOR -c green -o black
+r -t 0.700576059 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.700626059 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 4 -k MAC
+- -t 0.700626059 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 4 -k MAC
+n -t 0.700626059 -s 1 -S COLOR -c green -o black
+h -t 0.700626059 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 4 -k MAC
+n -t 0.702962688 -s 3 -S COLOR -c green -o black
+r -t 0.702962688 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 4 -k MAC
++ -t 0.702972688 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.702972688 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.702972688 -s 3 -S COLOR -c green -o black
+h -t 0.702972688 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.702987688 -s 3 -S COLOR -c green -o black
+r -t 0.702987688 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 4 -k AGT
+v -t 0.702999000 -e take_snapshot
+n -t 0.703125317 -s 1 -S COLOR -c green -o black
+r -t 0.703125317 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.740000000 -e take_snapshot
++ -t 0.751752595 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 5 -k AGT
+- -t 0.751752595 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 5 -k AGT
+n -t 0.751752595 -s 2 -S COLOR -c green -o black
+h -t 0.751752595 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 5 -k AGT
++ -t 0.751827595 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.751827595 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.751827595 -s 2 -S COLOR -c green -o black
+h -t 0.751827595 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.752004339 -s 1 -S COLOR -c green -o black
+r -t 0.752004339 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.752014339 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.752014339 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.752014339 -s 1 -S COLOR -c green -o black
+h -t 0.752014339 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.752167084 -s 2 -S COLOR -c green -o black
+r -t 0.752167084 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.752217084 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 5 -k MAC
+- -t 0.752217084 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 5 -k MAC
+n -t 0.752217084 -s 2 -S COLOR -c green -o black
+h -t 0.752217084 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 5 -k MAC
+n -t 0.754553828 -s 1 -S COLOR -c green -o black
+r -t 0.754553828 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 5 -k MAC
++ -t 0.754563828 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.754563828 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.754563828 -s 1 -S COLOR -c green -o black
+h -t 0.754563828 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.754716572 -s 2 -S COLOR -c green -o black
+r -t 0.754716572 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.755305828 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.755305828 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.755305828 -s 1 -S COLOR -c green -o black
+h -t 0.755305828 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.755482457 -s 3 -S COLOR -c green -o black
+r -t 0.755482457 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.755492457 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.755492457 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.755492457 -s 3 -S COLOR -c green -o black
+h -t 0.755492457 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.755645086 -s 1 -S COLOR -c green -o black
+r -t 0.755645086 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.755695086 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 5 -k MAC
+- -t 0.755695086 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 5 -k MAC
+n -t 0.755695086 -s 1 -S COLOR -c green -o black
+h -t 0.755695086 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 5 -k MAC
+n -t 0.758031715 -s 3 -S COLOR -c green -o black
+r -t 0.758031715 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 5 -k MAC
++ -t 0.758041715 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.758041715 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.758041715 -s 3 -S COLOR -c green -o black
+h -t 0.758041715 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.758056715 -s 3 -S COLOR -c green -o black
+r -t 0.758056715 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 5 -k AGT
+n -t 0.758194344 -s 1 -S COLOR -c green -o black
+r -t 0.758194344 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.759000000 -e take_snapshot
++ -t 0.854573567 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 6 -k AGT
+- -t 0.854573567 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 6 -k AGT
+n -t 0.854573567 -s 2 -S COLOR -c green -o black
+h -t 0.854573567 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 6 -k AGT
++ -t 0.854648567 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.854648567 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.854648567 -s 2 -S COLOR -c green -o black
+h -t 0.854648567 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.854825311 -s 1 -S COLOR -c green -o black
+r -t 0.854825311 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.854835311 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.854835311 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.854835311 -s 1 -S COLOR -c green -o black
+h -t 0.854835311 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.854988055 -s 2 -S COLOR -c green -o black
+r -t 0.854988055 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 0.855000000 -e take_snapshot
++ -t 0.855038055 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 6 -k MAC
+- -t 0.855038055 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 6 -k MAC
+n -t 0.855038055 -s 2 -S COLOR -c green -o black
+h -t 0.855038055 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 6 -k MAC
+n -t 0.857374800 -s 1 -S COLOR -c green -o black
+r -t 0.857374800 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 6 -k MAC
++ -t 0.857384800 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.857384800 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.857384800 -s 1 -S COLOR -c green -o black
+h -t 0.857384800 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.857537544 -s 2 -S COLOR -c green -o black
+r -t 0.857537544 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.857746800 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 0.857746800 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.857746800 -s 1 -S COLOR -c green -o black
+h -t 0.857746800 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 0.857923429 -s 3 -S COLOR -c green -o black
+r -t 0.857923429 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 0.857933429 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.857933429 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.857933429 -s 3 -S COLOR -c green -o black
+h -t 0.857933429 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.858086058 -s 1 -S COLOR -c green -o black
+r -t 0.858086058 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 0.858136058 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 6 -k MAC
+- -t 0.858136058 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 6 -k MAC
+n -t 0.858136058 -s 1 -S COLOR -c green -o black
+h -t 0.858136058 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 6 -k MAC
+v -t 0.860000000 -e take_snapshot
+n -t 0.950472687 -s 3 -S COLOR -c green -o black
+r -t 0.950472687 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 6 -k MAC
++ -t 0.950482687 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 0.950482687 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.950482687 -s 3 -S COLOR -c green -o black
+h -t 0.950482687 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 0.950497687 -s 3 -S COLOR -c green -o black
+r -t 0.950497687 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 6 -k AGT
+n -t 0.950635316 -s 1 -S COLOR -c green -o black
+r -t 0.950635316 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.29674139 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 7 -k AGT
+- -t 1.29674139 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 7 -k AGT
+n -t 1.29674139 -s 2 -S COLOR -c green -o black
+h -t 1.29674139 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 7 -k AGT
++ -t 1.29749139 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 1.29749139 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.29749139 -s 2 -S COLOR -c green -o black
+h -t 1.29749139 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.29925883 -s 1 -S COLOR -c green -o black
+r -t 1.29925883 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 1.29935883 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.29935883 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.29935883 -s 1 -S COLOR -c green -o black
+h -t 1.29935883 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.350088628 -s 2 -S COLOR -c green -o black
+r -t 1.350088628 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.350138628 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 7 -k MAC
+- -t 1.350138628 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 7 -k MAC
+n -t 1.350138628 -s 2 -S COLOR -c green -o black
+h -t 1.350138628 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 7 -k MAC
+n -t 1.352475372 -s 1 -S COLOR -c green -o black
+r -t 1.352475372 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 7 -k MAC
++ -t 1.352485372 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.352485372 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.352485372 -s 1 -S COLOR -c green -o black
+h -t 1.352485372 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.352638116 -s 2 -S COLOR -c green -o black
+r -t 1.352638116 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.353007372 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 1.353007372 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.353007372 -s 1 -S COLOR -c green -o black
+h -t 1.353007372 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.353184001 -s 3 -S COLOR -c green -o black
+r -t 1.353184001 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 1.353194001 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.353194001 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.353194001 -s 3 -S COLOR -c green -o black
+h -t 1.353194001 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.353346630 -s 1 -S COLOR -c green -o black
+r -t 1.353346630 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.353396630 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 7 -k MAC
+- -t 1.353396630 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 7 -k MAC
+n -t 1.353396630 -s 1 -S COLOR -c green -o black
+h -t 1.353396630 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 7 -k MAC
+n -t 1.355733259 -s 3 -S COLOR -c green -o black
+r -t 1.355733259 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 7 -k MAC
++ -t 1.355743259 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.355743259 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.355743259 -s 3 -S COLOR -c green -o black
+h -t 1.355743259 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.355758259 -s 3 -S COLOR -c green -o black
+r -t 1.355758259 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 7 -k AGT
+v -t 1.355770000 -e take_snapshot
+n -t 1.355895888 -s 1 -S COLOR -c green -o black
+r -t 1.355895888 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.455045905 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 8 -k AGT
+- -t 1.455045905 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 8 -k AGT
+n -t 1.455045905 -s 2 -S COLOR -c green -o black
+h -t 1.455045905 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 8 -k AGT
++ -t 1.455120905 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 1.455120905 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.455120905 -s 2 -S COLOR -c green -o black
+h -t 1.455120905 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.455297649 -s 1 -S COLOR -c green -o black
+r -t 1.455297649 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 1.455307649 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.455307649 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.455307649 -s 1 -S COLOR -c green -o black
+h -t 1.455307649 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.455460394 -s 2 -S COLOR -c green -o black
+r -t 1.455460394 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.455510394 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 8 -k MAC
+- -t 1.455510394 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 8 -k MAC
+n -t 1.455510394 -s 2 -S COLOR -c green -o black
+h -t 1.455510394 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 8 -k MAC
+n -t 1.457847138 -s 1 -S COLOR -c green -o black
+r -t 1.457847138 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 8 -k MAC
++ -t 1.457857138 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.457857138 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.457857138 -s 1 -S COLOR -c green -o black
+h -t 1.457857138 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.458009882 -s 2 -S COLOR -c green -o black
+r -t 1.458009882 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.458219138 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 1.458219138 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.458219138 -s 1 -S COLOR -c green -o black
+h -t 1.458219138 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.458395767 -s 3 -S COLOR -c green -o black
+r -t 1.458395767 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 1.458405767 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.458405767 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.458405767 -s 3 -S COLOR -c green -o black
+h -t 1.458405767 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.458558396 -s 1 -S COLOR -c green -o black
+r -t 1.458558396 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.458608396 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 8 -k MAC
+- -t 1.458608396 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 8 -k MAC
+n -t 1.458608396 -s 1 -S COLOR -c green -o black
+h -t 1.458608396 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 8 -k MAC
+v -t 1.459000000 -e take_snapshot
+n -t 1.550945025 -s 3 -S COLOR -c green -o black
+r -t 1.550945025 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 8 -k MAC
++ -t 1.550955025 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.550955025 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.550955025 -s 3 -S COLOR -c green -o black
+h -t 1.550955025 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.550970025 -s 3 -S COLOR -c green -o black
+r -t 1.550970025 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 8 -k AGT
+n -t 1.551107654 -s 1 -S COLOR -c green -o black
+r -t 1.551107654 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.67868716 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 9 -k AGT
+- -t 1.67868716 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 9 -k AGT
+n -t 1.67868716 -s 2 -S COLOR -c green -o black
+h -t 1.67868716 -s 2 -d -1 -p cbr -e 512 -c 2 -a 0 -i 9 -k AGT
++ -t 1.67943716 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 1.67943716 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.67943716 -s 2 -S COLOR -c green -o black
+h -t 1.67943716 -s 2 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+v -t 1.67947000 -e take_snapshot
+n -t 1.68120461 -s 1 -S COLOR -c green -o black
+r -t 1.68120461 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 1.68130461 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.68130461 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.68130461 -s 1 -S COLOR -c green -o black
+h -t 1.68130461 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.68283205 -s 2 -S COLOR -c green -o black
+r -t 1.68283205 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.68333205 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 9 -k MAC
+- -t 1.68333205 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 9 -k MAC
+n -t 1.68333205 -s 2 -S COLOR -c green -o black
+h -t 1.68333205 -s 2 -d 1 -p cbr -e 584 -c 2 -a 0 -i 9 -k MAC
+n -t 1.730669949 -s 1 -S COLOR -c green -o black
+r -t 1.730669949 -s 1 -d 1 -p cbr -e 532 -c 2 -a 0 -i 9 -k MAC
++ -t 1.730679949 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.730679949 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.730679949 -s 1 -S COLOR -c green -o black
+h -t 1.730679949 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.730832694 -s 2 -S COLOR -c green -o black
+r -t 1.730832694 -s 2 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.731001949 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+- -t 1.731001949 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.731001949 -s 1 -S COLOR -c green -o black
+h -t 1.731001949 -s 1 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
+n -t 1.731178578 -s 3 -S COLOR -c green -o black
+r -t 1.731178578 -s 3 -d -1 -p MAC -e 44 -c 2 -a 0 -i 0 -k MAC
++ -t 1.731188578 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.731188578 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.731188578 -s 3 -S COLOR -c green -o black
+h -t 1.731188578 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.731341207 -s 1 -S COLOR -c green -o black
+r -t 1.731341207 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
++ -t 1.731391207 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 9 -k MAC
+- -t 1.731391207 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 9 -k MAC
+n -t 1.731391207 -s 1 -S COLOR -c green -o black
+h -t 1.731391207 -s 1 -d 3 -p cbr -e 584 -c 2 -a 0 -i 9 -k MAC
+n -t 1.733727837 -s 3 -S COLOR -c green -o black
+r -t 1.733727837 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 9 -k MAC
++ -t 1.733737837 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+- -t 1.733737837 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.733737837 -s 3 -S COLOR -c green -o black
+h -t 1.733737837 -s 3 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+n -t 1.733752837 -s 3 -S COLOR -c green -o black
+r -t 1.733752837 -s 3 -d 3 -p cbr -e 532 -c 2 -a 0 -i 9 -k AGT
+n -t 1.733890466 -s 1 -S COLOR -c green -o black
+r -t 1.733890466 -s 1 -d -1 -p MAC -e 38 -c 2 -a 0 -i 0 -k MAC
+v -t 1.735000000 -e take_snapshot
+v -t 1.739000000 -e take_snapshot
+v -t 1.74 -e terminating_nam

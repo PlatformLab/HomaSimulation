@@ -1,0 +1,78 @@
+
+
+How to install the dei80211mr module:
+
+-------------
+ Quick start
+-------------
+
+1) you need a ns-allinone installation which has been patched for
+   dynamic libraries. For further info, see this webpage:
+   http://www.dei.unipd.it/~baldo/ns_dl_patch/ns_dl_patch.html	
+
+2) assuming that you have ns-allinone installed in PATH, 
+   run './configure  --with-ns-allinone=PATH', optionally using
+   '--prefix=/my/prefix' if you intend to run 'make install' (see
+   details below)  
+
+3) run 'make'
+
+4) if you configured with --prefix, or if you are allowed to install
+   files to the default prefix (usually /usr/local), you can type 'make install'
+
+
+
+--------------
+ More details
+--------------
+
+1) ns-allinone
+
+ns-allinone is required to build the dei80211mr module. 
+You are expected to specify the path to the ns-allinone installation
+using the --with-ns-allinone options to './configure'.
+
+Current version was tested with ns 2.29 and 2.31. Please note that you
+must not only unpack the ns-allinone source and patch it, but also run
+'install'. This is because the install process places some header
+files in 'ns-allinone-2.29/include' which are needed to build the
+dei80211mr module.
+
+
+
+2) I just built the library with 'make'. Where the hell is it???
+
+After you run 'make', you can find both static (.a) and shared (.so)
+libraries in 'lib/.libs' (the .libs subdir is automatically added by
+libtool). Static libraries are almost useless, since they cannot be
+loaded directly for NS simulation (you can disable their build by
+passing --disable-static to ./configure).
+If you run 'make install', all libraries are by default installed in
+/usr/local/lib. Since in many systems installing in that path requires
+root privileges, you might want to specify a different path, by using
+either the '--prefix' or '--libdir' switch. Please run './configure
+--help' for further info
+.
+
+3) Test suites
+
+Some test routines are provided, which can be built and run routines
+with 'make check'. 
+
+
+-------------------
+Further Reading
+-------------------
+
+As of April 2007, a tutorial is being written which explains how to
+install, among other things, ns-allinone with the patch for dynamic
+libraries and the dei80211mr library.
+The tutorial can be found at 
+http://www.dei.unipd.it/~baldo/nsmiracle-howto.html
+
+
+
+
+
+
+

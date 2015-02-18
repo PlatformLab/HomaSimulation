@@ -1,0 +1,3577 @@
+n -t * -s 69 -v circle -c grey -z 0.177110 
+n -t * -s 68 -v circle -c grey -z 0.177110 
+n -t * -s 67 -v circle -c grey -z 0.177110 
+n -t * -s 66 -v circle -c grey -z 0.177110 
+n -t * -s 65 -v circle -c grey -z 0.177110 
+n -t * -s 64 -v circle -c grey -z 0.177110 
+n -t * -s 63 -v circle -c grey -z 0.177110 
+n -t * -s 62 -v circle -c grey -z 0.177110 
+n -t * -s 60 -v circle -c grey -z 0.177110 
+n -t * -s 59 -v circle -c grey -z 0.177110 
+n -t * -s 58 -v circle -c grey -z 0.177110 
+n -t * -s 57 -v circle -c grey -z 0.177110 
+n -t * -s 56 -v circle -c grey -z 0.177110 
+n -t * -s 55 -v circle -c grey -z 0.177110 
+n -t * -s 54 -v circle -c grey -z 0.177110 
+n -t * -s 53 -v circle -c grey -z 0.177110 
+n -t * -s 52 -v circle -c grey -z 0.177110 
+n -t * -s 51 -v circle -c grey -z 0.177110 
+n -t * -s 50 -v circle -c grey -z 0.177110 
+n -t * -s 49 -v circle -c grey -z 0.177110 
+n -t * -s 48 -v circle -c grey -z 0.177110 
+n -t * -s 47 -v circle -c grey -z 0.177110 
+n -t * -s 46 -v circle -c grey -z 0.177110 
+n -t * -s 45 -v circle -c grey -z 0.177110 
+n -t * -s 44 -v circle -c grey -z 0.177110 
+n -t * -s 43 -v circle -c grey -z 0.177110 
+n -t * -s 42 -v circle -c grey -z 0.177110 
+n -t * -s 41 -v circle -c grey -z 0.177110 
+n -t * -s 40 -v circle -c grey -z 0.177110 
+n -t * -s 39 -v circle -c grey -z 0.177110 
+n -t * -s 38 -v circle -c grey -z 0.177110 
+n -t * -s 37 -v circle -c grey -z 0.177110 
+n -t * -s 36 -v circle -c grey -z 0.177110 
+n -t * -s 34 -v circle -c grey -z 0.177110 
+n -t * -s 33 -v circle -c grey -z 0.177110 
+n -t * -s 32 -v circle -c grey -z 0.177110 
+n -t * -s 31 -v circle -c grey -z 0.177110 
+n -t * -s 30 -v circle -c grey -z 0.177110 
+n -t * -s 29 -v circle -c grey -z 0.177110 
+n -t * -s 28 -v circle -c grey -z 0.177110 
+n -t * -s 27 -v circle -c grey -z 0.177110 
+n -t * -s 26 -v circle -c grey -z 0.177110 
+n -t * -s 25 -v circle -c grey -z 0.177110 
+n -t * -s 24 -v circle -c grey -z 0.177110 
+n -t * -s 23 -v circle -c grey -z 0.177110 
+n -t * -s 22 -v circle -c grey -z 0.177110 
+n -t * -s 21 -v circle -c grey -z 0.177110 
+n -t * -s 20 -v circle -c grey -z 0.177110 
+n -t * -s 19 -v circle -c grey -z 0.177110 
+n -t * -s 18 -v circle -c grey -z 0.177110 
+n -t * -s 17 -v circle -c grey -z 0.177110 
+n -t * -s 16 -v circle -c grey -z 0.177110 
+n -t * -s 15 -v circle -c grey -z 0.177110 
+n -t * -s 14 -v circle -c grey -z 0.177110 
+n -t * -s 13 -v circle -c grey -z 0.177110 
+n -t * -s 12 -v circle -c grey -z 0.177110 
+n -t * -s 11 -v circle -c grey -z 0.177110 
+n -t * -s 10 -v circle -c grey -z 0.177110 
+n -t * -s 9 -v circle -c grey -z 0.177110 
+n -t * -s 8 -v circle -c grey -z 0.177110 
+n -t * -s 7 -v circle -c grey -z 0.177110 
+n -t * -s 6 -v circle -c grey -z 0.177110 
+n -t * -s 5 -v circle -c grey -z 0.177110 
+n -t * -s 4 -v circle -c grey -z 0.177110 
+n -t * -s 3 -v circle -c grey -z 0.177110 
+n -t * -s 2 -v circle -c grey -z 0.177110 
+n -t * -s 1 -v circle -c grey -z 0.177110 
+n -t * -s 0 -v circle -c grey -z 0.177110 
+l -t * -s 66 -d 67 -r 512000.000000 -D 0.010000 -c grey -o 236.6deg -l 0.012432
+l -t * -s 65 -d 66 -r 512000.000000 -D 0.010000 -c grey -o 237.3deg -l 0.047823
+l -t * -s 64 -d 65 -r 512000.000000 -D 0.010000 -c grey -o 241.3deg -l 0.242590
+l -t * -s 63 -d 64 -r 512000.000000 -D 0.010000 -c grey -o 243.8deg -l 0.350145
+l -t * -s 62 -d 63 -r 512000.000000 -D 0.010000 -c grey -o 251.8deg -l 0.674888
+l -t * -s 60 -d 68 -r 512000.000000 -D 0.010000 -c grey -o 278.0deg -l 0.039892
+l -t * -s 58 -d 59 -r 512000.000000 -D 0.010000 -c grey -o 120.7deg -l 0.010773
+l -t * -s 57 -d 58 -r 512000.000000 -D 0.010000 -c grey -o 115.6deg -l 0.059988
+l -t * -s 56 -d 57 -r 512000.000000 -D 0.010000 -c grey -o 111.0deg -l 0.214523
+l -t * -s 55 -d 60 -r 512000.000000 -D 0.010000 -c grey -o 207.4deg -l 0.009570
+l -t * -s 53 -d 54 -r 512000.000000 -D 0.010000 -c grey -o 332.5deg -l 0.008932
+l -t * -s 52 -d 53 -r 512000.000000 -D 0.010000 -c grey -o 330.3deg -l 0.027123
+l -t * -s 50 -d 51 -r 512000.000000 -D 0.010000 -c grey -o 213.9deg -l 0.010770
+l -t * -s 49 -d 50 -r 512000.000000 -D 0.010000 -c grey -o 213.4deg -l 0.089550
+l -t * -s 48 -d 49 -r 512000.000000 -D 0.010000 -c grey -o 213.1deg -l 0.307003
+l -t * -s 47 -d 48 -r 512000.000000 -D 0.010000 -c grey -o 213.2deg -l 0.406217
+l -t * -s 45 -d 46 -r 512000.000000 -D 0.010000 -c grey -o 77.4deg -l 0.010975
+l -t * -s 44 -d 45 -r 512000.000000 -D 0.010000 -c grey -o 81.5deg -l 0.107872
+l -t * -s 43 -d 44 -r 512000.000000 -D 0.010000 -c grey -o 83.2deg -l 0.142910
+l -t * -s 42 -d 43 -r 512000.000000 -D 0.010000 -c grey -o 91.6deg -l 0.392748
+l -t * -s 41 -d 42 -r 512000.000000 -D 0.010000 -c grey -o 92.7deg -l 0.543889
+l -t * -s 40 -d 41 -r 512000.000000 -D 0.010000 -c grey -o 91.4deg -l 0.782281
+l -t * -s 38 -d 39 -r 512000.000000 -D 0.010000 -c grey -o 210.0deg -l 0.094510
+l -t * -s 37 -d 38 -r 512000.000000 -D 0.010000 -c grey -o 201.6deg -l 0.191327
+l -t * -s 36 -d 37 -r 512000.000000 -D 0.010000 -c grey -o 193.3deg -l 0.276765
+l -t * -s 32 -d 33 -r 512000.000000 -D 0.010000 -c grey -o 176.5deg -l 0.015577
+l -t * -s 31 -d 32 -r 512000.000000 -D 0.010000 -c grey -o 178.6deg -l 0.041803
+l -t * -s 30 -d 31 -r 512000.000000 -D 0.010000 -c grey -o 188.7deg -l 0.140526
+l -t * -s 28 -d 29 -r 512000.000000 -D 0.010000 -c grey -o 123.6deg -l 0.003157
+l -t * -s 26 -d 28 -r 512000.000000 -D 0.010000 -c grey -o 125.2deg -l 0.022392
+l -t * -s 25 -d 27 -r 512000.000000 -D 0.010000 -c grey -o 299.8deg -l 0.008223
+l -t * -s 24 -d 26 -r 512000.000000 -D 0.010000 -c grey -o 134.3deg -l 0.141292
+l -t * -s 23 -d 25 -r 512000.000000 -D 0.010000 -c grey -o 301.7deg -l 0.041823
+l -t * -s 22 -d 30 -r 512000.000000 -D 0.010000 -c grey -o 196.3deg -l 0.258121
+l -t * -s 22 -d 24 -r 512000.000000 -D 0.010000 -c grey -o 135.2deg -l 0.207179
+l -t * -s 20 -d 23 -r 512000.000000 -D 0.010000 -c grey -o 310.3deg -l 0.246140
+l -t * -s 19 -d 22 -r 512000.000000 -D 0.010000 -c grey -o 171.5deg -l 0.501466
+l -t * -s 18 -d 21 -r 512000.000000 -D 0.010000 -c grey -o 36.1deg -l 0.001174
+l -t * -s 17 -d 20 -r 512000.000000 -D 0.010000 -c grey -o 310.9deg -l 0.397924
+l -t * -s 16 -d 19 -r 512000.000000 -D 0.010000 -c grey -o 169.1deg -l 0.570886
+l -t * -s 15 -d 18 -r 512000.000000 -D 0.010000 -c grey -o 37.3deg -l 0.016167
+l -t * -s 14 -d 60 -r 512000.000000 -D 0.010000 -c grey -o 273.0deg -l 0.219939
+l -t * -s 14 -d 55 -r 512000.000000 -D 0.010000 -c grey -o 304.6deg -l 0.180333
+l -t * -s 14 -d 34 -r 512000.000000 -D 0.010000 -c grey -o 347.1deg -l 0.002031
+l -t * -s 14 -d 17 -r 512000.000000 -D 0.010000 -c grey -o 313.9deg -l 0.665056
+l -t * -s 13 -d 16 -r 512000.000000 -D 0.010000 -c grey -o 164.3deg -l 0.739609
+l -t * -s 12 -d 15 -r 512000.000000 -D 0.010000 -c grey -o 41.0deg -l 0.043921
+l -t * -s 11 -d 14 -r 512000.000000 -D 0.010000 -c grey -o 298.6deg -l 0.821839
+l -t * -s 10 -d 13 -r 512000.000000 -D 0.010000 -c grey -o 159.8deg -l 0.898903
+l -t * -s 9 -d 12 -r 512000.000000 -D 0.010000 -c grey -o 58.0deg -l 0.484081
+l -t * -s 8 -d 52 -r 512000.000000 -D 0.010000 -c grey -o 309.9deg -l 0.177975
+l -t * -s 8 -d 11 -r 512000.000000 -D 0.010000 -c grey -o 297.0deg -l 0.924552
+l -t * -s 7 -d 36 -r 512000.000000 -D 0.010000 -c grey -o 172.4deg -l 0.421910
+l -t * -s 7 -d 10 -r 512000.000000 -D 0.010000 -c grey -o 158.1deg -l 0.936369
+l -t * -s 6 -d 9 -r 512000.000000 -D 0.010000 -c grey -o 53.0deg -l 0.601206
+l -t * -s 5 -d 62 -r 512000.000000 -D 0.010000 -c grey -o 255.7deg -l 0.739082
+l -t * -s 5 -d 56 -r 512000.000000 -D 0.010000 -c grey -o 106.9deg -l 0.247873
+l -t * -s 5 -d 47 -r 512000.000000 -D 0.010000 -c grey -o 214.7deg -l 0.446755
+l -t * -s 5 -d 40 -r 512000.000000 -D 0.010000 -c grey -o 81.5deg -l 0.917764
+l -t * -s 5 -d 8 -r 512000.000000 -D 0.010000 -c grey -o 303.0deg -l 1.124339
+l -t * -s 5 -d 7 -r 512000.000000 -D 0.010000 -c grey -o 158.5deg -l 1.148381
+l -t * -s 5 -d 6 -r 512000.000000 -D 0.010000 -c grey -o 46.8deg -l 0.658809
+l -t * -s 4 -d 5 -r 512000.000000 -D 0.010000 -c grey -o 181.2deg -l 0.720193
+l -t * -s 3 -d 69 -r 512000.000000 -D 0.010000 -c grey -o 9.3deg -l 0.010453
+l -t * -s 3 -d 4 -r 512000.000000 -D 0.010000 -c grey -o 185.1deg -l 0.594933
+l -t * -s 1 -d 3 -r 512000.000000 -D 0.010000 -c grey -o 187.1deg -l 0.446924
+l -t * -s 0 -d 2 -r 512000.000000 -D 0.010000 -c grey -o 3.4deg -l 0.026328
+l -t * -s 0 -d 1 -r 512000.000000 -D 0.010000 -c grey -o 186.4deg -l 0.229964
+l -t 0.0 -s 0 -d 1 -S COLOR -c black
+l -t 0.0 -s 0 -d 2 -S COLOR -c black
+l -t 0.0 -s 1 -d 3 -S COLOR -c black
+l -t 0.0 -s 3 -d 4 -S COLOR -c black
+l -t 0.0 -s 4 -d 5 -S COLOR -c black
+l -t 0.0 -s 5 -d 6 -S COLOR -c brown
+l -t 0.0 -s 5 -d 7 -S COLOR -c red
+l -t 0.0 -s 5 -d 8 -S COLOR -c black
+l -t 0.0 -s 6 -d 9 -S COLOR -c red
+l -t 0.0 -s 7 -d 10 -S COLOR -c red
+l -t 0.0 -s 8 -d 11 -S COLOR -c black
+l -t 0.0 -s 9 -d 12 -S COLOR -c black
+l -t 0.0 -s 10 -d 13 -S COLOR -c orange
+l -t 0.0 -s 11 -d 14 -S COLOR -c brown
+l -t 0.0 -s 12 -d 15 -S COLOR -c black
+l -t 0.0 -s 13 -d 16 -S COLOR -c black
+l -t 0.0 -s 14 -d 17 -S COLOR -c blue
+l -t 0.0 -s 15 -d 18 -S COLOR -c black
+l -t 0.0 -s 16 -d 19 -S COLOR -c red
+l -t 0.0 -s 17 -d 20 -S COLOR -c black
+l -t 0.0 -s 18 -d 21 -S COLOR -c black
+l -t 0.0 -s 19 -d 22 -S COLOR -c black
+l -t 0.0 -s 20 -d 23 -S COLOR -c blue
+l -t 0.0 -s 22 -d 24 -S COLOR -c black
+l -t 0.0 -s 22 -d 30 -S COLOR -c brown
+l -t 0.0 -s 23 -d 25 -S COLOR -c black
+l -t 0.0 -s 24 -d 26 -S COLOR -c black
+l -t 0.0 -s 30 -d 31 -S COLOR -c black
+l -t 0.0 -s 25 -d 27 -S COLOR -c black
+l -t 0.0 -s 26 -d 28 -S COLOR -c black
+l -t 0.0 -s 31 -d 32 -S COLOR -c blue
+l -t 0.0 -s 28 -d 29 -S COLOR -c black
+l -t 0.0 -s 32 -d 33 -S COLOR -c black
+n -t 0.0 -s 0 -c black
+n -t 0.0 -s 1 -c black
+n -t 0.0 -s 2 -c black
+n -t 0.0 -s 3 -c black
+n -t 0.0 -s 4 -c black
+n -t 0.0 -s 5 -c black
+n -t 0.0 -s 6 -c black
+n -t 0.0 -s 7 -c black
+n -t 0.0 -s 8 -c black
+n -t 0.0 -s 9 -c black
+n -t 0.0 -s 10 -c black
+n -t 0.0 -s 11 -c black
+n -t 0.0 -s 12 -c black
+n -t 0.0 -s 13 -c black
+n -t 0.0 -s 14 -c black
+n -t 0.0 -s 15 -c black
+n -t 0.0 -s 16 -c black
+n -t 0.0 -s 17 -c black
+n -t 0.0 -s 18 -c black
+n -t 0.0 -s 19 -c black
+n -t 0.0 -s 20 -c black
+n -t 0.0 -s 21 -c black
+n -t 0.0 -s 22 -c black
+n -t 0.0 -s 23 -c black
+n -t 0.0 -s 24 -c black
+n -t 0.0 -s 25 -c black
+n -t 0.0 -s 26 -c black
+n -t 0.0 -s 27 -c black
+n -t 0.0 -s 28 -c black
+n -t 0.0 -s 29 -c black
+n -t 0.0 -s 30 -c black
+n -t 0.0 -s 31 -c black
+n -t 0.0 -s 32 -c black
+n -t 0.0 -s 33 -c black
+l -t 0.035 -s 0 -d 1 -S COLOR -c black
+l -t 0.035 -s 0 -d 2 -S COLOR -c black
+l -t 0.035 -s 1 -d 3 -S COLOR -c brown
+l -t 0.035 -s 3 -d 4 -S COLOR -c black
+l -t 0.035 -s 4 -d 5 -S COLOR -c blue
+l -t 0.035 -s 5 -d 6 -S COLOR -c black
+l -t 0.035 -s 5 -d 7 -S COLOR -c black
+l -t 0.035 -s 5 -d 8 -S COLOR -c brown
+l -t 0.035 -s 6 -d 9 -S COLOR -c red
+l -t 0.035 -s 7 -d 10 -S COLOR -c orange
+l -t 0.035 -s 8 -d 11 -S COLOR -c black
+l -t 0.035 -s 9 -d 12 -S COLOR -c black
+l -t 0.035 -s 10 -d 13 -S COLOR -c brown
+l -t 0.035 -s 11 -d 14 -S COLOR -c black
+l -t 0.035 -s 12 -d 15 -S COLOR -c black
+l -t 0.035 -s 13 -d 16 -S COLOR -c black
+l -t 0.035 -s 14 -d 17 -S COLOR -c black
+l -t 0.035 -s 15 -d 18 -S COLOR -c blue
+l -t 0.035 -s 16 -d 19 -S COLOR -c orange
+l -t 0.035 -s 17 -d 20 -S COLOR -c black
+l -t 0.035 -s 18 -d 21 -S COLOR -c black
+l -t 0.035 -s 19 -d 22 -S COLOR -c black
+l -t 0.035 -s 20 -d 23 -S COLOR -c brown
+l -t 0.035 -s 22 -d 24 -S COLOR -c black
+l -t 0.035 -s 23 -d 25 -S COLOR -c black
+l -t 0.035 -s 24 -d 26 -S COLOR -c black
+l -t 0.035 -s 25 -d 27 -S COLOR -c black
+l -t 0.035 -s 26 -d 28 -S COLOR -c black
+n -t 0.035 -s 29 -c grey
+n -t 0.035 -s 30 -c grey
+n -t 0.035 -s 31 -c grey
+n -t 0.035 -s 32 -c grey
+n -t 0.035 -s 33 -c grey
+l -t 0.035 -s 28 -d 29 -c grey
+l -t 0.035 -s 22 -d 30 -c grey
+l -t 0.035 -s 30 -d 31 -c grey
+l -t 0.035 -s 31 -d 32 -c grey
+l -t 0.035 -s 32 -d 33 -c grey
+l -t 0.0819444444444 -s 0 -d 1 -S COLOR -c brown
+l -t 0.0819444444444 -s 0 -d 2 -S COLOR -c black
+l -t 0.0819444444444 -s 1 -d 3 -S COLOR -c black
+l -t 0.0819444444444 -s 3 -d 4 -S COLOR -c black
+l -t 0.0819444444444 -s 4 -d 5 -S COLOR -c blue
+l -t 0.0819444444444 -s 5 -d 6 -S COLOR -c blue
+l -t 0.0819444444444 -s 5 -d 7 -S COLOR -c black
+l -t 0.0819444444444 -s 5 -d 8 -S COLOR -c brown
+l -t 0.0819444444444 -s 6 -d 9 -S COLOR -c red
+l -t 0.0819444444444 -s 7 -d 10 -S COLOR -c orange
+l -t 0.0819444444444 -s 8 -d 11 -S COLOR -c blue
+l -t 0.0819444444444 -s 9 -d 12 -S COLOR -c black
+l -t 0.0819444444444 -s 10 -d 13 -S COLOR -c orange
+l -t 0.0819444444444 -s 11 -d 14 -S COLOR -c black
+l -t 0.0819444444444 -s 12 -d 15 -S COLOR -c black
+l -t 0.0819444444444 -s 13 -d 16 -S COLOR -c black
+l -t 0.0819444444444 -s 14 -d 17 -S COLOR -c brown
+l -t 0.0819444444444 -s 15 -d 18 -S COLOR -c black
+l -t 0.0819444444444 -s 16 -d 19 -S COLOR -c red
+l -t 0.0819444444444 -s 17 -d 20 -S COLOR -c blue
+l -t 0.0819444444444 -s 18 -d 21 -S COLOR -c black
+l -t 0.0819444444444 -s 19 -d 22 -S COLOR -c blue
+l -t 0.0819444444444 -s 20 -d 23 -S COLOR -c brown
+l -t 0.0819444444444 -s 22 -d 24 -S COLOR -c black
+l -t 0.0819444444444 -s 23 -d 25 -S COLOR -c black
+l -t 0.0819444444444 -s 24 -d 26 -S COLOR -c black
+l -t 0.0819444444444 -s 25 -d 27 -S COLOR -c black
+l -t 0.0819444444444 -s 26 -d 28 -S COLOR -c black
+l -t 0.0819444444444 -s 28 -d 29 -S COLOR -c black
+n -t 0.0819444444444 -s 29 -c black
+l -t 0.108611111111 -s 0 -d 1 -S COLOR -c brown
+l -t 0.108611111111 -s 0 -d 2 -S COLOR -c black
+l -t 0.108611111111 -s 1 -d 3 -S COLOR -c black
+l -t 0.108611111111 -s 3 -d 4 -S COLOR -c black
+l -t 0.108611111111 -s 4 -d 5 -S COLOR -c brown
+l -t 0.108611111111 -s 5 -d 6 -S COLOR -c black
+l -t 0.108611111111 -s 5 -d 7 -S COLOR -c red
+l -t 0.108611111111 -s 5 -d 8 -S COLOR -c blue
+l -t 0.108611111111 -s 6 -d 9 -S COLOR -c red
+l -t 0.108611111111 -s 7 -d 10 -S COLOR -c orange
+l -t 0.108611111111 -s 8 -d 11 -S COLOR -c brown
+l -t 0.108611111111 -s 9 -d 12 -S COLOR -c black
+l -t 0.108611111111 -s 10 -d 13 -S COLOR -c orange
+l -t 0.108611111111 -s 11 -d 14 -S COLOR -c blue
+l -t 0.108611111111 -s 12 -d 15 -S COLOR -c blue
+l -t 0.108611111111 -s 13 -d 16 -S COLOR -c brown
+l -t 0.108611111111 -s 14 -d 17 -S COLOR -c brown
+l -t 0.108611111111 -s 15 -d 18 -S COLOR -c black
+l -t 0.108611111111 -s 16 -d 19 -S COLOR -c red
+l -t 0.108611111111 -s 17 -d 20 -S COLOR -c blue
+l -t 0.108611111111 -s 18 -d 21 -S COLOR -c black
+l -t 0.108611111111 -s 19 -d 22 -S COLOR -c black
+l -t 0.108611111111 -s 20 -d 23 -S COLOR -c brown
+l -t 0.108611111111 -s 22 -d 30 -S COLOR -c blue
+l -t 0.108611111111 -s 22 -d 24 -S COLOR -c black
+l -t 0.108611111111 -s 23 -d 25 -S COLOR -c black
+l -t 0.108611111111 -s 30 -d 31 -S COLOR -c brown
+l -t 0.108611111111 -s 24 -d 26 -S COLOR -c brown
+l -t 0.108611111111 -s 25 -d 27 -S COLOR -c black
+l -t 0.108611111111 -s 31 -d 32 -S COLOR -c black
+l -t 0.108611111111 -s 26 -d 28 -S COLOR -c black
+l -t 0.108611111111 -s 32 -d 33 -S COLOR -c black
+n -t 0.108611111111 -s 29 -c grey
+n -t 0.108611111111 -s 30 -c black
+n -t 0.108611111111 -s 31 -c black
+n -t 0.108611111111 -s 32 -c black
+n -t 0.108611111111 -s 33 -c black
+l -t 0.108611111111 -s 28 -d 29 -c grey
+l -t 0.162777777778 -s 0 -d 1 -S COLOR -c brown
+l -t 0.162777777778 -s 0 -d 2 -S COLOR -c black
+l -t 0.162777777778 -s 1 -d 3 -S COLOR -c black
+l -t 0.162777777778 -s 3 -d 4 -S COLOR -c black
+l -t 0.162777777778 -s 4 -d 5 -S COLOR -c brown
+l -t 0.162777777778 -s 5 -d 7 -S COLOR -c black
+l -t 0.162777777778 -s 5 -d 8 -S COLOR -c black
+l -t 0.162777777778 -s 7 -d 10 -S COLOR -c orange
+l -t 0.162777777778 -s 8 -d 11 -S COLOR -c red
+l -t 0.162777777778 -s 10 -d 13 -S COLOR -c orange
+l -t 0.162777777778 -s 11 -d 14 -S COLOR -c blue
+l -t 0.162777777778 -s 13 -d 16 -S COLOR -c brown
+l -t 0.162777777778 -s 14 -d 17 -S COLOR -c black
+l -t 0.162777777778 -s 16 -d 19 -S COLOR -c red
+l -t 0.162777777778 -s 17 -d 20 -S COLOR -c brown
+l -t 0.162777777778 -s 19 -d 22 -S COLOR -c black
+l -t 0.162777777778 -s 20 -d 23 -S COLOR -c black
+l -t 0.162777777778 -s 22 -d 30 -S COLOR -c brown
+l -t 0.162777777778 -s 22 -d 24 -S COLOR -c blue
+l -t 0.162777777778 -s 23 -d 25 -S COLOR -c black
+l -t 0.162777777778 -s 30 -d 31 -S COLOR -c black
+l -t 0.162777777778 -s 24 -d 26 -S COLOR -c black
+l -t 0.162777777778 -s 25 -d 27 -S COLOR -c black
+l -t 0.162777777778 -s 31 -d 32 -S COLOR -c black
+l -t 0.162777777778 -s 26 -d 28 -S COLOR -c black
+l -t 0.162777777778 -s 32 -d 33 -S COLOR -c black
+l -t 0.162777777778 -s 28 -d 29 -S COLOR -c black
+n -t 0.162777777778 -s 6 -c grey
+n -t 0.162777777778 -s 9 -c grey
+n -t 0.162777777778 -s 12 -c grey
+n -t 0.162777777778 -s 15 -c grey
+n -t 0.162777777778 -s 18 -c grey
+n -t 0.162777777778 -s 21 -c grey
+n -t 0.162777777778 -s 29 -c black
+l -t 0.162777777778 -s 5 -d 6 -c grey
+l -t 0.162777777778 -s 6 -d 9 -c grey
+l -t 0.162777777778 -s 9 -d 12 -c grey
+l -t 0.162777777778 -s 12 -d 15 -c grey
+l -t 0.162777777778 -s 15 -d 18 -c grey
+l -t 0.162777777778 -s 18 -d 21 -c grey
+l -t 0.216388888889 -s 0 -d 1 -S COLOR -c black
+l -t 0.216388888889 -s 0 -d 2 -S COLOR -c black
+l -t 0.216388888889 -s 1 -d 3 -S COLOR -c black
+l -t 0.216388888889 -s 3 -d 4 -S COLOR -c black
+l -t 0.216388888889 -s 4 -d 5 -S COLOR -c brown
+l -t 0.216388888889 -s 5 -d 6 -S COLOR -c black
+l -t 0.216388888889 -s 5 -d 7 -S COLOR -c black
+l -t 0.216388888889 -s 5 -d 8 -S COLOR -c black
+l -t 0.216388888889 -s 6 -d 9 -S COLOR -c red
+l -t 0.216388888889 -s 7 -d 10 -S COLOR -c red
+l -t 0.216388888889 -s 8 -d 11 -S COLOR -c black
+l -t 0.216388888889 -s 9 -d 12 -S COLOR -c black
+l -t 0.216388888889 -s 10 -d 13 -S COLOR -c orange
+l -t 0.216388888889 -s 11 -d 14 -S COLOR -c black
+l -t 0.216388888889 -s 12 -d 15 -S COLOR -c black
+l -t 0.216388888889 -s 13 -d 16 -S COLOR -c black
+l -t 0.216388888889 -s 14 -d 17 -S COLOR -c black
+l -t 0.216388888889 -s 15 -d 18 -S COLOR -c black
+l -t 0.216388888889 -s 16 -d 19 -S COLOR -c red
+l -t 0.216388888889 -s 17 -d 20 -S COLOR -c brown
+l -t 0.216388888889 -s 18 -d 21 -S COLOR -c black
+l -t 0.216388888889 -s 19 -d 22 -S COLOR -c brown
+l -t 0.216388888889 -s 20 -d 23 -S COLOR -c black
+l -t 0.216388888889 -s 22 -d 24 -S COLOR -c black
+l -t 0.216388888889 -s 22 -d 30 -S COLOR -c black
+l -t 0.216388888889 -s 23 -d 25 -S COLOR -c blue
+l -t 0.216388888889 -s 24 -d 26 -S COLOR -c black
+l -t 0.216388888889 -s 30 -d 31 -S COLOR -c black
+l -t 0.216388888889 -s 25 -d 27 -S COLOR -c black
+l -t 0.216388888889 -s 26 -d 28 -S COLOR -c black
+l -t 0.216388888889 -s 31 -d 32 -S COLOR -c black
+l -t 0.216388888889 -s 28 -d 29 -S COLOR -c black
+l -t 0.216388888889 -s 32 -d 33 -S COLOR -c black
+n -t 0.216388888889 -s 6 -c black
+n -t 0.216388888889 -s 9 -c black
+n -t 0.216388888889 -s 12 -c black
+n -t 0.216388888889 -s 15 -c black
+n -t 0.216388888889 -s 18 -c black
+n -t 0.216388888889 -s 21 -c black
+l -t 0.246111111111 -s 0 -d 1 -S COLOR -c black
+l -t 0.246111111111 -s 0 -d 2 -S COLOR -c black
+l -t 0.246111111111 -s 1 -d 3 -S COLOR -c black
+l -t 0.246111111111 -s 3 -d 4 -S COLOR -c brown
+l -t 0.246111111111 -s 4 -d 5 -S COLOR -c black
+l -t 0.246111111111 -s 5 -d 6 -S COLOR -c black
+l -t 0.246111111111 -s 5 -d 7 -S COLOR -c black
+l -t 0.246111111111 -s 5 -d 8 -S COLOR -c black
+l -t 0.246111111111 -s 6 -d 9 -S COLOR -c red
+l -t 0.246111111111 -s 7 -d 10 -S COLOR -c brown
+l -t 0.246111111111 -s 8 -d 11 -S COLOR -c brown
+l -t 0.246111111111 -s 9 -d 12 -S COLOR -c black
+l -t 0.246111111111 -s 10 -d 13 -S COLOR -c brown
+l -t 0.246111111111 -s 11 -d 14 -S COLOR -c black
+l -t 0.246111111111 -s 12 -d 15 -S COLOR -c black
+l -t 0.246111111111 -s 13 -d 16 -S COLOR -c blue
+l -t 0.246111111111 -s 14 -d 17 -S COLOR -c black
+l -t 0.246111111111 -s 15 -d 18 -S COLOR -c black
+l -t 0.246111111111 -s 16 -d 19 -S COLOR -c orange
+l -t 0.246111111111 -s 17 -d 20 -S COLOR -c blue
+l -t 0.246111111111 -s 18 -d 21 -S COLOR -c black
+l -t 0.246111111111 -s 19 -d 22 -S COLOR -c brown
+l -t 0.246111111111 -s 20 -d 23 -S COLOR -c black
+l -t 0.246111111111 -s 22 -d 30 -S COLOR -c black
+l -t 0.246111111111 -s 23 -d 25 -S COLOR -c black
+l -t 0.246111111111 -s 30 -d 31 -S COLOR -c brown
+l -t 0.246111111111 -s 25 -d 27 -S COLOR -c black
+l -t 0.246111111111 -s 31 -d 32 -S COLOR -c black
+l -t 0.246111111111 -s 32 -d 33 -S COLOR -c black
+n -t 0.246111111111 -s 24 -c grey
+n -t 0.246111111111 -s 26 -c grey
+n -t 0.246111111111 -s 28 -c grey
+n -t 0.246111111111 -s 29 -c grey
+l -t 0.246111111111 -s 22 -d 24 -c grey
+l -t 0.246111111111 -s 24 -d 26 -c grey
+l -t 0.246111111111 -s 26 -d 28 -c grey
+l -t 0.246111111111 -s 28 -d 29 -c grey
+l -t 0.287777777778 -s 0 -d 1 -S COLOR -c black
+l -t 0.287777777778 -s 0 -d 2 -S COLOR -c black
+l -t 0.287777777778 -s 1 -d 3 -S COLOR -c blue
+l -t 0.287777777778 -s 3 -d 4 -S COLOR -c black
+l -t 0.287777777778 -s 4 -d 5 -S COLOR -c brown
+l -t 0.287777777778 -s 5 -d 6 -S COLOR -c blue
+l -t 0.287777777778 -s 5 -d 7 -S COLOR -c black
+l -t 0.287777777778 -s 5 -d 8 -S COLOR -c brown
+l -t 0.287777777778 -s 6 -d 9 -S COLOR -c red
+l -t 0.287777777778 -s 7 -d 10 -S COLOR -c orange
+l -t 0.287777777778 -s 8 -d 11 -S COLOR -c blue
+l -t 0.287777777778 -s 9 -d 12 -S COLOR -c black
+l -t 0.287777777778 -s 10 -d 13 -S COLOR -c black
+l -t 0.287777777778 -s 11 -d 14 -S COLOR -c black
+l -t 0.287777777778 -s 12 -d 15 -S COLOR -c black
+l -t 0.287777777778 -s 13 -d 16 -S COLOR -c black
+l -t 0.287777777778 -s 14 -d 17 -S COLOR -c black
+l -t 0.287777777778 -s 15 -d 18 -S COLOR -c black
+l -t 0.287777777778 -s 16 -d 19 -S COLOR -c orange
+l -t 0.287777777778 -s 17 -d 20 -S COLOR -c black
+l -t 0.287777777778 -s 18 -d 21 -S COLOR -c black
+l -t 0.287777777778 -s 19 -d 22 -S COLOR -c black
+l -t 0.287777777778 -s 20 -d 23 -S COLOR -c brown
+l -t 0.287777777778 -s 22 -d 30 -S COLOR -c brown
+l -t 0.287777777778 -s 23 -d 25 -S COLOR -c blue
+l -t 0.287777777778 -s 30 -d 31 -S COLOR -c blue
+l -t 0.287777777778 -s 25 -d 27 -S COLOR -c black
+l -t 0.287777777778 -s 31 -d 32 -S COLOR -c black
+l -t 0.287777777778 -s 32 -d 33 -S COLOR -c black
+l -t 0.315555555556 -s 0 -d 1 -S COLOR -c black
+l -t 0.315555555556 -s 0 -d 2 -S COLOR -c black
+l -t 0.315555555556 -s 1 -d 3 -S COLOR -c black
+l -t 0.315555555556 -s 3 -d 4 -S COLOR -c blue
+l -t 0.315555555556 -s 4 -d 5 -S COLOR -c brown
+l -t 0.315555555556 -s 5 -d 7 -S COLOR -c black
+l -t 0.315555555556 -s 5 -d 8 -S COLOR -c blue
+l -t 0.315555555556 -s 7 -d 10 -S COLOR -c orange
+l -t 0.315555555556 -s 8 -d 11 -S COLOR -c black
+l -t 0.315555555556 -s 10 -d 13 -S COLOR -c brown
+l -t 0.315555555556 -s 11 -d 14 -S COLOR -c blue
+l -t 0.315555555556 -s 13 -d 16 -S COLOR -c blue
+l -t 0.315555555556 -s 14 -d 17 -S COLOR -c brown
+l -t 0.315555555556 -s 14 -d 34 -S COLOR -c black
+l -t 0.315555555556 -s 16 -d 19 -S COLOR -c red
+l -t 0.315555555556 -s 17 -d 20 -S COLOR -c blue
+l -t 0.315555555556 -s 19 -d 22 -S COLOR -c black
+l -t 0.315555555556 -s 20 -d 23 -S COLOR -c black
+l -t 0.315555555556 -s 22 -d 30 -S COLOR -c black
+l -t 0.315555555556 -s 22 -d 24 -S COLOR -c black
+l -t 0.315555555556 -s 23 -d 25 -S COLOR -c black
+l -t 0.315555555556 -s 30 -d 31 -S COLOR -c black
+l -t 0.315555555556 -s 24 -d 26 -S COLOR -c black
+l -t 0.315555555556 -s 25 -d 27 -S COLOR -c black
+l -t 0.315555555556 -s 31 -d 32 -S COLOR -c black
+l -t 0.315555555556 -s 26 -d 28 -S COLOR -c black
+l -t 0.315555555556 -s 32 -d 33 -S COLOR -c black
+l -t 0.315555555556 -s 28 -d 29 -S COLOR -c black
+n -t 0.315555555556 -s 6 -c grey
+n -t 0.315555555556 -s 9 -c grey
+n -t 0.315555555556 -s 12 -c grey
+n -t 0.315555555556 -s 15 -c grey
+n -t 0.315555555556 -s 18 -c grey
+n -t 0.315555555556 -s 21 -c grey
+n -t 0.315555555556 -s 24 -c black
+n -t 0.315555555556 -s 26 -c black
+n -t 0.315555555556 -s 28 -c black
+n -t 0.315555555556 -s 29 -c black
+n -t 0.315555555556 -s 34 -c black
+l -t 0.315555555556 -s 5 -d 6 -c grey
+l -t 0.315555555556 -s 6 -d 9 -c grey
+l -t 0.315555555556 -s 9 -d 12 -c grey
+l -t 0.315555555556 -s 12 -d 15 -c grey
+l -t 0.315555555556 -s 15 -d 18 -c grey
+l -t 0.315555555556 -s 18 -d 21 -c grey
+l -t 0.347777777778 -s 0 -d 1 -S COLOR -c black
+l -t 0.347777777778 -s 1 -d 3 -S COLOR -c black
+l -t 0.347777777778 -s 3 -d 4 -S COLOR -c black
+l -t 0.347777777778 -s 4 -d 5 -S COLOR -c blue
+l -t 0.347777777778 -s 5 -d 7 -S COLOR -c brown
+l -t 0.347777777778 -s 5 -d 8 -S COLOR -c brown
+l -t 0.347777777778 -s 7 -d 10 -S COLOR -c black
+l -t 0.347777777778 -s 8 -d 11 -S COLOR -c black
+l -t 0.347777777778 -s 10 -d 13 -S COLOR -c orange
+l -t 0.347777777778 -s 11 -d 14 -S COLOR -c black
+l -t 0.347777777778 -s 13 -d 16 -S COLOR -c blue
+l -t 0.347777777778 -s 14 -d 17 -S COLOR -c black
+l -t 0.347777777778 -s 14 -d 34 -S COLOR -c black
+l -t 0.347777777778 -s 16 -d 19 -S COLOR -c orange
+l -t 0.347777777778 -s 17 -d 20 -S COLOR -c brown
+l -t 0.347777777778 -s 19 -d 22 -S COLOR -c blue
+l -t 0.347777777778 -s 20 -d 23 -S COLOR -c black
+l -t 0.347777777778 -s 22 -d 30 -S COLOR -c brown
+l -t 0.347777777778 -s 23 -d 25 -S COLOR -c blue
+l -t 0.347777777778 -s 30 -d 31 -S COLOR -c black
+l -t 0.347777777778 -s 25 -d 27 -S COLOR -c black
+l -t 0.347777777778 -s 31 -d 32 -S COLOR -c black
+l -t 0.347777777778 -s 32 -d 33 -S COLOR -c black
+n -t 0.347777777778 -s 2 -c grey
+n -t 0.347777777778 -s 24 -c grey
+n -t 0.347777777778 -s 26 -c grey
+n -t 0.347777777778 -s 28 -c grey
+n -t 0.347777777778 -s 29 -c grey
+l -t 0.347777777778 -s 0 -d 2 -c grey
+l -t 0.347777777778 -s 22 -d 24 -c grey
+l -t 0.347777777778 -s 24 -d 26 -c grey
+l -t 0.347777777778 -s 26 -d 28 -c grey
+l -t 0.347777777778 -s 28 -d 29 -c grey
+l -t 0.407777777778 -s 0 -d 1 -S COLOR -c brown
+l -t 0.407777777778 -s 1 -d 3 -S COLOR -c black
+l -t 0.407777777778 -s 3 -d 4 -S COLOR -c black
+l -t 0.407777777778 -s 4 -d 5 -S COLOR -c blue
+l -t 0.407777777778 -s 5 -d 6 -S COLOR -c blue
+l -t 0.407777777778 -s 5 -d 7 -S COLOR -c black
+l -t 0.407777777778 -s 5 -d 8 -S COLOR -c brown
+l -t 0.407777777778 -s 6 -d 9 -S COLOR -c red
+l -t 0.407777777778 -s 7 -d 10 -S COLOR -c brown
+l -t 0.407777777778 -s 8 -d 11 -S COLOR -c black
+l -t 0.407777777778 -s 9 -d 12 -S COLOR -c black
+l -t 0.407777777778 -s 10 -d 13 -S COLOR -c brown
+l -t 0.407777777778 -s 11 -d 14 -S COLOR -c black
+l -t 0.407777777778 -s 12 -d 15 -S COLOR -c blue
+l -t 0.407777777778 -s 13 -d 16 -S COLOR -c blue
+l -t 0.407777777778 -s 14 -d 34 -S COLOR -c black
+l -t 0.407777777778 -s 14 -d 17 -S COLOR -c black
+l -t 0.407777777778 -s 15 -d 18 -S COLOR -c black
+l -t 0.407777777778 -s 16 -d 19 -S COLOR -c brown
+l -t 0.407777777778 -s 17 -d 20 -S COLOR -c black
+l -t 0.407777777778 -s 18 -d 21 -S COLOR -c black
+l -t 0.407777777778 -s 19 -d 22 -S COLOR -c black
+l -t 0.407777777778 -s 20 -d 23 -S COLOR -c brown
+l -t 0.407777777778 -s 22 -d 24 -S COLOR -c black
+l -t 0.407777777778 -s 22 -d 30 -S COLOR -c black
+l -t 0.407777777778 -s 23 -d 25 -S COLOR -c black
+l -t 0.407777777778 -s 24 -d 26 -S COLOR -c brown
+l -t 0.407777777778 -s 30 -d 31 -S COLOR -c brown
+l -t 0.407777777778 -s 25 -d 27 -S COLOR -c black
+l -t 0.407777777778 -s 26 -d 28 -S COLOR -c black
+l -t 0.407777777778 -s 31 -d 32 -S COLOR -c black
+l -t 0.407777777778 -s 28 -d 29 -S COLOR -c black
+l -t 0.407777777778 -s 32 -d 33 -S COLOR -c black
+n -t 0.407777777778 -s 6 -c black
+n -t 0.407777777778 -s 9 -c black
+n -t 0.407777777778 -s 12 -c black
+n -t 0.407777777778 -s 15 -c black
+n -t 0.407777777778 -s 18 -c black
+n -t 0.407777777778 -s 21 -c black
+n -t 0.407777777778 -s 24 -c black
+n -t 0.407777777778 -s 26 -c black
+n -t 0.407777777778 -s 28 -c black
+n -t 0.407777777778 -s 29 -c black
+l -t 0.471388888889 -s 0 -d 1 -S COLOR -c black
+l -t 0.471388888889 -s 0 -d 2 -S COLOR -c black
+l -t 0.471388888889 -s 1 -d 3 -S COLOR -c brown
+l -t 0.471388888889 -s 3 -d 4 -S COLOR -c black
+l -t 0.471388888889 -s 4 -d 5 -S COLOR -c black
+l -t 0.471388888889 -s 5 -d 6 -S COLOR -c brown
+l -t 0.471388888889 -s 5 -d 7 -S COLOR -c red
+l -t 0.471388888889 -s 5 -d 8 -S COLOR -c brown
+l -t 0.471388888889 -s 6 -d 9 -S COLOR -c red
+l -t 0.471388888889 -s 7 -d 10 -S COLOR -c orange
+l -t 0.471388888889 -s 8 -d 11 -S COLOR -c brown
+l -t 0.471388888889 -s 9 -d 12 -S COLOR -c black
+l -t 0.471388888889 -s 10 -d 13 -S COLOR -c blue
+l -t 0.471388888889 -s 11 -d 14 -S COLOR -c black
+l -t 0.471388888889 -s 12 -d 15 -S COLOR -c blue
+l -t 0.471388888889 -s 13 -d 16 -S COLOR -c brown
+l -t 0.471388888889 -s 14 -d 34 -S COLOR -c black
+l -t 0.471388888889 -s 14 -d 17 -S COLOR -c black
+l -t 0.471388888889 -s 15 -d 18 -S COLOR -c brown
+l -t 0.471388888889 -s 16 -d 19 -S COLOR -c red
+l -t 0.471388888889 -s 17 -d 20 -S COLOR -c black
+l -t 0.471388888889 -s 18 -d 21 -S COLOR -c black
+l -t 0.471388888889 -s 19 -d 22 -S COLOR -c black
+l -t 0.471388888889 -s 20 -d 23 -S COLOR -c blue
+l -t 0.471388888889 -s 22 -d 24 -S COLOR -c black
+l -t 0.471388888889 -s 22 -d 30 -S COLOR -c black
+l -t 0.471388888889 -s 23 -d 25 -S COLOR -c black
+l -t 0.471388888889 -s 24 -d 26 -S COLOR -c black
+l -t 0.471388888889 -s 30 -d 31 -S COLOR -c black
+l -t 0.471388888889 -s 25 -d 27 -S COLOR -c black
+l -t 0.471388888889 -s 26 -d 28 -S COLOR -c black
+l -t 0.471388888889 -s 31 -d 32 -S COLOR -c black
+l -t 0.471388888889 -s 28 -d 29 -S COLOR -c black
+l -t 0.471388888889 -s 32 -d 33 -S COLOR -c black
+n -t 0.471388888889 -s 2 -c black
+l -t 0.508888888889 -s 0 -d 1 -S COLOR -c black
+l -t 0.508888888889 -s 1 -d 3 -S COLOR -c black
+l -t 0.508888888889 -s 3 -d 4 -S COLOR -c black
+l -t 0.508888888889 -s 4 -d 5 -S COLOR -c blue
+l -t 0.508888888889 -s 5 -d 6 -S COLOR -c blue
+l -t 0.508888888889 -s 5 -d 7 -S COLOR -c brown
+l -t 0.508888888889 -s 5 -d 8 -S COLOR -c brown
+l -t 0.508888888889 -s 6 -d 9 -S COLOR -c red
+l -t 0.508888888889 -s 7 -d 10 -S COLOR -c blue
+l -t 0.508888888889 -s 8 -d 11 -S COLOR -c black
+l -t 0.508888888889 -s 9 -d 12 -S COLOR -c black
+l -t 0.508888888889 -s 10 -d 13 -S COLOR -c black
+l -t 0.508888888889 -s 11 -d 14 -S COLOR -c black
+l -t 0.508888888889 -s 12 -d 15 -S COLOR -c brown
+l -t 0.508888888889 -s 13 -d 16 -S COLOR -c black
+l -t 0.508888888889 -s 14 -d 34 -S COLOR -c black
+l -t 0.508888888889 -s 14 -d 17 -S COLOR -c black
+l -t 0.508888888889 -s 15 -d 18 -S COLOR -c black
+l -t 0.508888888889 -s 16 -d 19 -S COLOR -c orange
+l -t 0.508888888889 -s 17 -d 20 -S COLOR -c black
+l -t 0.508888888889 -s 18 -d 21 -S COLOR -c black
+l -t 0.508888888889 -s 19 -d 22 -S COLOR -c brown
+l -t 0.508888888889 -s 20 -d 23 -S COLOR -c black
+l -t 0.508888888889 -s 22 -d 24 -S COLOR -c black
+l -t 0.508888888889 -s 23 -d 25 -S COLOR -c black
+l -t 0.508888888889 -s 24 -d 26 -S COLOR -c black
+l -t 0.508888888889 -s 25 -d 27 -S COLOR -c black
+l -t 0.508888888889 -s 26 -d 28 -S COLOR -c black
+l -t 0.508888888889 -s 28 -d 29 -S COLOR -c black
+n -t 0.508888888889 -s 2 -c grey
+n -t 0.508888888889 -s 30 -c grey
+n -t 0.508888888889 -s 31 -c grey
+n -t 0.508888888889 -s 32 -c grey
+n -t 0.508888888889 -s 33 -c grey
+l -t 0.508888888889 -s 0 -d 2 -c grey
+l -t 0.508888888889 -s 22 -d 30 -c grey
+l -t 0.508888888889 -s 30 -d 31 -c grey
+l -t 0.508888888889 -s 31 -d 32 -c grey
+l -t 0.508888888889 -s 32 -d 33 -c grey
+l -t 0.560833333333 -s 0 -d 1 -S COLOR -c black
+l -t 0.560833333333 -s 0 -d 2 -S COLOR -c black
+l -t 0.560833333333 -s 1 -d 3 -S COLOR -c black
+l -t 0.560833333333 -s 3 -d 4 -S COLOR -c black
+l -t 0.560833333333 -s 4 -d 5 -S COLOR -c blue
+l -t 0.560833333333 -s 5 -d 7 -S COLOR -c black
+l -t 0.560833333333 -s 5 -d 8 -S COLOR -c black
+l -t 0.560833333333 -s 7 -d 10 -S COLOR -c blue
+l -t 0.560833333333 -s 8 -d 11 -S COLOR -c orange
+l -t 0.560833333333 -s 10 -d 13 -S COLOR -c blue
+l -t 0.560833333333 -s 11 -d 14 -S COLOR -c black
+l -t 0.560833333333 -s 13 -d 16 -S COLOR -c black
+l -t 0.560833333333 -s 14 -d 34 -S COLOR -c black
+l -t 0.560833333333 -s 16 -d 19 -S COLOR -c red
+l -t 0.560833333333 -s 19 -d 22 -S COLOR -c brown
+l -t 0.560833333333 -s 22 -d 30 -S COLOR -c black
+l -t 0.560833333333 -s 30 -d 31 -S COLOR -c black
+l -t 0.560833333333 -s 31 -d 32 -S COLOR -c blue
+l -t 0.560833333333 -s 32 -d 33 -S COLOR -c black
+n -t 0.560833333333 -s 2 -c black
+n -t 0.560833333333 -s 6 -c grey
+n -t 0.560833333333 -s 9 -c grey
+n -t 0.560833333333 -s 12 -c grey
+n -t 0.560833333333 -s 15 -c grey
+n -t 0.560833333333 -s 17 -c grey
+n -t 0.560833333333 -s 18 -c grey
+n -t 0.560833333333 -s 20 -c grey
+n -t 0.560833333333 -s 21 -c grey
+n -t 0.560833333333 -s 23 -c grey
+n -t 0.560833333333 -s 24 -c grey
+n -t 0.560833333333 -s 25 -c grey
+n -t 0.560833333333 -s 26 -c grey
+n -t 0.560833333333 -s 27 -c grey
+n -t 0.560833333333 -s 28 -c grey
+n -t 0.560833333333 -s 29 -c grey
+n -t 0.560833333333 -s 30 -c black
+n -t 0.560833333333 -s 31 -c black
+n -t 0.560833333333 -s 32 -c black
+n -t 0.560833333333 -s 33 -c black
+l -t 0.560833333333 -s 5 -d 6 -c grey
+l -t 0.560833333333 -s 6 -d 9 -c grey
+l -t 0.560833333333 -s 9 -d 12 -c grey
+l -t 0.560833333333 -s 12 -d 15 -c grey
+l -t 0.560833333333 -s 14 -d 17 -c grey
+l -t 0.560833333333 -s 15 -d 18 -c grey
+l -t 0.560833333333 -s 17 -d 20 -c grey
+l -t 0.560833333333 -s 18 -d 21 -c grey
+l -t 0.560833333333 -s 20 -d 23 -c grey
+l -t 0.560833333333 -s 22 -d 24 -c grey
+l -t 0.560833333333 -s 23 -d 25 -c grey
+l -t 0.560833333333 -s 24 -d 26 -c grey
+l -t 0.560833333333 -s 25 -d 27 -c grey
+l -t 0.560833333333 -s 26 -d 28 -c grey
+l -t 0.560833333333 -s 28 -d 29 -c grey
+l -t 0.625277777778 -s 0 -d 1 -S COLOR -c black
+l -t 0.625277777778 -s 1 -d 3 -S COLOR -c black
+l -t 0.625277777778 -s 3 -d 4 -S COLOR -c black
+l -t 0.625277777778 -s 4 -d 5 -S COLOR -c black
+l -t 0.625277777778 -s 5 -d 8 -S COLOR -c black
+l -t 0.625277777778 -s 5 -d 6 -S COLOR -c blue
+l -t 0.625277777778 -s 8 -d 11 -S COLOR -c red
+l -t 0.625277777778 -s 6 -d 9 -S COLOR -c red
+l -t 0.625277777778 -s 11 -d 14 -S COLOR -c black
+l -t 0.625277777778 -s 9 -d 12 -S COLOR -c black
+l -t 0.625277777778 -s 14 -d 17 -S COLOR -c brown
+l -t 0.625277777778 -s 12 -d 15 -S COLOR -c black
+l -t 0.625277777778 -s 17 -d 20 -S COLOR -c black
+l -t 0.625277777778 -s 15 -d 18 -S COLOR -c black
+l -t 0.625277777778 -s 20 -d 23 -S COLOR -c black
+l -t 0.625277777778 -s 18 -d 21 -S COLOR -c black
+l -t 0.625277777778 -s 23 -d 25 -S COLOR -c black
+l -t 0.625277777778 -s 25 -d 27 -S COLOR -c black
+n -t 0.625277777778 -s 2 -c grey
+n -t 0.625277777778 -s 6 -c black
+n -t 0.625277777778 -s 7 -c grey
+n -t 0.625277777778 -s 9 -c black
+n -t 0.625277777778 -s 10 -c grey
+n -t 0.625277777778 -s 12 -c black
+n -t 0.625277777778 -s 13 -c grey
+n -t 0.625277777778 -s 15 -c black
+n -t 0.625277777778 -s 16 -c grey
+n -t 0.625277777778 -s 17 -c black
+n -t 0.625277777778 -s 18 -c black
+n -t 0.625277777778 -s 19 -c grey
+n -t 0.625277777778 -s 20 -c black
+n -t 0.625277777778 -s 21 -c black
+n -t 0.625277777778 -s 22 -c grey
+n -t 0.625277777778 -s 23 -c black
+n -t 0.625277777778 -s 25 -c black
+n -t 0.625277777778 -s 27 -c black
+n -t 0.625277777778 -s 30 -c grey
+n -t 0.625277777778 -s 31 -c grey
+n -t 0.625277777778 -s 32 -c grey
+n -t 0.625277777778 -s 33 -c grey
+n -t 0.625277777778 -s 34 -c grey
+l -t 0.625277777778 -s 0 -d 2 -c grey
+l -t 0.625277777778 -s 5 -d 7 -c grey
+l -t 0.625277777778 -s 7 -d 10 -c grey
+l -t 0.625277777778 -s 10 -d 13 -c grey
+l -t 0.625277777778 -s 13 -d 16 -c grey
+l -t 0.625277777778 -s 16 -d 19 -c grey
+l -t 0.625277777778 -s 19 -d 22 -c grey
+l -t 0.625277777778 -s 22 -d 30 -c grey
+l -t 0.625277777778 -s 30 -d 31 -c grey
+l -t 0.625277777778 -s 31 -d 32 -c grey
+l -t 0.625277777778 -s 32 -d 33 -c grey
+l -t 0.625277777778 -s 14 -d 34 -c grey
+n -t 0.667222222222 -s 0 -c grey
+n -t 0.667222222222 -s 1 -c grey
+n -t 0.667222222222 -s 3 -c grey
+n -t 0.667222222222 -s 4 -c grey
+n -t 0.667222222222 -s 5 -c grey
+n -t 0.667222222222 -s 6 -c grey
+n -t 0.667222222222 -s 8 -c grey
+n -t 0.667222222222 -s 9 -c grey
+n -t 0.667222222222 -s 11 -c grey
+n -t 0.667222222222 -s 12 -c grey
+n -t 0.667222222222 -s 14 -c grey
+n -t 0.667222222222 -s 15 -c grey
+n -t 0.667222222222 -s 17 -c grey
+n -t 0.667222222222 -s 18 -c grey
+n -t 0.667222222222 -s 20 -c grey
+n -t 0.667222222222 -s 21 -c grey
+n -t 0.667222222222 -s 23 -c grey
+n -t 0.667222222222 -s 25 -c grey
+n -t 0.667222222222 -s 27 -c grey
+n -t 0.667222222222 -s 35 -c black
+l -t 0.667222222222 -s 0 -d 1 -c grey
+l -t 0.667222222222 -s 1 -d 3 -c grey
+l -t 0.667222222222 -s 3 -d 4 -c grey
+l -t 0.667222222222 -s 4 -d 5 -c grey
+l -t 0.667222222222 -s 5 -d 6 -c grey
+l -t 0.667222222222 -s 5 -d 8 -c grey
+l -t 0.667222222222 -s 6 -d 9 -c grey
+l -t 0.667222222222 -s 8 -d 11 -c grey
+l -t 0.667222222222 -s 9 -d 12 -c grey
+l -t 0.667222222222 -s 11 -d 14 -c grey
+l -t 0.667222222222 -s 12 -d 15 -c grey
+l -t 0.667222222222 -s 14 -d 17 -c grey
+l -t 0.667222222222 -s 15 -d 18 -c grey
+l -t 0.667222222222 -s 17 -d 20 -c grey
+l -t 0.667222222222 -s 18 -d 21 -c grey
+l -t 0.667222222222 -s 20 -d 23 -c grey
+l -t 0.667222222222 -s 23 -d 25 -c grey
+l -t 0.667222222222 -s 25 -d 27 -c grey
+l -t 0.703888888889 -s 0 -d 1 -S COLOR -c black
+l -t 0.703888888889 -s 0 -d 2 -S COLOR -c black
+l -t 0.703888888889 -s 1 -d 3 -S COLOR -c black
+l -t 0.703888888889 -s 3 -d 4 -S COLOR -c black
+l -t 0.703888888889 -s 4 -d 5 -S COLOR -c black
+l -t 0.703888888889 -s 5 -d 7 -S COLOR -c black
+l -t 0.703888888889 -s 5 -d 8 -S COLOR -c brown
+l -t 0.703888888889 -s 7 -d 36 -S COLOR -c blue
+l -t 0.703888888889 -s 7 -d 10 -S COLOR -c blue
+l -t 0.703888888889 -s 8 -d 11 -S COLOR -c red
+l -t 0.703888888889 -s 36 -d 37 -S COLOR -c black
+l -t 0.703888888889 -s 10 -d 13 -S COLOR -c brown
+l -t 0.703888888889 -s 11 -d 14 -S COLOR -c black
+l -t 0.703888888889 -s 37 -d 38 -S COLOR -c brown
+l -t 0.703888888889 -s 13 -d 16 -S COLOR -c black
+l -t 0.703888888889 -s 14 -d 17 -S COLOR -c black
+l -t 0.703888888889 -s 38 -d 39 -S COLOR -c black
+l -t 0.703888888889 -s 16 -d 19 -S COLOR -c red
+l -t 0.703888888889 -s 17 -d 20 -S COLOR -c brown
+l -t 0.703888888889 -s 19 -d 22 -S COLOR -c black
+l -t 0.703888888889 -s 20 -d 23 -S COLOR -c black
+l -t 0.703888888889 -s 22 -d 24 -S COLOR -c blue
+l -t 0.703888888889 -s 23 -d 25 -S COLOR -c black
+l -t 0.703888888889 -s 24 -d 26 -S COLOR -c black
+l -t 0.703888888889 -s 25 -d 27 -S COLOR -c black
+l -t 0.703888888889 -s 26 -d 28 -S COLOR -c black
+l -t 0.703888888889 -s 28 -d 29 -S COLOR -c black
+n -t 0.703888888889 -s 0 -c black
+n -t 0.703888888889 -s 1 -c black
+n -t 0.703888888889 -s 2 -c black
+n -t 0.703888888889 -s 3 -c black
+n -t 0.703888888889 -s 4 -c black
+n -t 0.703888888889 -s 5 -c black
+n -t 0.703888888889 -s 7 -c black
+n -t 0.703888888889 -s 8 -c black
+n -t 0.703888888889 -s 10 -c black
+n -t 0.703888888889 -s 11 -c black
+n -t 0.703888888889 -s 13 -c black
+n -t 0.703888888889 -s 14 -c black
+n -t 0.703888888889 -s 16 -c black
+n -t 0.703888888889 -s 17 -c black
+n -t 0.703888888889 -s 19 -c black
+n -t 0.703888888889 -s 20 -c black
+n -t 0.703888888889 -s 22 -c black
+n -t 0.703888888889 -s 23 -c black
+n -t 0.703888888889 -s 24 -c black
+n -t 0.703888888889 -s 25 -c black
+n -t 0.703888888889 -s 26 -c black
+n -t 0.703888888889 -s 27 -c black
+n -t 0.703888888889 -s 28 -c black
+n -t 0.703888888889 -s 29 -c black
+n -t 0.703888888889 -s 35 -c grey
+n -t 0.703888888889 -s 36 -c black
+n -t 0.703888888889 -s 37 -c black
+n -t 0.703888888889 -s 38 -c black
+n -t 0.703888888889 -s 39 -c black
+l -t 0.745 -s 0 -d 1 -S COLOR -c black
+l -t 0.745 -s 0 -d 2 -S COLOR -c black
+l -t 0.745 -s 1 -d 3 -S COLOR -c brown
+l -t 0.745 -s 3 -d 4 -S COLOR -c black
+l -t 0.745 -s 4 -d 5 -S COLOR -c black
+l -t 0.745 -s 5 -d 6 -S COLOR -c blue
+l -t 0.745 -s 5 -d 7 -S COLOR -c red
+l -t 0.745 -s 5 -d 8 -S COLOR -c black
+l -t 0.745 -s 6 -d 9 -S COLOR -c red
+l -t 0.745 -s 7 -d 10 -S COLOR -c orange
+l -t 0.745 -s 8 -d 11 -S COLOR -c red
+l -t 0.745 -s 9 -d 12 -S COLOR -c black
+l -t 0.745 -s 10 -d 13 -S COLOR -c black
+l -t 0.745 -s 11 -d 14 -S COLOR -c black
+l -t 0.745 -s 12 -d 15 -S COLOR -c black
+l -t 0.745 -s 13 -d 16 -S COLOR -c brown
+l -t 0.745 -s 14 -d 17 -S COLOR -c black
+l -t 0.745 -s 15 -d 18 -S COLOR -c black
+l -t 0.745 -s 16 -d 19 -S COLOR -c red
+l -t 0.745 -s 17 -d 20 -S COLOR -c brown
+l -t 0.745 -s 18 -d 21 -S COLOR -c black
+l -t 0.745 -s 19 -d 22 -S COLOR -c blue
+l -t 0.745 -s 20 -d 23 -S COLOR -c blue
+l -t 0.745 -s 22 -d 24 -S COLOR -c black
+l -t 0.745 -s 22 -d 30 -S COLOR -c black
+l -t 0.745 -s 23 -d 25 -S COLOR -c brown
+l -t 0.745 -s 24 -d 26 -S COLOR -c black
+l -t 0.745 -s 30 -d 31 -S COLOR -c black
+l -t 0.745 -s 25 -d 27 -S COLOR -c black
+l -t 0.745 -s 26 -d 28 -S COLOR -c black
+l -t 0.745 -s 31 -d 32 -S COLOR -c black
+l -t 0.745 -s 28 -d 29 -S COLOR -c black
+l -t 0.745 -s 32 -d 33 -S COLOR -c black
+n -t 0.745 -s 6 -c black
+n -t 0.745 -s 9 -c black
+n -t 0.745 -s 12 -c black
+n -t 0.745 -s 15 -c black
+n -t 0.745 -s 18 -c black
+n -t 0.745 -s 21 -c black
+n -t 0.745 -s 30 -c black
+n -t 0.745 -s 31 -c black
+n -t 0.745 -s 32 -c black
+n -t 0.745 -s 33 -c black
+n -t 0.745 -s 36 -c grey
+n -t 0.745 -s 37 -c grey
+n -t 0.745 -s 38 -c grey
+n -t 0.745 -s 39 -c grey
+l -t 0.745 -s 7 -d 36 -c grey
+l -t 0.745 -s 36 -d 37 -c grey
+l -t 0.745 -s 37 -d 38 -c grey
+l -t 0.745 -s 38 -d 39 -c grey
+l -t 0.772222222222 -s 0 -d 1 -S COLOR -c black
+l -t 0.772222222222 -s 0 -d 2 -S COLOR -c black
+l -t 0.772222222222 -s 1 -d 3 -S COLOR -c black
+l -t 0.772222222222 -s 3 -d 4 -S COLOR -c black
+l -t 0.772222222222 -s 4 -d 5 -S COLOR -c orange
+l -t 0.772222222222 -s 5 -d 6 -S COLOR -c brown
+l -t 0.772222222222 -s 5 -d 7 -S COLOR -c red
+l -t 0.772222222222 -s 5 -d 8 -S COLOR -c black
+l -t 0.772222222222 -s 6 -d 9 -S COLOR -c red
+l -t 0.772222222222 -s 7 -d 10 -S COLOR -c blue
+l -t 0.772222222222 -s 8 -d 11 -S COLOR -c blue
+l -t 0.772222222222 -s 9 -d 12 -S COLOR -c black
+l -t 0.772222222222 -s 10 -d 13 -S COLOR -c brown
+l -t 0.772222222222 -s 11 -d 14 -S COLOR -c brown
+l -t 0.772222222222 -s 12 -d 15 -S COLOR -c black
+l -t 0.772222222222 -s 13 -d 16 -S COLOR -c black
+l -t 0.772222222222 -s 14 -d 17 -S COLOR -c blue
+l -t 0.772222222222 -s 15 -d 18 -S COLOR -c blue
+l -t 0.772222222222 -s 16 -d 19 -S COLOR -c red
+l -t 0.772222222222 -s 17 -d 20 -S COLOR -c blue
+l -t 0.772222222222 -s 18 -d 21 -S COLOR -c black
+l -t 0.772222222222 -s 19 -d 22 -S COLOR -c blue
+l -t 0.772222222222 -s 20 -d 23 -S COLOR -c black
+l -t 0.772222222222 -s 22 -d 24 -S COLOR -c black
+l -t 0.772222222222 -s 22 -d 30 -S COLOR -c black
+l -t 0.772222222222 -s 23 -d 25 -S COLOR -c black
+l -t 0.772222222222 -s 24 -d 26 -S COLOR -c black
+l -t 0.772222222222 -s 30 -d 31 -S COLOR -c black
+l -t 0.772222222222 -s 25 -d 27 -S COLOR -c black
+l -t 0.772222222222 -s 26 -d 28 -S COLOR -c black
+l -t 0.772222222222 -s 31 -d 32 -S COLOR -c black
+l -t 0.772222222222 -s 28 -d 29 -S COLOR -c black
+l -t 0.772222222222 -s 32 -d 33 -S COLOR -c black
+l -t 0.801111111111 -s 0 -d 1 -S COLOR -c black
+l -t 0.801111111111 -s 1 -d 3 -S COLOR -c black
+l -t 0.801111111111 -s 3 -d 4 -S COLOR -c black
+l -t 0.801111111111 -s 4 -d 5 -S COLOR -c black
+l -t 0.801111111111 -s 5 -d 8 -S COLOR -c black
+l -t 0.801111111111 -s 8 -d 11 -S COLOR -c blue
+l -t 0.801111111111 -s 11 -d 14 -S COLOR -c black
+l -t 0.801111111111 -s 14 -d 17 -S COLOR -c brown
+l -t 0.801111111111 -s 17 -d 20 -S COLOR -c blue
+l -t 0.801111111111 -s 20 -d 23 -S COLOR -c brown
+l -t 0.801111111111 -s 23 -d 25 -S COLOR -c black
+l -t 0.801111111111 -s 25 -d 27 -S COLOR -c black
+n -t 0.801111111111 -s 2 -c grey
+n -t 0.801111111111 -s 6 -c grey
+n -t 0.801111111111 -s 7 -c grey
+n -t 0.801111111111 -s 9 -c grey
+n -t 0.801111111111 -s 10 -c grey
+n -t 0.801111111111 -s 12 -c grey
+n -t 0.801111111111 -s 13 -c grey
+n -t 0.801111111111 -s 15 -c grey
+n -t 0.801111111111 -s 16 -c grey
+n -t 0.801111111111 -s 18 -c grey
+n -t 0.801111111111 -s 19 -c grey
+n -t 0.801111111111 -s 21 -c grey
+n -t 0.801111111111 -s 22 -c grey
+n -t 0.801111111111 -s 24 -c grey
+n -t 0.801111111111 -s 26 -c grey
+n -t 0.801111111111 -s 28 -c grey
+n -t 0.801111111111 -s 29 -c grey
+n -t 0.801111111111 -s 30 -c grey
+n -t 0.801111111111 -s 31 -c grey
+n -t 0.801111111111 -s 32 -c grey
+n -t 0.801111111111 -s 33 -c grey
+l -t 0.801111111111 -s 0 -d 2 -c grey
+l -t 0.801111111111 -s 5 -d 6 -c grey
+l -t 0.801111111111 -s 5 -d 7 -c grey
+l -t 0.801111111111 -s 6 -d 9 -c grey
+l -t 0.801111111111 -s 7 -d 10 -c grey
+l -t 0.801111111111 -s 9 -d 12 -c grey
+l -t 0.801111111111 -s 10 -d 13 -c grey
+l -t 0.801111111111 -s 12 -d 15 -c grey
+l -t 0.801111111111 -s 13 -d 16 -c grey
+l -t 0.801111111111 -s 15 -d 18 -c grey
+l -t 0.801111111111 -s 16 -d 19 -c grey
+l -t 0.801111111111 -s 18 -d 21 -c grey
+l -t 0.801111111111 -s 19 -d 22 -c grey
+l -t 0.801111111111 -s 22 -d 24 -c grey
+l -t 0.801111111111 -s 24 -d 26 -c grey
+l -t 0.801111111111 -s 26 -d 28 -c grey
+l -t 0.801111111111 -s 28 -d 29 -c grey
+l -t 0.801111111111 -s 22 -d 30 -c grey
+l -t 0.801111111111 -s 30 -d 31 -c grey
+l -t 0.801111111111 -s 31 -d 32 -c grey
+l -t 0.801111111111 -s 32 -d 33 -c grey
+l -t 0.869722222222 -s 0 -d 1 -S COLOR -c black
+l -t 0.869722222222 -s 1 -d 3 -S COLOR -c black
+l -t 0.869722222222 -s 3 -d 4 -S COLOR -c black
+l -t 0.869722222222 -s 4 -d 5 -S COLOR -c brown
+l -t 0.869722222222 -s 5 -d 7 -S COLOR -c black
+l -t 0.869722222222 -s 5 -d 8 -S COLOR -c blue
+l -t 0.869722222222 -s 7 -d 10 -S COLOR -c blue
+l -t 0.869722222222 -s 8 -d 11 -S COLOR -c blue
+l -t 0.869722222222 -s 10 -d 13 -S COLOR -c blue
+l -t 0.869722222222 -s 11 -d 14 -S COLOR -c brown
+l -t 0.869722222222 -s 13 -d 16 -S COLOR -c brown
+l -t 0.869722222222 -s 14 -d 17 -S COLOR -c black
+l -t 0.869722222222 -s 16 -d 19 -S COLOR -c red
+l -t 0.869722222222 -s 17 -d 20 -S COLOR -c brown
+l -t 0.869722222222 -s 19 -d 22 -S COLOR -c blue
+l -t 0.869722222222 -s 20 -d 23 -S COLOR -c blue
+l -t 0.869722222222 -s 22 -d 30 -S COLOR -c black
+l -t 0.869722222222 -s 23 -d 25 -S COLOR -c black
+l -t 0.869722222222 -s 30 -d 31 -S COLOR -c orange
+l -t 0.869722222222 -s 25 -d 27 -S COLOR -c black
+l -t 0.869722222222 -s 31 -d 32 -S COLOR -c black
+l -t 0.869722222222 -s 32 -d 33 -S COLOR -c black
+n -t 0.869722222222 -s 7 -c black
+n -t 0.869722222222 -s 10 -c black
+n -t 0.869722222222 -s 13 -c black
+n -t 0.869722222222 -s 16 -c black
+n -t 0.869722222222 -s 19 -c black
+n -t 0.869722222222 -s 22 -c black
+n -t 0.869722222222 -s 30 -c black
+n -t 0.869722222222 -s 31 -c black
+n -t 0.869722222222 -s 32 -c black
+n -t 0.869722222222 -s 33 -c black
+l -t 0.915 -s 0 -d 1 -S COLOR -c black
+l -t 0.915 -s 0 -d 2 -S COLOR -c black
+l -t 0.915 -s 1 -d 3 -S COLOR -c black
+l -t 0.915 -s 3 -d 4 -S COLOR -c black
+l -t 0.915 -s 4 -d 5 -S COLOR -c black
+l -t 0.915 -s 5 -d 7 -S COLOR -c black
+l -t 0.915 -s 5 -d 8 -S COLOR -c black
+l -t 0.915 -s 7 -d 10 -S COLOR -c black
+l -t 0.915 -s 8 -d 11 -S COLOR -c blue
+l -t 0.915 -s 10 -d 13 -S COLOR -c blue
+l -t 0.915 -s 11 -d 14 -S COLOR -c black
+l -t 0.915 -s 13 -d 16 -S COLOR -c black
+l -t 0.915 -s 14 -d 17 -S COLOR -c brown
+l -t 0.915 -s 16 -d 19 -S COLOR -c red
+l -t 0.915 -s 17 -d 20 -S COLOR -c black
+l -t 0.915 -s 19 -d 22 -S COLOR -c blue
+l -t 0.915 -s 20 -d 23 -S COLOR -c black
+l -t 0.915 -s 22 -d 30 -S COLOR -c black
+l -t 0.915 -s 22 -d 24 -S COLOR -c blue
+l -t 0.915 -s 23 -d 25 -S COLOR -c black
+l -t 0.915 -s 30 -d 31 -S COLOR -c black
+l -t 0.915 -s 24 -d 26 -S COLOR -c orange
+l -t 0.915 -s 25 -d 27 -S COLOR -c black
+l -t 0.915 -s 31 -d 32 -S COLOR -c black
+l -t 0.915 -s 26 -d 28 -S COLOR -c black
+l -t 0.915 -s 32 -d 33 -S COLOR -c black
+l -t 0.915 -s 28 -d 29 -S COLOR -c black
+n -t 0.915 -s 2 -c black
+n -t 0.915 -s 24 -c black
+n -t 0.915 -s 26 -c black
+n -t 0.915 -s 28 -c black
+n -t 0.915 -s 29 -c black
+l -t 0.944722222222 -s 0 -d 1 -S COLOR -c black
+l -t 0.944722222222 -s 1 -d 3 -S COLOR -c black
+l -t 0.944722222222 -s 3 -d 4 -S COLOR -c black
+l -t 0.944722222222 -s 4 -d 5 -S COLOR -c blue
+l -t 0.944722222222 -s 5 -d 7 -S COLOR -c red
+l -t 0.944722222222 -s 5 -d 8 -S COLOR -c brown
+l -t 0.944722222222 -s 7 -d 10 -S COLOR -c red
+l -t 0.944722222222 -s 8 -d 11 -S COLOR -c blue
+l -t 0.944722222222 -s 10 -d 13 -S COLOR -c orange
+l -t 0.944722222222 -s 11 -d 14 -S COLOR -c black
+l -t 0.944722222222 -s 13 -d 16 -S COLOR -c black
+l -t 0.944722222222 -s 14 -d 17 -S COLOR -c black
+l -t 0.944722222222 -s 16 -d 19 -S COLOR -c red
+l -t 0.944722222222 -s 17 -d 20 -S COLOR -c brown
+l -t 0.944722222222 -s 19 -d 22 -S COLOR -c blue
+l -t 0.944722222222 -s 20 -d 23 -S COLOR -c black
+l -t 0.944722222222 -s 22 -d 30 -S COLOR -c black
+l -t 0.944722222222 -s 22 -d 24 -S COLOR -c black
+l -t 0.944722222222 -s 23 -d 25 -S COLOR -c black
+l -t 0.944722222222 -s 30 -d 31 -S COLOR -c black
+l -t 0.944722222222 -s 24 -d 26 -S COLOR -c black
+l -t 0.944722222222 -s 25 -d 27 -S COLOR -c black
+l -t 0.944722222222 -s 31 -d 32 -S COLOR -c black
+l -t 0.944722222222 -s 26 -d 28 -S COLOR -c black
+l -t 0.944722222222 -s 32 -d 33 -S COLOR -c black
+l -t 0.944722222222 -s 28 -d 29 -S COLOR -c black
+n -t 0.944722222222 -s 2 -c grey
+l -t 0.944722222222 -s 0 -d 2 -c grey
+l -t 0.994444444444 -s 0 -d 1 -S COLOR -c brown
+l -t 0.994444444444 -s 1 -d 3 -S COLOR -c black
+l -t 0.994444444444 -s 3 -d 4 -S COLOR -c blue
+l -t 0.994444444444 -s 4 -d 5 -S COLOR -c blue
+l -t 0.994444444444 -s 5 -d 7 -S COLOR -c black
+l -t 0.994444444444 -s 5 -d 6 -S COLOR -c black
+l -t 0.994444444444 -s 7 -d 10 -S COLOR -c black
+l -t 0.994444444444 -s 6 -d 9 -S COLOR -c brown
+l -t 0.994444444444 -s 10 -d 13 -S COLOR -c brown
+l -t 0.994444444444 -s 9 -d 12 -S COLOR -c black
+l -t 0.994444444444 -s 13 -d 16 -S COLOR -c brown
+l -t 0.994444444444 -s 12 -d 15 -S COLOR -c black
+l -t 0.994444444444 -s 16 -d 19 -S COLOR -c red
+l -t 0.994444444444 -s 15 -d 18 -S COLOR -c black
+l -t 0.994444444444 -s 19 -d 22 -S COLOR -c brown
+l -t 0.994444444444 -s 18 -d 21 -S COLOR -c black
+l -t 0.994444444444 -s 22 -d 30 -S COLOR -c black
+l -t 0.994444444444 -s 30 -d 31 -S COLOR -c black
+l -t 0.994444444444 -s 31 -d 32 -S COLOR -c brown
+l -t 0.994444444444 -s 32 -d 33 -S COLOR -c black
+n -t 0.994444444444 -s 6 -c black
+n -t 0.994444444444 -s 8 -c grey
+n -t 0.994444444444 -s 9 -c black
+n -t 0.994444444444 -s 11 -c grey
+n -t 0.994444444444 -s 12 -c black
+n -t 0.994444444444 -s 14 -c grey
+n -t 0.994444444444 -s 15 -c black
+n -t 0.994444444444 -s 17 -c grey
+n -t 0.994444444444 -s 18 -c black
+n -t 0.994444444444 -s 20 -c grey
+n -t 0.994444444444 -s 21 -c black
+n -t 0.994444444444 -s 23 -c grey
+n -t 0.994444444444 -s 24 -c grey
+n -t 0.994444444444 -s 25 -c grey
+n -t 0.994444444444 -s 26 -c grey
+n -t 0.994444444444 -s 27 -c grey
+n -t 0.994444444444 -s 28 -c grey
+n -t 0.994444444444 -s 29 -c grey
+l -t 0.994444444444 -s 5 -d 8 -c grey
+l -t 0.994444444444 -s 8 -d 11 -c grey
+l -t 0.994444444444 -s 11 -d 14 -c grey
+l -t 0.994444444444 -s 14 -d 17 -c grey
+l -t 0.994444444444 -s 17 -d 20 -c grey
+l -t 0.994444444444 -s 20 -d 23 -c grey
+l -t 0.994444444444 -s 22 -d 24 -c grey
+l -t 0.994444444444 -s 23 -d 25 -c grey
+l -t 0.994444444444 -s 24 -d 26 -c grey
+l -t 0.994444444444 -s 25 -d 27 -c grey
+l -t 0.994444444444 -s 26 -d 28 -c grey
+l -t 0.994444444444 -s 28 -d 29 -c grey
+n -t 1.06444444444 -s 0 -c grey
+n -t 1.06444444444 -s 1 -c grey
+n -t 1.06444444444 -s 3 -c grey
+n -t 1.06444444444 -s 4 -c grey
+n -t 1.06444444444 -s 5 -c grey
+n -t 1.06444444444 -s 6 -c grey
+n -t 1.06444444444 -s 7 -c grey
+n -t 1.06444444444 -s 9 -c grey
+n -t 1.06444444444 -s 10 -c grey
+n -t 1.06444444444 -s 12 -c grey
+n -t 1.06444444444 -s 13 -c grey
+n -t 1.06444444444 -s 15 -c grey
+n -t 1.06444444444 -s 16 -c grey
+n -t 1.06444444444 -s 18 -c grey
+n -t 1.06444444444 -s 19 -c grey
+n -t 1.06444444444 -s 21 -c grey
+n -t 1.06444444444 -s 22 -c grey
+n -t 1.06444444444 -s 30 -c grey
+n -t 1.06444444444 -s 31 -c grey
+n -t 1.06444444444 -s 32 -c grey
+n -t 1.06444444444 -s 33 -c grey
+n -t 1.06444444444 -s 35 -c black
+l -t 1.06444444444 -s 0 -d 1 -c grey
+l -t 1.06444444444 -s 1 -d 3 -c grey
+l -t 1.06444444444 -s 3 -d 4 -c grey
+l -t 1.06444444444 -s 4 -d 5 -c grey
+l -t 1.06444444444 -s 5 -d 6 -c grey
+l -t 1.06444444444 -s 5 -d 7 -c grey
+l -t 1.06444444444 -s 6 -d 9 -c grey
+l -t 1.06444444444 -s 7 -d 10 -c grey
+l -t 1.06444444444 -s 9 -d 12 -c grey
+l -t 1.06444444444 -s 10 -d 13 -c grey
+l -t 1.06444444444 -s 12 -d 15 -c grey
+l -t 1.06444444444 -s 13 -d 16 -c grey
+l -t 1.06444444444 -s 15 -d 18 -c grey
+l -t 1.06444444444 -s 16 -d 19 -c grey
+l -t 1.06444444444 -s 18 -d 21 -c grey
+l -t 1.06444444444 -s 19 -d 22 -c grey
+l -t 1.06444444444 -s 22 -d 30 -c grey
+l -t 1.06444444444 -s 30 -d 31 -c grey
+l -t 1.06444444444 -s 31 -d 32 -c grey
+l -t 1.06444444444 -s 32 -d 33 -c grey
+l -t 1.12166666667 -s 0 -d 1 -S COLOR -c brown
+l -t 1.12166666667 -s 0 -d 2 -S COLOR -c black
+l -t 1.12166666667 -s 1 -d 3 -S COLOR -c black
+l -t 1.12166666667 -s 3 -d 4 -S COLOR -c black
+l -t 1.12166666667 -s 4 -d 5 -S COLOR -c brown
+l -t 1.12166666667 -s 5 -d 6 -S COLOR -c black
+l -t 1.12166666667 -s 5 -d 7 -S COLOR -c brown
+l -t 1.12166666667 -s 5 -d 8 -S COLOR -c black
+l -t 1.12166666667 -s 6 -d 9 -S COLOR -c red
+l -t 1.12166666667 -s 7 -d 10 -S COLOR -c brown
+l -t 1.12166666667 -s 8 -d 11 -S COLOR -c blue
+l -t 1.12166666667 -s 9 -d 12 -S COLOR -c black
+l -t 1.12166666667 -s 10 -d 13 -S COLOR -c brown
+l -t 1.12166666667 -s 11 -d 14 -S COLOR -c black
+l -t 1.12166666667 -s 12 -d 15 -S COLOR -c blue
+l -t 1.12166666667 -s 13 -d 16 -S COLOR -c black
+l -t 1.12166666667 -s 14 -d 17 -S COLOR -c black
+l -t 1.12166666667 -s 15 -d 18 -S COLOR -c brown
+l -t 1.12166666667 -s 16 -d 19 -S COLOR -c red
+l -t 1.12166666667 -s 17 -d 20 -S COLOR -c black
+l -t 1.12166666667 -s 18 -d 21 -S COLOR -c black
+l -t 1.12166666667 -s 19 -d 22 -S COLOR -c brown
+l -t 1.12166666667 -s 20 -d 23 -S COLOR -c brown
+l -t 1.12166666667 -s 22 -d 24 -S COLOR -c black
+l -t 1.12166666667 -s 22 -d 30 -S COLOR -c black
+l -t 1.12166666667 -s 23 -d 25 -S COLOR -c black
+l -t 1.12166666667 -s 24 -d 26 -S COLOR -c black
+l -t 1.12166666667 -s 30 -d 31 -S COLOR -c brown
+l -t 1.12166666667 -s 25 -d 27 -S COLOR -c black
+l -t 1.12166666667 -s 26 -d 28 -S COLOR -c black
+l -t 1.12166666667 -s 31 -d 32 -S COLOR -c black
+l -t 1.12166666667 -s 28 -d 29 -S COLOR -c black
+l -t 1.12166666667 -s 32 -d 33 -S COLOR -c black
+n -t 1.12166666667 -s 0 -c black
+n -t 1.12166666667 -s 1 -c black
+n -t 1.12166666667 -s 2 -c black
+n -t 1.12166666667 -s 3 -c black
+n -t 1.12166666667 -s 4 -c black
+n -t 1.12166666667 -s 5 -c black
+n -t 1.12166666667 -s 6 -c black
+n -t 1.12166666667 -s 7 -c black
+n -t 1.12166666667 -s 8 -c black
+n -t 1.12166666667 -s 9 -c black
+n -t 1.12166666667 -s 10 -c black
+n -t 1.12166666667 -s 11 -c black
+n -t 1.12166666667 -s 12 -c black
+n -t 1.12166666667 -s 13 -c black
+n -t 1.12166666667 -s 14 -c black
+n -t 1.12166666667 -s 15 -c black
+n -t 1.12166666667 -s 16 -c black
+n -t 1.12166666667 -s 17 -c black
+n -t 1.12166666667 -s 18 -c black
+n -t 1.12166666667 -s 19 -c black
+n -t 1.12166666667 -s 20 -c black
+n -t 1.12166666667 -s 21 -c black
+n -t 1.12166666667 -s 22 -c black
+n -t 1.12166666667 -s 23 -c black
+n -t 1.12166666667 -s 24 -c black
+n -t 1.12166666667 -s 25 -c black
+n -t 1.12166666667 -s 26 -c black
+n -t 1.12166666667 -s 27 -c black
+n -t 1.12166666667 -s 28 -c black
+n -t 1.12166666667 -s 29 -c black
+n -t 1.12166666667 -s 30 -c black
+n -t 1.12166666667 -s 31 -c black
+n -t 1.12166666667 -s 32 -c black
+n -t 1.12166666667 -s 33 -c black
+n -t 1.12166666667 -s 35 -c grey
+n -t 1.15722222222 -s 0 -c grey
+n -t 1.15722222222 -s 1 -c grey
+n -t 1.15722222222 -s 2 -c grey
+n -t 1.15722222222 -s 3 -c grey
+n -t 1.15722222222 -s 4 -c grey
+n -t 1.15722222222 -s 5 -c grey
+n -t 1.15722222222 -s 6 -c grey
+n -t 1.15722222222 -s 7 -c grey
+n -t 1.15722222222 -s 8 -c grey
+n -t 1.15722222222 -s 9 -c grey
+n -t 1.15722222222 -s 10 -c grey
+n -t 1.15722222222 -s 11 -c grey
+n -t 1.15722222222 -s 12 -c grey
+n -t 1.15722222222 -s 13 -c grey
+n -t 1.15722222222 -s 14 -c grey
+n -t 1.15722222222 -s 15 -c grey
+n -t 1.15722222222 -s 16 -c grey
+n -t 1.15722222222 -s 17 -c grey
+n -t 1.15722222222 -s 18 -c grey
+n -t 1.15722222222 -s 19 -c grey
+n -t 1.15722222222 -s 20 -c grey
+n -t 1.15722222222 -s 21 -c grey
+n -t 1.15722222222 -s 22 -c grey
+n -t 1.15722222222 -s 23 -c grey
+n -t 1.15722222222 -s 24 -c grey
+n -t 1.15722222222 -s 25 -c grey
+n -t 1.15722222222 -s 26 -c grey
+n -t 1.15722222222 -s 27 -c grey
+n -t 1.15722222222 -s 28 -c grey
+n -t 1.15722222222 -s 29 -c grey
+n -t 1.15722222222 -s 30 -c grey
+n -t 1.15722222222 -s 31 -c grey
+n -t 1.15722222222 -s 32 -c grey
+n -t 1.15722222222 -s 33 -c grey
+n -t 1.15722222222 -s 35 -c black
+l -t 1.15722222222 -s 0 -d 1 -c grey
+l -t 1.15722222222 -s 0 -d 2 -c grey
+l -t 1.15722222222 -s 1 -d 3 -c grey
+l -t 1.15722222222 -s 3 -d 4 -c grey
+l -t 1.15722222222 -s 4 -d 5 -c grey
+l -t 1.15722222222 -s 5 -d 6 -c grey
+l -t 1.15722222222 -s 5 -d 7 -c grey
+l -t 1.15722222222 -s 5 -d 8 -c grey
+l -t 1.15722222222 -s 6 -d 9 -c grey
+l -t 1.15722222222 -s 7 -d 10 -c grey
+l -t 1.15722222222 -s 8 -d 11 -c grey
+l -t 1.15722222222 -s 9 -d 12 -c grey
+l -t 1.15722222222 -s 10 -d 13 -c grey
+l -t 1.15722222222 -s 11 -d 14 -c grey
+l -t 1.15722222222 -s 12 -d 15 -c grey
+l -t 1.15722222222 -s 13 -d 16 -c grey
+l -t 1.15722222222 -s 14 -d 17 -c grey
+l -t 1.15722222222 -s 15 -d 18 -c grey
+l -t 1.15722222222 -s 16 -d 19 -c grey
+l -t 1.15722222222 -s 17 -d 20 -c grey
+l -t 1.15722222222 -s 18 -d 21 -c grey
+l -t 1.15722222222 -s 19 -d 22 -c grey
+l -t 1.15722222222 -s 20 -d 23 -c grey
+l -t 1.15722222222 -s 22 -d 24 -c grey
+l -t 1.15722222222 -s 23 -d 25 -c grey
+l -t 1.15722222222 -s 24 -d 26 -c grey
+l -t 1.15722222222 -s 25 -d 27 -c grey
+l -t 1.15722222222 -s 26 -d 28 -c grey
+l -t 1.15722222222 -s 28 -d 29 -c grey
+l -t 1.15722222222 -s 22 -d 30 -c grey
+l -t 1.15722222222 -s 30 -d 31 -c grey
+l -t 1.15722222222 -s 31 -d 32 -c grey
+l -t 1.15722222222 -s 32 -d 33 -c grey
+l -t 1.20805555556 -s 0 -d 1 -S COLOR -c blue
+l -t 1.20805555556 -s 0 -d 2 -S COLOR -c black
+l -t 1.20805555556 -s 1 -d 3 -S COLOR -c black
+l -t 1.20805555556 -s 3 -d 4 -S COLOR -c black
+l -t 1.20805555556 -s 4 -d 5 -S COLOR -c brown
+l -t 1.20805555556 -s 5 -d 6 -S COLOR -c brown
+l -t 1.20805555556 -s 5 -d 7 -S COLOR -c black
+l -t 1.20805555556 -s 5 -d 8 -S COLOR -c blue
+l -t 1.20805555556 -s 6 -d 9 -S COLOR -c red
+l -t 1.20805555556 -s 7 -d 10 -S COLOR -c black
+l -t 1.20805555556 -s 8 -d 11 -S COLOR -c red
+l -t 1.20805555556 -s 9 -d 12 -S COLOR -c brown
+l -t 1.20805555556 -s 10 -d 13 -S COLOR -c black
+l -t 1.20805555556 -s 11 -d 14 -S COLOR -c brown
+l -t 1.20805555556 -s 12 -d 15 -S COLOR -c black
+l -t 1.20805555556 -s 13 -d 16 -S COLOR -c black
+l -t 1.20805555556 -s 14 -d 17 -S COLOR -c black
+l -t 1.20805555556 -s 15 -d 18 -S COLOR -c black
+l -t 1.20805555556 -s 16 -d 19 -S COLOR -c red
+l -t 1.20805555556 -s 17 -d 20 -S COLOR -c blue
+l -t 1.20805555556 -s 18 -d 21 -S COLOR -c black
+l -t 1.20805555556 -s 19 -d 22 -S COLOR -c brown
+l -t 1.20805555556 -s 20 -d 23 -S COLOR -c brown
+l -t 1.20805555556 -s 22 -d 24 -S COLOR -c black
+l -t 1.20805555556 -s 22 -d 30 -S COLOR -c black
+l -t 1.20805555556 -s 23 -d 25 -S COLOR -c black
+l -t 1.20805555556 -s 24 -d 26 -S COLOR -c black
+l -t 1.20805555556 -s 30 -d 31 -S COLOR -c black
+l -t 1.20805555556 -s 25 -d 27 -S COLOR -c black
+l -t 1.20805555556 -s 26 -d 28 -S COLOR -c black
+l -t 1.20805555556 -s 31 -d 32 -S COLOR -c black
+l -t 1.20805555556 -s 28 -d 29 -S COLOR -c black
+l -t 1.20805555556 -s 32 -d 33 -S COLOR -c black
+n -t 1.20805555556 -s 0 -c black
+n -t 1.20805555556 -s 1 -c black
+n -t 1.20805555556 -s 2 -c black
+n -t 1.20805555556 -s 3 -c black
+n -t 1.20805555556 -s 4 -c black
+n -t 1.20805555556 -s 5 -c black
+n -t 1.20805555556 -s 6 -c black
+n -t 1.20805555556 -s 7 -c black
+n -t 1.20805555556 -s 8 -c black
+n -t 1.20805555556 -s 9 -c black
+n -t 1.20805555556 -s 10 -c black
+n -t 1.20805555556 -s 11 -c black
+n -t 1.20805555556 -s 12 -c black
+n -t 1.20805555556 -s 13 -c black
+n -t 1.20805555556 -s 14 -c black
+n -t 1.20805555556 -s 15 -c black
+n -t 1.20805555556 -s 16 -c black
+n -t 1.20805555556 -s 17 -c black
+n -t 1.20805555556 -s 18 -c black
+n -t 1.20805555556 -s 19 -c black
+n -t 1.20805555556 -s 20 -c black
+n -t 1.20805555556 -s 21 -c black
+n -t 1.20805555556 -s 22 -c black
+n -t 1.20805555556 -s 23 -c black
+n -t 1.20805555556 -s 24 -c black
+n -t 1.20805555556 -s 25 -c black
+n -t 1.20805555556 -s 26 -c black
+n -t 1.20805555556 -s 27 -c black
+n -t 1.20805555556 -s 28 -c black
+n -t 1.20805555556 -s 29 -c black
+n -t 1.20805555556 -s 30 -c black
+n -t 1.20805555556 -s 31 -c black
+n -t 1.20805555556 -s 32 -c black
+n -t 1.20805555556 -s 33 -c black
+n -t 1.20805555556 -s 35 -c grey
+l -t 1.24111111111 -s 0 -d 1 -S COLOR -c black
+l -t 1.24111111111 -s 0 -d 2 -S COLOR -c black
+l -t 1.24111111111 -s 1 -d 3 -S COLOR -c black
+l -t 1.24111111111 -s 3 -d 4 -S COLOR -c black
+l -t 1.24111111111 -s 4 -d 5 -S COLOR -c black
+l -t 1.24111111111 -s 5 -d 6 -S COLOR -c blue
+l -t 1.24111111111 -s 5 -d 7 -S COLOR -c black
+l -t 1.24111111111 -s 5 -d 8 -S COLOR -c brown
+l -t 1.24111111111 -s 6 -d 9 -S COLOR -c red
+l -t 1.24111111111 -s 7 -d 10 -S COLOR -c blue
+l -t 1.24111111111 -s 8 -d 11 -S COLOR -c blue
+l -t 1.24111111111 -s 9 -d 12 -S COLOR -c black
+l -t 1.24111111111 -s 10 -d 13 -S COLOR -c brown
+l -t 1.24111111111 -s 11 -d 14 -S COLOR -c blue
+l -t 1.24111111111 -s 12 -d 15 -S COLOR -c black
+l -t 1.24111111111 -s 13 -d 16 -S COLOR -c brown
+l -t 1.24111111111 -s 14 -d 17 -S COLOR -c brown
+l -t 1.24111111111 -s 15 -d 18 -S COLOR -c black
+l -t 1.24111111111 -s 16 -d 19 -S COLOR -c red
+l -t 1.24111111111 -s 17 -d 20 -S COLOR -c blue
+l -t 1.24111111111 -s 18 -d 21 -S COLOR -c black
+l -t 1.24111111111 -s 19 -d 22 -S COLOR -c blue
+l -t 1.24111111111 -s 20 -d 23 -S COLOR -c brown
+l -t 1.24111111111 -s 22 -d 30 -S COLOR -c black
+l -t 1.24111111111 -s 23 -d 25 -S COLOR -c black
+l -t 1.24111111111 -s 30 -d 31 -S COLOR -c black
+l -t 1.24111111111 -s 25 -d 27 -S COLOR -c black
+l -t 1.24111111111 -s 31 -d 32 -S COLOR -c black
+l -t 1.24111111111 -s 32 -d 33 -S COLOR -c black
+n -t 1.24111111111 -s 24 -c grey
+n -t 1.24111111111 -s 26 -c grey
+n -t 1.24111111111 -s 28 -c grey
+n -t 1.24111111111 -s 29 -c grey
+l -t 1.24111111111 -s 22 -d 24 -c grey
+l -t 1.24111111111 -s 24 -d 26 -c grey
+l -t 1.24111111111 -s 26 -d 28 -c grey
+l -t 1.24111111111 -s 28 -d 29 -c grey
+l -t 1.29138888889 -s 0 -d 1 -S COLOR -c blue
+l -t 1.29138888889 -s 0 -d 2 -S COLOR -c black
+l -t 1.29138888889 -s 1 -d 3 -S COLOR -c brown
+l -t 1.29138888889 -s 3 -d 4 -S COLOR -c blue
+l -t 1.29138888889 -s 4 -d 5 -S COLOR -c brown
+l -t 1.29138888889 -s 5 -d 6 -S COLOR -c brown
+l -t 1.29138888889 -s 5 -d 7 -S COLOR -c red
+l -t 1.29138888889 -s 5 -d 8 -S COLOR -c blue
+l -t 1.29138888889 -s 6 -d 9 -S COLOR -c red
+l -t 1.29138888889 -s 7 -d 10 -S COLOR -c brown
+l -t 1.29138888889 -s 8 -d 11 -S COLOR -c brown
+l -t 1.29138888889 -s 9 -d 12 -S COLOR -c brown
+l -t 1.29138888889 -s 10 -d 13 -S COLOR -c orange
+l -t 1.29138888889 -s 11 -d 14 -S COLOR -c black
+l -t 1.29138888889 -s 12 -d 15 -S COLOR -c black
+l -t 1.29138888889 -s 13 -d 16 -S COLOR -c black
+l -t 1.29138888889 -s 14 -d 17 -S COLOR -c black
+l -t 1.29138888889 -s 15 -d 18 -S COLOR -c black
+l -t 1.29138888889 -s 16 -d 19 -S COLOR -c red
+l -t 1.29138888889 -s 17 -d 20 -S COLOR -c black
+l -t 1.29138888889 -s 18 -d 21 -S COLOR -c black
+l -t 1.29138888889 -s 19 -d 22 -S COLOR -c black
+l -t 1.29138888889 -s 20 -d 23 -S COLOR -c blue
+l -t 1.29138888889 -s 22 -d 24 -S COLOR -c black
+l -t 1.29138888889 -s 22 -d 30 -S COLOR -c black
+l -t 1.29138888889 -s 23 -d 25 -S COLOR -c black
+l -t 1.29138888889 -s 24 -d 26 -S COLOR -c brown
+l -t 1.29138888889 -s 30 -d 31 -S COLOR -c black
+l -t 1.29138888889 -s 25 -d 27 -S COLOR -c black
+l -t 1.29138888889 -s 26 -d 28 -S COLOR -c black
+l -t 1.29138888889 -s 31 -d 32 -S COLOR -c black
+l -t 1.29138888889 -s 28 -d 29 -S COLOR -c black
+l -t 1.29138888889 -s 32 -d 33 -S COLOR -c black
+n -t 1.29138888889 -s 24 -c black
+n -t 1.29138888889 -s 26 -c black
+n -t 1.29138888889 -s 28 -c black
+n -t 1.29138888889 -s 29 -c black
+l -t 1.34444444444 -s 0 -d 1 -S COLOR -c black
+l -t 1.34444444444 -s 1 -d 3 -S COLOR -c blue
+l -t 1.34444444444 -s 3 -d 4 -S COLOR -c brown
+l -t 1.34444444444 -s 4 -d 5 -S COLOR -c blue
+l -t 1.34444444444 -s 5 -d 40 -S COLOR -c red
+l -t 1.34444444444 -s 5 -d 7 -S COLOR -c red
+l -t 1.34444444444 -s 5 -d 8 -S COLOR -c black
+l -t 1.34444444444 -s 40 -d 41 -S COLOR -c brown
+l -t 1.34444444444 -s 7 -d 10 -S COLOR -c orange
+l -t 1.34444444444 -s 8 -d 11 -S COLOR -c black
+l -t 1.34444444444 -s 41 -d 42 -S COLOR -c black
+l -t 1.34444444444 -s 10 -d 13 -S COLOR -c brown
+l -t 1.34444444444 -s 11 -d 14 -S COLOR -c blue
+l -t 1.34444444444 -s 42 -d 43 -S COLOR -c black
+l -t 1.34444444444 -s 13 -d 16 -S COLOR -c black
+l -t 1.34444444444 -s 14 -d 17 -S COLOR -c brown
+l -t 1.34444444444 -s 43 -d 44 -S COLOR -c black
+l -t 1.34444444444 -s 16 -d 19 -S COLOR -c red
+l -t 1.34444444444 -s 17 -d 20 -S COLOR -c blue
+l -t 1.34444444444 -s 44 -d 45 -S COLOR -c blue
+l -t 1.34444444444 -s 19 -d 22 -S COLOR -c blue
+l -t 1.34444444444 -s 20 -d 23 -S COLOR -c brown
+l -t 1.34444444444 -s 45 -d 46 -S COLOR -c orange
+l -t 1.34444444444 -s 22 -d 24 -S COLOR -c brown
+l -t 1.34444444444 -s 22 -d 30 -S COLOR -c brown
+l -t 1.34444444444 -s 23 -d 25 -S COLOR -c black
+l -t 1.34444444444 -s 24 -d 26 -S COLOR -c brown
+l -t 1.34444444444 -s 30 -d 31 -S COLOR -c blue
+l -t 1.34444444444 -s 25 -d 27 -S COLOR -c black
+l -t 1.34444444444 -s 26 -d 28 -S COLOR -c black
+l -t 1.34444444444 -s 31 -d 32 -S COLOR -c black
+l -t 1.34444444444 -s 32 -d 33 -S COLOR -c black
+n -t 1.34444444444 -s 2 -c grey
+n -t 1.34444444444 -s 6 -c grey
+n -t 1.34444444444 -s 9 -c grey
+n -t 1.34444444444 -s 12 -c grey
+n -t 1.34444444444 -s 15 -c grey
+n -t 1.34444444444 -s 18 -c grey
+n -t 1.34444444444 -s 21 -c grey
+n -t 1.34444444444 -s 29 -c grey
+n -t 1.34444444444 -s 40 -c black
+n -t 1.34444444444 -s 41 -c black
+n -t 1.34444444444 -s 42 -c black
+n -t 1.34444444444 -s 43 -c black
+n -t 1.34444444444 -s 44 -c black
+n -t 1.34444444444 -s 45 -c black
+n -t 1.34444444444 -s 46 -c black
+l -t 1.34444444444 -s 0 -d 2 -c grey
+l -t 1.34444444444 -s 5 -d 6 -c grey
+l -t 1.34444444444 -s 6 -d 9 -c grey
+l -t 1.34444444444 -s 9 -d 12 -c grey
+l -t 1.34444444444 -s 12 -d 15 -c grey
+l -t 1.34444444444 -s 15 -d 18 -c grey
+l -t 1.34444444444 -s 18 -d 21 -c grey
+l -t 1.34444444444 -s 28 -d 29 -c grey
+l -t 1.395 -s 0 -d 1 -S COLOR -c brown
+l -t 1.395 -s 1 -d 3 -S COLOR -c black
+l -t 1.395 -s 3 -d 4 -S COLOR -c black
+l -t 1.395 -s 4 -d 5 -S COLOR -c orange
+l -t 1.395 -s 5 -d 8 -S COLOR -c black
+l -t 1.395 -s 5 -d 6 -S COLOR -c black
+l -t 1.395 -s 8 -d 11 -S COLOR -c brown
+l -t 1.395 -s 6 -d 9 -S COLOR -c red
+l -t 1.395 -s 11 -d 14 -S COLOR -c black
+l -t 1.395 -s 9 -d 12 -S COLOR -c black
+l -t 1.395 -s 14 -d 17 -S COLOR -c black
+l -t 1.395 -s 12 -d 15 -S COLOR -c blue
+l -t 1.395 -s 17 -d 20 -S COLOR -c blue
+l -t 1.395 -s 15 -d 18 -S COLOR -c black
+l -t 1.395 -s 20 -d 23 -S COLOR -c black
+l -t 1.395 -s 18 -d 21 -S COLOR -c black
+l -t 1.395 -s 23 -d 25 -S COLOR -c black
+l -t 1.395 -s 25 -d 27 -S COLOR -c black
+n -t 1.395 -s 6 -c black
+n -t 1.395 -s 7 -c grey
+n -t 1.395 -s 9 -c black
+n -t 1.395 -s 10 -c grey
+n -t 1.395 -s 12 -c black
+n -t 1.395 -s 13 -c grey
+n -t 1.395 -s 15 -c black
+n -t 1.395 -s 16 -c grey
+n -t 1.395 -s 18 -c black
+n -t 1.395 -s 19 -c grey
+n -t 1.395 -s 21 -c black
+n -t 1.395 -s 22 -c grey
+n -t 1.395 -s 24 -c grey
+n -t 1.395 -s 26 -c grey
+n -t 1.395 -s 28 -c grey
+n -t 1.395 -s 30 -c grey
+n -t 1.395 -s 31 -c grey
+n -t 1.395 -s 32 -c grey
+n -t 1.395 -s 33 -c grey
+n -t 1.395 -s 40 -c grey
+n -t 1.395 -s 41 -c grey
+n -t 1.395 -s 42 -c grey
+n -t 1.395 -s 43 -c grey
+n -t 1.395 -s 44 -c grey
+n -t 1.395 -s 45 -c grey
+n -t 1.395 -s 46 -c grey
+l -t 1.395 -s 5 -d 7 -c grey
+l -t 1.395 -s 7 -d 10 -c grey
+l -t 1.395 -s 10 -d 13 -c grey
+l -t 1.395 -s 13 -d 16 -c grey
+l -t 1.395 -s 16 -d 19 -c grey
+l -t 1.395 -s 19 -d 22 -c grey
+l -t 1.395 -s 22 -d 24 -c grey
+l -t 1.395 -s 24 -d 26 -c grey
+l -t 1.395 -s 26 -d 28 -c grey
+l -t 1.395 -s 22 -d 30 -c grey
+l -t 1.395 -s 30 -d 31 -c grey
+l -t 1.395 -s 31 -d 32 -c grey
+l -t 1.395 -s 32 -d 33 -c grey
+l -t 1.395 -s 5 -d 40 -c grey
+l -t 1.395 -s 40 -d 41 -c grey
+l -t 1.395 -s 41 -d 42 -c grey
+l -t 1.395 -s 42 -d 43 -c grey
+l -t 1.395 -s 43 -d 44 -c grey
+l -t 1.395 -s 44 -d 45 -c grey
+l -t 1.395 -s 45 -d 46 -c grey
+n -t 1.45388888889 -s 0 -c grey
+n -t 1.45388888889 -s 1 -c grey
+n -t 1.45388888889 -s 3 -c grey
+n -t 1.45388888889 -s 4 -c grey
+n -t 1.45388888889 -s 5 -c grey
+n -t 1.45388888889 -s 6 -c grey
+n -t 1.45388888889 -s 8 -c grey
+n -t 1.45388888889 -s 9 -c grey
+n -t 1.45388888889 -s 11 -c grey
+n -t 1.45388888889 -s 12 -c grey
+n -t 1.45388888889 -s 14 -c grey
+n -t 1.45388888889 -s 15 -c grey
+n -t 1.45388888889 -s 17 -c grey
+n -t 1.45388888889 -s 18 -c grey
+n -t 1.45388888889 -s 20 -c grey
+n -t 1.45388888889 -s 21 -c grey
+n -t 1.45388888889 -s 23 -c grey
+n -t 1.45388888889 -s 25 -c grey
+n -t 1.45388888889 -s 27 -c grey
+n -t 1.45388888889 -s 35 -c black
+l -t 1.45388888889 -s 0 -d 1 -c grey
+l -t 1.45388888889 -s 1 -d 3 -c grey
+l -t 1.45388888889 -s 3 -d 4 -c grey
+l -t 1.45388888889 -s 4 -d 5 -c grey
+l -t 1.45388888889 -s 5 -d 6 -c grey
+l -t 1.45388888889 -s 5 -d 8 -c grey
+l -t 1.45388888889 -s 6 -d 9 -c grey
+l -t 1.45388888889 -s 8 -d 11 -c grey
+l -t 1.45388888889 -s 9 -d 12 -c grey
+l -t 1.45388888889 -s 11 -d 14 -c grey
+l -t 1.45388888889 -s 12 -d 15 -c grey
+l -t 1.45388888889 -s 14 -d 17 -c grey
+l -t 1.45388888889 -s 15 -d 18 -c grey
+l -t 1.45388888889 -s 17 -d 20 -c grey
+l -t 1.45388888889 -s 18 -d 21 -c grey
+l -t 1.45388888889 -s 20 -d 23 -c grey
+l -t 1.45388888889 -s 23 -d 25 -c grey
+l -t 1.45388888889 -s 25 -d 27 -c grey
+l -t 1.51083333333 -s 0 -d 1 -S COLOR -c black
+l -t 1.51083333333 -s 0 -d 2 -S COLOR -c black
+l -t 1.51083333333 -s 1 -d 3 -S COLOR -c black
+l -t 1.51083333333 -s 3 -d 4 -S COLOR -c black
+l -t 1.51083333333 -s 4 -d 5 -S COLOR -c black
+l -t 1.51083333333 -s 5 -d 7 -S COLOR -c black
+l -t 1.51083333333 -s 5 -d 8 -S COLOR -c black
+l -t 1.51083333333 -s 7 -d 10 -S COLOR -c brown
+l -t 1.51083333333 -s 8 -d 11 -S COLOR -c red
+l -t 1.51083333333 -s 10 -d 13 -S COLOR -c brown
+l -t 1.51083333333 -s 11 -d 14 -S COLOR -c black
+l -t 1.51083333333 -s 13 -d 16 -S COLOR -c black
+l -t 1.51083333333 -s 14 -d 17 -S COLOR -c blue
+l -t 1.51083333333 -s 16 -d 19 -S COLOR -c red
+l -t 1.51083333333 -s 17 -d 20 -S COLOR -c black
+l -t 1.51083333333 -s 19 -d 22 -S COLOR -c black
+l -t 1.51083333333 -s 20 -d 23 -S COLOR -c blue
+l -t 1.51083333333 -s 22 -d 24 -S COLOR -c black
+l -t 1.51083333333 -s 23 -d 25 -S COLOR -c black
+l -t 1.51083333333 -s 24 -d 26 -S COLOR -c black
+l -t 1.51083333333 -s 25 -d 27 -S COLOR -c black
+l -t 1.51083333333 -s 26 -d 28 -S COLOR -c blue
+l -t 1.51083333333 -s 28 -d 29 -S COLOR -c black
+n -t 1.51083333333 -s 0 -c black
+n -t 1.51083333333 -s 1 -c black
+n -t 1.51083333333 -s 2 -c black
+n -t 1.51083333333 -s 3 -c black
+n -t 1.51083333333 -s 4 -c black
+n -t 1.51083333333 -s 5 -c black
+n -t 1.51083333333 -s 7 -c black
+n -t 1.51083333333 -s 8 -c black
+n -t 1.51083333333 -s 10 -c black
+n -t 1.51083333333 -s 11 -c black
+n -t 1.51083333333 -s 13 -c black
+n -t 1.51083333333 -s 14 -c black
+n -t 1.51083333333 -s 16 -c black
+n -t 1.51083333333 -s 17 -c black
+n -t 1.51083333333 -s 19 -c black
+n -t 1.51083333333 -s 20 -c black
+n -t 1.51083333333 -s 22 -c black
+n -t 1.51083333333 -s 23 -c black
+n -t 1.51083333333 -s 24 -c black
+n -t 1.51083333333 -s 25 -c black
+n -t 1.51083333333 -s 26 -c black
+n -t 1.51083333333 -s 27 -c black
+n -t 1.51083333333 -s 28 -c black
+n -t 1.51083333333 -s 29 -c black
+n -t 1.51083333333 -s 35 -c grey
+l -t 1.54361111111 -s 0 -d 1 -S COLOR -c black
+l -t 1.54361111111 -s 0 -d 2 -S COLOR -c black
+l -t 1.54361111111 -s 1 -d 3 -S COLOR -c black
+l -t 1.54361111111 -s 3 -d 4 -S COLOR -c blue
+l -t 1.54361111111 -s 4 -d 5 -S COLOR -c black
+l -t 1.54361111111 -s 5 -d 7 -S COLOR -c brown
+l -t 1.54361111111 -s 5 -d 8 -S COLOR -c black
+l -t 1.54361111111 -s 7 -d 10 -S COLOR -c orange
+l -t 1.54361111111 -s 8 -d 11 -S COLOR -c red
+l -t 1.54361111111 -s 10 -d 13 -S COLOR -c brown
+l -t 1.54361111111 -s 11 -d 14 -S COLOR -c blue
+l -t 1.54361111111 -s 13 -d 16 -S COLOR -c blue
+l -t 1.54361111111 -s 14 -d 17 -S COLOR -c black
+l -t 1.54361111111 -s 16 -d 19 -S COLOR -c red
+l -t 1.54361111111 -s 17 -d 20 -S COLOR -c brown
+l -t 1.54361111111 -s 19 -d 22 -S COLOR -c brown
+l -t 1.54361111111 -s 20 -d 23 -S COLOR -c blue
+l -t 1.54361111111 -s 22 -d 24 -S COLOR -c brown
+l -t 1.54361111111 -s 23 -d 25 -S COLOR -c black
+l -t 1.54361111111 -s 24 -d 26 -S COLOR -c black
+l -t 1.54361111111 -s 25 -d 27 -S COLOR -c black
+l -t 1.54361111111 -s 26 -d 28 -S COLOR -c black
+l -t 1.54361111111 -s 28 -d 29 -S COLOR -c black
+l -t 1.59333333333 -s 0 -d 1 -S COLOR -c black
+l -t 1.59333333333 -s 0 -d 2 -S COLOR -c black
+l -t 1.59333333333 -s 1 -d 3 -S COLOR -c black
+l -t 1.59333333333 -s 3 -d 4 -S COLOR -c black
+l -t 1.59333333333 -s 4 -d 5 -S COLOR -c brown
+l -t 1.59333333333 -s 5 -d 7 -S COLOR -c blue
+l -t 1.59333333333 -s 7 -d 10 -S COLOR -c orange
+l -t 1.59333333333 -s 10 -d 13 -S COLOR -c brown
+l -t 1.59333333333 -s 13 -d 16 -S COLOR -c black
+l -t 1.59333333333 -s 16 -d 19 -S COLOR -c red
+l -t 1.59333333333 -s 19 -d 22 -S COLOR -c blue
+l -t 1.59333333333 -s 22 -d 30 -S COLOR -c black
+l -t 1.59333333333 -s 30 -d 31 -S COLOR -c brown
+l -t 1.59333333333 -s 31 -d 32 -S COLOR -c black
+l -t 1.59333333333 -s 32 -d 33 -S COLOR -c black
+n -t 1.59333333333 -s 8 -c grey
+n -t 1.59333333333 -s 11 -c grey
+n -t 1.59333333333 -s 14 -c grey
+n -t 1.59333333333 -s 17 -c grey
+n -t 1.59333333333 -s 20 -c grey
+n -t 1.59333333333 -s 23 -c grey
+n -t 1.59333333333 -s 24 -c grey
+n -t 1.59333333333 -s 25 -c grey
+n -t 1.59333333333 -s 26 -c grey
+n -t 1.59333333333 -s 27 -c grey
+n -t 1.59333333333 -s 28 -c grey
+n -t 1.59333333333 -s 29 -c grey
+n -t 1.59333333333 -s 30 -c black
+n -t 1.59333333333 -s 31 -c black
+n -t 1.59333333333 -s 32 -c black
+n -t 1.59333333333 -s 33 -c black
+l -t 1.59333333333 -s 5 -d 8 -c grey
+l -t 1.59333333333 -s 8 -d 11 -c grey
+l -t 1.59333333333 -s 11 -d 14 -c grey
+l -t 1.59333333333 -s 14 -d 17 -c grey
+l -t 1.59333333333 -s 17 -d 20 -c grey
+l -t 1.59333333333 -s 20 -d 23 -c grey
+l -t 1.59333333333 -s 22 -d 24 -c grey
+l -t 1.59333333333 -s 23 -d 25 -c grey
+l -t 1.59333333333 -s 24 -d 26 -c grey
+l -t 1.59333333333 -s 25 -d 27 -c grey
+l -t 1.59333333333 -s 26 -d 28 -c grey
+l -t 1.59333333333 -s 28 -d 29 -c grey
+l -t 1.63694444444 -s 0 -d 1 -S COLOR -c brown
+l -t 1.63694444444 -s 0 -d 2 -S COLOR -c black
+l -t 1.63694444444 -s 1 -d 3 -S COLOR -c brown
+l -t 1.63694444444 -s 3 -d 4 -S COLOR -c black
+l -t 1.63694444444 -s 4 -d 5 -S COLOR -c red
+l -t 1.63694444444 -s 5 -d 6 -S COLOR -c black
+l -t 1.63694444444 -s 5 -d 7 -S COLOR -c blue
+l -t 1.63694444444 -s 5 -d 8 -S COLOR -c blue
+l -t 1.63694444444 -s 5 -d 47 -S COLOR -c red
+l -t 1.63694444444 -s 6 -d 9 -S COLOR -c red
+l -t 1.63694444444 -s 7 -d 10 -S COLOR -c orange
+l -t 1.63694444444 -s 8 -d 11 -S COLOR -c brown
+l -t 1.63694444444 -s 47 -d 48 -S COLOR -c black
+l -t 1.63694444444 -s 9 -d 12 -S COLOR -c brown
+l -t 1.63694444444 -s 10 -d 13 -S COLOR -c brown
+l -t 1.63694444444 -s 11 -d 14 -S COLOR -c blue
+l -t 1.63694444444 -s 48 -d 49 -S COLOR -c black
+l -t 1.63694444444 -s 12 -d 15 -S COLOR -c black
+l -t 1.63694444444 -s 13 -d 16 -S COLOR -c brown
+l -t 1.63694444444 -s 14 -d 17 -S COLOR -c black
+l -t 1.63694444444 -s 49 -d 50 -S COLOR -c black
+l -t 1.63694444444 -s 15 -d 18 -S COLOR -c black
+l -t 1.63694444444 -s 16 -d 19 -S COLOR -c red
+l -t 1.63694444444 -s 17 -d 20 -S COLOR -c black
+l -t 1.63694444444 -s 18 -d 21 -S COLOR -c black
+l -t 1.63694444444 -s 19 -d 22 -S COLOR -c blue
+l -t 1.63694444444 -s 20 -d 23 -S COLOR -c black
+l -t 1.63694444444 -s 22 -d 30 -S COLOR -c black
+l -t 1.63694444444 -s 22 -d 24 -S COLOR -c black
+l -t 1.63694444444 -s 23 -d 25 -S COLOR -c brown
+l -t 1.63694444444 -s 30 -d 31 -S COLOR -c brown
+l -t 1.63694444444 -s 24 -d 26 -S COLOR -c brown
+l -t 1.63694444444 -s 25 -d 27 -S COLOR -c black
+l -t 1.63694444444 -s 31 -d 32 -S COLOR -c black
+l -t 1.63694444444 -s 26 -d 28 -S COLOR -c black
+l -t 1.63694444444 -s 32 -d 33 -S COLOR -c black
+l -t 1.63694444444 -s 28 -d 29 -S COLOR -c black
+n -t 1.63694444444 -s 6 -c black
+n -t 1.63694444444 -s 8 -c black
+n -t 1.63694444444 -s 9 -c black
+n -t 1.63694444444 -s 11 -c black
+n -t 1.63694444444 -s 12 -c black
+n -t 1.63694444444 -s 14 -c black
+n -t 1.63694444444 -s 15 -c black
+n -t 1.63694444444 -s 17 -c black
+n -t 1.63694444444 -s 18 -c black
+n -t 1.63694444444 -s 20 -c black
+n -t 1.63694444444 -s 21 -c black
+n -t 1.63694444444 -s 23 -c black
+n -t 1.63694444444 -s 24 -c black
+n -t 1.63694444444 -s 25 -c black
+n -t 1.63694444444 -s 26 -c black
+n -t 1.63694444444 -s 27 -c black
+n -t 1.63694444444 -s 28 -c black
+n -t 1.63694444444 -s 29 -c black
+n -t 1.63694444444 -s 47 -c black
+n -t 1.63694444444 -s 48 -c black
+n -t 1.63694444444 -s 49 -c black
+n -t 1.63694444444 -s 50 -c black
+l -t 1.68138888889 -s 0 -d 1 -S COLOR -c black
+l -t 1.68138888889 -s 1 -d 3 -S COLOR -c black
+l -t 1.68138888889 -s 3 -d 4 -S COLOR -c black
+l -t 1.68138888889 -s 4 -d 5 -S COLOR -c orange
+l -t 1.68138888889 -s 5 -d 47 -S COLOR -c red
+l -t 1.68138888889 -s 5 -d 7 -S COLOR -c black
+l -t 1.68138888889 -s 5 -d 8 -S COLOR -c blue
+l -t 1.68138888889 -s 47 -d 48 -S COLOR -c black
+l -t 1.68138888889 -s 7 -d 10 -S COLOR -c orange
+l -t 1.68138888889 -s 8 -d 11 -S COLOR -c black
+l -t 1.68138888889 -s 48 -d 49 -S COLOR -c black
+l -t 1.68138888889 -s 10 -d 13 -S COLOR -c black
+l -t 1.68138888889 -s 11 -d 14 -S COLOR -c black
+l -t 1.68138888889 -s 49 -d 50 -S COLOR -c black
+l -t 1.68138888889 -s 13 -d 16 -S COLOR -c black
+l -t 1.68138888889 -s 14 -d 17 -S COLOR -c black
+l -t 1.68138888889 -s 50 -d 51 -S COLOR -c black
+l -t 1.68138888889 -s 16 -d 19 -S COLOR -c red
+l -t 1.68138888889 -s 17 -d 20 -S COLOR -c black
+l -t 1.68138888889 -s 19 -d 22 -S COLOR -c brown
+l -t 1.68138888889 -s 20 -d 23 -S COLOR -c black
+l -t 1.68138888889 -s 22 -d 24 -S COLOR -c black
+l -t 1.68138888889 -s 23 -d 25 -S COLOR -c black
+l -t 1.68138888889 -s 24 -d 26 -S COLOR -c black
+l -t 1.68138888889 -s 25 -d 27 -S COLOR -c black
+l -t 1.68138888889 -s 26 -d 28 -S COLOR -c black
+l -t 1.68138888889 -s 28 -d 29 -S COLOR -c black
+n -t 1.68138888889 -s 2 -c grey
+n -t 1.68138888889 -s 6 -c grey
+n -t 1.68138888889 -s 9 -c grey
+n -t 1.68138888889 -s 12 -c grey
+n -t 1.68138888889 -s 15 -c grey
+n -t 1.68138888889 -s 18 -c grey
+n -t 1.68138888889 -s 21 -c grey
+n -t 1.68138888889 -s 30 -c grey
+n -t 1.68138888889 -s 31 -c grey
+n -t 1.68138888889 -s 32 -c grey
+n -t 1.68138888889 -s 33 -c grey
+n -t 1.68138888889 -s 51 -c black
+l -t 1.68138888889 -s 0 -d 2 -c grey
+l -t 1.68138888889 -s 5 -d 6 -c grey
+l -t 1.68138888889 -s 6 -d 9 -c grey
+l -t 1.68138888889 -s 9 -d 12 -c grey
+l -t 1.68138888889 -s 12 -d 15 -c grey
+l -t 1.68138888889 -s 15 -d 18 -c grey
+l -t 1.68138888889 -s 18 -d 21 -c grey
+l -t 1.68138888889 -s 22 -d 30 -c grey
+l -t 1.68138888889 -s 30 -d 31 -c grey
+l -t 1.68138888889 -s 31 -d 32 -c grey
+l -t 1.68138888889 -s 32 -d 33 -c grey
+l -t 1.72638888889 -s 0 -d 1 -S COLOR -c black
+l -t 1.72638888889 -s 0 -d 2 -S COLOR -c black
+l -t 1.72638888889 -s 1 -d 3 -S COLOR -c black
+l -t 1.72638888889 -s 3 -d 4 -S COLOR -c blue
+l -t 1.72638888889 -s 4 -d 5 -S COLOR -c orange
+l -t 1.72638888889 -s 5 -d 6 -S COLOR -c blue
+l -t 1.72638888889 -s 5 -d 7 -S COLOR -c brown
+l -t 1.72638888889 -s 5 -d 8 -S COLOR -c black
+l -t 1.72638888889 -s 6 -d 9 -S COLOR -c red
+l -t 1.72638888889 -s 7 -d 10 -S COLOR -c brown
+l -t 1.72638888889 -s 8 -d 11 -S COLOR -c brown
+l -t 1.72638888889 -s 9 -d 12 -S COLOR -c black
+l -t 1.72638888889 -s 10 -d 13 -S COLOR -c orange
+l -t 1.72638888889 -s 11 -d 14 -S COLOR -c blue
+l -t 1.72638888889 -s 12 -d 15 -S COLOR -c black
+l -t 1.72638888889 -s 13 -d 16 -S COLOR -c blue
+l -t 1.72638888889 -s 14 -d 17 -S COLOR -c brown
+l -t 1.72638888889 -s 15 -d 18 -S COLOR -c black
+l -t 1.72638888889 -s 16 -d 19 -S COLOR -c orange
+l -t 1.72638888889 -s 17 -d 20 -S COLOR -c blue
+l -t 1.72638888889 -s 18 -d 21 -S COLOR -c black
+l -t 1.72638888889 -s 19 -d 22 -S COLOR -c black
+l -t 1.72638888889 -s 20 -d 23 -S COLOR -c brown
+l -t 1.72638888889 -s 22 -d 24 -S COLOR -c black
+l -t 1.72638888889 -s 22 -d 30 -S COLOR -c black
+l -t 1.72638888889 -s 23 -d 25 -S COLOR -c black
+l -t 1.72638888889 -s 24 -d 26 -S COLOR -c brown
+l -t 1.72638888889 -s 30 -d 31 -S COLOR -c blue
+l -t 1.72638888889 -s 25 -d 27 -S COLOR -c black
+l -t 1.72638888889 -s 26 -d 28 -S COLOR -c black
+l -t 1.72638888889 -s 31 -d 32 -S COLOR -c black
+l -t 1.72638888889 -s 28 -d 29 -S COLOR -c black
+l -t 1.72638888889 -s 32 -d 33 -S COLOR -c black
+n -t 1.72638888889 -s 2 -c black
+n -t 1.72638888889 -s 6 -c black
+n -t 1.72638888889 -s 9 -c black
+n -t 1.72638888889 -s 12 -c black
+n -t 1.72638888889 -s 15 -c black
+n -t 1.72638888889 -s 18 -c black
+n -t 1.72638888889 -s 21 -c black
+n -t 1.72638888889 -s 30 -c black
+n -t 1.72638888889 -s 31 -c black
+n -t 1.72638888889 -s 32 -c black
+n -t 1.72638888889 -s 33 -c black
+n -t 1.72638888889 -s 47 -c grey
+n -t 1.72638888889 -s 48 -c grey
+n -t 1.72638888889 -s 49 -c grey
+n -t 1.72638888889 -s 50 -c grey
+n -t 1.72638888889 -s 51 -c grey
+l -t 1.72638888889 -s 5 -d 47 -c grey
+l -t 1.72638888889 -s 47 -d 48 -c grey
+l -t 1.72638888889 -s 48 -d 49 -c grey
+l -t 1.72638888889 -s 49 -d 50 -c grey
+l -t 1.72638888889 -s 50 -d 51 -c grey
+l -t 1.76416666667 -s 0 -d 1 -S COLOR -c black
+l -t 1.76416666667 -s 0 -d 2 -S COLOR -c black
+l -t 1.76416666667 -s 1 -d 3 -S COLOR -c black
+l -t 1.76416666667 -s 3 -d 4 -S COLOR -c black
+l -t 1.76416666667 -s 4 -d 5 -S COLOR -c brown
+l -t 1.76416666667 -s 5 -d 6 -S COLOR -c black
+l -t 1.76416666667 -s 5 -d 7 -S COLOR -c black
+l -t 1.76416666667 -s 5 -d 8 -S COLOR -c black
+l -t 1.76416666667 -s 6 -d 9 -S COLOR -c red
+l -t 1.76416666667 -s 7 -d 10 -S COLOR -c brown
+l -t 1.76416666667 -s 8 -d 11 -S COLOR -c blue
+l -t 1.76416666667 -s 9 -d 12 -S COLOR -c black
+l -t 1.76416666667 -s 10 -d 13 -S COLOR -c black
+l -t 1.76416666667 -s 11 -d 14 -S COLOR -c black
+l -t 1.76416666667 -s 12 -d 15 -S COLOR -c black
+l -t 1.76416666667 -s 13 -d 16 -S COLOR -c black
+l -t 1.76416666667 -s 14 -d 17 -S COLOR -c black
+l -t 1.76416666667 -s 15 -d 18 -S COLOR -c black
+l -t 1.76416666667 -s 16 -d 19 -S COLOR -c red
+l -t 1.76416666667 -s 17 -d 20 -S COLOR -c brown
+l -t 1.76416666667 -s 18 -d 21 -S COLOR -c black
+l -t 1.76416666667 -s 19 -d 22 -S COLOR -c blue
+l -t 1.76416666667 -s 20 -d 23 -S COLOR -c blue
+l -t 1.76416666667 -s 22 -d 24 -S COLOR -c brown
+l -t 1.76416666667 -s 22 -d 30 -S COLOR -c black
+l -t 1.76416666667 -s 23 -d 25 -S COLOR -c black
+l -t 1.76416666667 -s 24 -d 26 -S COLOR -c black
+l -t 1.76416666667 -s 30 -d 31 -S COLOR -c brown
+l -t 1.76416666667 -s 25 -d 27 -S COLOR -c black
+l -t 1.76416666667 -s 26 -d 28 -S COLOR -c black
+l -t 1.76416666667 -s 31 -d 32 -S COLOR -c black
+l -t 1.76416666667 -s 28 -d 29 -S COLOR -c black
+l -t 1.76416666667 -s 32 -d 33 -S COLOR -c black
+l -t 1.81416666667 -s 0 -d 1 -S COLOR -c black
+l -t 1.81416666667 -s 0 -d 2 -S COLOR -c black
+l -t 1.81416666667 -s 1 -d 3 -S COLOR -c brown
+l -t 1.81416666667 -s 3 -d 4 -S COLOR -c black
+l -t 1.81416666667 -s 4 -d 5 -S COLOR -c orange
+l -t 1.81416666667 -s 5 -d 6 -S COLOR -c brown
+l -t 1.81416666667 -s 5 -d 7 -S COLOR -c black
+l -t 1.81416666667 -s 5 -d 8 -S COLOR -c brown
+l -t 1.81416666667 -s 6 -d 9 -S COLOR -c red
+l -t 1.81416666667 -s 7 -d 10 -S COLOR -c blue
+l -t 1.81416666667 -s 8 -d 52 -S COLOR -c black
+l -t 1.81416666667 -s 8 -d 11 -S COLOR -c brown
+l -t 1.81416666667 -s 9 -d 12 -S COLOR -c black
+l -t 1.81416666667 -s 10 -d 13 -S COLOR -c orange
+l -t 1.81416666667 -s 52 -d 53 -S COLOR -c blue
+l -t 1.81416666667 -s 11 -d 14 -S COLOR -c blue
+l -t 1.81416666667 -s 12 -d 15 -S COLOR -c blue
+l -t 1.81416666667 -s 13 -d 16 -S COLOR -c brown
+l -t 1.81416666667 -s 53 -d 54 -S COLOR -c black
+l -t 1.81416666667 -s 14 -d 34 -S COLOR -c black
+l -t 1.81416666667 -s 14 -d 17 -S COLOR -c black
+l -t 1.81416666667 -s 15 -d 18 -S COLOR -c black
+l -t 1.81416666667 -s 16 -d 19 -S COLOR -c orange
+l -t 1.81416666667 -s 17 -d 20 -S COLOR -c brown
+l -t 1.81416666667 -s 18 -d 21 -S COLOR -c black
+l -t 1.81416666667 -s 19 -d 22 -S COLOR -c black
+l -t 1.81416666667 -s 20 -d 23 -S COLOR -c blue
+l -t 1.81416666667 -s 22 -d 24 -S COLOR -c black
+l -t 1.81416666667 -s 22 -d 30 -S COLOR -c black
+l -t 1.81416666667 -s 23 -d 25 -S COLOR -c black
+l -t 1.81416666667 -s 24 -d 26 -S COLOR -c black
+l -t 1.81416666667 -s 30 -d 31 -S COLOR -c black
+l -t 1.81416666667 -s 25 -d 27 -S COLOR -c black
+l -t 1.81416666667 -s 26 -d 28 -S COLOR -c black
+l -t 1.81416666667 -s 31 -d 32 -S COLOR -c black
+l -t 1.81416666667 -s 28 -d 29 -S COLOR -c black
+l -t 1.81416666667 -s 32 -d 33 -S COLOR -c black
+n -t 1.81416666667 -s 34 -c black
+n -t 1.81416666667 -s 52 -c black
+n -t 1.81416666667 -s 53 -c black
+n -t 1.81416666667 -s 54 -c black
+l -t 1.85333333333 -s 0 -d 1 -S COLOR -c brown
+l -t 1.85333333333 -s 0 -d 2 -S COLOR -c black
+l -t 1.85333333333 -s 1 -d 3 -S COLOR -c blue
+l -t 1.85333333333 -s 3 -d 4 -S COLOR -c brown
+l -t 1.85333333333 -s 4 -d 5 -S COLOR -c brown
+l -t 1.85333333333 -s 5 -d 6 -S COLOR -c blue
+l -t 1.85333333333 -s 5 -d 7 -S COLOR -c black
+l -t 1.85333333333 -s 5 -d 8 -S COLOR -c blue
+l -t 1.85333333333 -s 5 -d 47 -S COLOR -c red
+l -t 1.85333333333 -s 6 -d 9 -S COLOR -c red
+l -t 1.85333333333 -s 7 -d 10 -S COLOR -c red
+l -t 1.85333333333 -s 8 -d 52 -S COLOR -c brown
+l -t 1.85333333333 -s 8 -d 11 -S COLOR -c orange
+l -t 1.85333333333 -s 47 -d 48 -S COLOR -c brown
+l -t 1.85333333333 -s 9 -d 12 -S COLOR -c black
+l -t 1.85333333333 -s 10 -d 13 -S COLOR -c brown
+l -t 1.85333333333 -s 52 -d 53 -S COLOR -c blue
+l -t 1.85333333333 -s 11 -d 14 -S COLOR -c blue
+l -t 1.85333333333 -s 48 -d 49 -S COLOR -c black
+l -t 1.85333333333 -s 12 -d 15 -S COLOR -c black
+l -t 1.85333333333 -s 13 -d 16 -S COLOR -c blue
+l -t 1.85333333333 -s 53 -d 54 -S COLOR -c black
+l -t 1.85333333333 -s 14 -d 34 -S COLOR -c black
+l -t 1.85333333333 -s 14 -d 17 -S COLOR -c black
+l -t 1.85333333333 -s 49 -d 50 -S COLOR -c black
+l -t 1.85333333333 -s 15 -d 18 -S COLOR -c black
+l -t 1.85333333333 -s 16 -d 19 -S COLOR -c blue
+l -t 1.85333333333 -s 17 -d 20 -S COLOR -c brown
+l -t 1.85333333333 -s 18 -d 21 -S COLOR -c black
+l -t 1.85333333333 -s 19 -d 22 -S COLOR -c black
+l -t 1.85333333333 -s 20 -d 23 -S COLOR -c black
+l -t 1.85333333333 -s 22 -d 30 -S COLOR -c black
+l -t 1.85333333333 -s 22 -d 24 -S COLOR -c black
+l -t 1.85333333333 -s 23 -d 25 -S COLOR -c black
+l -t 1.85333333333 -s 30 -d 31 -S COLOR -c black
+l -t 1.85333333333 -s 24 -d 26 -S COLOR -c brown
+l -t 1.85333333333 -s 25 -d 27 -S COLOR -c black
+l -t 1.85333333333 -s 31 -d 32 -S COLOR -c blue
+l -t 1.85333333333 -s 26 -d 28 -S COLOR -c black
+l -t 1.85333333333 -s 32 -d 33 -S COLOR -c black
+l -t 1.85333333333 -s 28 -d 29 -S COLOR -c black
+n -t 1.85333333333 -s 47 -c black
+n -t 1.85333333333 -s 48 -c black
+n -t 1.85333333333 -s 49 -c black
+n -t 1.85333333333 -s 50 -c black
+l -t 1.91027777778 -s 0 -d 1 -S COLOR -c black
+l -t 1.91027777778 -s 0 -d 2 -S COLOR -c black
+l -t 1.91027777778 -s 1 -d 3 -S COLOR -c brown
+l -t 1.91027777778 -s 3 -d 4 -S COLOR -c black
+l -t 1.91027777778 -s 4 -d 5 -S COLOR -c red
+l -t 1.91027777778 -s 5 -d 6 -S COLOR -c blue
+l -t 1.91027777778 -s 5 -d 7 -S COLOR -c red
+l -t 1.91027777778 -s 5 -d 8 -S COLOR -c black
+l -t 1.91027777778 -s 6 -d 9 -S COLOR -c red
+l -t 1.91027777778 -s 7 -d 10 -S COLOR -c blue
+l -t 1.91027777778 -s 8 -d 11 -S COLOR -c black
+l -t 1.91027777778 -s 9 -d 12 -S COLOR -c black
+l -t 1.91027777778 -s 10 -d 13 -S COLOR -c orange
+l -t 1.91027777778 -s 11 -d 14 -S COLOR -c black
+l -t 1.91027777778 -s 12 -d 15 -S COLOR -c black
+l -t 1.91027777778 -s 13 -d 16 -S COLOR -c blue
+l -t 1.91027777778 -s 14 -d 34 -S COLOR -c black
+l -t 1.91027777778 -s 14 -d 17 -S COLOR -c blue
+l -t 1.91027777778 -s 15 -d 18 -S COLOR -c blue
+l -t 1.91027777778 -s 16 -d 19 -S COLOR -c red
+l -t 1.91027777778 -s 17 -d 20 -S COLOR -c brown
+l -t 1.91027777778 -s 18 -d 21 -S COLOR -c black
+l -t 1.91027777778 -s 19 -d 22 -S COLOR -c brown
+l -t 1.91027777778 -s 20 -d 23 -S COLOR -c blue
+l -t 1.91027777778 -s 22 -d 24 -S COLOR -c black
+l -t 1.91027777778 -s 22 -d 30 -S COLOR -c black
+l -t 1.91027777778 -s 23 -d 25 -S COLOR -c black
+l -t 1.91027777778 -s 24 -d 26 -S COLOR -c black
+l -t 1.91027777778 -s 30 -d 31 -S COLOR -c black
+l -t 1.91027777778 -s 25 -d 27 -S COLOR -c black
+l -t 1.91027777778 -s 26 -d 28 -S COLOR -c black
+l -t 1.91027777778 -s 31 -d 32 -S COLOR -c blue
+l -t 1.91027777778 -s 28 -d 29 -S COLOR -c black
+l -t 1.91027777778 -s 32 -d 33 -S COLOR -c black
+n -t 1.91027777778 -s 47 -c grey
+n -t 1.91027777778 -s 48 -c grey
+n -t 1.91027777778 -s 49 -c grey
+n -t 1.91027777778 -s 50 -c grey
+n -t 1.91027777778 -s 52 -c grey
+n -t 1.91027777778 -s 53 -c grey
+n -t 1.91027777778 -s 54 -c grey
+l -t 1.91027777778 -s 5 -d 47 -c grey
+l -t 1.91027777778 -s 47 -d 48 -c grey
+l -t 1.91027777778 -s 48 -d 49 -c grey
+l -t 1.91027777778 -s 49 -d 50 -c grey
+l -t 1.91027777778 -s 8 -d 52 -c grey
+l -t 1.91027777778 -s 52 -d 53 -c grey
+l -t 1.91027777778 -s 53 -d 54 -c grey
+l -t 1.96861111111 -s 0 -d 1 -S COLOR -c black
+l -t 1.96861111111 -s 1 -d 3 -S COLOR -c black
+l -t 1.96861111111 -s 3 -d 4 -S COLOR -c black
+l -t 1.96861111111 -s 4 -d 5 -S COLOR -c black
+l -t 1.96861111111 -s 5 -d 47 -S COLOR -c red
+l -t 1.96861111111 -s 5 -d 8 -S COLOR -c blue
+l -t 1.96861111111 -s 5 -d 6 -S COLOR -c black
+l -t 1.96861111111 -s 47 -d 48 -S COLOR -c black
+l -t 1.96861111111 -s 8 -d 11 -S COLOR -c black
+l -t 1.96861111111 -s 6 -d 9 -S COLOR -c red
+l -t 1.96861111111 -s 48 -d 49 -S COLOR -c red
+l -t 1.96861111111 -s 11 -d 14 -S COLOR -c black
+l -t 1.96861111111 -s 9 -d 12 -S COLOR -c black
+l -t 1.96861111111 -s 49 -d 50 -S COLOR -c black
+l -t 1.96861111111 -s 14 -d 17 -S COLOR -c black
+l -t 1.96861111111 -s 12 -d 15 -S COLOR -c black
+l -t 1.96861111111 -s 17 -d 20 -S COLOR -c black
+l -t 1.96861111111 -s 15 -d 18 -S COLOR -c blue
+l -t 1.96861111111 -s 20 -d 23 -S COLOR -c black
+l -t 1.96861111111 -s 18 -d 21 -S COLOR -c black
+l -t 1.96861111111 -s 23 -d 25 -S COLOR -c black
+l -t 1.96861111111 -s 25 -d 27 -S COLOR -c black
+n -t 1.96861111111 -s 2 -c grey
+n -t 1.96861111111 -s 7 -c grey
+n -t 1.96861111111 -s 10 -c grey
+n -t 1.96861111111 -s 13 -c grey
+n -t 1.96861111111 -s 16 -c grey
+n -t 1.96861111111 -s 19 -c grey
+n -t 1.96861111111 -s 22 -c grey
+n -t 1.96861111111 -s 24 -c grey
+n -t 1.96861111111 -s 26 -c grey
+n -t 1.96861111111 -s 28 -c grey
+n -t 1.96861111111 -s 29 -c grey
+n -t 1.96861111111 -s 30 -c grey
+n -t 1.96861111111 -s 31 -c grey
+n -t 1.96861111111 -s 32 -c grey
+n -t 1.96861111111 -s 33 -c grey
+n -t 1.96861111111 -s 34 -c grey
+n -t 1.96861111111 -s 47 -c black
+n -t 1.96861111111 -s 48 -c black
+n -t 1.96861111111 -s 49 -c black
+n -t 1.96861111111 -s 50 -c black
+l -t 1.96861111111 -s 0 -d 2 -c grey
+l -t 1.96861111111 -s 5 -d 7 -c grey
+l -t 1.96861111111 -s 7 -d 10 -c grey
+l -t 1.96861111111 -s 10 -d 13 -c grey
+l -t 1.96861111111 -s 13 -d 16 -c grey
+l -t 1.96861111111 -s 16 -d 19 -c grey
+l -t 1.96861111111 -s 19 -d 22 -c grey
+l -t 1.96861111111 -s 22 -d 24 -c grey
+l -t 1.96861111111 -s 24 -d 26 -c grey
+l -t 1.96861111111 -s 26 -d 28 -c grey
+l -t 1.96861111111 -s 28 -d 29 -c grey
+l -t 1.96861111111 -s 22 -d 30 -c grey
+l -t 1.96861111111 -s 30 -d 31 -c grey
+l -t 1.96861111111 -s 31 -d 32 -c grey
+l -t 1.96861111111 -s 32 -d 33 -c grey
+l -t 1.96861111111 -s 14 -d 34 -c grey
+l -t 2.04277777778 -s 0 -d 1 -S COLOR -c brown
+l -t 2.04277777778 -s 0 -d 2 -S COLOR -c black
+l -t 2.04277777778 -s 1 -d 3 -S COLOR -c black
+l -t 2.04277777778 -s 3 -d 4 -S COLOR -c black
+l -t 2.04277777778 -s 4 -d 5 -S COLOR -c blue
+l -t 2.04277777778 -s 5 -d 6 -S COLOR -c black
+l -t 2.04277777778 -s 5 -d 7 -S COLOR -c black
+l -t 2.04277777778 -s 5 -d 8 -S COLOR -c brown
+l -t 2.04277777778 -s 6 -d 9 -S COLOR -c red
+l -t 2.04277777778 -s 7 -d 10 -S COLOR -c brown
+l -t 2.04277777778 -s 8 -d 11 -S COLOR -c black
+l -t 2.04277777778 -s 9 -d 12 -S COLOR -c black
+l -t 2.04277777778 -s 10 -d 13 -S COLOR -c black
+l -t 2.04277777778 -s 11 -d 14 -S COLOR -c black
+l -t 2.04277777778 -s 12 -d 15 -S COLOR -c black
+l -t 2.04277777778 -s 13 -d 16 -S COLOR -c black
+l -t 2.04277777778 -s 14 -d 34 -S COLOR -c black
+l -t 2.04277777778 -s 14 -d 17 -S COLOR -c black
+l -t 2.04277777778 -s 15 -d 18 -S COLOR -c black
+l -t 2.04277777778 -s 16 -d 19 -S COLOR -c red
+l -t 2.04277777778 -s 17 -d 20 -S COLOR -c brown
+l -t 2.04277777778 -s 18 -d 21 -S COLOR -c black
+l -t 2.04277777778 -s 19 -d 22 -S COLOR -c brown
+l -t 2.04277777778 -s 20 -d 23 -S COLOR -c blue
+l -t 2.04277777778 -s 22 -d 24 -S COLOR -c black
+l -t 2.04277777778 -s 23 -d 25 -S COLOR -c black
+l -t 2.04277777778 -s 24 -d 26 -S COLOR -c black
+l -t 2.04277777778 -s 25 -d 27 -S COLOR -c black
+l -t 2.04277777778 -s 26 -d 28 -S COLOR -c black
+n -t 2.04277777778 -s 2 -c black
+n -t 2.04277777778 -s 7 -c black
+n -t 2.04277777778 -s 10 -c black
+n -t 2.04277777778 -s 13 -c black
+n -t 2.04277777778 -s 16 -c black
+n -t 2.04277777778 -s 19 -c black
+n -t 2.04277777778 -s 22 -c black
+n -t 2.04277777778 -s 24 -c black
+n -t 2.04277777778 -s 26 -c black
+n -t 2.04277777778 -s 28 -c black
+n -t 2.04277777778 -s 34 -c black
+n -t 2.04277777778 -s 47 -c grey
+n -t 2.04277777778 -s 48 -c grey
+n -t 2.04277777778 -s 49 -c grey
+n -t 2.04277777778 -s 50 -c grey
+l -t 2.04277777778 -s 5 -d 47 -c grey
+l -t 2.04277777778 -s 47 -d 48 -c grey
+l -t 2.04277777778 -s 48 -d 49 -c grey
+l -t 2.04277777778 -s 49 -d 50 -c grey
+l -t 2.15166666667 -s 0 -d 1 -S COLOR -c black
+l -t 2.15166666667 -s 1 -d 3 -S COLOR -c black
+l -t 2.15166666667 -s 3 -d 4 -S COLOR -c brown
+l -t 2.15166666667 -s 4 -d 5 -S COLOR -c blue
+l -t 2.15166666667 -s 5 -d 6 -S COLOR -c brown
+l -t 2.15166666667 -s 5 -d 7 -S COLOR -c blue
+l -t 2.15166666667 -s 5 -d 8 -S COLOR -c blue
+l -t 2.15166666667 -s 5 -d 47 -S COLOR -c red
+l -t 2.15166666667 -s 6 -d 9 -S COLOR -c red
+l -t 2.15166666667 -s 7 -d 10 -S COLOR -c red
+l -t 2.15166666667 -s 8 -d 11 -S COLOR -c brown
+l -t 2.15166666667 -s 47 -d 48 -S COLOR -c black
+l -t 2.15166666667 -s 9 -d 12 -S COLOR -c black
+l -t 2.15166666667 -s 10 -d 13 -S COLOR -c brown
+l -t 2.15166666667 -s 11 -d 14 -S COLOR -c brown
+l -t 2.15166666667 -s 48 -d 49 -S COLOR -c black
+l -t 2.15166666667 -s 12 -d 15 -S COLOR -c black
+l -t 2.15166666667 -s 13 -d 16 -S COLOR -c black
+l -t 2.15166666667 -s 14 -d 34 -S COLOR -c black
+l -t 2.15166666667 -s 14 -d 17 -S COLOR -c black
+l -t 2.15166666667 -s 49 -d 50 -S COLOR -c black
+l -t 2.15166666667 -s 15 -d 18 -S COLOR -c black
+l -t 2.15166666667 -s 16 -d 19 -S COLOR -c red
+l -t 2.15166666667 -s 17 -d 20 -S COLOR -c blue
+l -t 2.15166666667 -s 18 -d 21 -S COLOR -c black
+l -t 2.15166666667 -s 19 -d 22 -S COLOR -c blue
+l -t 2.15166666667 -s 20 -d 23 -S COLOR -c brown
+l -t 2.15166666667 -s 22 -d 24 -S COLOR -c black
+l -t 2.15166666667 -s 22 -d 30 -S COLOR -c black
+l -t 2.15166666667 -s 23 -d 25 -S COLOR -c black
+l -t 2.15166666667 -s 24 -d 26 -S COLOR -c brown
+l -t 2.15166666667 -s 30 -d 31 -S COLOR -c brown
+l -t 2.15166666667 -s 25 -d 27 -S COLOR -c black
+l -t 2.15166666667 -s 26 -d 28 -S COLOR -c black
+l -t 2.15166666667 -s 31 -d 32 -S COLOR -c blue
+l -t 2.15166666667 -s 32 -d 33 -S COLOR -c black
+n -t 2.15166666667 -s 2 -c grey
+n -t 2.15166666667 -s 30 -c black
+n -t 2.15166666667 -s 31 -c black
+n -t 2.15166666667 -s 32 -c black
+n -t 2.15166666667 -s 33 -c black
+n -t 2.15166666667 -s 47 -c black
+n -t 2.15166666667 -s 48 -c black
+n -t 2.15166666667 -s 49 -c black
+n -t 2.15166666667 -s 50 -c black
+l -t 2.15166666667 -s 0 -d 2 -c grey
+l -t 2.24472222222 -s 0 -d 1 -S COLOR -c black
+l -t 2.24472222222 -s 0 -d 2 -S COLOR -c black
+l -t 2.24472222222 -s 1 -d 3 -S COLOR -c black
+l -t 2.24472222222 -s 3 -d 4 -S COLOR -c black
+l -t 2.24472222222 -s 4 -d 5 -S COLOR -c orange
+l -t 2.24472222222 -s 5 -d 47 -S COLOR -c red
+l -t 2.24472222222 -s 5 -d 7 -S COLOR -c brown
+l -t 2.24472222222 -s 5 -d 8 -S COLOR -c black
+l -t 2.24472222222 -s 47 -d 48 -S COLOR -c brown
+l -t 2.24472222222 -s 7 -d 10 -S COLOR -c blue
+l -t 2.24472222222 -s 8 -d 11 -S COLOR -c blue
+l -t 2.24472222222 -s 48 -d 49 -S COLOR -c black
+l -t 2.24472222222 -s 10 -d 13 -S COLOR -c orange
+l -t 2.24472222222 -s 11 -d 14 -S COLOR -c orange
+l -t 2.24472222222 -s 49 -d 50 -S COLOR -c black
+l -t 2.24472222222 -s 13 -d 16 -S COLOR -c black
+l -t 2.24472222222 -s 14 -d 55 -S COLOR -c black
+l -t 2.24472222222 -s 14 -d 17 -S COLOR -c black
+l -t 2.24472222222 -s 14 -d 34 -S COLOR -c black
+l -t 2.24472222222 -s 50 -d 51 -S COLOR -c black
+l -t 2.24472222222 -s 16 -d 19 -S COLOR -c red
+l -t 2.24472222222 -s 17 -d 20 -S COLOR -c black
+l -t 2.24472222222 -s 19 -d 22 -S COLOR -c black
+l -t 2.24472222222 -s 20 -d 23 -S COLOR -c black
+l -t 2.24472222222 -s 22 -d 30 -S COLOR -c black
+l -t 2.24472222222 -s 22 -d 24 -S COLOR -c black
+l -t 2.24472222222 -s 23 -d 25 -S COLOR -c blue
+l -t 2.24472222222 -s 30 -d 31 -S COLOR -c brown
+l -t 2.24472222222 -s 24 -d 26 -S COLOR -c brown
+l -t 2.24472222222 -s 25 -d 27 -S COLOR -c black
+l -t 2.24472222222 -s 31 -d 32 -S COLOR -c black
+l -t 2.24472222222 -s 26 -d 28 -S COLOR -c black
+l -t 2.24472222222 -s 32 -d 33 -S COLOR -c black
+l -t 2.24472222222 -s 28 -d 29 -S COLOR -c black
+n -t 2.24472222222 -s 2 -c black
+n -t 2.24472222222 -s 6 -c grey
+n -t 2.24472222222 -s 9 -c grey
+n -t 2.24472222222 -s 12 -c grey
+n -t 2.24472222222 -s 15 -c grey
+n -t 2.24472222222 -s 18 -c grey
+n -t 2.24472222222 -s 21 -c grey
+n -t 2.24472222222 -s 29 -c black
+n -t 2.24472222222 -s 51 -c black
+n -t 2.24472222222 -s 55 -c black
+l -t 2.24472222222 -s 5 -d 6 -c grey
+l -t 2.24472222222 -s 6 -d 9 -c grey
+l -t 2.24472222222 -s 9 -d 12 -c grey
+l -t 2.24472222222 -s 12 -d 15 -c grey
+l -t 2.24472222222 -s 15 -d 18 -c grey
+l -t 2.24472222222 -s 18 -d 21 -c grey
+l -t 2.30055555556 -s 0 -d 1 -S COLOR -c black
+l -t 2.30055555556 -s 0 -d 2 -S COLOR -c black
+l -t 2.30055555556 -s 1 -d 3 -S COLOR -c brown
+l -t 2.30055555556 -s 3 -d 4 -S COLOR -c black
+l -t 2.30055555556 -s 4 -d 5 -S COLOR -c brown
+l -t 2.30055555556 -s 5 -d 6 -S COLOR -c blue
+l -t 2.30055555556 -s 5 -d 7 -S COLOR -c brown
+l -t 2.30055555556 -s 5 -d 8 -S COLOR -c orange
+l -t 2.30055555556 -s 5 -d 56 -S COLOR -c blue
+l -t 2.30055555556 -s 6 -d 9 -S COLOR -c red
+l -t 2.30055555556 -s 7 -d 10 -S COLOR -c red
+l -t 2.30055555556 -s 8 -d 11 -S COLOR -c blue
+l -t 2.30055555556 -s 56 -d 57 -S COLOR -c orange
+l -t 2.30055555556 -s 9 -d 12 -S COLOR -c black
+l -t 2.30055555556 -s 10 -d 13 -S COLOR -c orange
+l -t 2.30055555556 -s 11 -d 14 -S COLOR -c blue
+l -t 2.30055555556 -s 57 -d 58 -S COLOR -c blue
+l -t 2.30055555556 -s 12 -d 15 -S COLOR -c black
+l -t 2.30055555556 -s 13 -d 16 -S COLOR -c brown
+l -t 2.30055555556 -s 14 -d 55 -S COLOR -c black
+l -t 2.30055555556 -s 14 -d 17 -S COLOR -c brown
+l -t 2.30055555556 -s 14 -d 34 -S COLOR -c black
+l -t 2.30055555556 -s 58 -d 59 -S COLOR -c black
+l -t 2.30055555556 -s 15 -d 18 -S COLOR -c black
+l -t 2.30055555556 -s 16 -d 19 -S COLOR -c orange
+l -t 2.30055555556 -s 17 -d 20 -S COLOR -c blue
+l -t 2.30055555556 -s 18 -d 21 -S COLOR -c black
+l -t 2.30055555556 -s 19 -d 22 -S COLOR -c black
+l -t 2.30055555556 -s 20 -d 23 -S COLOR -c black
+l -t 2.30055555556 -s 22 -d 30 -S COLOR -c black
+l -t 2.30055555556 -s 22 -d 24 -S COLOR -c brown
+l -t 2.30055555556 -s 23 -d 25 -S COLOR -c black
+l -t 2.30055555556 -s 30 -d 31 -S COLOR -c black
+l -t 2.30055555556 -s 24 -d 26 -S COLOR -c black
+l -t 2.30055555556 -s 25 -d 27 -S COLOR -c black
+l -t 2.30055555556 -s 31 -d 32 -S COLOR -c black
+l -t 2.30055555556 -s 26 -d 28 -S COLOR -c black
+l -t 2.30055555556 -s 32 -d 33 -S COLOR -c black
+l -t 2.30055555556 -s 28 -d 29 -S COLOR -c black
+n -t 2.30055555556 -s 6 -c black
+n -t 2.30055555556 -s 9 -c black
+n -t 2.30055555556 -s 12 -c black
+n -t 2.30055555556 -s 15 -c black
+n -t 2.30055555556 -s 18 -c black
+n -t 2.30055555556 -s 21 -c black
+n -t 2.30055555556 -s 47 -c grey
+n -t 2.30055555556 -s 48 -c grey
+n -t 2.30055555556 -s 49 -c grey
+n -t 2.30055555556 -s 50 -c grey
+n -t 2.30055555556 -s 51 -c grey
+n -t 2.30055555556 -s 56 -c black
+n -t 2.30055555556 -s 57 -c black
+n -t 2.30055555556 -s 58 -c black
+n -t 2.30055555556 -s 59 -c black
+l -t 2.30055555556 -s 5 -d 47 -c grey
+l -t 2.30055555556 -s 47 -d 48 -c grey
+l -t 2.30055555556 -s 48 -d 49 -c grey
+l -t 2.30055555556 -s 49 -d 50 -c grey
+l -t 2.30055555556 -s 50 -d 51 -c grey
+l -t 2.35777777778 -s 0 -d 1 -S COLOR -c blue
+l -t 2.35777777778 -s 0 -d 2 -S COLOR -c black
+l -t 2.35777777778 -s 1 -d 3 -S COLOR -c black
+l -t 2.35777777778 -s 3 -d 4 -S COLOR -c black
+l -t 2.35777777778 -s 4 -d 5 -S COLOR -c red
+l -t 2.35777777778 -s 5 -d 56 -S COLOR -c blue
+l -t 2.35777777778 -s 5 -d 6 -S COLOR -c blue
+l -t 2.35777777778 -s 5 -d 7 -S COLOR -c black
+l -t 2.35777777778 -s 5 -d 8 -S COLOR -c blue
+l -t 2.35777777778 -s 5 -d 47 -S COLOR -c red
+l -t 2.35777777778 -s 56 -d 57 -S COLOR -c brown
+l -t 2.35777777778 -s 6 -d 9 -S COLOR -c red
+l -t 2.35777777778 -s 7 -d 10 -S COLOR -c red
+l -t 2.35777777778 -s 8 -d 11 -S COLOR -c orange
+l -t 2.35777777778 -s 47 -d 48 -S COLOR -c black
+l -t 2.35777777778 -s 57 -d 58 -S COLOR -c blue
+l -t 2.35777777778 -s 9 -d 12 -S COLOR -c black
+l -t 2.35777777778 -s 10 -d 13 -S COLOR -c orange
+l -t 2.35777777778 -s 11 -d 14 -S COLOR -c orange
+l -t 2.35777777778 -s 48 -d 49 -S COLOR -c blue
+l -t 2.35777777778 -s 58 -d 59 -S COLOR -c black
+l -t 2.35777777778 -s 12 -d 15 -S COLOR -c black
+l -t 2.35777777778 -s 13 -d 16 -S COLOR -c black
+l -t 2.35777777778 -s 14 -d 34 -S COLOR -c black
+l -t 2.35777777778 -s 14 -d 17 -S COLOR -c black
+l -t 2.35777777778 -s 14 -d 60 -S COLOR -c black
+l -t 2.35777777778 -s 49 -d 50 -S COLOR -c blue
+l -t 2.35777777778 -s 15 -d 18 -S COLOR -c black
+l -t 2.35777777778 -s 16 -d 19 -S COLOR -c red
+l -t 2.35777777778 -s 17 -d 20 -S COLOR -c black
+l -t 2.35777777778 -s 60 -d 55 -S COLOR -c red
+l -t 2.35777777778 -s 18 -d 21 -S COLOR -c black
+l -t 2.35777777778 -s 19 -d 22 -S COLOR -c black
+l -t 2.35777777778 -s 20 -d 23 -S COLOR -c black
+l -t 2.35777777778 -s 22 -d 30 -S COLOR -c black
+l -t 2.35777777778 -s 22 -d 24 -S COLOR -c black
+l -t 2.35777777778 -s 23 -d 25 -S COLOR -c black
+l -t 2.35777777778 -s 30 -d 31 -S COLOR -c black
+l -t 2.35777777778 -s 24 -d 26 -S COLOR -c brown
+l -t 2.35777777778 -s 25 -d 27 -S COLOR -c black
+l -t 2.35777777778 -s 31 -d 32 -S COLOR -c brown
+l -t 2.35777777778 -s 26 -d 28 -S COLOR -c black
+l -t 2.35777777778 -s 32 -d 33 -S COLOR -c black
+l -t 2.35777777778 -s 28 -d 29 -S COLOR -c black
+n -t 2.35777777778 -s 47 -c black
+n -t 2.35777777778 -s 48 -c black
+n -t 2.35777777778 -s 49 -c black
+n -t 2.35777777778 -s 50 -c black
+n -t 2.35777777778 -s 60 -c black
+l -t 2.35777777778 -s 14 -d 55 -c grey
+n -t 2.41083333333 -s 0 -c grey
+n -t 2.41083333333 -s 1 -c grey
+n -t 2.41083333333 -s 2 -c grey
+n -t 2.41083333333 -s 3 -c grey
+n -t 2.41083333333 -s 4 -c grey
+n -t 2.41083333333 -s 5 -c grey
+n -t 2.41083333333 -s 6 -c grey
+n -t 2.41083333333 -s 7 -c grey
+n -t 2.41083333333 -s 8 -c grey
+n -t 2.41083333333 -s 9 -c grey
+n -t 2.41083333333 -s 10 -c grey
+n -t 2.41083333333 -s 11 -c grey
+n -t 2.41083333333 -s 12 -c grey
+n -t 2.41083333333 -s 13 -c grey
+n -t 2.41083333333 -s 14 -c grey
+n -t 2.41083333333 -s 15 -c grey
+n -t 2.41083333333 -s 16 -c grey
+n -t 2.41083333333 -s 17 -c grey
+n -t 2.41083333333 -s 18 -c grey
+n -t 2.41083333333 -s 19 -c grey
+n -t 2.41083333333 -s 20 -c grey
+n -t 2.41083333333 -s 21 -c grey
+n -t 2.41083333333 -s 22 -c grey
+n -t 2.41083333333 -s 23 -c grey
+n -t 2.41083333333 -s 24 -c grey
+n -t 2.41083333333 -s 25 -c grey
+n -t 2.41083333333 -s 26 -c grey
+n -t 2.41083333333 -s 27 -c grey
+n -t 2.41083333333 -s 28 -c grey
+n -t 2.41083333333 -s 29 -c grey
+n -t 2.41083333333 -s 30 -c grey
+n -t 2.41083333333 -s 31 -c grey
+n -t 2.41083333333 -s 32 -c grey
+n -t 2.41083333333 -s 33 -c grey
+n -t 2.41083333333 -s 34 -c grey
+n -t 2.41083333333 -s 47 -c grey
+n -t 2.41083333333 -s 48 -c grey
+n -t 2.41083333333 -s 49 -c grey
+n -t 2.41083333333 -s 50 -c grey
+n -t 2.41083333333 -s 55 -c grey
+n -t 2.41083333333 -s 56 -c grey
+n -t 2.41083333333 -s 57 -c grey
+n -t 2.41083333333 -s 58 -c grey
+n -t 2.41083333333 -s 59 -c grey
+n -t 2.41083333333 -s 60 -c grey
+n -t 2.41083333333 -s 61 -c black
+l -t 2.41083333333 -s 0 -d 1 -c grey
+l -t 2.41083333333 -s 0 -d 2 -c grey
+l -t 2.41083333333 -s 1 -d 3 -c grey
+l -t 2.41083333333 -s 3 -d 4 -c grey
+l -t 2.41083333333 -s 4 -d 5 -c grey
+l -t 2.41083333333 -s 5 -d 6 -c grey
+l -t 2.41083333333 -s 5 -d 7 -c grey
+l -t 2.41083333333 -s 5 -d 8 -c grey
+l -t 2.41083333333 -s 6 -d 9 -c grey
+l -t 2.41083333333 -s 7 -d 10 -c grey
+l -t 2.41083333333 -s 8 -d 11 -c grey
+l -t 2.41083333333 -s 9 -d 12 -c grey
+l -t 2.41083333333 -s 10 -d 13 -c grey
+l -t 2.41083333333 -s 11 -d 14 -c grey
+l -t 2.41083333333 -s 12 -d 15 -c grey
+l -t 2.41083333333 -s 13 -d 16 -c grey
+l -t 2.41083333333 -s 14 -d 17 -c grey
+l -t 2.41083333333 -s 15 -d 18 -c grey
+l -t 2.41083333333 -s 16 -d 19 -c grey
+l -t 2.41083333333 -s 17 -d 20 -c grey
+l -t 2.41083333333 -s 18 -d 21 -c grey
+l -t 2.41083333333 -s 19 -d 22 -c grey
+l -t 2.41083333333 -s 20 -d 23 -c grey
+l -t 2.41083333333 -s 22 -d 24 -c grey
+l -t 2.41083333333 -s 23 -d 25 -c grey
+l -t 2.41083333333 -s 24 -d 26 -c grey
+l -t 2.41083333333 -s 25 -d 27 -c grey
+l -t 2.41083333333 -s 26 -d 28 -c grey
+l -t 2.41083333333 -s 28 -d 29 -c grey
+l -t 2.41083333333 -s 22 -d 30 -c grey
+l -t 2.41083333333 -s 30 -d 31 -c grey
+l -t 2.41083333333 -s 31 -d 32 -c grey
+l -t 2.41083333333 -s 32 -d 33 -c grey
+l -t 2.41083333333 -s 14 -d 34 -c grey
+l -t 2.41083333333 -s 5 -d 47 -c grey
+l -t 2.41083333333 -s 47 -d 48 -c grey
+l -t 2.41083333333 -s 48 -d 49 -c grey
+l -t 2.41083333333 -s 49 -d 50 -c grey
+l -t 2.41083333333 -s 5 -d 56 -c grey
+l -t 2.41083333333 -s 56 -d 57 -c grey
+l -t 2.41083333333 -s 57 -d 58 -c grey
+l -t 2.41083333333 -s 58 -d 59 -c grey
+l -t 2.41083333333 -s 14 -d 60 -c grey
+l -t 2.41083333333 -s 60 -d 55 -c grey
+l -t 2.50138888889 -s 0 -d 1 -S COLOR -c black
+l -t 2.50138888889 -s 0 -d 2 -S COLOR -c black
+l -t 2.50138888889 -s 1 -d 3 -S COLOR -c brown
+l -t 2.50138888889 -s 3 -d 4 -S COLOR -c black
+l -t 2.50138888889 -s 4 -d 5 -S COLOR -c brown
+l -t 2.50138888889 -s 5 -d 47 -S COLOR -c red
+l -t 2.50138888889 -s 5 -d 7 -S COLOR -c black
+l -t 2.50138888889 -s 5 -d 8 -S COLOR -c brown
+l -t 2.50138888889 -s 47 -d 48 -S COLOR -c black
+l -t 2.50138888889 -s 7 -d 10 -S COLOR -c orange
+l -t 2.50138888889 -s 8 -d 11 -S COLOR -c blue
+l -t 2.50138888889 -s 48 -d 49 -S COLOR -c black
+l -t 2.50138888889 -s 10 -d 13 -S COLOR -c black
+l -t 2.50138888889 -s 11 -d 14 -S COLOR -c black
+l -t 2.50138888889 -s 49 -d 50 -S COLOR -c black
+l -t 2.50138888889 -s 13 -d 16 -S COLOR -c black
+l -t 2.50138888889 -s 14 -d 34 -S COLOR -c black
+l -t 2.50138888889 -s 14 -d 17 -S COLOR -c brown
+l -t 2.50138888889 -s 50 -d 51 -S COLOR -c black
+l -t 2.50138888889 -s 16 -d 19 -S COLOR -c red
+l -t 2.50138888889 -s 17 -d 20 -S COLOR -c blue
+l -t 2.50138888889 -s 19 -d 22 -S COLOR -c blue
+l -t 2.50138888889 -s 20 -d 23 -S COLOR -c brown
+l -t 2.50138888889 -s 22 -d 30 -S COLOR -c black
+l -t 2.50138888889 -s 23 -d 25 -S COLOR -c black
+l -t 2.50138888889 -s 30 -d 31 -S COLOR -c black
+l -t 2.50138888889 -s 25 -d 27 -S COLOR -c black
+l -t 2.50138888889 -s 31 -d 32 -S COLOR -c black
+l -t 2.50138888889 -s 32 -d 33 -S COLOR -c black
+n -t 2.50138888889 -s 0 -c black
+n -t 2.50138888889 -s 1 -c black
+n -t 2.50138888889 -s 2 -c black
+n -t 2.50138888889 -s 3 -c black
+n -t 2.50138888889 -s 4 -c black
+n -t 2.50138888889 -s 5 -c black
+n -t 2.50138888889 -s 7 -c black
+n -t 2.50138888889 -s 8 -c black
+n -t 2.50138888889 -s 10 -c black
+n -t 2.50138888889 -s 11 -c black
+n -t 2.50138888889 -s 13 -c black
+n -t 2.50138888889 -s 14 -c black
+n -t 2.50138888889 -s 16 -c black
+n -t 2.50138888889 -s 17 -c black
+n -t 2.50138888889 -s 19 -c black
+n -t 2.50138888889 -s 20 -c black
+n -t 2.50138888889 -s 22 -c black
+n -t 2.50138888889 -s 23 -c black
+n -t 2.50138888889 -s 25 -c black
+n -t 2.50138888889 -s 27 -c black
+n -t 2.50138888889 -s 30 -c black
+n -t 2.50138888889 -s 31 -c black
+n -t 2.50138888889 -s 32 -c black
+n -t 2.50138888889 -s 33 -c black
+n -t 2.50138888889 -s 34 -c black
+n -t 2.50138888889 -s 47 -c black
+n -t 2.50138888889 -s 48 -c black
+n -t 2.50138888889 -s 49 -c black
+n -t 2.50138888889 -s 50 -c black
+n -t 2.50138888889 -s 51 -c black
+n -t 2.50138888889 -s 61 -c grey
+l -t 2.59416666667 -s 0 -d 1 -S COLOR -c brown
+l -t 2.59416666667 -s 1 -d 3 -S COLOR -c black
+l -t 2.59416666667 -s 3 -d 4 -S COLOR -c black
+l -t 2.59416666667 -s 4 -d 5 -S COLOR -c blue
+l -t 2.59416666667 -s 5 -d 8 -S COLOR -c brown
+l -t 2.59416666667 -s 5 -d 47 -S COLOR -c red
+l -t 2.59416666667 -s 8 -d 11 -S COLOR -c black
+l -t 2.59416666667 -s 47 -d 48 -S COLOR -c brown
+l -t 2.59416666667 -s 11 -d 14 -S COLOR -c black
+l -t 2.59416666667 -s 48 -d 49 -S COLOR -c black
+l -t 2.59416666667 -s 14 -d 55 -S COLOR -c black
+l -t 2.59416666667 -s 14 -d 17 -S COLOR -c brown
+l -t 2.59416666667 -s 14 -d 34 -S COLOR -c black
+l -t 2.59416666667 -s 49 -d 50 -S COLOR -c black
+l -t 2.59416666667 -s 17 -d 20 -S COLOR -c black
+l -t 2.59416666667 -s 50 -d 51 -S COLOR -c black
+l -t 2.59416666667 -s 20 -d 23 -S COLOR -c blue
+l -t 2.59416666667 -s 23 -d 25 -S COLOR -c black
+l -t 2.59416666667 -s 25 -d 27 -S COLOR -c black
+n -t 2.59416666667 -s 2 -c grey
+n -t 2.59416666667 -s 7 -c grey
+n -t 2.59416666667 -s 10 -c grey
+n -t 2.59416666667 -s 13 -c grey
+n -t 2.59416666667 -s 16 -c grey
+n -t 2.59416666667 -s 19 -c grey
+n -t 2.59416666667 -s 22 -c grey
+n -t 2.59416666667 -s 30 -c grey
+n -t 2.59416666667 -s 31 -c grey
+n -t 2.59416666667 -s 32 -c grey
+n -t 2.59416666667 -s 33 -c grey
+n -t 2.59416666667 -s 55 -c black
+l -t 2.59416666667 -s 0 -d 2 -c grey
+l -t 2.59416666667 -s 5 -d 7 -c grey
+l -t 2.59416666667 -s 7 -d 10 -c grey
+l -t 2.59416666667 -s 10 -d 13 -c grey
+l -t 2.59416666667 -s 13 -d 16 -c grey
+l -t 2.59416666667 -s 16 -d 19 -c grey
+l -t 2.59416666667 -s 19 -d 22 -c grey
+l -t 2.59416666667 -s 22 -d 30 -c grey
+l -t 2.59416666667 -s 30 -d 31 -c grey
+l -t 2.59416666667 -s 31 -d 32 -c grey
+l -t 2.59416666667 -s 32 -d 33 -c grey
+n -t 2.69 -s 0 -c grey
+n -t 2.69 -s 1 -c grey
+n -t 2.69 -s 3 -c grey
+n -t 2.69 -s 4 -c grey
+n -t 2.69 -s 5 -c grey
+n -t 2.69 -s 8 -c grey
+n -t 2.69 -s 11 -c grey
+n -t 2.69 -s 14 -c grey
+n -t 2.69 -s 17 -c grey
+n -t 2.69 -s 20 -c grey
+n -t 2.69 -s 23 -c grey
+n -t 2.69 -s 25 -c grey
+n -t 2.69 -s 27 -c grey
+n -t 2.69 -s 34 -c grey
+n -t 2.69 -s 35 -c black
+n -t 2.69 -s 47 -c grey
+n -t 2.69 -s 48 -c grey
+n -t 2.69 -s 49 -c grey
+n -t 2.69 -s 50 -c grey
+n -t 2.69 -s 51 -c grey
+n -t 2.69 -s 55 -c grey
+l -t 2.69 -s 0 -d 1 -c grey
+l -t 2.69 -s 1 -d 3 -c grey
+l -t 2.69 -s 3 -d 4 -c grey
+l -t 2.69 -s 4 -d 5 -c grey
+l -t 2.69 -s 5 -d 8 -c grey
+l -t 2.69 -s 8 -d 11 -c grey
+l -t 2.69 -s 11 -d 14 -c grey
+l -t 2.69 -s 14 -d 17 -c grey
+l -t 2.69 -s 17 -d 20 -c grey
+l -t 2.69 -s 20 -d 23 -c grey
+l -t 2.69 -s 23 -d 25 -c grey
+l -t 2.69 -s 25 -d 27 -c grey
+l -t 2.69 -s 14 -d 34 -c grey
+l -t 2.69 -s 5 -d 47 -c grey
+l -t 2.69 -s 47 -d 48 -c grey
+l -t 2.69 -s 48 -d 49 -c grey
+l -t 2.69 -s 49 -d 50 -c grey
+l -t 2.69 -s 50 -d 51 -c grey
+l -t 2.69 -s 14 -d 55 -c grey
+l -t 2.91583333333 -s 0 -d 1 -S COLOR -c brown
+l -t 2.91583333333 -s 0 -d 2 -S COLOR -c black
+l -t 2.91583333333 -s 1 -d 3 -S COLOR -c black
+l -t 2.91583333333 -s 3 -d 4 -S COLOR -c brown
+l -t 2.91583333333 -s 4 -d 5 -S COLOR -c brown
+l -t 2.91583333333 -s 5 -d 6 -S COLOR -c black
+l -t 2.91583333333 -s 5 -d 7 -S COLOR -c red
+l -t 2.91583333333 -s 5 -d 8 -S COLOR -c brown
+l -t 2.91583333333 -s 5 -d 47 -S COLOR -c red
+l -t 2.91583333333 -s 6 -d 9 -S COLOR -c red
+l -t 2.91583333333 -s 7 -d 10 -S COLOR -c blue
+l -t 2.91583333333 -s 8 -d 11 -S COLOR -c brown
+l -t 2.91583333333 -s 47 -d 48 -S COLOR -c black
+l -t 2.91583333333 -s 9 -d 12 -S COLOR -c black
+l -t 2.91583333333 -s 10 -d 13 -S COLOR -c orange
+l -t 2.91583333333 -s 11 -d 14 -S COLOR -c brown
+l -t 2.91583333333 -s 48 -d 49 -S COLOR -c black
+l -t 2.91583333333 -s 12 -d 15 -S COLOR -c black
+l -t 2.91583333333 -s 13 -d 16 -S COLOR -c blue
+l -t 2.91583333333 -s 14 -d 55 -S COLOR -c black
+l -t 2.91583333333 -s 14 -d 17 -S COLOR -c black
+l -t 2.91583333333 -s 14 -d 34 -S COLOR -c black
+l -t 2.91583333333 -s 49 -d 50 -S COLOR -c black
+l -t 2.91583333333 -s 15 -d 18 -S COLOR -c black
+l -t 2.91583333333 -s 16 -d 19 -S COLOR -c red
+l -t 2.91583333333 -s 17 -d 20 -S COLOR -c blue
+l -t 2.91583333333 -s 50 -d 51 -S COLOR -c black
+l -t 2.91583333333 -s 18 -d 21 -S COLOR -c black
+l -t 2.91583333333 -s 19 -d 22 -S COLOR -c blue
+l -t 2.91583333333 -s 20 -d 23 -S COLOR -c black
+l -t 2.91583333333 -s 22 -d 30 -S COLOR -c black
+l -t 2.91583333333 -s 22 -d 24 -S COLOR -c brown
+l -t 2.91583333333 -s 23 -d 25 -S COLOR -c black
+l -t 2.91583333333 -s 30 -d 31 -S COLOR -c black
+l -t 2.91583333333 -s 24 -d 26 -S COLOR -c black
+l -t 2.91583333333 -s 25 -d 27 -S COLOR -c black
+l -t 2.91583333333 -s 31 -d 32 -S COLOR -c black
+l -t 2.91583333333 -s 26 -d 28 -S COLOR -c red
+l -t 2.91583333333 -s 32 -d 33 -S COLOR -c black
+n -t 2.91583333333 -s 0 -c black
+n -t 2.91583333333 -s 1 -c black
+n -t 2.91583333333 -s 2 -c black
+n -t 2.91583333333 -s 3 -c black
+n -t 2.91583333333 -s 4 -c black
+n -t 2.91583333333 -s 5 -c black
+n -t 2.91583333333 -s 6 -c black
+n -t 2.91583333333 -s 7 -c black
+n -t 2.91583333333 -s 8 -c black
+n -t 2.91583333333 -s 9 -c black
+n -t 2.91583333333 -s 10 -c black
+n -t 2.91583333333 -s 11 -c black
+n -t 2.91583333333 -s 12 -c black
+n -t 2.91583333333 -s 13 -c black
+n -t 2.91583333333 -s 14 -c black
+n -t 2.91583333333 -s 15 -c black
+n -t 2.91583333333 -s 16 -c black
+n -t 2.91583333333 -s 17 -c black
+n -t 2.91583333333 -s 18 -c black
+n -t 2.91583333333 -s 19 -c black
+n -t 2.91583333333 -s 20 -c black
+n -t 2.91583333333 -s 21 -c black
+n -t 2.91583333333 -s 22 -c black
+n -t 2.91583333333 -s 23 -c black
+n -t 2.91583333333 -s 24 -c black
+n -t 2.91583333333 -s 25 -c black
+n -t 2.91583333333 -s 26 -c black
+n -t 2.91583333333 -s 27 -c black
+n -t 2.91583333333 -s 28 -c black
+n -t 2.91583333333 -s 30 -c black
+n -t 2.91583333333 -s 31 -c black
+n -t 2.91583333333 -s 32 -c black
+n -t 2.91583333333 -s 33 -c black
+n -t 2.91583333333 -s 34 -c black
+n -t 2.91583333333 -s 35 -c grey
+n -t 2.91583333333 -s 47 -c black
+n -t 2.91583333333 -s 48 -c black
+n -t 2.91583333333 -s 49 -c black
+n -t 2.91583333333 -s 50 -c black
+n -t 2.91583333333 -s 51 -c black
+n -t 2.91583333333 -s 55 -c black
+l -t 2.95333333333 -s 0 -d 1 -S COLOR -c black
+l -t 2.95333333333 -s 0 -d 2 -S COLOR -c black
+l -t 2.95333333333 -s 1 -d 3 -S COLOR -c black
+l -t 2.95333333333 -s 3 -d 4 -S COLOR -c black
+l -t 2.95333333333 -s 4 -d 5 -S COLOR -c blue
+l -t 2.95333333333 -s 5 -d 6 -S COLOR -c black
+l -t 2.95333333333 -s 5 -d 7 -S COLOR -c black
+l -t 2.95333333333 -s 5 -d 8 -S COLOR -c black
+l -t 2.95333333333 -s 5 -d 47 -S COLOR -c red
+l -t 2.95333333333 -s 6 -d 9 -S COLOR -c red
+l -t 2.95333333333 -s 7 -d 10 -S COLOR -c orange
+l -t 2.95333333333 -s 8 -d 11 -S COLOR -c blue
+l -t 2.95333333333 -s 47 -d 48 -S COLOR -c black
+l -t 2.95333333333 -s 9 -d 12 -S COLOR -c black
+l -t 2.95333333333 -s 10 -d 13 -S COLOR -c black
+l -t 2.95333333333 -s 11 -d 14 -S COLOR -c blue
+l -t 2.95333333333 -s 48 -d 49 -S COLOR -c black
+l -t 2.95333333333 -s 12 -d 15 -S COLOR -c blue
+l -t 2.95333333333 -s 13 -d 16 -S COLOR -c black
+l -t 2.95333333333 -s 14 -d 55 -S COLOR -c black
+l -t 2.95333333333 -s 14 -d 17 -S COLOR -c black
+l -t 2.95333333333 -s 14 -d 34 -S COLOR -c black
+l -t 2.95333333333 -s 49 -d 50 -S COLOR -c black
+l -t 2.95333333333 -s 15 -d 18 -S COLOR -c black
+l -t 2.95333333333 -s 16 -d 19 -S COLOR -c orange
+l -t 2.95333333333 -s 17 -d 20 -S COLOR -c orange
+l -t 2.95333333333 -s 50 -d 51 -S COLOR -c black
+l -t 2.95333333333 -s 18 -d 21 -S COLOR -c black
+l -t 2.95333333333 -s 19 -d 22 -S COLOR -c black
+l -t 2.95333333333 -s 20 -d 23 -S COLOR -c black
+l -t 2.95333333333 -s 22 -d 30 -S COLOR -c black
+l -t 2.95333333333 -s 23 -d 25 -S COLOR -c blue
+l -t 2.95333333333 -s 30 -d 31 -S COLOR -c black
+l -t 2.95333333333 -s 25 -d 27 -S COLOR -c black
+l -t 2.95333333333 -s 31 -d 32 -S COLOR -c blue
+l -t 2.95333333333 -s 32 -d 33 -S COLOR -c black
+n -t 2.95333333333 -s 24 -c grey
+n -t 2.95333333333 -s 26 -c grey
+n -t 2.95333333333 -s 28 -c grey
+l -t 2.95333333333 -s 22 -d 24 -c grey
+l -t 2.95333333333 -s 24 -d 26 -c grey
+l -t 2.95333333333 -s 26 -d 28 -c grey
+l -t 2.9925 -s 0 -d 1 -S COLOR -c black
+l -t 2.9925 -s 0 -d 2 -S COLOR -c black
+l -t 2.9925 -s 1 -d 3 -S COLOR -c black
+l -t 2.9925 -s 3 -d 4 -S COLOR -c black
+l -t 2.9925 -s 4 -d 5 -S COLOR -c blue
+l -t 2.9925 -s 5 -d 47 -S COLOR -c red
+l -t 2.9925 -s 5 -d 7 -S COLOR -c blue
+l -t 2.9925 -s 5 -d 8 -S COLOR -c brown
+l -t 2.9925 -s 47 -d 48 -S COLOR -c black
+l -t 2.9925 -s 7 -d 10 -S COLOR -c orange
+l -t 2.9925 -s 8 -d 11 -S COLOR -c blue
+l -t 2.9925 -s 48 -d 49 -S COLOR -c black
+l -t 2.9925 -s 10 -d 13 -S COLOR -c black
+l -t 2.9925 -s 11 -d 14 -S COLOR -c brown
+l -t 2.9925 -s 49 -d 50 -S COLOR -c blue
+l -t 2.9925 -s 13 -d 16 -S COLOR -c blue
+l -t 2.9925 -s 14 -d 55 -S COLOR -c black
+l -t 2.9925 -s 14 -d 17 -S COLOR -c black
+l -t 2.9925 -s 14 -d 34 -S COLOR -c black
+l -t 2.9925 -s 50 -d 51 -S COLOR -c black
+l -t 2.9925 -s 16 -d 19 -S COLOR -c red
+l -t 2.9925 -s 17 -d 20 -S COLOR -c black
+l -t 2.9925 -s 19 -d 22 -S COLOR -c brown
+l -t 2.9925 -s 20 -d 23 -S COLOR -c black
+l -t 2.9925 -s 22 -d 30 -S COLOR -c black
+l -t 2.9925 -s 23 -d 25 -S COLOR -c black
+l -t 2.9925 -s 30 -d 31 -S COLOR -c black
+l -t 2.9925 -s 25 -d 27 -S COLOR -c black
+l -t 2.9925 -s 31 -d 32 -S COLOR -c black
+l -t 2.9925 -s 32 -d 33 -S COLOR -c black
+n -t 2.9925 -s 6 -c grey
+n -t 2.9925 -s 9 -c grey
+n -t 2.9925 -s 12 -c grey
+n -t 2.9925 -s 15 -c grey
+n -t 2.9925 -s 18 -c grey
+n -t 2.9925 -s 21 -c grey
+l -t 2.9925 -s 5 -d 6 -c grey
+l -t 2.9925 -s 6 -d 9 -c grey
+l -t 2.9925 -s 9 -d 12 -c grey
+l -t 2.9925 -s 12 -d 15 -c grey
+l -t 2.9925 -s 15 -d 18 -c grey
+l -t 2.9925 -s 18 -d 21 -c grey
+l -t 3.04555555556 -s 0 -d 1 -S COLOR -c brown
+l -t 3.04555555556 -s 1 -d 3 -S COLOR -c black
+l -t 3.04555555556 -s 3 -d 4 -S COLOR -c black
+l -t 3.04555555556 -s 4 -d 5 -S COLOR -c brown
+l -t 3.04555555556 -s 5 -d 47 -S COLOR -c red
+l -t 3.04555555556 -s 5 -d 8 -S COLOR -c brown
+l -t 3.04555555556 -s 5 -d 6 -S COLOR -c blue
+l -t 3.04555555556 -s 47 -d 48 -S COLOR -c black
+l -t 3.04555555556 -s 8 -d 11 -S COLOR -c brown
+l -t 3.04555555556 -s 6 -d 9 -S COLOR -c red
+l -t 3.04555555556 -s 48 -d 49 -S COLOR -c black
+l -t 3.04555555556 -s 11 -d 14 -S COLOR -c blue
+l -t 3.04555555556 -s 9 -d 12 -S COLOR -c black
+l -t 3.04555555556 -s 49 -d 50 -S COLOR -c black
+l -t 3.04555555556 -s 14 -d 17 -S COLOR -c black
+l -t 3.04555555556 -s 14 -d 34 -S COLOR -c black
+l -t 3.04555555556 -s 12 -d 15 -S COLOR -c black
+l -t 3.04555555556 -s 50 -d 51 -S COLOR -c black
+l -t 3.04555555556 -s 17 -d 20 -S COLOR -c brown
+l -t 3.04555555556 -s 15 -d 18 -S COLOR -c black
+l -t 3.04555555556 -s 20 -d 23 -S COLOR -c black
+l -t 3.04555555556 -s 18 -d 21 -S COLOR -c black
+l -t 3.04555555556 -s 23 -d 25 -S COLOR -c black
+l -t 3.04555555556 -s 25 -d 27 -S COLOR -c black
+n -t 3.04555555556 -s 2 -c grey
+n -t 3.04555555556 -s 6 -c black
+n -t 3.04555555556 -s 7 -c grey
+n -t 3.04555555556 -s 9 -c black
+n -t 3.04555555556 -s 10 -c grey
+n -t 3.04555555556 -s 12 -c black
+n -t 3.04555555556 -s 13 -c grey
+n -t 3.04555555556 -s 15 -c black
+n -t 3.04555555556 -s 16 -c grey
+n -t 3.04555555556 -s 18 -c black
+n -t 3.04555555556 -s 19 -c grey
+n -t 3.04555555556 -s 21 -c black
+n -t 3.04555555556 -s 22 -c grey
+n -t 3.04555555556 -s 30 -c grey
+n -t 3.04555555556 -s 31 -c grey
+n -t 3.04555555556 -s 32 -c grey
+n -t 3.04555555556 -s 33 -c grey
+n -t 3.04555555556 -s 55 -c grey
+l -t 3.04555555556 -s 0 -d 2 -c grey
+l -t 3.04555555556 -s 5 -d 7 -c grey
+l -t 3.04555555556 -s 7 -d 10 -c grey
+l -t 3.04555555556 -s 10 -d 13 -c grey
+l -t 3.04555555556 -s 13 -d 16 -c grey
+l -t 3.04555555556 -s 16 -d 19 -c grey
+l -t 3.04555555556 -s 19 -d 22 -c grey
+l -t 3.04555555556 -s 22 -d 30 -c grey
+l -t 3.04555555556 -s 30 -d 31 -c grey
+l -t 3.04555555556 -s 31 -d 32 -c grey
+l -t 3.04555555556 -s 32 -d 33 -c grey
+l -t 3.04555555556 -s 14 -d 55 -c grey
+l -t 3.09888888889 -s 0 -d 1 -S COLOR -c blue
+l -t 3.09888888889 -s 1 -d 3 -S COLOR -c black
+l -t 3.09888888889 -s 3 -d 4 -S COLOR -c black
+l -t 3.09888888889 -s 4 -d 5 -S COLOR -c black
+l -t 3.09888888889 -s 5 -d 47 -S COLOR -c red
+l -t 3.09888888889 -s 5 -d 8 -S COLOR -c blue
+l -t 3.09888888889 -s 5 -d 6 -S COLOR -c brown
+l -t 3.09888888889 -s 47 -d 48 -S COLOR -c black
+l -t 3.09888888889 -s 8 -d 11 -S COLOR -c brown
+l -t 3.09888888889 -s 6 -d 9 -S COLOR -c red
+l -t 3.09888888889 -s 48 -d 49 -S COLOR -c black
+l -t 3.09888888889 -s 11 -d 14 -S COLOR -c blue
+l -t 3.09888888889 -s 9 -d 12 -S COLOR -c black
+l -t 3.09888888889 -s 49 -d 50 -S COLOR -c brown
+l -t 3.09888888889 -s 14 -d 34 -S COLOR -c black
+l -t 3.09888888889 -s 14 -d 17 -S COLOR -c black
+l -t 3.09888888889 -s 14 -d 60 -S COLOR -c black
+l -t 3.09888888889 -s 12 -d 15 -S COLOR -c black
+l -t 3.09888888889 -s 17 -d 20 -S COLOR -c brown
+l -t 3.09888888889 -s 60 -d 55 -S COLOR -c red
+l -t 3.09888888889 -s 15 -d 18 -S COLOR -c black
+l -t 3.09888888889 -s 20 -d 23 -S COLOR -c blue
+l -t 3.09888888889 -s 18 -d 21 -S COLOR -c black
+l -t 3.09888888889 -s 23 -d 25 -S COLOR -c brown
+l -t 3.09888888889 -s 25 -d 27 -S COLOR -c black
+n -t 3.09888888889 -s 51 -c grey
+n -t 3.09888888889 -s 55 -c black
+n -t 3.09888888889 -s 60 -c black
+l -t 3.09888888889 -s 50 -d 51 -c grey
+l -t 3.175 -s 0 -d 1 -S COLOR -c black
+l -t 3.175 -s 0 -d 2 -S COLOR -c black
+l -t 3.175 -s 1 -d 3 -S COLOR -c black
+l -t 3.175 -s 3 -d 4 -S COLOR -c brown
+l -t 3.175 -s 4 -d 5 -S COLOR -c blue
+l -t 3.175 -s 5 -d 6 -S COLOR -c brown
+l -t 3.175 -s 5 -d 7 -S COLOR -c black
+l -t 3.175 -s 5 -d 8 -S COLOR -c blue
+l -t 3.175 -s 5 -d 47 -S COLOR -c red
+l -t 3.175 -s 6 -d 9 -S COLOR -c red
+l -t 3.175 -s 7 -d 10 -S COLOR -c blue
+l -t 3.175 -s 8 -d 11 -S COLOR -c brown
+l -t 3.175 -s 47 -d 48 -S COLOR -c black
+l -t 3.175 -s 9 -d 12 -S COLOR -c black
+l -t 3.175 -s 10 -d 13 -S COLOR -c black
+l -t 3.175 -s 11 -d 14 -S COLOR -c brown
+l -t 3.175 -s 48 -d 49 -S COLOR -c black
+l -t 3.175 -s 12 -d 15 -S COLOR -c black
+l -t 3.175 -s 13 -d 16 -S COLOR -c black
+l -t 3.175 -s 14 -d 60 -S COLOR -c black
+l -t 3.175 -s 14 -d 17 -S COLOR -c black
+l -t 3.175 -s 14 -d 34 -S COLOR -c black
+l -t 3.175 -s 49 -d 50 -S COLOR -c blue
+l -t 3.175 -s 15 -d 18 -S COLOR -c black
+l -t 3.175 -s 16 -d 19 -S COLOR -c blue
+l -t 3.175 -s 60 -d 55 -S COLOR -c red
+l -t 3.175 -s 17 -d 20 -S COLOR -c blue
+l -t 3.175 -s 18 -d 21 -S COLOR -c black
+l -t 3.175 -s 19 -d 22 -S COLOR -c black
+l -t 3.175 -s 20 -d 23 -S COLOR -c brown
+l -t 3.175 -s 22 -d 30 -S COLOR -c black
+l -t 3.175 -s 23 -d 25 -S COLOR -c black
+l -t 3.175 -s 30 -d 31 -S COLOR -c black
+l -t 3.175 -s 25 -d 27 -S COLOR -c black
+l -t 3.175 -s 31 -d 32 -S COLOR -c brown
+l -t 3.175 -s 32 -d 33 -S COLOR -c black
+n -t 3.175 -s 2 -c black
+n -t 3.175 -s 7 -c black
+n -t 3.175 -s 10 -c black
+n -t 3.175 -s 13 -c black
+n -t 3.175 -s 16 -c black
+n -t 3.175 -s 19 -c black
+n -t 3.175 -s 22 -c black
+n -t 3.175 -s 30 -c black
+n -t 3.175 -s 31 -c black
+n -t 3.175 -s 32 -c black
+n -t 3.175 -s 33 -c black
+l -t 3.25555555556 -s 0 -d 1 -S COLOR -c black
+l -t 3.25555555556 -s 0 -d 2 -S COLOR -c black
+l -t 3.25555555556 -s 1 -d 3 -S COLOR -c black
+l -t 3.25555555556 -s 3 -d 4 -S COLOR -c blue
+l -t 3.25555555556 -s 4 -d 5 -S COLOR -c orange
+l -t 3.25555555556 -s 5 -d 47 -S COLOR -c red
+l -t 3.25555555556 -s 5 -d 7 -S COLOR -c brown
+l -t 3.25555555556 -s 5 -d 8 -S COLOR -c blue
+l -t 3.25555555556 -s 5 -d 56 -S COLOR -c brown
+l -t 3.25555555556 -s 47 -d 48 -S COLOR -c black
+l -t 3.25555555556 -s 7 -d 10 -S COLOR -c blue
+l -t 3.25555555556 -s 8 -d 11 -S COLOR -c brown
+l -t 3.25555555556 -s 56 -d 57 -S COLOR -c blue
+l -t 3.25555555556 -s 48 -d 49 -S COLOR -c black
+l -t 3.25555555556 -s 10 -d 13 -S COLOR -c black
+l -t 3.25555555556 -s 11 -d 14 -S COLOR -c brown
+l -t 3.25555555556 -s 57 -d 58 -S COLOR -c blue
+l -t 3.25555555556 -s 49 -d 50 -S COLOR -c brown
+l -t 3.25555555556 -s 13 -d 16 -S COLOR -c black
+l -t 3.25555555556 -s 14 -d 60 -S COLOR -c black
+l -t 3.25555555556 -s 14 -d 17 -S COLOR -c black
+l -t 3.25555555556 -s 14 -d 34 -S COLOR -c black
+l -t 3.25555555556 -s 58 -d 59 -S COLOR -c black
+l -t 3.25555555556 -s 50 -d 51 -S COLOR -c black
+l -t 3.25555555556 -s 16 -d 19 -S COLOR -c orange
+l -t 3.25555555556 -s 60 -d 55 -S COLOR -c red
+l -t 3.25555555556 -s 17 -d 20 -S COLOR -c blue
+l -t 3.25555555556 -s 19 -d 22 -S COLOR -c black
+l -t 3.25555555556 -s 20 -d 23 -S COLOR -c brown
+l -t 3.25555555556 -s 22 -d 30 -S COLOR -c black
+l -t 3.25555555556 -s 23 -d 25 -S COLOR -c black
+l -t 3.25555555556 -s 30 -d 31 -S COLOR -c brown
+l -t 3.25555555556 -s 25 -d 27 -S COLOR -c black
+l -t 3.25555555556 -s 31 -d 32 -S COLOR -c black
+l -t 3.25555555556 -s 32 -d 33 -S COLOR -c black
+n -t 3.25555555556 -s 6 -c grey
+n -t 3.25555555556 -s 9 -c grey
+n -t 3.25555555556 -s 12 -c grey
+n -t 3.25555555556 -s 15 -c grey
+n -t 3.25555555556 -s 18 -c grey
+n -t 3.25555555556 -s 21 -c grey
+n -t 3.25555555556 -s 51 -c black
+n -t 3.25555555556 -s 56 -c black
+n -t 3.25555555556 -s 57 -c black
+n -t 3.25555555556 -s 58 -c black
+n -t 3.25555555556 -s 59 -c black
+l -t 3.25555555556 -s 5 -d 6 -c grey
+l -t 3.25555555556 -s 6 -d 9 -c grey
+l -t 3.25555555556 -s 9 -d 12 -c grey
+l -t 3.25555555556 -s 12 -d 15 -c grey
+l -t 3.25555555556 -s 15 -d 18 -c grey
+l -t 3.25555555556 -s 18 -d 21 -c grey
+l -t 3.30555555556 -s 0 -d 1 -S COLOR -c blue
+l -t 3.30555555556 -s 1 -d 3 -S COLOR -c black
+l -t 3.30555555556 -s 3 -d 4 -S COLOR -c blue
+l -t 3.30555555556 -s 4 -d 5 -S COLOR -c red
+l -t 3.30555555556 -s 5 -d 56 -S COLOR -c blue
+l -t 3.30555555556 -s 5 -d 6 -S COLOR -c black
+l -t 3.30555555556 -s 5 -d 7 -S COLOR -c brown
+l -t 3.30555555556 -s 5 -d 8 -S COLOR -c brown
+l -t 3.30555555556 -s 5 -d 47 -S COLOR -c red
+l -t 3.30555555556 -s 56 -d 57 -S COLOR -c brown
+l -t 3.30555555556 -s 6 -d 9 -S COLOR -c red
+l -t 3.30555555556 -s 7 -d 10 -S COLOR -c blue
+l -t 3.30555555556 -s 8 -d 11 -S COLOR -c orange
+l -t 3.30555555556 -s 47 -d 48 -S COLOR -c brown
+l -t 3.30555555556 -s 57 -d 58 -S COLOR -c blue
+l -t 3.30555555556 -s 9 -d 12 -S COLOR -c blue
+l -t 3.30555555556 -s 10 -d 13 -S COLOR -c blue
+l -t 3.30555555556 -s 11 -d 14 -S COLOR -c black
+l -t 3.30555555556 -s 48 -d 49 -S COLOR -c black
+l -t 3.30555555556 -s 58 -d 59 -S COLOR -c black
+l -t 3.30555555556 -s 12 -d 15 -S COLOR -c black
+l -t 3.30555555556 -s 13 -d 16 -S COLOR -c black
+l -t 3.30555555556 -s 14 -d 34 -S COLOR -c black
+l -t 3.30555555556 -s 14 -d 17 -S COLOR -c black
+l -t 3.30555555556 -s 14 -d 55 -S COLOR -c black
+l -t 3.30555555556 -s 49 -d 50 -S COLOR -c black
+l -t 3.30555555556 -s 15 -d 18 -S COLOR -c black
+l -t 3.30555555556 -s 16 -d 19 -S COLOR -c orange
+l -t 3.30555555556 -s 17 -d 20 -S COLOR -c brown
+l -t 3.30555555556 -s 18 -d 21 -S COLOR -c black
+l -t 3.30555555556 -s 19 -d 22 -S COLOR -c blue
+l -t 3.30555555556 -s 20 -d 23 -S COLOR -c blue
+l -t 3.30555555556 -s 22 -d 30 -S COLOR -c black
+l -t 3.30555555556 -s 23 -d 25 -S COLOR -c brown
+l -t 3.30555555556 -s 30 -d 31 -S COLOR -c black
+l -t 3.30555555556 -s 25 -d 27 -S COLOR -c black
+l -t 3.30555555556 -s 31 -d 32 -S COLOR -c red
+l -t 3.30555555556 -s 32 -d 33 -S COLOR -c black
+n -t 3.30555555556 -s 2 -c grey
+n -t 3.30555555556 -s 6 -c black
+n -t 3.30555555556 -s 9 -c black
+n -t 3.30555555556 -s 12 -c black
+n -t 3.30555555556 -s 15 -c black
+n -t 3.30555555556 -s 18 -c black
+n -t 3.30555555556 -s 21 -c black
+n -t 3.30555555556 -s 51 -c grey
+n -t 3.30555555556 -s 60 -c grey
+l -t 3.30555555556 -s 0 -d 2 -c grey
+l -t 3.30555555556 -s 50 -d 51 -c grey
+l -t 3.30555555556 -s 14 -d 60 -c grey
+l -t 3.30555555556 -s 60 -d 55 -c grey
+l -t 3.38555555556 -s 0 -d 1 -S COLOR -c blue
+l -t 3.38555555556 -s 0 -d 2 -S COLOR -c black
+l -t 3.38555555556 -s 1 -d 3 -S COLOR -c black
+l -t 3.38555555556 -s 3 -d 4 -S COLOR -c black
+l -t 3.38555555556 -s 4 -d 5 -S COLOR -c brown
+l -t 3.38555555556 -s 5 -d 47 -S COLOR -c red
+l -t 3.38555555556 -s 5 -d 7 -S COLOR -c black
+l -t 3.38555555556 -s 5 -d 8 -S COLOR -c blue
+l -t 3.38555555556 -s 5 -d 56 -S COLOR -c black
+l -t 3.38555555556 -s 47 -d 48 -S COLOR -c blue
+l -t 3.38555555556 -s 7 -d 10 -S COLOR -c black
+l -t 3.38555555556 -s 8 -d 11 -S COLOR -c brown
+l -t 3.38555555556 -s 56 -d 57 -S COLOR -c orange
+l -t 3.38555555556 -s 48 -d 49 -S COLOR -c black
+l -t 3.38555555556 -s 10 -d 13 -S COLOR -c black
+l -t 3.38555555556 -s 11 -d 14 -S COLOR -c orange
+l -t 3.38555555556 -s 57 -d 58 -S COLOR -c blue
+l -t 3.38555555556 -s 49 -d 50 -S COLOR -c black
+l -t 3.38555555556 -s 13 -d 16 -S COLOR -c black
+l -t 3.38555555556 -s 14 -d 55 -S COLOR -c black
+l -t 3.38555555556 -s 14 -d 17 -S COLOR -c blue
+l -t 3.38555555556 -s 14 -d 34 -S COLOR -c black
+l -t 3.38555555556 -s 58 -d 59 -S COLOR -c black
+l -t 3.38555555556 -s 50 -d 51 -S COLOR -c black
+l -t 3.38555555556 -s 16 -d 19 -S COLOR -c orange
+l -t 3.38555555556 -s 17 -d 20 -S COLOR -c black
+l -t 3.38555555556 -s 19 -d 22 -S COLOR -c blue
+l -t 3.38555555556 -s 20 -d 23 -S COLOR -c brown
+l -t 3.38555555556 -s 22 -d 30 -S COLOR -c black
+l -t 3.38555555556 -s 23 -d 25 -S COLOR -c black
+l -t 3.38555555556 -s 30 -d 31 -S COLOR -c black
+l -t 3.38555555556 -s 25 -d 27 -S COLOR -c black
+l -t 3.38555555556 -s 31 -d 32 -S COLOR -c black
+l -t 3.38555555556 -s 32 -d 33 -S COLOR -c black
+n -t 3.38555555556 -s 2 -c black
+n -t 3.38555555556 -s 6 -c grey
+n -t 3.38555555556 -s 9 -c grey
+n -t 3.38555555556 -s 12 -c grey
+n -t 3.38555555556 -s 15 -c grey
+n -t 3.38555555556 -s 18 -c grey
+n -t 3.38555555556 -s 21 -c grey
+n -t 3.38555555556 -s 51 -c black
+l -t 3.38555555556 -s 5 -d 6 -c grey
+l -t 3.38555555556 -s 6 -d 9 -c grey
+l -t 3.38555555556 -s 9 -d 12 -c grey
+l -t 3.38555555556 -s 12 -d 15 -c grey
+l -t 3.38555555556 -s 15 -d 18 -c grey
+l -t 3.38555555556 -s 18 -d 21 -c grey
+l -t 3.43861111111 -s 0 -d 1 -S COLOR -c black
+l -t 3.43861111111 -s 0 -d 2 -S COLOR -c black
+l -t 3.43861111111 -s 1 -d 3 -S COLOR -c black
+l -t 3.43861111111 -s 3 -d 4 -S COLOR -c black
+l -t 3.43861111111 -s 4 -d 5 -S COLOR -c brown
+l -t 3.43861111111 -s 5 -d 47 -S COLOR -c red
+l -t 3.43861111111 -s 5 -d 62 -S COLOR -c black
+l -t 3.43861111111 -s 5 -d 7 -S COLOR -c black
+l -t 3.43861111111 -s 5 -d 8 -S COLOR -c blue
+l -t 3.43861111111 -s 5 -d 6 -S COLOR -c black
+l -t 3.43861111111 -s 5 -d 56 -S COLOR -c brown
+l -t 3.43861111111 -s 47 -d 48 -S COLOR -c black
+l -t 3.43861111111 -s 62 -d 63 -S COLOR -c blue
+l -t 3.43861111111 -s 7 -d 10 -S COLOR -c brown
+l -t 3.43861111111 -s 8 -d 11 -S COLOR -c brown
+l -t 3.43861111111 -s 6 -d 9 -S COLOR -c red
+l -t 3.43861111111 -s 56 -d 57 -S COLOR -c brown
+l -t 3.43861111111 -s 48 -d 49 -S COLOR -c black
+l -t 3.43861111111 -s 63 -d 64 -S COLOR -c black
+l -t 3.43861111111 -s 10 -d 13 -S COLOR -c black
+l -t 3.43861111111 -s 11 -d 14 -S COLOR -c black
+l -t 3.43861111111 -s 9 -d 12 -S COLOR -c brown
+l -t 3.43861111111 -s 57 -d 58 -S COLOR -c blue
+l -t 3.43861111111 -s 49 -d 50 -S COLOR -c black
+l -t 3.43861111111 -s 64 -d 65 -S COLOR -c brown
+l -t 3.43861111111 -s 13 -d 16 -S COLOR -c blue
+l -t 3.43861111111 -s 14 -d 34 -S COLOR -c black
+l -t 3.43861111111 -s 14 -d 17 -S COLOR -c black
+l -t 3.43861111111 -s 14 -d 55 -S COLOR -c black
+l -t 3.43861111111 -s 12 -d 15 -S COLOR -c black
+l -t 3.43861111111 -s 58 -d 59 -S COLOR -c black
+l -t 3.43861111111 -s 50 -d 51 -S COLOR -c black
+l -t 3.43861111111 -s 65 -d 66 -S COLOR -c blue
+l -t 3.43861111111 -s 16 -d 19 -S COLOR -c orange
+l -t 3.43861111111 -s 17 -d 20 -S COLOR -c black
+l -t 3.43861111111 -s 15 -d 18 -S COLOR -c blue
+l -t 3.43861111111 -s 66 -d 67 -S COLOR -c black
+l -t 3.43861111111 -s 19 -d 22 -S COLOR -c black
+l -t 3.43861111111 -s 20 -d 23 -S COLOR -c blue
+l -t 3.43861111111 -s 18 -d 21 -S COLOR -c black
+l -t 3.43861111111 -s 22 -d 30 -S COLOR -c black
+l -t 3.43861111111 -s 23 -d 25 -S COLOR -c black
+l -t 3.43861111111 -s 30 -d 31 -S COLOR -c black
+l -t 3.43861111111 -s 25 -d 27 -S COLOR -c black
+l -t 3.43861111111 -s 31 -d 32 -S COLOR -c brown
+l -t 3.43861111111 -s 32 -d 33 -S COLOR -c black
+n -t 3.43861111111 -s 6 -c black
+n -t 3.43861111111 -s 9 -c black
+n -t 3.43861111111 -s 12 -c black
+n -t 3.43861111111 -s 15 -c black
+n -t 3.43861111111 -s 18 -c black
+n -t 3.43861111111 -s 21 -c black
+n -t 3.43861111111 -s 62 -c black
+n -t 3.43861111111 -s 63 -c black
+n -t 3.43861111111 -s 64 -c black
+n -t 3.43861111111 -s 65 -c black
+n -t 3.43861111111 -s 66 -c black
+n -t 3.43861111111 -s 67 -c black
+l -t 3.49194444444 -s 0 -d 1 -S COLOR -c blue
+l -t 3.49194444444 -s 0 -d 2 -S COLOR -c black
+l -t 3.49194444444 -s 1 -d 3 -S COLOR -c black
+l -t 3.49194444444 -s 3 -d 4 -S COLOR -c black
+l -t 3.49194444444 -s 4 -d 5 -S COLOR -c blue
+l -t 3.49194444444 -s 5 -d 47 -S COLOR -c red
+l -t 3.49194444444 -s 5 -d 7 -S COLOR -c black
+l -t 3.49194444444 -s 5 -d 8 -S COLOR -c blue
+l -t 3.49194444444 -s 5 -d 56 -S COLOR -c blue
+l -t 3.49194444444 -s 47 -d 48 -S COLOR -c black
+l -t 3.49194444444 -s 7 -d 10 -S COLOR -c orange
+l -t 3.49194444444 -s 8 -d 11 -S COLOR -c red
+l -t 3.49194444444 -s 56 -d 57 -S COLOR -c brown
+l -t 3.49194444444 -s 48 -d 49 -S COLOR -c black
+l -t 3.49194444444 -s 10 -d 13 -S COLOR -c brown
+l -t 3.49194444444 -s 11 -d 14 -S COLOR -c black
+l -t 3.49194444444 -s 57 -d 58 -S COLOR -c blue
+l -t 3.49194444444 -s 49 -d 50 -S COLOR -c black
+l -t 3.49194444444 -s 13 -d 16 -S COLOR -c brown
+l -t 3.49194444444 -s 14 -d 55 -S COLOR -c black
+l -t 3.49194444444 -s 14 -d 17 -S COLOR -c black
+l -t 3.49194444444 -s 14 -d 34 -S COLOR -c black
+l -t 3.49194444444 -s 58 -d 59 -S COLOR -c black
+l -t 3.49194444444 -s 16 -d 19 -S COLOR -c orange
+l -t 3.49194444444 -s 17 -d 20 -S COLOR -c brown
+l -t 3.49194444444 -s 19 -d 22 -S COLOR -c blue
+l -t 3.49194444444 -s 20 -d 23 -S COLOR -c black
+l -t 3.49194444444 -s 22 -d 30 -S COLOR -c black
+l -t 3.49194444444 -s 23 -d 25 -S COLOR -c blue
+l -t 3.49194444444 -s 30 -d 31 -S COLOR -c black
+l -t 3.49194444444 -s 25 -d 27 -S COLOR -c black
+l -t 3.49194444444 -s 31 -d 32 -S COLOR -c brown
+l -t 3.49194444444 -s 32 -d 33 -S COLOR -c black
+n -t 3.49194444444 -s 6 -c grey
+n -t 3.49194444444 -s 9 -c grey
+n -t 3.49194444444 -s 12 -c grey
+n -t 3.49194444444 -s 15 -c grey
+n -t 3.49194444444 -s 18 -c grey
+n -t 3.49194444444 -s 21 -c grey
+n -t 3.49194444444 -s 51 -c grey
+n -t 3.49194444444 -s 62 -c grey
+n -t 3.49194444444 -s 63 -c grey
+n -t 3.49194444444 -s 64 -c grey
+n -t 3.49194444444 -s 65 -c grey
+n -t 3.49194444444 -s 66 -c grey
+n -t 3.49194444444 -s 67 -c grey
+l -t 3.49194444444 -s 5 -d 6 -c grey
+l -t 3.49194444444 -s 6 -d 9 -c grey
+l -t 3.49194444444 -s 9 -d 12 -c grey
+l -t 3.49194444444 -s 12 -d 15 -c grey
+l -t 3.49194444444 -s 15 -d 18 -c grey
+l -t 3.49194444444 -s 18 -d 21 -c grey
+l -t 3.49194444444 -s 50 -d 51 -c grey
+l -t 3.49194444444 -s 5 -d 62 -c grey
+l -t 3.49194444444 -s 62 -d 63 -c grey
+l -t 3.49194444444 -s 63 -d 64 -c grey
+l -t 3.49194444444 -s 64 -d 65 -c grey
+l -t 3.49194444444 -s 65 -d 66 -c grey
+l -t 3.49194444444 -s 66 -d 67 -c grey
+l -t 3.58722222222 -s 68 -d 60 -S COLOR -c black
+l -t 3.58722222222 -s 60 -d 55 -S COLOR -c red
+n -t 3.58722222222 -s 0 -c grey
+n -t 3.58722222222 -s 1 -c grey
+n -t 3.58722222222 -s 2 -c grey
+n -t 3.58722222222 -s 3 -c grey
+n -t 3.58722222222 -s 4 -c grey
+n -t 3.58722222222 -s 5 -c grey
+n -t 3.58722222222 -s 7 -c grey
+n -t 3.58722222222 -s 8 -c grey
+n -t 3.58722222222 -s 10 -c grey
+n -t 3.58722222222 -s 11 -c grey
+n -t 3.58722222222 -s 13 -c grey
+n -t 3.58722222222 -s 14 -c grey
+n -t 3.58722222222 -s 16 -c grey
+n -t 3.58722222222 -s 17 -c grey
+n -t 3.58722222222 -s 19 -c grey
+n -t 3.58722222222 -s 20 -c grey
+n -t 3.58722222222 -s 22 -c grey
+n -t 3.58722222222 -s 23 -c grey
+n -t 3.58722222222 -s 25 -c grey
+n -t 3.58722222222 -s 27 -c grey
+n -t 3.58722222222 -s 30 -c grey
+n -t 3.58722222222 -s 31 -c grey
+n -t 3.58722222222 -s 32 -c grey
+n -t 3.58722222222 -s 33 -c grey
+n -t 3.58722222222 -s 34 -c grey
+n -t 3.58722222222 -s 47 -c grey
+n -t 3.58722222222 -s 48 -c grey
+n -t 3.58722222222 -s 49 -c grey
+n -t 3.58722222222 -s 50 -c grey
+n -t 3.58722222222 -s 56 -c grey
+n -t 3.58722222222 -s 57 -c grey
+n -t 3.58722222222 -s 58 -c grey
+n -t 3.58722222222 -s 59 -c grey
+n -t 3.58722222222 -s 60 -c black
+n -t 3.58722222222 -s 68 -c black
+l -t 3.58722222222 -s 0 -d 1 -c grey
+l -t 3.58722222222 -s 0 -d 2 -c grey
+l -t 3.58722222222 -s 1 -d 3 -c grey
+l -t 3.58722222222 -s 3 -d 4 -c grey
+l -t 3.58722222222 -s 4 -d 5 -c grey
+l -t 3.58722222222 -s 5 -d 7 -c grey
+l -t 3.58722222222 -s 5 -d 8 -c grey
+l -t 3.58722222222 -s 7 -d 10 -c grey
+l -t 3.58722222222 -s 8 -d 11 -c grey
+l -t 3.58722222222 -s 10 -d 13 -c grey
+l -t 3.58722222222 -s 11 -d 14 -c grey
+l -t 3.58722222222 -s 13 -d 16 -c grey
+l -t 3.58722222222 -s 14 -d 17 -c grey
+l -t 3.58722222222 -s 16 -d 19 -c grey
+l -t 3.58722222222 -s 17 -d 20 -c grey
+l -t 3.58722222222 -s 19 -d 22 -c grey
+l -t 3.58722222222 -s 20 -d 23 -c grey
+l -t 3.58722222222 -s 23 -d 25 -c grey
+l -t 3.58722222222 -s 25 -d 27 -c grey
+l -t 3.58722222222 -s 22 -d 30 -c grey
+l -t 3.58722222222 -s 30 -d 31 -c grey
+l -t 3.58722222222 -s 31 -d 32 -c grey
+l -t 3.58722222222 -s 32 -d 33 -c grey
+l -t 3.58722222222 -s 14 -d 34 -c grey
+l -t 3.58722222222 -s 5 -d 47 -c grey
+l -t 3.58722222222 -s 47 -d 48 -c grey
+l -t 3.58722222222 -s 48 -d 49 -c grey
+l -t 3.58722222222 -s 49 -d 50 -c grey
+l -t 3.58722222222 -s 14 -d 55 -c grey
+l -t 3.58722222222 -s 5 -d 56 -c grey
+l -t 3.58722222222 -s 56 -d 57 -c grey
+l -t 3.58722222222 -s 57 -d 58 -c grey
+l -t 3.58722222222 -s 58 -d 59 -c grey
+n -t 3.63722222222 -s 35 -c black
+n -t 3.63722222222 -s 55 -c grey
+n -t 3.63722222222 -s 60 -c grey
+n -t 3.63722222222 -s 68 -c grey
+l -t 3.63722222222 -s 60 -d 55 -c grey
+l -t 3.63722222222 -s 68 -d 60 -c grey
+l -t 3.66305555556 -s 0 -d 1 -S COLOR -c blue
+l -t 3.66305555556 -s 0 -d 2 -S COLOR -c black
+l -t 3.66305555556 -s 1 -d 3 -S COLOR -c black
+l -t 3.66305555556 -s 3 -d 4 -S COLOR -c black
+l -t 3.66305555556 -s 4 -d 5 -S COLOR -c brown
+l -t 3.66305555556 -s 5 -d 7 -S COLOR -c red
+l -t 3.66305555556 -s 5 -d 8 -S COLOR -c brown
+l -t 3.66305555556 -s 7 -d 10 -S COLOR -c blue
+l -t 3.66305555556 -s 8 -d 11 -S COLOR -c red
+l -t 3.66305555556 -s 10 -d 13 -S COLOR -c black
+l -t 3.66305555556 -s 11 -d 14 -S COLOR -c blue
+l -t 3.66305555556 -s 13 -d 16 -S COLOR -c brown
+l -t 3.66305555556 -s 14 -d 34 -S COLOR -c black
+l -t 3.66305555556 -s 14 -d 17 -S COLOR -c black
+l -t 3.66305555556 -s 14 -d 55 -S COLOR -c black
+l -t 3.66305555556 -s 16 -d 19 -S COLOR -c blue
+l -t 3.66305555556 -s 17 -d 20 -S COLOR -c black
+l -t 3.66305555556 -s 19 -d 22 -S COLOR -c black
+l -t 3.66305555556 -s 20 -d 23 -S COLOR -c black
+l -t 3.66305555556 -s 22 -d 30 -S COLOR -c black
+l -t 3.66305555556 -s 23 -d 25 -S COLOR -c black
+l -t 3.66305555556 -s 30 -d 31 -S COLOR -c black
+l -t 3.66305555556 -s 25 -d 27 -S COLOR -c black
+l -t 3.66305555556 -s 31 -d 32 -S COLOR -c blue
+l -t 3.66305555556 -s 32 -d 33 -S COLOR -c black
+n -t 3.66305555556 -s 0 -c black
+n -t 3.66305555556 -s 1 -c black
+n -t 3.66305555556 -s 2 -c black
+n -t 3.66305555556 -s 3 -c black
+n -t 3.66305555556 -s 4 -c black
+n -t 3.66305555556 -s 5 -c black
+n -t 3.66305555556 -s 7 -c black
+n -t 3.66305555556 -s 8 -c black
+n -t 3.66305555556 -s 10 -c black
+n -t 3.66305555556 -s 11 -c black
+n -t 3.66305555556 -s 13 -c black
+n -t 3.66305555556 -s 14 -c black
+n -t 3.66305555556 -s 16 -c black
+n -t 3.66305555556 -s 17 -c black
+n -t 3.66305555556 -s 19 -c black
+n -t 3.66305555556 -s 20 -c black
+n -t 3.66305555556 -s 22 -c black
+n -t 3.66305555556 -s 23 -c black
+n -t 3.66305555556 -s 25 -c black
+n -t 3.66305555556 -s 27 -c black
+n -t 3.66305555556 -s 30 -c black
+n -t 3.66305555556 -s 31 -c black
+n -t 3.66305555556 -s 32 -c black
+n -t 3.66305555556 -s 33 -c black
+n -t 3.66305555556 -s 34 -c black
+n -t 3.66305555556 -s 35 -c grey
+n -t 3.66305555556 -s 55 -c black
+l -t 3.70777777778 -s 0 -d 1 -S COLOR -c brown
+l -t 3.70777777778 -s 0 -d 2 -S COLOR -c black
+l -t 3.70777777778 -s 1 -d 3 -S COLOR -c black
+l -t 3.70777777778 -s 3 -d 4 -S COLOR -c brown
+l -t 3.70777777778 -s 4 -d 5 -S COLOR -c red
+l -t 3.70777777778 -s 5 -d 56 -S COLOR -c blue
+l -t 3.70777777778 -s 5 -d 62 -S COLOR -c black
+l -t 3.70777777778 -s 5 -d 7 -S COLOR -c red
+l -t 3.70777777778 -s 5 -d 8 -S COLOR -c blue
+l -t 3.70777777778 -s 5 -d 47 -S COLOR -c red
+l -t 3.70777777778 -s 56 -d 57 -S COLOR -c brown
+l -t 3.70777777778 -s 62 -d 63 -S COLOR -c black
+l -t 3.70777777778 -s 7 -d 10 -S COLOR -c orange
+l -t 3.70777777778 -s 8 -d 11 -S COLOR -c red
+l -t 3.70777777778 -s 47 -d 48 -S COLOR -c black
+l -t 3.70777777778 -s 57 -d 58 -S COLOR -c blue
+l -t 3.70777777778 -s 63 -d 64 -S COLOR -c black
+l -t 3.70777777778 -s 10 -d 13 -S COLOR -c brown
+l -t 3.70777777778 -s 11 -d 14 -S COLOR -c blue
+l -t 3.70777777778 -s 48 -d 49 -S COLOR -c black
+l -t 3.70777777778 -s 58 -d 59 -S COLOR -c black
+l -t 3.70777777778 -s 64 -d 65 -S COLOR -c black
+l -t 3.70777777778 -s 13 -d 16 -S COLOR -c black
+l -t 3.70777777778 -s 14 -d 34 -S COLOR -c black
+l -t 3.70777777778 -s 14 -d 17 -S COLOR -c black
+l -t 3.70777777778 -s 14 -d 55 -S COLOR -c black
+l -t 3.70777777778 -s 49 -d 50 -S COLOR -c black
+l -t 3.70777777778 -s 65 -d 66 -S COLOR -c brown
+l -t 3.70777777778 -s 16 -d 19 -S COLOR -c black
+l -t 3.70777777778 -s 17 -d 20 -S COLOR -c brown
+l -t 3.70777777778 -s 66 -d 67 -S COLOR -c black
+l -t 3.70777777778 -s 19 -d 22 -S COLOR -c blue
+l -t 3.70777777778 -s 20 -d 23 -S COLOR -c blue
+l -t 3.70777777778 -s 22 -d 30 -S COLOR -c black
+l -t 3.70777777778 -s 23 -d 25 -S COLOR -c black
+l -t 3.70777777778 -s 30 -d 31 -S COLOR -c brown
+l -t 3.70777777778 -s 25 -d 27 -S COLOR -c black
+l -t 3.70777777778 -s 31 -d 32 -S COLOR -c black
+l -t 3.70777777778 -s 32 -d 33 -S COLOR -c black
+n -t 3.70777777778 -s 47 -c black
+n -t 3.70777777778 -s 48 -c black
+n -t 3.70777777778 -s 49 -c black
+n -t 3.70777777778 -s 50 -c black
+n -t 3.70777777778 -s 56 -c black
+n -t 3.70777777778 -s 57 -c black
+n -t 3.70777777778 -s 58 -c black
+n -t 3.70777777778 -s 59 -c black
+n -t 3.70777777778 -s 62 -c black
+n -t 3.70777777778 -s 63 -c black
+n -t 3.70777777778 -s 64 -c black
+n -t 3.70777777778 -s 65 -c black
+n -t 3.70777777778 -s 66 -c black
+n -t 3.70777777778 -s 67 -c black
+l -t 3.77388888889 -s 0 -d 1 -S COLOR -c black
+l -t 3.77388888889 -s 0 -d 2 -S COLOR -c black
+l -t 3.77388888889 -s 1 -d 3 -S COLOR -c black
+l -t 3.77388888889 -s 3 -d 4 -S COLOR -c blue
+l -t 3.77388888889 -s 4 -d 5 -S COLOR -c black
+l -t 3.77388888889 -s 5 -d 47 -S COLOR -c red
+l -t 3.77388888889 -s 5 -d 62 -S COLOR -c black
+l -t 3.77388888889 -s 5 -d 7 -S COLOR -c black
+l -t 3.77388888889 -s 5 -d 8 -S COLOR -c brown
+l -t 3.77388888889 -s 5 -d 6 -S COLOR -c blue
+l -t 3.77388888889 -s 5 -d 56 -S COLOR -c brown
+l -t 3.77388888889 -s 47 -d 48 -S COLOR -c black
+l -t 3.77388888889 -s 62 -d 63 -S COLOR -c black
+l -t 3.77388888889 -s 7 -d 10 -S COLOR -c orange
+l -t 3.77388888889 -s 8 -d 11 -S COLOR -c black
+l -t 3.77388888889 -s 6 -d 9 -S COLOR -c red
+l -t 3.77388888889 -s 56 -d 57 -S COLOR -c black
+l -t 3.77388888889 -s 48 -d 49 -S COLOR -c black
+l -t 3.77388888889 -s 63 -d 64 -S COLOR -c black
+l -t 3.77388888889 -s 10 -d 13 -S COLOR -c black
+l -t 3.77388888889 -s 11 -d 14 -S COLOR -c brown
+l -t 3.77388888889 -s 9 -d 12 -S COLOR -c black
+l -t 3.77388888889 -s 57 -d 58 -S COLOR -c blue
+l -t 3.77388888889 -s 49 -d 50 -S COLOR -c brown
+l -t 3.77388888889 -s 64 -d 65 -S COLOR -c black
+l -t 3.77388888889 -s 13 -d 16 -S COLOR -c black
+l -t 3.77388888889 -s 14 -d 34 -S COLOR -c black
+l -t 3.77388888889 -s 14 -d 17 -S COLOR -c black
+l -t 3.77388888889 -s 14 -d 55 -S COLOR -c black
+l -t 3.77388888889 -s 12 -d 15 -S COLOR -c black
+l -t 3.77388888889 -s 58 -d 59 -S COLOR -c black
+l -t 3.77388888889 -s 50 -d 51 -S COLOR -c black
+l -t 3.77388888889 -s 65 -d 66 -S COLOR -c black
+l -t 3.77388888889 -s 16 -d 19 -S COLOR -c orange
+l -t 3.77388888889 -s 17 -d 20 -S COLOR -c brown
+l -t 3.77388888889 -s 15 -d 18 -S COLOR -c black
+l -t 3.77388888889 -s 66 -d 67 -S COLOR -c black
+l -t 3.77388888889 -s 19 -d 22 -S COLOR -c blue
+l -t 3.77388888889 -s 20 -d 23 -S COLOR -c black
+l -t 3.77388888889 -s 18 -d 21 -S COLOR -c black
+l -t 3.77388888889 -s 22 -d 30 -S COLOR -c black
+l -t 3.77388888889 -s 23 -d 25 -S COLOR -c black
+l -t 3.77388888889 -s 30 -d 31 -S COLOR -c brown
+l -t 3.77388888889 -s 25 -d 27 -S COLOR -c black
+l -t 3.77388888889 -s 31 -d 32 -S COLOR -c black
+l -t 3.77388888889 -s 32 -d 33 -S COLOR -c black
+n -t 3.77388888889 -s 6 -c black
+n -t 3.77388888889 -s 9 -c black
+n -t 3.77388888889 -s 12 -c black
+n -t 3.77388888889 -s 15 -c black
+n -t 3.77388888889 -s 18 -c black
+n -t 3.77388888889 -s 21 -c black
+n -t 3.77388888889 -s 51 -c black
+l -t 3.83583333333 -s 0 -d 1 -S COLOR -c brown
+l -t 3.83583333333 -s 0 -d 2 -S COLOR -c black
+l -t 3.83583333333 -s 1 -d 3 -S COLOR -c black
+l -t 3.83583333333 -s 3 -d 4 -S COLOR -c brown
+l -t 3.83583333333 -s 4 -d 5 -S COLOR -c blue
+l -t 3.83583333333 -s 5 -d 47 -S COLOR -c red
+l -t 3.83583333333 -s 5 -d 62 -S COLOR -c black
+l -t 3.83583333333 -s 5 -d 7 -S COLOR -c blue
+l -t 3.83583333333 -s 5 -d 8 -S COLOR -c black
+l -t 3.83583333333 -s 5 -d 6 -S COLOR -c black
+l -t 3.83583333333 -s 5 -d 56 -S COLOR -c black
+l -t 3.83583333333 -s 47 -d 48 -S COLOR -c blue
+l -t 3.83583333333 -s 62 -d 63 -S COLOR -c blue
+l -t 3.83583333333 -s 7 -d 10 -S COLOR -c orange
+l -t 3.83583333333 -s 8 -d 11 -S COLOR -c brown
+l -t 3.83583333333 -s 6 -d 9 -S COLOR -c red
+l -t 3.83583333333 -s 56 -d 57 -S COLOR -c brown
+l -t 3.83583333333 -s 48 -d 49 -S COLOR -c black
+l -t 3.83583333333 -s 63 -d 64 -S COLOR -c brown
+l -t 3.83583333333 -s 10 -d 13 -S COLOR -c black
+l -t 3.83583333333 -s 11 -d 14 -S COLOR -c black
+l -t 3.83583333333 -s 9 -d 12 -S COLOR -c black
+l -t 3.83583333333 -s 57 -d 58 -S COLOR -c blue
+l -t 3.83583333333 -s 49 -d 50 -S COLOR -c black
+l -t 3.83583333333 -s 64 -d 65 -S COLOR -c black
+l -t 3.83583333333 -s 13 -d 16 -S COLOR -c brown
+l -t 3.83583333333 -s 14 -d 34 -S COLOR -c black
+l -t 3.83583333333 -s 14 -d 17 -S COLOR -c black
+l -t 3.83583333333 -s 14 -d 55 -S COLOR -c black
+l -t 3.83583333333 -s 12 -d 15 -S COLOR -c black
+l -t 3.83583333333 -s 58 -d 59 -S COLOR -c black
+l -t 3.83583333333 -s 50 -d 51 -S COLOR -c black
+l -t 3.83583333333 -s 65 -d 66 -S COLOR -c black
+l -t 3.83583333333 -s 16 -d 19 -S COLOR -c black
+l -t 3.83583333333 -s 17 -d 20 -S COLOR -c blue
+l -t 3.83583333333 -s 15 -d 18 -S COLOR -c black
+l -t 3.83583333333 -s 66 -d 67 -S COLOR -c black
+l -t 3.83583333333 -s 19 -d 22 -S COLOR -c black
+l -t 3.83583333333 -s 20 -d 23 -S COLOR -c brown
+l -t 3.83583333333 -s 18 -d 21 -S COLOR -c black
+l -t 3.83583333333 -s 22 -d 30 -S COLOR -c black
+l -t 3.83583333333 -s 23 -d 25 -S COLOR -c black
+l -t 3.83583333333 -s 30 -d 31 -S COLOR -c black
+l -t 3.83583333333 -s 25 -d 27 -S COLOR -c black
+l -t 3.83583333333 -s 31 -d 32 -S COLOR -c black
+l -t 3.83583333333 -s 32 -d 33 -S COLOR -c black
+l -t 3.88444444444 -s 0 -d 1 -S COLOR -c black
+l -t 3.88444444444 -s 1 -d 3 -S COLOR -c orange
+l -t 3.88444444444 -s 3 -d 4 -S COLOR -c blue
+l -t 3.88444444444 -s 3 -d 69 -S COLOR -c black
+l -t 3.88444444444 -s 4 -d 5 -S COLOR -c black
+l -t 3.88444444444 -s 5 -d 8 -S COLOR -c black
+l -t 3.88444444444 -s 5 -d 6 -S COLOR -c black
+l -t 3.88444444444 -s 5 -d 47 -S COLOR -c red
+l -t 3.88444444444 -s 5 -d 56 -S COLOR -c blue
+l -t 3.88444444444 -s 8 -d 11 -S COLOR -c black
+l -t 3.88444444444 -s 6 -d 9 -S COLOR -c black
+l -t 3.88444444444 -s 47 -d 48 -S COLOR -c black
+l -t 3.88444444444 -s 56 -d 57 -S COLOR -c brown
+l -t 3.88444444444 -s 11 -d 14 -S COLOR -c black
+l -t 3.88444444444 -s 9 -d 12 -S COLOR -c black
+l -t 3.88444444444 -s 48 -d 49 -S COLOR -c black
+l -t 3.88444444444 -s 57 -d 58 -S COLOR -c blue
+l -t 3.88444444444 -s 14 -d 34 -S COLOR -c black
+l -t 3.88444444444 -s 14 -d 55 -S COLOR -c black
+l -t 3.88444444444 -s 12 -d 15 -S COLOR -c black
+l -t 3.88444444444 -s 49 -d 50 -S COLOR -c red
+l -t 3.88444444444 -s 58 -d 59 -S COLOR -c black
+l -t 3.88444444444 -s 15 -d 18 -S COLOR -c black
+l -t 3.88444444444 -s 18 -d 21 -S COLOR -c black
+n -t 3.88444444444 -s 2 -c grey
+n -t 3.88444444444 -s 7 -c grey
+n -t 3.88444444444 -s 10 -c grey
+n -t 3.88444444444 -s 13 -c grey
+n -t 3.88444444444 -s 16 -c grey
+n -t 3.88444444444 -s 17 -c grey
+n -t 3.88444444444 -s 19 -c grey
+n -t 3.88444444444 -s 20 -c grey
+n -t 3.88444444444 -s 22 -c grey
+n -t 3.88444444444 -s 23 -c grey
+n -t 3.88444444444 -s 25 -c grey
+n -t 3.88444444444 -s 27 -c grey
+n -t 3.88444444444 -s 30 -c grey
+n -t 3.88444444444 -s 31 -c grey
+n -t 3.88444444444 -s 32 -c grey
+n -t 3.88444444444 -s 33 -c grey
+n -t 3.88444444444 -s 51 -c grey
+n -t 3.88444444444 -s 62 -c grey
+n -t 3.88444444444 -s 63 -c grey
+n -t 3.88444444444 -s 64 -c grey
+n -t 3.88444444444 -s 65 -c grey
+n -t 3.88444444444 -s 66 -c grey
+n -t 3.88444444444 -s 67 -c grey
+n -t 3.88444444444 -s 69 -c black
+l -t 3.88444444444 -s 0 -d 2 -c grey
+l -t 3.88444444444 -s 5 -d 7 -c grey
+l -t 3.88444444444 -s 7 -d 10 -c grey
+l -t 3.88444444444 -s 10 -d 13 -c grey
+l -t 3.88444444444 -s 13 -d 16 -c grey
+l -t 3.88444444444 -s 14 -d 17 -c grey
+l -t 3.88444444444 -s 16 -d 19 -c grey
+l -t 3.88444444444 -s 17 -d 20 -c grey
+l -t 3.88444444444 -s 19 -d 22 -c grey
+l -t 3.88444444444 -s 20 -d 23 -c grey
+l -t 3.88444444444 -s 23 -d 25 -c grey
+l -t 3.88444444444 -s 25 -d 27 -c grey
+l -t 3.88444444444 -s 22 -d 30 -c grey
+l -t 3.88444444444 -s 30 -d 31 -c grey
+l -t 3.88444444444 -s 31 -d 32 -c grey
+l -t 3.88444444444 -s 32 -d 33 -c grey
+l -t 3.88444444444 -s 50 -d 51 -c grey
+l -t 3.88444444444 -s 5 -d 62 -c grey
+l -t 3.88444444444 -s 62 -d 63 -c grey
+l -t 3.88444444444 -s 63 -d 64 -c grey
+l -t 3.88444444444 -s 64 -d 65 -c grey
+l -t 3.88444444444 -s 65 -d 66 -c grey
+l -t 3.88444444444 -s 66 -d 67 -c grey
+l -t 3.99166666667 -s 0 -d 1 -S COLOR -c black
+l -t 3.99166666667 -s 0 -d 2 -S COLOR -c black
+l -t 3.99166666667 -s 1 -d 3 -S COLOR -c black
+l -t 3.99166666667 -s 3 -d 4 -S COLOR -c black
+l -t 3.99166666667 -s 4 -d 5 -S COLOR -c brown
+l -t 3.99166666667 -s 5 -d 6 -S COLOR -c blue
+l -t 3.99166666667 -s 5 -d 7 -S COLOR -c black
+l -t 3.99166666667 -s 5 -d 62 -S COLOR -c black
+l -t 3.99166666667 -s 5 -d 8 -S COLOR -c black
+l -t 3.99166666667 -s 6 -d 9 -S COLOR -c red
+l -t 3.99166666667 -s 7 -d 10 -S COLOR -c blue
+l -t 3.99166666667 -s 62 -d 63 -S COLOR -c black
+l -t 3.99166666667 -s 8 -d 11 -S COLOR -c blue
+l -t 3.99166666667 -s 9 -d 12 -S COLOR -c brown
+l -t 3.99166666667 -s 10 -d 13 -S COLOR -c brown
+l -t 3.99166666667 -s 63 -d 64 -S COLOR -c blue
+l -t 3.99166666667 -s 11 -d 14 -S COLOR -c black
+l -t 3.99166666667 -s 12 -d 15 -S COLOR -c black
+l -t 3.99166666667 -s 13 -d 16 -S COLOR -c black
+l -t 3.99166666667 -s 64 -d 65 -S COLOR -c black
+l -t 3.99166666667 -s 14 -d 60 -S COLOR -c black
+l -t 3.99166666667 -s 14 -d 34 -S COLOR -c black
+l -t 3.99166666667 -s 15 -d 18 -S COLOR -c blue
+l -t 3.99166666667 -s 16 -d 19 -S COLOR -c black
+l -t 3.99166666667 -s 65 -d 66 -S COLOR -c black
+l -t 3.99166666667 -s 60 -d 55 -S COLOR -c red
+l -t 3.99166666667 -s 18 -d 21 -S COLOR -c black
+l -t 3.99166666667 -s 19 -d 22 -S COLOR -c black
+l -t 3.99166666667 -s 66 -d 67 -S COLOR -c black
+l -t 3.99166666667 -s 22 -d 30 -S COLOR -c black
+l -t 3.99166666667 -s 30 -d 31 -S COLOR -c blue
+l -t 3.99166666667 -s 31 -d 32 -S COLOR -c black
+l -t 3.99166666667 -s 32 -d 33 -S COLOR -c black
+n -t 3.99166666667 -s 2 -c black
+n -t 3.99166666667 -s 7 -c black
+n -t 3.99166666667 -s 10 -c black
+n -t 3.99166666667 -s 13 -c black
+n -t 3.99166666667 -s 16 -c black
+n -t 3.99166666667 -s 19 -c black
+n -t 3.99166666667 -s 22 -c black
+n -t 3.99166666667 -s 30 -c black
+n -t 3.99166666667 -s 31 -c black
+n -t 3.99166666667 -s 32 -c black
+n -t 3.99166666667 -s 33 -c black
+n -t 3.99166666667 -s 47 -c grey
+n -t 3.99166666667 -s 48 -c grey
+n -t 3.99166666667 -s 49 -c grey
+n -t 3.99166666667 -s 50 -c grey
+n -t 3.99166666667 -s 56 -c grey
+n -t 3.99166666667 -s 57 -c grey
+n -t 3.99166666667 -s 58 -c grey
+n -t 3.99166666667 -s 59 -c grey
+n -t 3.99166666667 -s 60 -c black
+n -t 3.99166666667 -s 62 -c black
+n -t 3.99166666667 -s 63 -c black
+n -t 3.99166666667 -s 64 -c black
+n -t 3.99166666667 -s 65 -c black
+n -t 3.99166666667 -s 66 -c black
+n -t 3.99166666667 -s 67 -c black
+n -t 3.99166666667 -s 69 -c grey
+l -t 3.99166666667 -s 5 -d 47 -c grey
+l -t 3.99166666667 -s 47 -d 48 -c grey
+l -t 3.99166666667 -s 48 -d 49 -c grey
+l -t 3.99166666667 -s 49 -d 50 -c grey
+l -t 3.99166666667 -s 14 -d 55 -c grey
+l -t 3.99166666667 -s 5 -d 56 -c grey
+l -t 3.99166666667 -s 56 -d 57 -c grey
+l -t 3.99166666667 -s 57 -d 58 -c grey
+l -t 3.99166666667 -s 58 -d 59 -c grey
+l -t 3.99166666667 -s 3 -d 69 -c grey

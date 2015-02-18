@@ -1,0 +1,145 @@
+$Id: itm-doc.txt,v 1.1 1996/10/04 13:29:13 ewz Exp $
+
+Name: itm 
+
+Function:  Driver to create flat random graphs and two forms
+	   of hierarchical graphs (N-level and transit-stub).
+
+	   See models.ps for a more complete description of
+	   the methods.  This file describes the syntax and
+	   (limited) semantics of the parameter specification file.
+
+Usage:  itm <spec-file0> <spec-file1> ....
+
+Details:
+
+File Format
+-----------
+    
+    Each argument is a file containing ONE set of specs for 
+    graph generation.  Such a file has the following format:
+
+       [# comment line]
+       <method keyword> <number of graphs> [<initial seed>]
+       <method-dependent parameter lines>
+
+    <method keyword> is one of:
+	"geo":  flat random graph 
+        "hier": N-level hierarchical graph
+	"ts":   transit-stub graph
+
+    <number of graphs>: number of graphs of specified type to generate
+    <initial seed>: initial random number seed; optional
+
+    Any line preceeded by # is a comment and is ignored by itm.
+
+
+Method-dependent Parameters
+---------------------------
+
+    All of the methods make use of the following <geo_parms>
+    line, which specifies the parameters for a flat random
+    graph.  Six different types of flat random graphs are supported.
+    (See models.ps for more detail on parameters and edge
+    generation methods.)
+
+    <geo_parms> ::= <n> <scale> <edgemethod> <alpha> [<beta> <gamma>]
+
+       <n>: number of nodes in graph
+       <scale>: one-sided dimension of space in which nodes are distributed
+       <edgemethod>: method for generating edges; valid range 1..6
+		1: Waxman 1 
+		2: Waxman 2
+		3: Pure random
+		4: Doar-Leslie
+		5: Exponential
+		6: Locality
+	<alpha>: random graph parameter (0.0 <= alpha <= 1.0)
+	<beta>: random graph parameter (0.0 <= beta)
+	<gamma>: random graph parameter (0.0 <= gamma)
+
+
+   The <method-dependent parameter lines> are as follows:
+  
+   <"geo" parms> ::= <geo_parms>
+
+   <"hier" parms> ::= <number of levels> <edgeconnmethod> <threshold>
+                      <geo_parms>+  {one per number of levels}
+
+	<number of levels>: number of levels in hierarchy
+	<edgeconnmethod>: method of resolving edges  
+		(NOTE: probably should just use method 0)
+		0: random
+		1: use non-leaf node of smallest degree 
+	 	2: use node of smallest degree
+		3: use first node with degree less than <threshold> 
+	<threshold>: see above 
+
+   <"ts" parms> ::= <# stubs/xit> <#t-s edges> <#s-s edges>
+                    <geo_parms>       {top-level parameters}
+                    <geo_parms>       {transit domain parameters}
+                    <geo_parms>       {stub domain parameters}
+
+	<# stubs/xit>: avg number of stub domains attached per transit node
+	<#t-s edges>: number of extra transit-stub edges
+	<#s-s edges>: number of extra stub-stub edges
+
+
+Output File Naming Convention:
+------------------------------
+	
+    The i'th graph created with the parameters from file "arg" is placed
+    in file "arg-i.gb", where the first value of i is zero.
+
+
+Example of Usage:
+-----------------
+
+The following is a valid specification file called r10:
+
+
+	# <method keyword> <number of graphs> [<initial seed>]
+	# <n> <scale> <edgemethod>  <alpha> [<beta>] [<gamma>]
+	geo 3 
+	10 10 3 .2 
+
+If we run 'itm r10' then three pure random graphs of 10 nodes
+each will be created.  The nodes of each graph will be generated
+in a 10 by 10 (logical) grid.  The probability of an edge is 0.2, as
+given by the <alpha> parameter; <beta> and <gamma> are not needed
+for this method.  The output files will be named: r10-0.gb, r10-1.gb, 
+r10-2.gb.  (This specification file and the resulting output files
+can be found in sample-graphs/rand/r10.)
+
+
+Another Example of Usage:
+-------------------------
+
+The following is a valid specification file called t100:
+
+        # <method keyword> <number of graphs> [<initial seed>]
+	# <# stubs/xit> <#t-s edges> <#s-s edges>
+	# <n> <scale> <edgemethod> <alpha> [<beta>] [<gamma>]
+	# number of nodes = 1x4x(1+3x8) = 100
+	ts 10 47
+	3 0 0
+	1 20 3 1.0
+	4 20 3 0.6
+	8 10 3 0.42
+	
+
+If we run 'itm t100', then 10 transit-stub graphs of 100 nodes each
+will be created, starting with initial seed 47.  Each graph will have
+three stub domains per transit node, with no extra transit-stub
+or stub-stub edges.  The line "1 20 3 1.0" says that there
+will be one transit domain.  The next line "4 20 3 0.6" specifies
+transit domains have (on average) four nodes, and an edge between each
+pair of nodes with probability 0.6.  The last line "8 10 3 0.42" says
+that each stub domain will have (on average) eight nodes, and edge
+probability 0.42.  The graphs will be named t100-[0-9].gb.
+
+
+
+
+
+

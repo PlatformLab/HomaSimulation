@@ -1,0 +1,65 @@
+
+The attached nam file (adc.nam) shows a simple comparison between a
+comparison between measurement-based admission control and
+parameter-based admission control.   The measurement-based algorithm
+is the Measured Sum algorithm given in "Comparison of
+Measurement-Based Admission Control Algorithms for Controlled-Load
+Service", by Jamin, Shenker and Danzig in Infocomm '97.  The
+parameter-based algorithm makes admission control decisions based on
+reserved rates. 
+
+In the animation, there are two bottleneck links with capacity 1Mbps.
+Link 6-7 uses the parameter-based algorithm, and Link 0-1 uses the
+measurement based algorithm.  The remaining links in the topology have
+5Mbps capacity and are never congested.  
+
+The key point to notice is that when presented with equal average
+offered load (in terms of the number of flows requesting reservations)
+the measurement-based algorithm, which makes admission decisions based
+on the token bucket parameters of the flow requesting service and on
+the measurements of traffic sent by flows with existing reservations, 
+admits more flows and achieves a higher measured utilization on the
+bottleneck link than the parameter-based algorithm, which makes
+admission decisions using the token bucket parameters of the new flow
+and the reserved rate of existing flows.
+
+The 3 magenta nodes on the left are the sources of traffic and the 3
+orange nodes on the right are destinations.  Flows are started
+randomly between pairs of source and destination nodes.  When a flow
+is started, a reservation request (white packets in the animation) is
+sent from the source (Node 8, 2 or 3) to the destination (Node 9, 5 or
+4).  The token bucket parameters in the reservation packet are r =
+64kbps are b = 1.  Admission control decisions are made at either node
+0 or node 6.  Based on the admission control decision, the destination
+returns either an Accept packet (green) or Reject packet (red) to the
+source.  A source that receives an Accept then transmits data (the
+data packets are not shown in the animation).  After sending its data,
+the source transmits a Teardown packet (black) to signal the network
+it no longer needs its reservation.
+
+The bottleneck links change color to reflect the last admission
+control decision made on the link.  When reservation requests are
+accepted, the link turns (or remains) green.  When a reservation
+request is rejected, the link turns (or remains) red.
+
+Monitors associated with the admission control agents at Nodes 0 and 6
+display relevant information about the state of the admission control
+process and link utilization.  Each monitor shows the number of flows
+with reservations in place on the adjacent link, and the measured
+utilization on the adjacent link (utilization measures are averaged
+over 2 second intervals).  For the parameter-based admission control
+algorithm, the total amount of reserved bandwidth is shown.  For the
+measurement-based algorithm, the estimated link utilization, which is
+an input parameter to the decision process, is shown.  (See the
+above-reference paper for an explanation of how this estimate is
+computed and used.)
+
+Other relevant parameters to the simulation that created this
+animation:  
+
+Flow inter-arrival times are exponentially distributed with average of
+400 ms on each link.  Average flow lifetime is 30 seconds (again
+exponentially distributed).  Flows transmit data according to the
+Exponential On/Off source model in the ns-2 simulator.  Relevant
+parameters are: packet size = 125 bytes, on time = 312.5 msec, off
+time = 325 msec, and rate = 64 kbps.

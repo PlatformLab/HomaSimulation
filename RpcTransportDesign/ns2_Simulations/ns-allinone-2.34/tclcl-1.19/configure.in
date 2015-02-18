@@ -1,0 +1,37 @@
+dnl 'autoconf' input file for the LBL C++ object Tcl library
+dnl $Header: /cvsroot/otcl-tclcl/tclcl/configure.in,v 1.15 2009/05/22 19:24:02 tom_henderson Exp $ (LBL)
+
+AC_INIT(Tcl.cc)
+
+AC_CONFIG_HEADERS([config.h:config.h.in])
+
+V_PROG="libtclcl.a"
+V_ALL="$V_PROG"
+
+dnl standard setup for vic/vat/etc. autoconf scripts.
+dnl $Header: /cvsroot/otcl-tclcl/tclcl/configure.in,v 1.15 2009/05/22 19:24:02 tom_henderson Exp $ (LBL)
+
+
+builtin(include, ./conf/configure.in.fns)
+builtin(include, ./conf/configure.in.head)
+
+# These must follow configure.in.head because they mess
+# with $*.
+AC_PROG_RANLIB
+# (install is in tail)
+
+AC_CHECK_FUNCS(snprintf)
+dnl next line for <stdlib.h>
+AC_HEADER_STDC
+
+builtin(include, ./conf/configure.in.int64_t)
+builtin(include, ./conf/configure.in.tcl)
+builtin(include, ./conf/configure.in.tk)
+builtin(include, ./conf/configure.in.otcl)
+builtin(include, ./conf/configure.in.x11)
+builtin(include, ./conf/configure.in.misc)
+builtin(include, ./conf/configure.in.z)
+NS_FNS_TAIL
+define(AcOutputFiles, Makefile)
+builtin(include, ./conf/configure.in.tail)
+

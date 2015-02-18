@@ -1,0 +1,28 @@
+Trace file: 
+	att.nam.gz
+
+Purpose:
+	demonstrate ns-2's capability in large-scale simulations
+
+Topology: 
+	~470 nodes and ~500 links simulated ISP topology
+	with various bandwidth and delay 
+
+Web Client:
+	420 of them, all connected to one modem pool/node in a star graph
+
+Web Server:
+	40 of them 
+
+Traffic:
+	- one long-lasting tcp connection in blue
+	- 200 web sessions issued by randomly selected web clients in 
+	an exponential interval
+	- web requests received by randomly selected web servers 
+	- web servers reply with web object size in heavy-tailed distribution.
+
+Memory Consumption:
+	871MB to complete the simulation
+
+Polly Huang, Wed Oct 14 11:54:52 PDT 1998
+huang@isi.edu

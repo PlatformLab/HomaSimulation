@@ -1,0 +1,207 @@
+AC_INIT(otcl.c)
+
+#XXX
+V_PROG="otclsh"
+V_ALL="$V_PROG"
+V_SHM="-DUSE_SHM"
+
+builtin(include, ./conf/configure.in.fns)
+
+builtin(include, ./conf/configure.in.head)
+builtin(include, ./conf/configure.in.tcl)
+builtin(include, ./conf/configure.in.tk)
+builtin(include, ./conf/configure.in.x11)
+
+# These must follow configure.in.head because they mess
+# with $*.
+AC_PROG_RANLIB
+AC_PROG_INSTALL
+
+#
+# deal with dynamic loading, code snarfed from tcl distribution
+#
+
+AC_MSG_CHECKING([system version (for dynamic loading)])
+system=`uname -s`-`uname -r`
+if test "$status" = 1 ; then
+    AC_MSG_RESULT([unknown (can't find uname command)])
+    system=unknown
+else
+    # Special check for weird MP-RAS system (uname returns weird
+    # results, and the version is kept in special file).
+
+    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+        system=MP-RAS-`awk '{print $3}' /etc/.relid`
+    fi
+    AC_MSG_RESULT($system)
+fi
+
+case $system in
+    Darwin-5.*|Darwin-6.*)
+	SHLIB_CFLAGS="-fno-common -fPIC -pipe"
+	SHLIB_LD="cc -dynamiclib -flat_namespace -undefined suppress"
+	SHLIB_SUFFIX=".dylib"
+	DL_LIBS=""
+	SHLD_FLAGS="-Wl,-bind_at_load -Wl,-multiply_defined -Wl,suppress"
+	;;
+    Darwin-7.*|Darwin-8.*) # Remove `-mcpu=7450' for G5 (PPC970) optimization:
+	SHLIB_CFLAGS="-fno-common -fPIC -pipe"
+	SHLIB_LD="cc -dynamiclib -flat_namespace -undefined suppress"
+	SHLIB_SUFFIX=".dylib"
+	DL_LIBS=""
+	SHLD_FLAGS="-Wl,-bind_at_load -Wl,-multiply_defined -Wl,suppress"
+	;;
+    HP-UX-*.08.*|HP-UX-*.09.*|HP-UX-*.10.*)
+        SHLIB_CFLAGS="+z"
+        SHLIB_LD="ld -b"
+        SHLIB_SUFFIX=".sl"
+        DL_LIBS="-ldld"
+        SHLD_FLAGS="-Wl,-E"
+        ;;
+    IRIX-4.*)
+        SHLIB_CFLAGS="-G0"
+        SHLIB_LD="echo tclLdAout | tclsh -r -G 0"
+        SHLIB_SUFFIX="..o"
+        DL_LIBS=""
+        SHLD_FLAGS="-D 08000000"
+        ;;
+    IRIX-5.*)
+        SHLIB_CFLAGS=""
+        SHLIB_LD="ld -shared -rdata_shared"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS=""
+        SHLD_FLAGS=""
+        ;;
+    Linux*)
+        SHLIB_CFLAGS="-fpic"
+        SHLIB_LD="ld -shared"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="-ldl"
+        SHLD_FLAGS=""
+        ;;
+    MP-RAS-02*)
+        SHLIB_CFLAGS="-K PIC"
+        SHLIB_LD="cc -G"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="-ldl"
+        SHLD_FLAGS=""
+        ;;
+    MP-RAS-*)
+        SHLIB_CFLAGS="-K PIC"
+        SHLIB_LD="cc -G"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="-ldl"
+        SHLD_FLAGS="-Wl,-Bexport"
+        ;;
+    NetBSD-*|FreeBSD-*)
+        # Not available on all versions:  check for include file.
+        if test -e /usr/include/dlfcn.h; then
+            SHLIB_CFLAGS="-fpic"
+            SHLIB_LD="ld -Bshareable"
+            SHLIB_SUFFIX=".so"
+            DL_LIBS=""
+            SHLD_FLAGS=""
+        else
+            echo "NetBSD/FreeBSD with no support for dynamic loading"
+            echo " or shared libraries on this system."
+            SHLIB_CFLAGS=""
+            SHLIB_LD=":  Skipping shared libaries"
+            SHLIB_SUFFIX=".so"
+            DL_LIBS=""
+            SHLD_FLAGS=""
+        fi
+        ;;
+    OSF-1.*)
+        SHLIB_CFLAGS="-fpic"
+        SHLIB_LD='ld -shared -expect_unresolved "*"'
+        SHLIB_SUFFIX=".so"
+        DL_LIBS=""
+        SHLD_FLAGS=""
+        ;;
+    OSF1-V*)
+        SHLIB_CFLAGS=""
+        SHLIB_LD='ld -shared -expect_unresolved "*"'
+        SHLIB_SUFFIX=".so"
+        DL_LIBS=""
+        SHLD_FLAGS=""
+        ;;
+    RISCos-*)
+        SHLIB_CFLAGS="-G0"
+        SHLIB_LD="echo tclLdAout | tclsh -r -G 0"
+        SHLIB_SUFFIX="..o"
+        DL_LIBS=""
+        SHLD_FLAGS="-D 08000000"
+        ;;
+    SCO_SV-3.2*)
+        # Note, dlopen is available only on SCO 3.2.5 and greater.  However,
+        # this test works, since "uname -s" was non-standard in 3.2.4 and
+        # below.
+        SHLIB_CFLAGS="-Kpic -belf"
+        SHLIB_LD="ld -G -z text"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS=""
+        SHLD_FLAGS="-belf -Wl,-Bexport"
+        ;;
+    SunOS-4*)
+        SHLIB_CFLAGS="-pic"
+        SHLIB_LD="ld -assert pure-text"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="-ldl"
+        SHLD_FLAGS=""
+        ;;
+    SunOS-5*)
+       if test "$CC" != "gcc"; then
+               SHLIB_CFLAGS="-K pic"
+       fi
+        SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="-ldl"
+        SHLD_FLAGS=""
+        ;;
+    ULTRIX-4.*)
+        SHLIB_CFLAGS="-G0"
+        SHLIB_LD="echo tclLdAout | tclsh -r -G 0"
+        SHLIB_SUFFIX="..o"
+        DL_LIBS=""
+        SHLD_FLAGS="-D 08000000"
+        ;;
+    UNIX_SV*)
+        SHLIB_CFLAGS="-K PIC"
+        SHLIB_LD="cc -G"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="-ldl"
+        SHLD_FLAGS="-Wl,-Bexport"
+        ;;
+    *)
+        echo "Can't figure out how to do dynamic loading or shared libraries"
+        echo "on this system."
+        SHLIB_CFLAGS=""
+        SHLIB_LD=":  Skipping shared libaries"
+        SHLIB_SUFFIX=".so"
+        DL_LIBS="" 
+        SHLD_FLAGS=""
+        ;;
+esac
+
+if test "$CC" = "gcc" -a "X$SHLIB_CFLAGS" = "X"; then
+    SHLIB_CFLAGS="-fpic"
+fi
+
+AC_SUBST(SHLIB_CFLAGS)
+AC_SUBST(SHLIB_LD)
+AC_SUBST(SHLIB_SUFFIX)
+AC_SUBST(SHLD_FLAGS)
+AC_SUBST(DL_LIBS)
+
+#
+# decide where to install the shared library
+#
+
+INST_OLIBSH="${prefix}/lib"
+if test -d ${prefix}/shlib ; then
+  INST_OLIBSH="${prefix}/shlib"
+fi
+AC_SUBST(INST_OLIBSH)
+
+NS_FNS_TAIL
+builtin(include, ./conf/configure.in.tail)

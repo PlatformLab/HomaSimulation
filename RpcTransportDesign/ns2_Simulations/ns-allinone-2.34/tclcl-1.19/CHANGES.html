@@ -1,0 +1,1132 @@
+<!-- @(#) $Header: /cvsroot/otcl-tclcl/tclcl/CHANGES.html,v 1.120 2007/03/10 22:55:08 tom_henderson Exp $-->
+<html><head><title>TclCL Change Log</title></head><body>
+<h1>TclCL: Change History</h1>
+
+<hr>
+<h3>TclCL-1.20
+<b>PENDING</h3>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=26142">tclcl-1.19</a>
+<b>Released Sat Mar 10 2007</h3>
+    <li> Refresh packages, Sun OS compilation patch </li>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=26142">tclcl-1.18</a>
+<b>Released Sat Sep 24 2006</h3>
+    <li> Refresh packages </li>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&package_id=26142&release_id=360699">TclCL-1.17</a>
+<b>Released Sun Oct 2 15:00:00 PDT 2005</h3>
+
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Mon Sep 26 21:58:00 PDT 2005</b></li>
+      <br> Bumping up version numbers: configure.in.TclCL, configure.in.tcl, configure.in.tk
+</ul>
+
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Sun Sep 25 22:22:00 PDT 2005</b></li>
+      <br> Remove configure.in.Tcl because it is in the way for HFS+ file systems. Slight mod to the Tcl include path for Fedora Core 4
+</ul>
+
+<ul>
+  <p>
+    <li>
+      <b><a href="http://www.tomh.org">[tomh]</a></b> <b>Tue Sep 6 21:53:00 PDT 2005</b></li>
+      <br>  Patch for Mac OS X (XCode 2.1). Contributed by Francesco Gringoli.
+</ul>
+
+<ul>
+<p>
+    <li>
+           <b><a href="http://www.tomh.org/">[tomh]</a></b> <b>Wed Aug 31 18:51 PDT 2005
+</b>	   </li>
+       <br> patches for Debian pre-installed Tcl/Tk, and for building with -Wall and -Werror on gcc-4.0.1 (mainly autoconf fixes).  Contributed by Georg Wittenburg and Mathieu Lacage, respectively.
+</ul>
+       
+<hr>
+<h3>RELEASE: TclCL-1.16 released Wed Jan 19 12:46:22 PST 2005</h3>
+
+<ul>
+<p>
+    <li>
+           <b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Fri Dec 10 08:55:52 PST 2004
+</b>	   </li>
+       <br> tclcl.h modified to build under gcc-3.4.
+       
+        <p>
+    <li	>
+       <b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Aug 17 10:23:48 PDT 2004
+</b></li>
+       <br> autoconf now finds http.tcl automatically for better portability
+       
+        
+  <p>	
+    <li>
+     <b><a href="http://www.isi.edu/~xuanc/">[xuanc]</a></b> <b>Tue Feb 10 21:07:17 PST 2004</b></li>
+     <br> Change the default versions in conf/configure.in.{tcl,tk,otcl,TclCL}
+     
+     <p><li>
+	<b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Feb 10 17:32:55 PST 2004</b></li>
+		  <br> Configure changes to support tcl-8.3.5 on Fedora.
+		  	  
+</ul>			  
+
+<hr>
+<h3>RELEASE: TclCL-1.15 released on Fri Jan  9 14:14:08 PST 2004</h3>
+
+<ul>
+  <p>
+<li><b><a href="http://www.isi.edu/~xuanc/">[xuanc]</a></b> 
+<b>Sun Oct 12 21:35:22 PST 2003</b></li>
+<br>
+Made changes to config for support to tcl/tk8.4.5 libs
+</ul>
+
+<hr>
+<h3>TclCL-1.0b13[OLD]/tclcl-1.14[NEW]<b>released Fri Feb 14 10:35:27 PST 2003</b></h3>
+<ul>
+  <p>
+  <li><b><a href="http://www.isi.edu/~xuanc/">[xuanc]</a></b> <b>Tue Jul 29 11:16:14 PDT 2003
+  </b></li>
+  <br>
+  Make tclcl portable to tcl/tk 8.4.3.
+  Change char* to CONST84 char* (or CONST84_RETRUN char * if it is a
+  function return)
+  (these two macros are defined in otcl.h)
+  Change Tcl:result to return const char * rather than char *.
+
+  <p>
+    <li>
+       <b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Wed Jul 17 10:18:06 PDT 2002</b></li>
+       <br> Re-enabled code to avoid dumping tcl code on errors if
+       there's a LOT of tcl code.  (Disabled since Dec-00 by mistake.)
+
+  <p>
+<li><p><b><a href="http://www.isi.edu/~buchheim/">[Tim Buchheim]</a></b>
+Thu Jul 11 17:25:00 PDT 2002<br>
+Fixed Tcl "source" command so filenames with spaces work.
+</p>
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=83954">TclCL-1.0b12[OLD]/tclcl-1.13[NEW]</a>
+<b>released Wed Apr 10 15:02:43 PDT 2002</b></h3>
+<ul>
+
+    <LI><B><A href="mailto:kclan@isi.edu">[kclan]</A></B>
+    Thu Sep  6 12:50:03 PST 2001
+    <BR>Remove Tcl.h from the tclcl distribution because it causes build 
+    problems on Mac OS X and is only around for backwards compatibility 
+    with 3-year old code.
+
+    <li><b>[lim]</b> <b>Thu Aug  2 14:57:03 PDT 2001</b></li><br>
+    Changed PUBLIC and PRIVATE to INSTPROC_PUBLIC and INSTPROC_PRIVATE to avoid
+    conflicts with Solaris header files.
+    <li><b>[lim]</b> <b>Tue Jul 10 16:19:19 PDT 2001</b></li><br>
+    Fixed INSTPROC and PROC so they will compile with recent versions of gcc.
+
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49086">TclCL-1.0b11[OLD]/tclcl-1.12[NEW]</a>
+released on Wed May 30 10:11:06 PDT 2001</h3>
+<ul>
+
+<LI><B><A href="mailto:haldar@isi.edu">[Padma Haldar]</A></B>
+Tue Mar  6 12:32:23 PST 2001
+<BR>Added bind function for binding TclObjects. Files modified: tclcl.h, Tcl.cc. 
+
+
+  <li>
+       <b><a href="http://www.isi.edu/~johnh/">[johnh]</a></b> <b>Tue Dec 12 10:36:34 PST 2000</b></li>
+       <br> Updated config.guess to autoconf's current one.
+</ul>
+
+
+<hr>
+<p>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49085">TclCL-1.0b10[OLD]/tclcl-1.11[NEW]</a> 
+    released on Mon Oct 16 21:01:42 PDT 2000<br>
+</h3>
+<ul>
+	<P>
+
+
+  <li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a></b>
+  	<b>Fri Oct  6 11:16:17 PDT 2000</b><br>
+	Add global qualifier to abort() inside TclObject::abort().
+
+       <P>
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>Wed Aug 16 21:03:03 PDT 2000</b><br>
+       Tcl::eval(const char*) added
+       (so that ns-2 works with tcltk-8.3).
+
+       <P>
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>Tue Aug  8 22:35:02 PDT 2000</b><br>
+       Changes to build with tcltk-8.3
+       (requires --with-tcl-ver=8.3 on configure line).
+
+       <P>
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>
+       Mon Jun 12 15:54:31 PDT 2000
+       </b><br>
+       Errors evaling tcl code now don't dump ALL the code
+       if there's a lot of it (like all the ns code!).
+
+</ul>
+<p>
+
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49084">TclCL-1.0b9[OLD]/tclcl-1.10[NEW]</a>
+<b>Released on Tue Jan 18 16:19:44 PST 2000</b></h3>
+<ul>
+
+  <li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a>
+	Fri Apr 14 17:55:41 PDT 2000</b>
+	Added check in TclObject::create_framevar() so that it will do 
+	nothing if the variable already exists in the frame. When 
+	the variable does not exist, the 'set var 0' won't change the 
+	variable value in C++ because the InstVar link isn't there
+	yet. However, if it's already there (e.g., we have two
+	instvars of the same variable in the same frame), this 'set
+	var 0' will change the C++ variable value, which is not
+	expected. This check disables this incorrect behavior.
+
+  <li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a>
+	Fri Mar 24 11:41:48 PST 2000</b>
+	Virtual method abort() as a generic interface to avoid all the 
+	'sprintf(stderr, ...); abort()' stuff.
+
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>
+       Tue Jan  4 14:18:32 PST 2000
+       </b><br>
+       Support for delay-bound trace vars added
+       (requiring some reworking of the existing delay-bind APIs).
+
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>
+       Fri Nov 19 15:27:44 PST 1999
+       </b><br>
+       NOWRK ifdefs (which conditionalized removing wrk_) are now gone.
+
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>
+       Fri Nov 19 15:13:53 PST 1999
+       </b><br>
+       Portability fixes: snprintf decl moved to tclcl-config.h,
+       u_int's removed.   (u_int isn't portable... spell it out.)
+
+  <li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+       <b>
+       Wed Oct 27 16:14:36 PDT 1999
+       </b><br>
+1. get rid of wrk_ in InstVar.
+    This shouldn't affect anyone since it was only used internally.
+    (Saves 32B per bound variable.)
+
+       <p>
+2. get rid of ios{Width,Precision,Mask} in TracedVar.
+    By default the streams stuff isn't compiled in
+    and no one was using this.
+    (Saves 4B per TracedVar.)
+
+       <p>
+3. converts tracedvars to use snprintf internally.
+    This is an INCOMPATIBLE change:  if you used to call
+    tv->value(foo), you now need to call
+    tv->value(foo, sizeof(foo)).
+
+       <p>
+<li><b><a href=mailto:yuri@isi.edu>[YP]</a></b>
+<b>
+Fri May 28 12:19:23 PDT 1999
+</b><br>
+Added support for making some instvars "untouchable": if the
+variable is set/read a warning message is shown and the execution
+abort()s.  Needed to enforce the use of new names after renaming (see
+the macro _RENAMED).
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Tue Apr  6 09:49:01 PDT 1999
+</b><br>
+     Better recognition (hopefully) of windows compilers that can't
+     handle long strings in tcl2c++.cc.
+</ul>
+
+
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49083">TclCL-1.0b8[OLD]/tclcl-1.9[NEW]</a>
+<b>Released on Mon Feb 22 17:17:05 PST 1999</b></h2>
+<ul>
+
+<li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a></b>
+<b>
+Tue Feb 23 12:04:51 PST 1999
+</b><br>
+Fixed bug for tcl2c++.c under SunOS, where ungetc() doesn't function
+at all for a pipe stream. 
+
+<li><b><a href="http://www.isi.edu/~haoboy">[haoboy]</a></b>
+<b>
+Mon Feb 22 17:14:20 PST 1999
+</b><br>
+Added 64-bit integer support (for Solaris, Linux and FreeBSD).
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin/">[YC]</a>
+Tue Nov 17 10:37:13 PST 1998</b>
+<ul>
+<li> Added code to the "import from web" mechanism to test whether
+the cached copies are still up-to-date or not
+</ul>
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Mon Nov 16 23:15:08 PST 1998
+</b><br>
+     Ranlib autoconf support fixed.
+
+</ul>
+
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49082">TclCL-1.0b7[OLD]/tclcl-1.8[NEW]</a>
+<b>Released on Wed Oct 21 18:31:16 PDT 1998</b></h3>
+<ul>
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Tue Aug  4 09:15:55 PDT 1998
+</b><br>
+     Declare snprintf in Tcl.cc (to suppress warnings),
+     enforce length checking in our implementation.
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Wed Jul 29 09:49:38 PDT 1998
+</b><br>
+     Fixed a double-free bug left over from the classinstvars code.
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin/">[YC]</a>
+Mon Jul 27 15:09:31 PDT 1998</b>
+<ul>
+<li> "Rewrote" tcl-import.tcl to speed things up. Import from disk 
+while a mash script is running (as opposed to expanded at make-time 
+by mash-1/tcl-expand.tcl) now takes a third of its original time.
+
+<li> Added a simple HTTP cache to the import off the web mechanism. It 
+is implemented as Class HTTPCache in tclcl/tcl-http.tcl
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~aswan/">[ACS]</a></b>
+<b>
+Fri Jul 17 12:07:09 PDT 1998
+</b><br>
+Fixed bug introduced with classinstvars in which setting an
+instvar to an empty list resulted in the instvar containing
+a list containing an empty list instead of just an empty list.
+
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49081">TclCL-1.0b6[OLD]/tclcl-1.7[NEW]
+</a> Released on Tue July 7 12:20:00 PST 1998
+</h3>
+<ul>
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Thu Jul  2 11:10:03 PDT 1998
+</b><br>
+     Changed WRK_SMALL_SIZE to 32 (from 64) to save memory.
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Wed Jul  1 11:33:30 PDT 1998
+</b><br>
+     classinstvars support turned on by default
+     (and the ifdef's removed).
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+     <b>
+     Wed Jun 10 18:13:57 PDT 1998
+     </b><br>
+     <ul>
+       <li> No longer link the library to libTcl.
+       <li> snprintf option added for SunOS
+     </ul>
+
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Tue Jun  9 21:17:07 PDT 1998
+</b><br>
+     Better support for delayed binding (nee classinstvars);
+     added some length checking to buffers.
+     <p>
+     Delayed binding is <strong>only</strong> available
+     if you configured tclcl and otcl with the option
+     <strong>--enable-tclcl-classinstvar</strong>.
+     (When doing so, btw, make sure you've got everyone built
+     the same way, or you'll get random crashes due to
+     mismatched slots in virtual function tables.)
+     <p>
+     Delayed binding are a way to do binding between OTcl and C++
+     that consume memory only when bound variables are actually
+     in use from Tcl.
+     (Normally bound variables consume memory throughout the lifetime
+     of the object.)
+     Delayed binding is therfore useful if you have
+     an object with many instances (for example, an NsObject)
+     whose bound variables are only occationaly used from Tcl
+     (for example, off_cmn_).
+     <p>
+     Here's a minimal example of delayed binding:
+<pre>
+class C5 : public TclObject {
+public:
+	C5();
+	virtual int delay_bind_dispatch(const char *varName, const char *localName);
+	virtual void delay_bind_init_all();
+protected:
+	int normal_;
+	int delayed_;
+};
+
+DEFINE_OTCL_CLASS(C5, "C5")
+{
+}
+
+C5::C5()
+{
+	bind("normal_", &normal_);
+}
+
+void
+C5::delay_bind_init_all()
+{
+	delay_bind_init_one("delayed_");
+}
+
+C5::delay_bind_dispatch(const char *varName, const char *localName)
+{
+	DELAY_BIND_DISPATCH(varName, localName, "delayed_", delay_bind, &delayed_);
+	return TclObject::delay_bind_dispatch(varName, localName);
+}
+</pre>
+     <p>
+     From Tcl there should be no visible differences between
+     delayed and normally bound variables.
+     <p>
+     The penality for delayed binding is higher run-time cost.
+     Classes with delayed binding incur a search cost proprotional
+     to class hierarchy depth (of that class) and the number of delay-bound
+     variables in that class hierarchy.
+     <p>
+    (What happens with delayed binding
+    is that you call the delay_bind_dispatch function
+    for each instvar/set/get, this function percolates up the class
+    hierarchy.  (This is basically how command dispatch currently works.)
+    With normal binding each instvar is put in a Tcl_Hash
+    and accessed in O(1) time (but with higher memory requirements).
+     <p>
+     For a simple ns run with ~1400 NsObjects (~120 nodes/links/agents)
+     and both of NsObject's
+     variables delay-bound run-time went up ~2% (not clear if this is outside
+     expected error) and memory went down 10%.
+     For larger simulations run-time cost should stay constant
+	memory savings should rise.
+     (If you want to your own benchmarks,
+     my test case was
+     ./ns tcl/ex/many_tcp.tcl -client-arrival-rate 20 -ns-random-seed 1 -mem-trace 1.)
+     
+<li><b><a href="http://www.isi.edu/~johnh">[johnh]</a></b>
+<b>
+Tue Jun  9 21:17:07 PDT 1998
+</b><br>
+<ul>
+<li> Added support code for classinstvars.
+     Currently this code is only turned on if you
+     do --enable-tclcl-classinstvars when configuring.
+     (Re autoconf'ed.)
+<li> Moved {Traced,}InstVar::import_instvar to TclObject::create_instvar
+<li> Shortened wrk_ to 32 bytes.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~cromer">[CR]</a></b>
+<b>
+Sun May 31 17:01:21 PDT 1998
+</b><br>
+<ul>
+<li> In Makefile.in, a set of tcl library files are currently packaged
+with a set of tk library files in the embedded tcl object, et_tk.  To
+include these tcl library files (but not the tk library files) in the
+smash executable (a.k.a. mash w/out tk), I would like to package them in
+a separate embedded tcl object, et_tcl.  For now, just added et_tcl, but
+after get ns-developers approval, will remove tcl library files from
+et_tk.  Btw, also added new embedded tcl files, tcl-import.tcl and
+tcl-http.tcl, to et_tcl.
+<li> Added ability for mash interpreter to import objects from the web
+server, as opposed to just local file-server (by specifying the
+TCLCL_IMPORT_DIRS environment variable).
+<li> Augmenting mash interpreter's "source" procedure to accept EITHER a
+URL or local filename
+<li> Augmenting the mash interpreter's "import" procedure to accept
+EITHER URLs or local filenames in the importTables it processes
+<li> Effected files:
+ Tcl/tcl-import.tcl
+ Tcl/Makefile.in
+ Tcl/tcl-object.tcl
+ Tcl/tcl-http.tcl
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin/">[YC]</a>
+Sun May 31 13:18:56 PDT 1998</b>
+<ul>
+<li> Added new file tcl-http.tcl. This file includes a class HTTP (and an
+object Http) that you can use to fetch URLs from the web. This class 
+includes a user interface that is displayed when you are waiting for 
+responses from the web.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~cromer">[CR]</a></b>
+<b>
+Mon Apr  6 13:37:46 PDT 1998
+</b><br>
+<ul>
+<li> Added some new features to otcldoc...
+<ul>
+<li> For objects which acquire default setting from the "-configuration" option of the Class definition, display the defaults in a section of the API page for the Object.
+<li> Added a section for "Proc Methods" on the API page for each Object for which procs are defined.
+<li> Added a page, linked from index.html, that lists all of the procs not associated with a particular Object.
+<li> Fixed "is_tcl_comment" proc to consider lines that start with '#', even if preceeded by whitespace, to be considered comments.
+<li> Since omitting classes from the class hierarchy could be misleading, now all the subclasses of a class are expanded at every place they occur, thus making the class hierarchy on index.html more accurate.  To do this, simply commented out "set mark($c) 1" which was used to prevent a subclass from being outputted to index.html if it had already been outputted earlier on the page.
+<li> Timestamped all pages outputted. 
+<li> Class definitions are processed w/out restricting their length to a single line.
+</ul>
+</ul>
+
+</ul>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49080">TclCL-1.0b5[OLD]/tclcl-1.6[NEW]
+</a> Released on Tue Jan 27 10:22:59 PST 1998 
+</h3>
+<ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin/">[YC]</a>
+Wed Mar  4 21:36:25 PST 1998</b>
+<ul>
+<li> Added proc.invoke to otcl. This defines a "nameless" proc on a class
+and immediately executes it.
+</ul>
+
+
+<li><b><a href="http://www.cs.berkeley.edu/~cromer">[CR]</a></b>
+<b>
+Tue Feb 17 17:12:39 PST 1998
+</b><br>
+<ul>
+<li> In order to generate some online documentation for WidgetClasses, I added two new options to otcldoc. 
+<ul> 
+<li>	-i <index-file-name> is used to specify the name of the index file.  Default = "index.html"  
+<li>	-c <class-string> is used to specify the class being documented.  Default = "Class" 
+</ul>
+<li> Added a call to otcldoc using the new options to the Makefile so that doing "make doc" will now generate an additional index file by the name of "widgetindex.tcl"
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan/">[EA]</a>
+Mon Feb  9 11:57:01 PST 1998</b>
+<ul>
+<li> Added importLocation to tcl-expand.tcl. This file should contain
+     a list of directories, one on every line.  If it is in the 
+     local directory it overrides the TCLCL_IMPORT files.  This 
+     makes overriding the import search path for specific tools a little
+     easier.
+</ul>
+
+
+    <LI><B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A>Fri Jan 23 13:36:08 PST 1998</b><br>
+	 Improved the error message from SplitObject instproc warn-instvar.
+     </LI>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Fri Jan  2 14:01:45 PST 1998
+</b><br>
+<ul>
+<li> Enhanced the import command to look
+for modules and the importTable in the colon-separated path list
+specified by the TCLCL_IMPORT environment variable.
+If TCLCL_IMPORT is not set, then "." is assumed.
+This allows us to easily generate scripts outside of the
+mash build environment --- all you need is a mash interpreter,
+the tcl source tree (with importTable), and a pointer into it.
+Note: this is not how the package is distributed but rather
+how we use to generate scripts.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Fri Jan  2 00:16:32 PST 1998
+</b>
+<ul>
+<li> Removed options_ hack that was causing aborts with ns and tcl7.6.
+<li> Removed Import enable proc since we now require import
+mechanism across all mash scripts (though scripts that use "Import enable"
+won't flag an error because this just declares an object now).
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin/">[YC]</a></b>
+<b>Wed Dec 31 17:47:56 PST 1997</b><br>
+<ul>
+<li> Added two new methods to the Object class: proc.public and
+proc.private. These are the public and private variants of "proc".
+<li> Added macros PUBLIC, PRIVATE, PROC_PUBLIC and PROC_PRIVATE to
+tclcl-mappings.h. The first two are the public and private variants
+of INSTPROC, while the last two are replacements for PROC.
+</ul>
+
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin/">[YC]</a>
+Fri Dec 26 18:09:04 PST 1997</b>
+<ul>
+<li> Added history.tcl and word.tcl to embedded-tk (only for Tcl8.0)
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a>
+Wed Dec 24 20:18:48 GMT-8:00 1997</b>
+<ul>
+<li> changed tcl-object.tcl: removed dependency to "cat" command since it does
+not work in win32; updated Import to work for classes that span multiple files
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>
+Tue Dec 23 01:05:11 PST 1997
+</b>
+<ul>
+<li> Alphabetized index in otcldoc and added OTcl/C++ designation.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin">[YC]</a></b>
+<b>
+Mon Dec 22 15:22:42 PST 1997
+</b>
+<ul>
+<li> fixed bug in the macro definition for PROC which caused it to not work
+when there were multiple methods with the same name.
+
+<li> fixed the error message that is generated when the constructor for an 
+OTcl object fails, so as to display the actual error rather than a stock
+"class Foo: constructor failed" message.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Mon Dec 22 02:45:27 PST 1997
+</b>
+<ul>
+<li> Added support for a simple, java-like import command
+to tclcl and merged it with vic and all of vic's modules.
+By default, import directives are ignored so as to not
+break existing apps.  "import" behaves like the tcl source command
+except it includes the file only once (even when used multiple
+times) and the OTcl class name is specified instead
+of the actual file.  To facilitate this, import assumes the
+existence of a file called importTable that contains the
+mappings (... maybe this should be built on demand).
+mash-1/mkImportTable creates this table from a list
+of tcl input files (should move this to tclcl).
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>
+Mon Dec 22 01:22:05 PST 1997
+</b>
+<ul>
+<li> In otcldoc: identified C++, OTcl, and Split classes and documented all
+     the files that the class is defined in.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Wed Dec 17 20:10:01 PST 1997
+</b>
+<ul>
+<li> Made a bunch of changes to otcldoc to handle C++ method
+and class documentation.  This is less automatic than the OTcl
+counterpart because it's harder to scan the input file.
+Thus, we sort of give up and rely upon structured comments.
+The model is to indicate a class or method def with the tag "<otcl>"
+prepended to the equivalent syntax (within a C comment).
+Then the comment block following this line becomes the
+html desription.  E.g.,
+<pre>
+	/*
+	 * <otcl> Class Foo -superclass Bar
+	 * Foo is the base class for all foo-like objects blah blah.
+	 *
+	 * <otcl> Foo public run {}
+	 * The run method causes a foo object to start running.
+	 */
+</pre>
+<li> Factored out Elan's cross-reference hook into a separate proc.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>
+Mon Dec 15 23:04:11 PST 1997
+</b>
+<ul>
+<li> Added class cross referencing to otcldoc.
+</ul> 
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Mon Dec 15 19:03:49 PST 1997
+</b>
+<ul>
+<li> Added a script for transforming OTcl class definitions
+and structured comments into html documentation.
+The script, inspired by javadoc,
+is called <i>otcldoc</i> and resides in the top-level directory.
+It's still pretty rough and buggy, but shows promise.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Mon Dec 15 16:58:32 PST 1997
+</b>
+<ul>
+<li> Added change to inherit options_ instance variable, if it exists,
+from parent from within new.
+<li> This allows us to easily use inheritence to distribute
+a configuration database across a hierarchicy of object instances.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Sat Dec 13 15:27:25 PST 1997
+</b>
+<ul>
+<li> Re-ran autoconf to reflect recent change to configure.in.tcl
+(so .. is searched before /usr)
+<li> Added Object::public and Object::private methods as
+stand-ins for instproc.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a>
+Tue Nov 25 00:05:16 GMT-8:00 1997</b>
+<ul>
+<li> added few more convenient functions to Class Tcl.
+</ul>
+
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a></b>
+<b>Sat Nov 15 17:17:54 PST 1997</b>
+<br>
+<ul>
+<li> fixed error output in <tt>SplitObject instproc unknown</tt> so
+that <tt>errorInfo</tt> will now show the full stack trace when
+<tt>$self cmd $args</tt> i.e. <tt>TclObject::command</tt> returns an
+error.
+
+<li> add bgerror proc that calls tkerror. bgerror is supposed to replace tkerror in tcl 8.
+<li> win32: changed makefile.win to use the right flags to link with dll
+versions of the VC runtime (msvrt.dll).
+</ul>
+
+
+<li><B><A HREF="http://www.cs.berkeley.edu/~tecklee">[TLT]</A>
+Mon Oct  6 15:41:10 PDT 1997
+</b>Sun Nov  9 02:12:03 PST 1997<br>
+<ul>
+<li> Add functions: evalObj(), objResult()s
+<li> change result() in tcl8 to return Tcl_GetStringResult(). This
+guarantee the right return value since interp->result may not be set
+right all the time.
+</ul>
+</ul>
+
+<hr>
+<h3><a href="http://sourceforge.net/project/showfiles.php?group_id=30174&release_id=49079">TclCL-1.0b4[OLD]/tclcl-1.5[NEW]</a>
+Mon Oct 20 21:35:11 PDT 1997
+</h3>
+<ul>
+
+<li><B><A HREF="http://www.cs.berkeley.edu/~tecklee">[TLT]</A>
+Mon Oct  6 15:41:10 PDT 1997
+</b><br>
+<ul>
+<li> minor changes to get it to compile under windows for tcl/tk 8.0
+</ul>
+
+<li><B><A HREF="http://www.cs.berkeley.edu/~tecklee">[TLT]</A>Sat Sep 27
+03:15:27 PDT 1997</b><br>
+<ul>
+<li>change Timer::msched to delete the timer handler if token_ is non-zero. This prevents extra dangling timers.
+<li>add EmbeddedTcl::load(interp) function for loading code into a different
+interpreter. Used for win32's tkConsole window. 
+</ul>
+
+<li><B><A HREF="http://www.cs.berkeley.edu/~yatin/">[YC]</A> Mon Sep 15
+14:04:01 PDT 1997</b><br>
+  Incorporated Steve's suggestion to modify the INSTPROC and PROC macros to
+  take only one argument, which is the name of both the C++ and Otcl 
+  methods.
+       
+</ul>
+
+<hr>
+<h3><a href="http://www-mash.cs.berkeley.edu/dist/tclcl-src-1.0b3.tar.gz">TclCL-1.0b3[OLD]/tclcl-1.4[NEW]</a>
+Sep 9, 1997</h3>
+<i>Snapshot for ns-2.0 release.</i>
+<ul>
+
+    <LI><B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A> Tue Sep  9 08:43:36 PDT 1997</b><br>
+	 libTclCL.a to libtclcl.a.
+     </LI>
+
+    <LI><B><A HREF="http://www.isi.edu/~johnh/">[johnh]</A> Mon Sep  8 17:44:19 PDT 1997</b><br>
+	 General libTcl to TclCL changes.
+	 make tar, srctar make tclcl-*.
+	 Generates libTclCL.a,
+	 symlinked to libTcl.a for backwards compatibility.
+     </LI>
+
+<li><b><a href="http://www.isi.edu/~kannan">[KVa]</a></b>
+<b>
+Mon Sep  8 16:27:28 PDT 1997
+</b>
+<ul>
+<li> Added SplitObjectCompare to compare two objects by handle.
+<br> It is useful to use this routine as a command to <code>lsort</code>
+to sort a list of SplitObjects (<em>nee</em>TclObjects) in increasing order, as
+<pre>        lsort -command SplitObjectCompare {list}
+</pre>
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Sun Aug 31 03:26:39 PDT 1997
+</b>
+<ul>
+<li> Moved the call to TclObject::init from the tclcl-mappings
+macro into the TclClass object creator.  The previous arrangement
+caused init to be called before TclObject::name_ was set, preventing
+the init method from calling the Otcl object (although it could
+get the name out of argv[0], the object was not in the hash table
+so TclObject::lookup wouldn't work for it).  Since TclObject::init
+is now always called, I changed it to always return TCL_OK
+(typically the args are passed up to Object anyway).
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Sat Aug 30 12:20:11 PDT 1997
+</b>
+<ul>
+<li> Still trying to get constructor argument passing write.
+Removed an eval because catch does effectively the same thing
+(i.e., expands args so that it is properly interpreted as multiple
+args rather than a list).  This is a bit subtle and failed only when 
+null arguments (e.g., "") where present.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Fri Aug 29 23:57:41 PDT 1997
+</b>
+<ul>
+<li> Changed reaction to the failure of the shadow object creation.
+Rather than raise a tcl error, the OTcl object is deleted and "new"
+returns an empty string.  This allows the callee to react to a
+failed "new" call.  If the problem is in the OTcl constructor rather
+than in the actual creation of the C++ shadow, the error is
+raised as before.
+
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Fri Aug 29 22:58:54 PDT 1997
+</b>
+<ul>
+<li> Handle expceptional cases more gracefully.
+Return TCL_ERROR if TclClass constructor fails
+to create object and add code to tcl-object.tcl
+to gracefully catch this condition.
+<li> Change base class name of otcl split object from TclObject
+to SplitObject and add a backward compat hook for TclObject.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+<b>
+Fri Aug 29 11:16:50 PDT 1997
+</b>
+<ul>
+<li> Changed TclObject::unknown to invoke Tcl "error" procedure upon
+encountering an undefined method.  Previously, this condition caused
+the process to exit, often making debugging difficult.
+Under Tk, "error" raises a pop-up that allows one to dump
+the call stack, which typically makes debugging much easier.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a></b>
+<b> Wed Aug 27 15:23:03 PDT 1997 </b><br>
+<ul>
+<li> add compat/win32.c for displayerr function and place holder for future
+common additions.
+<li> merged in with gnguyen's new makefile.vc (with patches)
+<li> add embedded-console for win32 console.
+<li> renamed the wndclass name to the more unique TclCLWSocket, so that rsdr
+will work; added some error checking during initialization.
+</ul>
+
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>
+Thu Aug 21 12:08:36 PDT 1997
+</b><br>
+<ul>
+<li> Generated new configure scripts from new conf files.
+<li> Fixed Makefile.in to perform make depend correctly.
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~tecklee">[TLT]</a></b>
+<b>Thu Aug  7 13:04:21 PDT 1997</b><br>
+Changes to make libTcl compile under windows and prepare for transition of the
+package to tclcl, pronounced Tickle-C-L. It stands for "Tcl Class". Motivation
+for the change: (1) hard to difference between Tcl and tcl verbally, (2) more
+importantly, under an OS with case-insensitive filenames like win32, "tcl.h" 
+conflicts with "Tcl.h".
+<ul>
+   <li> moved contents of Tcl.h to tclcl.h. Please make all future changes to
+   tclcl.h. Old "Tcl.h" is retained but it only includes "tclcl.h". Eventually
+   we should get rid of "Tcl.h" completely. All includes in the package has
+   been updated to use "tclcl.h". 
+   <li> added compat/gettod.c for gettimeofday function in win32
+   <li> added tclcl-config.h for conditional defines in win32
+   <li> added makefile.vc for windows. do 'nmake -f makefile.vc' to compile to
+   tclcl.lib under windows. (we should change libTcl.* to libtclcl.* in 
+   Makefile.in some time later).  
+</ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin">[YC]</a></b>
+<b>Tue Aug  5 09:49:56 PDT 1997</b><br>
+Added macros to the Tcl library to allow automatic definitions of the mappings
+between TclObjects and OTcl classes
+
+<ul>
+  <li> The OTCL_MAPPINGS macro defines the mapping between a TclObject class 
+  and a corresponding OTcl class. With this definition, the manner in which
+  arguments are passed to the constructor for the object has changed. Instead
+  of parsing the args in subclass_of_TclClass::create, the object is now 
+  created with an empty constructor (i.e. subclass_of_TclObject() ). Once the 
+  object has been successfully constructed, a new virtual method init(argc, 
+  argv) is invoked on that object. The argv array contains some dummy args 
+  for argv[0] and argv[1] (whatever were originally passed to some of the 
+  elements of argv for the TclClass::create method). The actual args start at 
+  argv[2]. Note that this is different from what used to happen for the create 
+  method. I made this change so that the structure of the argv array is 
+  consistent with the structure that is passed to the command(argc, argv) 
+  method. (Please note that this does *not* break any previous code that used 
+  the original TclClass's create mechanism to create TclObjects.)
+
+  <li> INSTPROC defines a mapping between a C++ method and an OTcl method. 
+  This mechanism is cleaner than the original single huge command() method. It 
+  ensures that all C++ methods are visible thru "$object info instcommands",
+  and allows "$self next" to work even for these C++ methods! Use the argument
+  parsing functions described below to parse out the argv array into individual
+  arguments
+
+  <li> BEGIN_PARSE_ARGS(argc, argv): start parsing the arguments array
+
+  <li> ARG(var): parse the next argument into the variable 'var'. Currently, 
+  the type of 'var' can be one of int, unsigned int, double, const char *, 
+  TclObject *.
+
+  <li> ARG_DEFAULT(var, default): same as ARG, except you can specify a 
+  default value to use if this arg has not been specified in the cmdline
+
+  <li> END_PARSE_ARGS: clean up at the end of parsing. Check for extra
+  arguments that might have been passed in, and output an error if there are
+  any. Even if your function does not expect any arguments, use 
+  BEGIN_PARSE_ARGS and END_PARSE_ARGS at the start of your function to ensure 
+  that you check for any spurious args that have been passed into this function
+
+  <li> Example:
+  <pre>
+    class TestClass : public TclObject {
+    public:
+        TestClass();  /* must have this constructor */
+	virtual int init(int argc, const char * const *argv) {
+	    int myarg;
+
+	    BEGIN_PARSE_ARGS(argc, argv);
+	    ARG(my_arg);
+	    END_PARSE_ARGS;
+
+	    /* ... use 'myarg' in the initialization of this object */
+
+	}
+
+	int func1(int argc, const char * const *argv) {
+	    char *name;
+	    BEGIN_PARSE_ARGS(argc, argv);
+	    ARG(name);
+	    END_PARSE_ARGS;	    
+
+	    // ...
+	}
+
+	int func2(int argc, const char * const *argv) {
+	    BEGIN_PARSE_ARGS(argc, argv);
+	    END_PARSE_ARGS;
+	    // ....
+	}
+    }
+
+
+    OTCL_MAPPINGS(TestClass, "TestClass") {
+        INSTPROC(func1, "func1");
+	INSTPROC(func2, "func2");
+    }
+  </pre>
+</ul> 
+</ul>
+
+<hr>
+<h3><a href="http://www-mash.cs.berkeley.edu/dist/libTcl-src-1.0b2.tar.gz">libTcl-1.0b2[OLD]/tclcl-1.3[NEW]</a>
+Jul 25 1997</h3>
+<i>Snapshot for ns-2.0b17 release.</i>
+
+<ul>
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>Wed Jul 23 16:01:55 PDT 1997</b><br>
+Fixed problem in Makefile.in which caused the embedded files to not build
+correctly.  Regenerated configure script.
+
+<li><b><a href="http://www.cs.berkeley.edu/~gnguyen">[GN]</a></b>
+<b>Mon Jul 21 15:12:43 PDT 1997</b><br>
+
+Add tracedvar.{h,cc} to implement a tracing mechanism for variables.
+Each "traced" variables should be initialized with its string name and a
+TclObject to callback when its value is changed.  The callback happens
+through the TclObject::trace(TracedVar*) method.
+
+  <li><b><a href="http://www.isi.edu/~johnh/">[johnh]</a>
+       Thu Jul  3 15:54:53 PDT 1997</b><br>
+       bug in InstVarBool (preventing set foo_ 1
+       from working if foo_ was created with bind_bool) fixed.
+
+<li><b><a href="http://www.cs.berkeley.edu/~yatin">[YC]</a></b>
+<b>Mon Jun  9 19:27:19 PDT 1997</b><br>
+
+Moved the tkvar stuff into Tcl/tcl-object.tcl. Arranged the delete proc 
+to invoke "$object delete_tkvar" to clean up any global tk variables that
+are associated with this variable
+</ul>
+
+<hr>
+<h3><a href="http://www-mash.cs.berkeley.edu/dist/libTcl-src-1.0b1.tar.gz">libTcl-1.0b1[OLD]/tclcl-1.2[NEW]</a>
+Tue Jun  3 15:42:41 PDT 1997</h3>
+
+<ul>
+<li><b><a href="http://www.isi.edu/~kannan">[KVa]</a></b>
+<b> Tue Jun  3 11:04:11 PDT 1997</b><br>
+Incorrect memory free patterns in Tcl.cc, cause the occasional leak,
+reported by purify.
+In brief, array storage allocated as ``var = new DataType[nelem]''
+should be freed as ``delete[] var''.
+
+<li><b><a href="http://www.cs.berkeley.edu/~elan">[EA]</a></b>
+<b>Thu Apr 17 21:54:00 PDT 1997</b><br>
+Fixed Makefile.in so that you can do a make depend.
+
+<li><b><a href="http://www.cs.berkeley.edu/~padmanab">[VP]</a></b>
+<b>Wed Apr 16 02:44:32 PDT 1997</b><br>
+Added new bind routines that allow establishing a linkage between
+OTcl variables and functions that handle reads to and writes from the
+corresponding C++ variable. The functions can then be instrumented
+as desired, for example to log all changes in the value of the C++
+variables.
+
+<li><b><a href="http://www.isi.edu/~kannan">[KVa]</a></b>
+<b>Mon Apr  7 15:45:59 PDT 1997</b><br>
+Fixed tcl2c++.c to skip over multi-line comments correctly.<br>
+<code>proc tkerror</code> will also print its argument string when invoked.
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a>
+Thu Mar 6 00:15:55 PDT 1997</b><br></b>
+Changed Tk_* event handling calls to Tcl_* since Tcl now
+handles the event loop and we don't want to inlclude tk.h
+if we don't have to.
+
+</ul>
+
+<hr>
+<h3><a href="http://www-mash.cs.berkeley.edu/dist/libTcl-src-1.0a6.tar.gz">libTcl-1.0a6[OLD]/tclcl-1.1[NEW]</a>
+<b>Feb 3 1997</b></h3>
+<ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a>
+Mon Jan 31 18:59:59 PDT 1997</b><br>
+Fixed up rate variables so that they are not evaluated in global context.
+This change allows us to wrapt OTcl instance variables in a rate-variable.
+
+</ul>
+
+<hr>
+<h3><a href="http://www-mash.cs.berkeley.edu/dist/libTcl-src-1.0a5.tar.gz">libTcl-1.0a5</a>
+Tue Dec 31 18:01:20 PST 1996</h3>
+<i>Snapshot to <a href="http://netweb.usc.edu/vint/">VINT</a>
+collaborators.</i>
+<ul>
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+Re-arranged configure.in to use shared conf structure.
+
+</ul>
+
+<hr>
+<h3><a href="http://www-mash.cs.berkeley.edu/dist/libTcl-src-1.0a3.tar.gz">libTcl-1.0a3[OLD]/tclcl-1.0[NEW]</a>
+Sun Nov 10 11:06:46 PST 1996</h3>
+<i>Snapshot to <a href="http://netweb.usc.edu/vint/">VINT</a>
+collaborators.</i>
+<ul>
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+Moved C++ shadow object management into TclObject proper.
+This allows one to now transparently override the init method of
+built-in C++ classes.  Previously, this would cause the
+C++ shadow object to not be created (unless explicited
+wired in).
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+Switched to model where TclClass-defined
+classes have structured names with the hierarchy
+delineated by slashes, e.g., a side effect of
+creating class <i>A/B/C</i> is to create classes <i>A</i>
+and <i>A/B</i>.
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+Enhanced tcl2c++ to use stdin if no file arguments
+appear on the command line.
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+Fixed TclObject::init-instvar to search object hierarchy
+for default value of each C++/OTcl instance variable
+(rather than just in the respective class).
+
+<li><b><a href="http://www.cs.berkeley.edu/~mccanne">[SM]</a></b>
+Fixed bug that caused init_instvar to be called before virtual
+methods were completely filled in.  This caused the initial
+value of bandwidths and times to be misinterpreted as doubles.
+
+</ul>
+
+</body></html>

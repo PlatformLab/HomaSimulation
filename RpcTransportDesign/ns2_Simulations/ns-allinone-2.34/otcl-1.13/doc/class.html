@@ -1,0 +1,385 @@
+<html>
+<head>
+<title>OTcl Classes (Version 0.96, September 95)</title>
+</head>
+
+<body>
+
+<h1><a href="../README.html">OTcl</a> Classes (Version 0.96, September 95)</h1>
+
+<h2>Overview</h2>
+
+<p>This reference page describes the functionality provided for all
+classes by methods on the <tt>Class</tt> class. See the <a
+href="tutorial.html">tutorial</a> for an introduction to programming
+in OTcl, and the <a href="capi.html">C API</a> page for details of
+manipulating classes from C.</p>
+
+<p>Classes in OTcl are a special kind of object used mainly for
+inheritance. By convention, they are named with mixed case to
+distinguish them from regular objects.  They inherit all the abilities
+of regular objects from <tt>Object</tt>, and add more. The inherited
+behavior includes method lookup, dispatch, and combination, and
+initialization syntax. See <a href="object.html">Objects in OTcl</a>
+to understand these abilities of regular objects.</p>
+
+<p>Classes are created through meta-class objects, either implicitly
+with a widget command syntax, or explicitly by calling a creation
+method. Generic classes may be created with the <tt>Class</tt>
+class. By default, they will inherit from <tt>Object</tt>. The classes
+Bagel, and SuperBagel, which inherits from Bagel, may be defined as
+follows. See the <tt>create</tt> instproc for a description of the
+overall creation process and how to customize it.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Bagel info class
+Class
+% Bagel info superclass
+Object
+% Class SuperBagel -superclass Bagel
+SuperBagel
+% SuperBagel info class
+Class
+% SuperBagel info superclass
+Bagel
+</pre></blockquote>
+
+
+<p><tt>Class</tt> is the repository for the behavior common to all
+classes. It includes methods for defining new methods for use by
+instances, initializing and destroying classes, specifying their
+superclasses, querying them, and so forth. The remainder of this
+reference page describes these methods. Their functionality can be
+customized for particular meta-classes or classes by using the
+standard inheritance mechanisms, or changed directly for all classes
+by rewriting the methods on <tt>Class</tt> in Tcl or C.</p>
+
+
+<h2>Alloc</h2>
+
+<p>The <tt>alloc</tt> proc is used to allocate a fresh class object
+that is an instance of class <tt>Class</tt> and has superclass
+<tt>Object</tt>. It is normally called by the system as part of class
+creation, but may be called by the user.</p>
+
+<p>The system <tt>create</tt> instproc on <tt>Class</tt> expects all
+<tt>alloc</tt> procs to take the name of the object to allocate, and a
+list of arguments. It expects them to allocate the object, install it
+in the interpreter, and return the list of unprocessed arguments. For
+the case of the <tt>Class</tt> <tt>alloc</tt> proc, no additional arguments are
+processed, and so they are all returned.</p>
+
+<p>To customize class creation, write an <tt>init</tt> instproc, not
+an <tt>alloc</tt> proc. New <tt>alloc</tt> procs will typically be
+written in C to allocate structurally different types of object.</p>
+
+<blockquote><pre>
+% Class alloc foo bar baz
+bar baz
+% foo info class
+Class
+% foo info procs
+% foo info vars
+</pre></blockquote>
+
+
+<h2>Create</h2>
+
+<p>The <tt>create</tt> instproc provides a mechanism for classes to
+create other classes and objects. It is invoked by the default
+<tt>unknown</tt> instproc if no matching method name can be found, and
+so may be ellided to yield the familiar widget-like creation
+syntax.</p>
+
+<p><tt>create</tt> takes the name of a class or object to create plus
+extra initialization argument pairs, and returns the name of the
+object or class created. It effectively calls an <tt>alloc</tt> proc
+to allocate the object, then dispatches the <tt>init</tt> method with
+the initialization arguments to initialize the object. Recall that the
+base <tt>init</tt> method on <tt>Object</tt> interprets these
+arguments as option key and option value pairs, evaluating each pair
+in turn. The following three sequences are essentially equivalent
+(except in terms of return value).</p>
+
+
+<blockquote><pre>
+% Class create Bagel
+Bagel
+</pre></blockquote>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+</pre></blockquote>
+
+<blockquote><pre>
+% Class alloc Bagel
+% Bagel init
+</pre></blockquote>
+
+
+<p>The <tt>alloc</tt> proc that is called by create is determined by
+the class object on which it is called. <tt>create</tt> first looks
+for an <tt>alloc</tt> proc on this class object, then on its
+superclasses according to the precedence ordering. The result is that
+calling <tt>create</tt> on <tt>Class</tt> (or a class specialized from
+it) will create a new class, whereas calling <tt>create</tt> on
+<tt>Object</tt> (or a class specialized from it) will create a new
+object.</p>
+
+<p>Classes may customize the initialization of their instances by
+defining an <tt>init</tt> instproc. If the option key and option value
+creation syntax is still desired, this <tt>init</tt> instproc should
+combine its behavior with the <tt>init</tt> instproc on
+<tt>Object</tt> by using the <tt>next</tt> instproc, as shown
+below. For example, the class Bagel may require an instance variable
+called bites to be initialized to a default value of 12, in addition
+to regular option key and option value initialization. This is
+accomplished as follows. (The use of eval is simply to flatten the
+list of arguments contained in args.)  Similarly, an <tt>init</tt>
+instproc on <tt>Class</tt> may be used to customize the initialization
+of all classes.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Bagel instproc init {args} {
+  $self set bites 12
+  eval $self next $args
+}
+% Bagel instproc flavor {f} {
+  $self set flavor $f
+}
+% Bagel abagel -flavor sesame
+abagel
+% abagel set bites
+12
+% abagel set flavor
+sesame
+</pre></blockquote>
+
+
+<p>Alternatively, the standard inheritance mechanisms may be used to
+provide some or all classes with their own <tt>create</tt> proc,
+allowing complete control over the creation process. For reference,
+the default <tt>create</tt> instproc on <tt>Class</tt> is conceptually
+defined as follows.</p>
+
+<blockquote><pre>
+Class instproc create {obj args} {              
+  set h [$self info heritage]                   
+  foreach i [concat $self $h] {                 
+    if {[$i info commands alloc] != {}} then {  
+      set args [eval [list $i] alloc [list $obj] $args]       
+      $obj class $self                          
+      eval [list $obj] init $args                      
+      return $obj                               
+    }                                           
+  }                                             
+  error {No reachable alloc}                    
+}
+</pre></blockquote>
+
+
+<h2>Info</h2>
+
+<p>The <tt>info</tt> instproc is used to query the class and retrieve
+information about its current state. It mirrors the Tcl info command,
+and has the following options in addition to those of the <tt>Object</tt>
+<tt>info</tt> instproc.</p>
+
+<ul>
+
+<li><tt>superclass</tt> returns the superclass list of the
+object. With an additional argument that is the name of a class, it
+returns 1 if that class is a direct or indirect superclass of the
+class, and 0 otherwise.
+
+<li><tt>subclass</tt> returns the subclass list of the object. With an
+additional argument that is the name of a class, it returns 1 if that
+class is a direct or indirect subclass of the class, and 0 otherwise.
+
+<li><tt>heritage</tt> returns the inheritance precedence list (as
+described for the <tt>superclass</tt> instproc). An additional
+argument is taken to be a string match pattern which filters the
+result list.
+
+<li><tt>instances</tt> returns a list of the instance objects of the
+class. An additional argument is taken to be a string match pattern
+which filters the result list.
+
+<li><tt>instprocs</tt> returns a list of the names of instproc methods
+defined on the class. An additional argument is taken to be a string
+match pattern which filters the result list.
+
+<li><tt>instcommands</tt> returns a list of the names of both Tcl and
+C instproc methods defined on the class. An additional argument is
+taken to be a string match pattern which filters the result list.
+
+<li><tt>instargs</tt> is used to query the argument list of a Tcl
+instproc method. It functions in the same manner as the Tcl info args
+command.
+
+<li><tt>instbody</tt> is used to query the body of a Tcl instproc
+method. It functions in the same manner as the Tcl info body command.
+
+<li><tt>instdefault</tt> is used to query the default value of an
+argument of a Tcl instproc method. It functions in the same manner as
+the Tcl info default command.
+
+</ul>
+
+<p>These options can recover most information about the state of a
+class. As an example, the following instproc returns a list of all
+direct and indirect instances of a class.</p>
+
+<blockquote><pre>
+Class instproc instances {} {
+  set il {}
+  foreach i [Class info instances] {
+    if {[$self info subclass $i]} then {
+      eval lappend il [$i info instances]
+    }
+  }
+  return $il
+}
+</pre></blockquote>
+
+
+<h2>Instproc</h2>
+
+<p>The <tt>instproc</tt> instproc is used to install instproc methods
+on a class, for use by that class's direct and indirect instances. Use
+<tt>instproc</tt> to share and inherit behaviors.  With particular
+argument forms, <tt>instproc</tt> can also remove instproc methods
+from a class, or specify an autoload script for demand loading of the
+instproc method.</p>
+
+<p>The arguments and body of an instproc method are of the same form
+as a Tcl procedure, with two exceptions. If both args and body are
+empty, then an existing instproc method with the specified name is
+removed from the class. If args is <tt>{auto}</tt>, then the body is
+interpreted as an autoload script in the same manner as described
+under the <tt>proc</tt> instproc in <a href="object.html">OTcl
+Objects</a>. See <a href="autoload.html">OTcl Autoloading</a> for a
+higher level demand loading scheme.</p>
+
+<p>The following example demonstrates defining instprocs, using them
+on behalf of and object, and combining their functionality with
+next.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Class SuperBagel -superclass Bagel
+SuperBagel
+% Bagel instproc taste {} {
+  puts yum!      
+}
+% SuperBagel instproc taste {} {
+  $self next
+  puts YUM!
+}
+% SuperBagel abagel
+abagel
+% abagel taste
+yum!
+YUM!
+</pre></blockquote>
+
+
+<p>The environment in effect when an instproc is being executed is the
+same as when a proc is being executed, and is described under the
+<tt>proc</tt> instproc in <a href="object.html">OTcl Objects</a>. The
+special variable <tt>class</tt> may be used for a variety of tasks,
+such as to access shared variables stored on the class object. For
+example, the default size of a bagel in bites may be stored on the
+Bagel class to be accessed during the <tt>init</tt> instproc as
+follows.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+% Bagel set bites 12
+12
+% Bagel instproc init {args} {
+  $class instvar bites
+  $self set size $bites
+  eval $self next $args
+}
+% Bagel abagel
+abagel
+% abagel set size
+12
+% Bagel set bites 7
+7
+% Bagel abagel
+abagel
+% abagel set size
+7
+</pre></blockquote>
+
+
+<h2>Superclass</h2>
+
+<p>The <tt>superclass</tt> instproc is used to change the superclasses
+from which a class directly inherits behavior. It takes one argument
+that is a list of superclasses and returns the empty string. The order
+of the superclass list determines the order of inheritance. Multiple
+inheritance is supported.</p>
+
+<p>The superclasses must be in precedence order (from most specialized
+to least specialized) if they are related, and the resulting
+superclass relation must be cycle-free. An error is returned and the
+superclass graph is unchanged if either of these conditions are
+unmet.</p>
+
+<p>The linear precedence order in which superclasses are searched for
+instprocs is constrained according to each local superclass list. It
+is guaranteed that if A inherits from B and C, then A will behave like
+a B before it behaves like a C, and so forth for B and C and their
+superclasses. The algorithm used to generate this ordering is an
+unspecified CLOS-like topological sort of the inheritance graph. (This
+is all you need to know. Multiple inheritance is best thought of in
+terms of local orderings. If you are relying on subtleties of the
+global ordering, then you are asking for trouble.)</p>
+
+<p>The <tt>heritage</tt> option of the <tt>info</tt> instproc may be
+used to discover the precedence order, and hence the path that the
+<tt>next</tt> instproc will use when instructed to combine
+methods.</p>
+
+
+<h2>Unknown</h2>
+
+<p>The <tt>unknown</tt> instproc for classes is used to implement
+implicit creation of objects. It is invoked when no matching method is
+found, and interprets the method name as the name of an object to be
+created with <tt>create</tt>, thus allowing a widget-like creation
+syntax.</p>
+
+<p>See the entry for <tt>unknown</tt> in <a href="object.html">OTcl
+Objects</a> for a general description of the unknown method
+mechanism.</p>
+
+<p>The <tt>unknown</tt> instproc on <tt>Class</tt> is conceptually
+defined as follows. It you do not want implicit creation, then
+redefine or remove the default method with the <tt>instproc</tt>
+method.</p>
+
+<blockquote>
+<pre>
+Class instproc unknown {m args} {       
+  if {$m == {create}} then {            
+    error "$self: unable to dispatch $m"
+  }                                     
+  eval [list $self] create [list $m] $args 
+}                                          
+</pre></blockquote>
+
+</body>
+</html>
+
+<!-- $Date: 1997/07/19 02:08:53 $ -->

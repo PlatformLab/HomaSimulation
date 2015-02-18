@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>OTcl - MIT Object Tcl</title>
+</head>
+
+<body>
+<h1>OTcl - MIT Object Tcl</h1>
+<h2>The FAQ &amp; Manual (Version 0.96, September 95)</h2>
+
+<address>
+David Wetherall<br>
+djw@lcs.mit.edu<br>
+MIT Lab for Computer Science<br>
+</address>
+
+<h2>What is OTcl?</h2>
+
+<p>OTcl, short for MIT Object Tcl, is an extension to Tcl/Tk for
+object-oriented programming. It shouldn't be confused with the IXI
+Object Tcl extension by Dean Sheenan. (Sorry, but we both like the
+name and have been using it for a while.)</p>
+
+<p>Some of OTcl's features as compared to alternatives are:</p>
+
+<ul>
+  <li>designed to be dynamically extensible, like Tcl, from the ground up
+  <li>builds on Tcl syntax and concepts rather than importing another language
+  <li>compact yet powerful object programming system (draws on CLOS,
+  Smalltalk, and Self)
+  <li>fairly portable implementation (2000 lines of C, without core hacks)
+</ul>
+
+<p>OTcl was presented at the Tcl/Tk Workshop '95. It constitutes a
+standalone release of a system that has been in use, embedded in the
+<a href="http://www.tns.lcs.mit.edu/vs/vusystem.html">VuSystem</a>, for
+two years. We made the release public (with free use, distribution and
+modification under the MIT license) to meet the demand for
+object-oriented programming in Tcl.</p>
+
+
+<h2>Where do I get it?</h2>
+
+<p>The primary distribution site for OTcl, including this FAQ and
+Manual, and documentation is:</p>
+
+<a href="ftp://ftp.tns.lcs.mit.edu/pub/otcl/">
+<blockquote>ftp://ftp.tns.lcs.mit.edu/pub/otcl/</a></blockquote>
+
+<p>As well as the source code distribution, binary distributions are
+available for some platforms.</p>
+
+<h2>How do I make it?</h2>
+
+<p>OTcl is known to work with Tcl/Tk versions 7.3/3.6, 7.4/4.0, and
+7.5/4.1 (alpha1) on Unix platforms. Since it is written in ANSI C,
+does not change the Tcl core, and is small, it should be relatively
+easy to port to other platforms. [And I expect it could easily work
+with earlier Tcl/Tk versions, at least down to 7.0/3.3.]</p>
+
+<h3>Compiling the Source Distribution</h3>
+
+<p>To build OTcl from its source distribution, you will need access to
+the Tcl source distribution, plus compatible Tcl/Tk libraries and
+external includes. The Tcl source is needed to include structures
+defined in internal headers. The libraries are needed if you want to
+link OTcl into standalone shells.</p>
+
+<p>(Specifically, OTcl needs the file tclInt.h and tclIntDecls.h from
+the source code to Tcl.  If you're building OTcl on a platform with a
+binary installation of Tcl/Tk you <em>must</em> get these header files
+from the matching source code for your version ot Tcl/Tk.)
+
+<p>To compile, <tt>cd</tt> to the untarred directory, type
+<tt>./configure</tt>, and then <tt>make</tt>. The configuration
+process will ask you the location of the Tcl/Tk files it requires and
+produce the <tt>Makefile</tt>. Running <tt>make</tt> will cause four
+binaries to be produced; they are described below.</p>
+
+<p>Don't be put off by the use of configure. Compiling OTcl is
+straightforward (it's all in one C file!) and configure is mainly
+being used to accommodate platform dependent libraries and
+linking. You can edit the <tt>Makefile</tt> directly, or issue compile
+and link commands manually.</p>
+
+<h3>Using and Installing the Binaries</h3>
+
+<p>OTcl compiles to four binary results, each suited to a different
+purpose.</p>
+
+<ol>
+
+<li>otclsh, a tclsh loaded with OTcl.
+
+<li>owish, a wish loaded with OTcl.
+
+<li>libotcl.a, the OTcl library, for adding OTcl to your Tcl
+application. See below.
+
+<li>libotcl.so (suffix may vary), a shared version of the OTcl library
+for dynamically loading OTcl into running Tcl shells. See below.
+
+</ol>
+
+<p>You can test the binaries with <tt>make test</tt>. This runs the
+<tt>test.tcl</tt> script, which should report that several tests are
+passed.</p>
+
+<p>You can install the binaries with <tt>make install</tt>.</p>
+
+
+<h3>Adding OTcl to Your Application</h3>
+
+<p>OTcl doesn't change the core, so it can be added to other Tcl
+applications or shells in the usual manner. It is known to work with
+expect-5.18 and tclX7.4a, for example. However, OTcl does depend on
+several internal Tcl data structures, so it may not be compatible with
+Tcl versions in which the core has been modified.</p>
+
+<p>With a Tcl application of version 7.5 or higher (and a corresponding
+<tt>libotcl.so</tt>) OTcl may be loaded dynamically by issuing the tcl
+command <tt>"load libotcl.so OTcl"</tt> to the running interpreter. (If
+<tt>libotcl.so</tt> is not installed, then you may require environment
+variables, such as LD_LIBRARY_PATH for Solaris, or other schemes for
+access.)</p>
+
+<p>Alternatively, OTcl can be linked into a Tcl application to provide
+access to its C API. Simply call <tt>Otcl_Init</tt> from your
+application initialization routine (for which you will need to include
+<tt>otcl.h</tt> and link against an OTcl library). Then your modules
+may acess OTcl C functions through its external interface file,
+<tt>otcl.h</tt>.</p>
+
+
+<h2>How do I use it?</h2>
+
+<p>There's a quickstart tutorial to help you become familiar with OTcl
+syntax and style. It's included in the distribution.</p>
+
+<blockquote>
+  <a href="doc/tutorial.html">Tutorial</a>
+</blockquote>
+
+<p>For documentation about objects, classes, and their capabilities,
+see the following reference pages. They're included in the
+distribution.</p>
+
+<blockquote>
+  <a href="doc/object.html">OTcl Objects</a><br>
+  <a href="doc/class.html">OTcl Classes</a><br>
+  <a href="doc/autoload.html">OTcl Autoloading</a><br>
+  <a href="doc/capi.html">OTcl C API</a><br>
+</blockquote>
+
+<p>You can read further about OTcl's capabilities and design in the
+workshop paper, also included as part of the distribution. It provides
+a couple of terse examples too.</p>
+
+<blockquote>
+   <a href="http://www.tns.lcs.mit.edu/publications/tcltk95.djw.html">
+   Extending Tcl for Dynamic Object-Oriented Programming</a><br>
+   David Wetherall and Christopher J. Lindblad<br>
+   Proceedings of the Tcl/Tk Workshop '95, Toronto, July 1995.<br>
+</blockquote>
+
+
+ <h2>Feedback?</h2>
+
+<p>Let me (<a href="mailto:djw@lcs.mit.edu">djw@lcs.mit.edu</a>) know
+if you have suggestions or other feedback.</p>
+
+</body>
+</html>
+
+<!-- $Date: 2001/06/26 18:50:10 $ -->

@@ -1,0 +1,1145 @@
+#!/bin/sh
+# the exec restarts using tclsh which in turn ignores
+# the command because of this backslash: \
+exec tclsh "$0" "$@"
+
+#
+# otcldoc - a simple script for translating otcl classes into
+# an html hyperlinked document.  Inspired by javadoc.
+# Basic algorithm: for a given set of input files, find all Class
+# definitions.  Put the text in the comment immediately preceding the
+# class def in the "description" section of the doc.
+# Parse the Class definition to locate superclasses and at
+# that to the "superclasses" section.  Locate each method
+# labeled as instproc, public, or private, and enter desriptions
+# in the "Public/Private Methods" sections of the html doc.
+#
+# TO-DO:
+#
+#   Add a cross-links for methods as Elan did for classes
+#   (in format_line)
+#
+#   Separate public and private methods into different sections
+#   of the web page. [DONE]
+#
+#   Add a tags section to the comment so we can include
+#   "see also" refs, author info, etc.
+#
+#   Do more interesting html formatting of code, e.g., highlight
+#   class names and add hyperlinks.
+#
+#   Add tags for C++ methods so they will not only be documented
+#   in the OTcl module, but they will also appear in the html doc
+#   in a special section.
+#
+#   Have a separate pass that determines all of children used by
+#   a class so we can build the class interdependecnies into the 
+#   doc (i.e., we should encompss more than just superclass relationships)
+#	[DONE]
+#
+#   Add hyperlinks from method description to actual OTcl proc.
+#	[DONE]
+#
+#   Create a top-level index.
+#	[DONE - rough cut]
+#
+#   Add keyword or comment to set up inherits-from/overrides relationships.
+#
+#   Parsing of the Class definition should not assume it all fits on a single line.
+#   (WidgetClass definitions, for example, often span multiple lines.)  [DONE]
+#
+#   Parse WidgetClass definitions, presenting available attributes and their defaults in html. 
+#   i.e. Process "-configspec"/"-config" and "-default" similar to the way "-superclass" is handled.    
+#
+set app [pwd]
+set outputDir /var/tmp/doc-[file tail [pwd]]
+set indexFileName index.html
+set classString Class
+exec mkdir -p $outputDir
+set outputChannel stdout
+set nlines 0
+
+proc emit s {
+	global outputChannel
+	puts $outputChannel $s
+}
+
+proc emit_nonewline s {
+	global outputChannel
+	puts -nonewline $outputChannel $s
+}
+
+#
+# Mape an OTcl class name to an html file name
+#
+proc class_to_file c {
+	set f ""
+	# map slashes to dashes
+	set sep ""
+	foreach s [split $c /] {
+		set f "$f$sep$s"
+		set sep -
+	}
+	return $f.html
+}
+
+#
+# Arrange for output to go to the appropriate output file.
+# 
+proc set_class c {
+	global outputChannel outputDir
+	if { $outputChannel != "stdout" } {
+		close $outputChannel
+	}
+	set outputChannel [open $outputDir/[class_to_file $c] w]
+}
+
+#
+# Arrange for output to go to the appropriate output file.
+# 
+proc set_generic_class {} {
+	global outputChannel outputDir
+	if { $outputChannel != "stdout" } {
+		close $outputChannel
+	}
+	set outputChannel [open $outputDir/[class_to_file "Generic"] w]
+}
+
+#
+# Return a list of the otcl class definitions
+# found in the file.  Set up a table (called "lineOfClass")
+# to map class name to line number and a table (called "methods")
+# that maps a class name to a list of line numbers that
+# correspond to each method of that class.
+#
+proc find_tcl_classes {} {
+	global line nlines lineOfClass public_methods private_methods proc_methods generic_proc_methods classString 
+
+	set classes ""
+	set n 0
+	while { $n < $nlines } {
+		set s [split $line($n)]
+		if { [lindex $s 0]  == $classString } {
+			set cname [lindex $s 1]
+			if { $cname != "instproc" && $cname != "proc" &&
+			    $cname != "private" && $cname != "public" } {
+				set classes "$classes $cname"
+				set lineOfClass($cname) $n
+			}
+		} elseif { "[lindex $s 0]"  == "proc" } {
+			lappend generic_proc_methods $n
+		# if second word is one of the following, make sure the first word is not a standard tcl/tk command
+		# (This is to avoid the situations where "public", "proc", etc. are used as variables sent as argument to a command)
+		} elseif { [lsearch -exact [info commands {[a-z]*}] [lindex $s 0]] == -1 } {
+			if { "[lindex $s 1]" == "instproc" ||
+			     "[lindex $s 1]" == "public" } {
+				set cname [lindex $s 0]
+				lappend public_methods($cname) $n
+			} elseif { "[lindex $s 1]" == "private" } {
+				set cname [lindex $s 0]
+				lappend private_methods($cname) $n
+			} elseif { "[lindex $s 1]" == "proc" } {
+				set cname [lindex $s 0]
+				lappend proc_methods($cname) $n
+			}
+		}
+
+		incr n
+	}
+	return $classes
+}
+
+proc class_anchor_name lineno {
+	global line
+	set s $line($lineno)
+	return [lindex $s 1]
+}
+
+proc method_anchor_name lineno {
+	global line
+	set s $line($lineno)
+	return [lindex $s 0]::[lindex $s 2]
+}
+
+proc generic_method_anchor_name lineno {
+	global line
+	set s $line($lineno)
+	return [lindex $s 1]
+}
+
+#
+# Read the important lines from input file into the "lines" array.
+# While we're reading in the file, dump the code to correponsding
+# output html file and insert anchors for each Class and instproc
+#
+proc read_tcl_file fname {
+	global line nlines outputDir file classString
+
+	set outFile $outputDir/$fname.html
+	exec mkdir -p [file dirname $outFile]
+	set out [open $outFile w]
+	puts $out "<html><pre>"
+
+	set cont 0
+	set contClassDefn 0
+	set f [open $fname r]
+	while 1 {
+		set rawline [gets $f]
+		if [eof $f] {
+			break
+		}
+		set s $rawline
+		
+		# Since we are outputting in an html <pre> section, 
+		# change '<' to '&#60;' so that '<' is not interpreted
+		# to be the start of a specially interpreted element,
+		# such as '<s>' which means strike-through.
+		regsub -all {<} $rawline {\&#60;} rawline
+
+		set linekReset 0
+		if $cont {
+			set c [continuation $s]
+			if { $c != "" } {
+				set s $c
+			} else {
+				set cont 0
+			}
+			set k [expr $nlines - 1]
+			set linekReset 1
+			set oldlinek $line($k)
+			set line($k) "$line($k) $s"
+		} 
+
+		# For Class definitions, read in the entire body of the definition even if it spans multiple lines.
+		# To do this, we count open and closed braces.
+		# The motivation for this was to be able to process the "-configuration" option of a Class definition
+		# in order to display the default settings for an Object.
+		if { $contClassDefn } {
+			if { [is_tcl_comment $s] == 1} {
+			    continue
+			}
+
+			set c [continuation $s]
+			if { $c != "" } {
+				set s $c
+				set cont 1
+			}
+
+			set c [classDefnContinuation $s]
+			global unclosedbraces
+			if { $unclosedbraces > 0 } {
+			    set s $c
+			} else {
+			    set contClassDefn 0
+			}
+			if { $linekReset == 1} {
+			    set line($k) $oldlinek
+			} else {
+			    set k [expr $nlines - 1]
+			}
+			while { $line($k) == "" } {
+			    incr k -1
+			}
+			set line($k) "$line($k) $s"
+		}
+
+		#
+		# Strip off trailing open brace if necessary
+		# (escape rules in split are too difficult otherwise)
+		#
+		set stringb4trim $s
+		set s [string trim $s]
+		if { [string last \{ $s] == [expr [string length $s] - 1] } {
+			set s [string range $s 0 [expr [string length $s] - 2]]
+		}
+		
+
+		set words [split $s]
+		#
+		# Preserve all class and method definitions in addition
+		# to comments and blank lines.  (We need the blank
+		# lines to server as delimeters in the logic used later.)
+		#
+		if { [is_tcl_comment $s] || [lindex $words 0]  == $classString ||
+			[lindex $words 1] == "instproc" ||
+			[lindex $words 1] == "public" ||
+			[lindex $words 1] == "private" ||
+			[lindex $words 1] == "proc" ||
+			[lindex $words 0] == "proc" ||
+				$words == "" } {
+
+			set c [continuation $s]
+			if { $c != "" } {
+				set s $c
+				set cont 1
+			}
+
+			#if s has configuration, read til the brace afterwards is closed into a var which i will process later
+			if {[lindex $words 0] == $classString && 
+			    [lindex $words 1] != "instproc" &&
+			    [lindex $words 1] != "public" &&
+			    [lindex $words 1] != "private" &&
+			    [lindex $words 1] != "proc" &&
+			    ![is_tcl_comment $s] } {
+				set c [classDefnContinuation $stringb4trim]
+				global unclosedbraces
+				if { $unclosedbraces > 0 } {
+				    set s $c
+				    set contClassDefn 1
+				}
+			}
+
+			set line($nlines) $s
+			set file($nlines) $fname
+
+			if { [lindex $words 0]  == $classString } {
+				set anc [class_anchor_name $nlines]
+				puts $out "</pre><a name=$anc><pre>"
+			} elseif { [lindex $words 0] == "proc" } {
+				set anc [generic_method_anchor_name $nlines]
+				puts $out "</pre><a name=$anc><pre>"
+			# if second word is one of the following, make sure the first word is not a standard tcl/tk command
+			# (This is to avoid the situations where "public", "proc", etc. are used as variables sent as argument to a command)
+			} elseif { [lsearch -exact [info commands {[a-z]*}] [lindex $words 0]] == -1 } {
+				if { [lindex $words 1] == "instproc" ||
+					[lindex $words 1] == "public" ||
+					[lindex $words 1] == "private" ||
+					[lindex $words 1] == "proc" } {
+					set anc [method_anchor_name $nlines]
+					puts $out "</pre><a name=$anc><pre>"
+				}
+			}
+			incr nlines
+		}
+		puts $out $rawline
+	}
+	puts $out "</pre></html>"
+	close $out
+	close $f
+}
+
+#
+# Like read_tcl_file, but for C++.  Doesn't bother
+# generating C++ html files.
+#
+proc read_cpp_file fname {
+	global line nlines outputDir file tcl_class classString
+
+	set outFile $outputDir/$fname.html
+	exec mkdir -p [file dirname $outFile]
+	set out [open $outFile w]
+	puts $out "<html><pre>"
+
+	set f [open $fname r]
+	while 1 {
+		set rawline [gets $f]
+		if [eof $f] {
+			break
+		}
+		set s $rawline
+		set words [split $s]
+		#
+		# Collect up all the TclClass names so we can
+		# warn of classes that don't have structured
+		# comments.
+		#
+		foreach w $words {
+			if [string match TclClass(*) $w] {
+				set s [string first \" $w]
+				set e [string last \" $w]
+				if { $s < 0 } {
+					continue
+				}
+				incr s
+				incr e -1
+				set c [string range $w $s $e]
+				# 
+				set tcl_class($c) 1
+				break
+			}
+			#XXX skip C++ methods for now.
+		}
+
+		#
+		# Preserve all comments since all interesting OTcl
+		# methods are defined inside C comments.
+		#
+		if { [is_c_comment $s] } {
+			#
+			# convert to tcl comment for consistency with
+			# other code
+			#
+			set ss [convert_comment $s]
+			set words [split $ss]
+
+			set line($nlines) $ss
+			set file($nlines) $fname
+
+			if { [lindex $words 1] == "<otcl>" } {
+
+				set ss [strip_otcl_tag $ss]
+				set line($nlines) [string trimleft $ss]
+
+				if { [lindex $words 2] == $classString } {
+					set anc [class_anchor_name $nlines]
+					puts $out "</pre><a name=$anc><pre>"
+				} elseif { [lindex $words 3] == "instproc" ||
+					[lindex $words 3] == "public" ||
+					[lindex $words 3] == "private" ||
+					[lindex $words 3] == "proc" } {
+					set anc [method_anchor_name $nlines]
+					puts $out "</pre><a name=$anc><pre>"
+				} elseif { [lindex $words 2] == "proc" } {
+					set anc [generic_method_anchor_name $nlines]
+					puts $out "</pre><a name=$anc><pre>"
+				}
+			}
+
+			incr nlines
+		}
+		puts $out $rawline
+	}
+	puts $out "</pre></html>"
+	close $out
+	close $f
+}
+
+proc convert_comment s {
+	set s [string trimleft $s]
+	if { [string index $s 0] == "*" } {
+		if { [string index $s 1] == "/" } {
+			#
+			# terminate the comment block with a special
+			# marker (#.) so we can detect it later
+			#
+			return "\#. [string range $s 2 end]"
+		}
+		return "\#[string range $s 1 end]"
+	}
+	#	
+	# must be a "/*"
+	#
+	return "\#[string range $s 2 end]"
+}
+
+proc strip_otcl_tag s {
+	set k [string first <otcl> $s]
+	return [string range $s [expr $k + 6] end]
+}
+
+proc is_tcl_comment s {
+#	if { [string index $s 0] == "#" } {
+#		return 1
+#	}
+	if { [regexp "^\[ \t\]*#" $s] } {
+		return 1
+	}
+	return 0
+}
+
+#
+# Return true iff the string s begins with "/*", "*", ignoring
+# leading whitespace.  This is not necessarily a C comment, but is
+# good enough for our purposes here.
+#
+proc is_c_comment s {
+	set s [string trimleft $s]
+	if { [string index $s 0] == "*" || [string range $s 0 1] == "/*" } {
+		return 1
+	}
+	return 0
+}
+
+#
+# return null if the string does not end in backslash
+# otherwise, return the string less the backslash char
+#
+proc continuation s {
+	set k [expr [string length $s] - 1]
+	if { [string index $s $k] == "\\" } {
+		incr k -1
+		return [string range $s 0 $k]
+	}
+	return ""
+}
+
+#
+# return null if the string closes all the open braces
+# otherwise, return the string  (NOTE that if $s is "", that is what will be returned)
+#
+proc classDefnContinuation s {
+    global unclosedbraces
+    
+    if { [is_tcl_comment $s] } {
+	return " "
+    }
+
+    if {![info exists unclosedbraces]} {
+	set unclosedbraces 0
+    }
+    regsub -all {[^\{]} $s {} openers
+    regsub -all {[^\}]} $s {} closers
+    set openbraces [string length $openers]
+    set closebraces [string length $closers]
+    set ucb [expr $unclosedbraces + $openbraces - $closebraces]
+    set unclosedbraces $ucb
+    if { $unclosedbraces > 0 } {
+	return $s
+    } else {
+	return ""
+    }
+}
+
+proc strip s {
+	set n 1
+	if { [string index $s $n] == " " } {
+		set n 2
+	}
+	return [string range $s $n end]
+}
+
+proc get_comment_block lineNo {
+	global file
+	if { [file extension $file($lineNo)] == ".tcl" } {
+		return [get_tcl_comment_block $lineNo]
+	} else {
+		return [get_cpp_comment_block $lineNo]
+	}
+}
+
+proc format_line l {
+	global lineOfClass
+	set l [strip $l]
+	# set up class cross references
+	set q ""
+	foreach w [split $l] {
+		# trim punctuation.
+		set c [string trim $w ".;:?,()\{\}[]!"]
+		if [info exists lineOfClass($c)] {
+			set o "<a href=[class_to_file $c]>$w</a>"
+		} else {
+			set o $w
+		}
+		set q "$q $o"
+	}
+	return $q
+}
+
+#
+# Return the comment block immediately above line number $lineNo.
+# Removes leading comment characters (but does not strip whitespace
+# since we probably want to preserve tabs).  But it does strip
+# a single space char if present.  Assume $lineNo < $nlines.
+#
+proc get_tcl_comment_block lineNo {
+	global line nlines
+	set n $lineNo
+	incr n -1
+
+	#
+	# First skip over whitespace
+	#
+	while { $n > 0 } {
+		set s $line($n)
+		if [is_tcl_comment $s] {
+			break
+		}
+		set w [string trim $s]
+		if { $w != "" } {
+			# ran into non-comment, non-whitespace
+			break
+		}
+		incr n -1
+	}
+
+	#
+	# Now skip up past the comment body
+	#
+	while { $n > 0 } {
+		set s $line($n)
+		if ![is_tcl_comment $s] {
+			break
+		}
+		incr n -1
+	}
+
+	#
+	# gather up the text
+	#
+	set blk ""
+	while 1 {
+		incr n
+		if { $n >= $lineNo } {
+			break
+		}
+		set blk "$blk\n[format_line $line($n)]"
+	}
+	return $blk
+}
+
+#
+# Just like get_tcl_comment_block but for C++.
+# Note that the C++ comment has been converted to tcl
+# syntax --- the only difference is the comment is
+# below the method rather than above it.
+#
+proc get_cpp_comment_block lineNo {
+	global line nlines
+	set n $lineNo
+	#
+	# gather up the text
+	# Note that we terminated the comment block 
+	# with "#." when we converted from C to tcl.
+	#
+	set blk ""
+	while 1 {
+		incr n
+		set s $line($n)
+		if { $n >= $nlines || [string first "#." $s] >= 0 || \
+			![is_tcl_comment $s] } {
+			break
+		}
+		set blk "$blk\n[format_line $line($n)]"
+	}
+	return $blk
+}
+
+proc inList { list item } {
+	return [expr [lsearch $list $item] >= 0]
+}
+
+proc add_class_edge { parent child } {
+	global subclass
+	if ![inList subclass($parent) $child] {
+		lappend subclass($parent) $child
+	}
+}
+
+# XXX not sure if this will do the right thing
+proc copy_class { dst src } {
+	global lineOfClass
+	set lineOfClass($dst) $lineOfClass($src)
+}
+
+
+#
+# compute the superclass relationships
+#
+proc arrange_class_hierarchy classes {
+	global superclass
+	foreach c $classes {
+		set sc [get_superclasses $c]
+		set superclass($c) $sc
+		foreach super $sc {
+			add_class_edge $super $c
+		}
+	}
+}
+
+#
+# Return true iff we encountered the class definition
+# of the class $c.
+#
+proc class_known c {
+	global lineOfClass
+	return [info exists lineOfClass($c)]
+}
+
+
+#
+# Return the superclasses of a given class $c.  We no longer assume that the
+# entire "-superclass" directive is on the same line as the Class keyword.
+#
+proc get_superclasses c {
+	global line lineOfClass
+	set s $line($lineOfClass($c))
+
+	if {[regexp {\-superclass[ ]*(.*)} $s match allAfterDashSuperClass]} {
+	    return [lindex $allAfterDashSuperClass 0]
+	} else {
+		return ""
+	}
+}
+
+proc is_otcl_class c {
+	global file lineOfClass
+	return [string match [file extension $file($lineOfClass($c))] ".tcl"]
+}
+
+proc is_otcl_method lineno {
+	global file
+	return [string match [file extension $file($lineno)] ".tcl"]
+}
+
+proc emit_generic_header {} {
+	global file lineOfClass private_methods public_methods proc_methods generic_proc_methods
+	#XXX should dump comment that otcldoc autogen'd this
+	#XXX should use paramters for link color, font etc
+	if [info exists generic_proc_methods] {
+		foreach l $generic_proc_methods {
+			set files($file($l)) 1
+		}
+	}
+	set flist [array names files]
+	emit "\
+<HTML>\n\
+<HEAD>\n\
+<TITLE>Object</TITLE>\n\
+</HEAD>\n\
+<BODY BGCOLOR=#FFFFFF TEXT=#000000 LINK=#0000FF>\n\
+<h1> <i>MASH</i> Proc Methods Not Installed on a Particular Object</h1>\n\
+<h2>Files</h2>
+"
+	foreach fname $flist {
+		set flink $fname.html
+		emit "\
+<ul><a href=$flink>\n\
+<pre>$fname</pre></a></ul>\n\
+"	
+	}
+}
+
+proc emit_header c {
+	global file lineOfClass private_methods public_methods proc_methods 
+	#XXX should dump comment that otcldoc autogen'd this
+	#XXX should use paramters for link color, font etc
+	if [info exists public_methods($c)] {
+		foreach l $public_methods($c) {
+			set files($file($l)) 1
+		}
+	}
+	if [info exists private_methods($c)] {
+		foreach l $private_methods($c) {
+			set files($file($l)) 1
+		}
+	}
+	if [info exists proc_methods($c)] {
+		foreach l $proc_methods($c) {
+			set files($file($l)) 1
+		}
+	}
+	set flist [array names files]
+	if { $flist == "" } {
+		set flist $file($lineOfClass($c))
+	}
+	set tcl 0
+	set cpp 0
+	foreach f $flist {
+		if [string match [file extension $f] ".tcl"] {
+			set tcl 1
+		} else {
+			set cpp 1
+		}
+	}
+	global classtype classfiles
+	if { $tcl } {
+		if { $cpp } {
+			set cn "Split C++/OTcl Class"
+			set classtype($c) split
+		} else {
+			set cn "OTcl Class"
+			set classtype($c) otcl
+		}
+	} else {
+		set cn "C++ Class"
+		set classtype($c) c++
+	}
+	set classfiles($c) $flist
+
+	emit "\
+<HTML>\n\
+<HEAD>\n\
+<TITLE>$c Object</TITLE>\n\
+</HEAD>\n\
+<BODY BGCOLOR=#FFFFFF TEXT=#000000 LINK=#0000FF>\n\
+<h1>$cn <u>$c</u></h1>\n\
+<h2>Files</h2>
+"
+	foreach fname $flist {
+		set flink $fname.html
+		emit "\
+<ul><a href=$flink>\n\
+<pre>$fname</pre></a></ul>\n\
+"	
+	}
+}
+
+proc emit_trailer {} {
+	#XXX
+	emit "</HTML>"
+}
+
+proc class_link c {
+	set link [class_to_file $c]
+	return "<A HREF=\"$link\">$c</A>"
+}
+
+proc emit_class_list clist {
+	emit "<UL>"
+	set sep ""
+	foreach sc $clist {
+		emit_nonewline "$sep[class_link $sc]"
+		set sep ",\n\t"
+	}
+	emit "</UL>"
+}
+
+proc emit_superclasses c {
+	set scl [get_superclasses $c]
+	if { $scl != "" } {
+		emit "<p>\n<h2>Superclasses</h2>\n"
+		emit_class_list $scl
+	}
+}
+
+proc emit_subclasses c {
+	global subclass
+	if ![info exists subclass($c)] {
+		return
+	}
+	emit "<p>\n<h2>Subclasses</h2>\n"
+	emit_class_list $subclass($c)
+}
+
+proc emit_syntax c {
+	global public_methods private_methods line file
+	emit "<h2>Syntax</h2>"
+	if ![info exists public_methods($c)] {
+		#XXX no methods (in particular, no constructor)
+		emit "<UL><B>$c::init</B><BR></UL>"
+		return
+	}
+
+	#
+	# find the constructor
+	#
+	foreach lineno $public_methods($c) {
+		set s $line($lineno)
+		set proc [lindex $s 2]
+		if { $proc == "init" } {
+			set args [lindex $s 3]
+			set link $file($lineno).html\#[method_anchor_name $lineno]
+			emit "<UL><a href=$link>$c::init</a> <I>$args</I><br>"
+			set desc [get_comment_block $lineno]
+			if { $desc != "" } {
+				emit $desc
+				emit "<BR>"
+			}
+			emit "</UL><BR>"
+			return
+		}
+	}
+	if [info exists private_methods($c)] {
+		foreach lineno $private_methods($c) {
+			set s $line($lineno)
+			set proc [lindex $s 2]
+			if { $proc == "init" } {
+				emit \
+		"<ul>Abstract base class.  Constructor is private.</ul>"
+				return
+			}
+		}
+	}
+	emit "<ul>No constructor.</ul>"
+}
+
+#
+# Lists each default configuration for this Class in a two-column format,
+# the first column displaying the option-name, the second column displaying the default value.
+#
+proc emit_default_configuration c {
+	global lineOfClass line
+
+	# put everything from the Class defn after "-configuration " into the variable "allAfterDashConfig"
+	if {[regexp {\-configuration[ ]*(\{.*)} $line($lineOfClass($c)) match allAfterDashConfig]} {
+	    # put the item immediately after "-configuration " into a list variable 
+	    set configuration_list [lindex $allAfterDashConfig 0]
+	    if { [is_even [llength $configuration_list]] } {
+		# convert the list to an array of default values, indexed by the option-names
+		array set configuration_array $configuration_list
+		# output a heading
+		emit "\
+<h2>Default Configuration</h2>\n\
+"
+		emit "\
+<ul><b>Use the <i>add_option</i> method provided by the <i>Configuration</i> object to override these default settings:</b></ul>\n\
+"
+		emit "<ul><table>"
+		# output the option-name & default-value pairs in a two-column format
+		foreach {key value} [array get configuration_array] {
+		    emit "<tr><td> $key </td><td> $value </td></tr>"
+		}
+		emit "</table></ul>"
+	    } else {
+		puts stderr "Warning: every default configuration option must have a value."
+		puts stderr "Class $c has an uneven list of default configuration options: $configuration_list"
+	    }
+	}
+}
+
+proc is_even { num } {
+    if { [expr { $num % 2 }] == 0 } {
+	return 1
+    } else {
+	return 0
+    }
+}
+
+proc emit_description c {
+	global lineOfClass
+	emit "\
+<h2>Description</h2>\n\
+"
+	emit [get_comment_block $lineOfClass($c)]
+}
+
+proc emit_generic_methods { title } {
+	global generic_proc_methods line file
+
+	if ![info exists generic_proc_methods] {
+		#XXX no methods
+		return
+	}
+
+	emit "<H2>$title</H2>\n<UL>\n"
+		
+	foreach lineno [set generic_proc_methods] {
+		set s $line($lineno)
+		set proc [lindex $s 1]
+		set args [lindex $s 2]
+
+		if [is_otcl_method $lineno] {
+			set type "(OTcl)"
+		} else {
+			set type "(C++)"
+		}
+
+		set link $file($lineno).html\#[generic_method_anchor_name $lineno]
+		emit "<LI><a href=$link>$proc</a> <I>$args</I>$type<br>"
+		set desc [get_comment_block $lineno]
+		if { $desc != "" } {
+			emit $desc
+			emit "<br>"
+		}
+		emit "<br>"
+	}
+	emit "</UL>"
+}
+
+proc emit_methods { c scope title } {
+	global $scope\_methods line file
+
+	if ![info exists $scope\_methods($c)] {
+		#XXX no methods
+		return
+	}
+
+	emit "<H2>$title</H2>\n<UL>\n"
+		
+	foreach lineno [set $scope\_methods($c)] {
+		set s $line($lineno)
+		set proc [lindex $s 2]
+		set args [lindex $s 3]
+
+		if [is_otcl_method $lineno] {
+			set type "(OTcl)"
+		} else {
+			set type "(C++)"
+		}
+
+		set link $file($lineno).html\#[method_anchor_name $lineno]
+		emit "<LI><a href=$link>$proc</a> <I>$args</I>$type<br>"
+		set desc [get_comment_block $lineno]
+		if { $desc != "" } {
+			emit $desc
+			emit "<br>"
+		}
+		emit "<br>"
+	}
+	emit "</UL>"
+}
+
+proc emit_class_tree c {
+	global mark subclass classtype
+	if [info exists mark($c)] {
+		return
+	}
+# If the next line is uncommented, objects that inherit from multiple parents will only be output beneath the
+# parent that appears first in the tree.
+#	set mark($c) 1
+	emit "<li> [class_link $c]"
+
+	switch $classtype($c) {
+	split { emit "(OTcl/C++)" }
+	otcl { emit "(OTcl)" }
+	c++ { emit "(C++)" }
+	}
+
+	if [info exists subclass($c)] {
+		foreach s [lsort $subclass($c)] {
+			emit "<ul>"
+			emit_class_tree $s
+			emit "</ul>"
+		}
+	}
+}
+
+#
+# Return true iff the class $c has no parents that
+# have been encountered in the scan of all input files.
+#
+proc is_root_class c {
+	global superclass
+	foreach p $superclass($c)  {
+		if [class_known $p] {
+			return 0
+		}
+	}
+	return 1
+}
+
+proc emit_index classes {
+	emit "<html>"
+	global indexHeaderFile
+	if { [info exists indexHeaderFile] &&
+		[file readable $indexHeaderFile] } {
+		emit [exec cat $indexHeaderFile]
+		emit "<hr size=2 noshade>"
+	}
+
+	set link [class_to_file "Generic"]
+	emit "<br><A HREF=\"$link\">General Tcl procs</A> (<i>i.e.</i> proc methods not installed on a particular Object)" 
+
+	#
+	# Go through all the classes.  For each root class, dump
+	# the class hierarchy below.  A root class is a class with
+	# no parent that will be encountered in the scan.
+	#
+	foreach c [lsort $classes] {
+		if [is_root_class $c] {
+			emit "<ul>"
+			emit_class_tree $c
+			emit "</ul>"
+		}
+	}
+	emit "</html>"
+}
+
+proc emit_timestamp {} {
+    emit "<HR WIDTH='100%'> <CITE>Updated [exec date].</CITE>"
+}
+
+proc emit_generic_doc {} {
+	emit_generic_header 
+	emit_generic_methods "Procs"
+	emit_trailer 
+	emit_timestamp
+}
+
+proc emit_doc c {
+	emit_header $c
+	emit_description $c
+	emit_superclasses $c
+	emit_subclasses $c
+	emit_syntax $c
+	emit_default_configuration $c
+	emit_methods $c public "Public Methods"
+	emit_methods $c private "Private Methods"
+	emit_methods $c proc "Proc Methods"
+	emit_trailer 
+	emit_timestamp
+}
+
+proc is_arg argv {
+	if { $argv != "" } {
+		return [string match -* [lindex $argv 0]]
+	}
+	return 0
+}
+
+proc fatal s {
+	puts stderr "otcldoc: $s"
+	exit 1
+}
+
+proc warn s {
+	puts stderr "otcldoc: warning - $s"
+}
+
+proc usage {} {
+	puts stderr "usage: otcldoc \[-h index-header-file] \[ -d output-dir ] \[ -i index-file-name ] \[ -c class-string ] files ..."
+	exit 1
+}
+
+proc parse_args argv {
+	while 1 {
+		if ![is_arg $argv] {
+			break
+		}
+		set arg [lindex $argv 0]
+		set argv [lrange $argv 1 end]
+		set val [lindex $argv 0]
+		if { $arg == "-d" } {
+			global outputDir
+			set outputDir $val
+			set argv [lrange $argv 1 end]
+			continue
+		}
+		if { $arg == "-h" } {
+			global indexHeaderFile
+			set indexHeaderFile $val
+			set argv [lrange $argv 1 end]
+			continue
+		}
+		if { $arg == "-i" } {
+			global indexFileName
+			set indexFileName $val
+			set argv [lrange $argv 1 end]
+			continue
+		}
+		if { $arg == "-c" } {
+			global classString
+			set classString $val
+			set argv [lrange $argv 1 end]
+			continue
+		}
+		fatal "unknown command option at '$arg'"
+	}
+	return $argv
+}
+
+if { $argv == "" } {
+	usage
+}
+set argv [parse_args $argv]
+
+foreach f $argv {
+	if { [file extension $f] == ".tcl" } {
+		read_tcl_file $f
+	} elseif { [file extension $f] == ".cc" } {
+		read_cpp_file $f
+	} else {
+		fatal "$f: unknown file extension"
+	}
+}
+
+set classes [find_tcl_classes]
+arrange_class_hierarchy $classes
+set_generic_class 
+emit_generic_doc
+foreach c $classes {
+	set_class $c
+	emit_doc $c
+}
+close $outputChannel
+
+set outputChannel [open $outputDir/$indexFileName w]
+emit_index  $classes
+emit_timestamp
+close $outputChannel
+
+foreach c [array names tcl_class] {
+	if ![inList $classes $c] {
+		warn "no doc for C++ class $c"
+	}	
+}

@@ -1,0 +1,5 @@
+#!/bin/csh
+
+foreach i (0 1 2)
+   ../../../bin/sgb2alt r10-$i.gb r10-$i.alt 
+end

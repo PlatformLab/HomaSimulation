@@ -1,0 +1,118 @@
+$Id: sgb2alt-doc.txt,v 1.1 1996/10/04 13:29:27 ewz Exp $
+
+Name: sgb2alt
+
+Function: converts from sgb format to alternative format. 
+
+Usage: sgb2old <sgfile> <oldfile>
+
+Details:
+
+The alternative format is as follows:
+
+    GRAPH (#nodes #edges id uu vv ww xx yy zz):
+    <#nodes> <#edges> <id> [all integer utility fields]
+ 
+   VERTICES (index name u v w x y z):
+   0 <name-node0> [all integer utility fields for node0]
+   1 <name-node1> [all integer utility fields for node1]
+   ....
+   
+    EDGES (from-node to-node length a b):
+    <from-node> <to-node> <length> [all integer utility fields]
+    ....
+
+For example, here is a 10 node graph represented first in SGB file format
+and then in the alternative format.  (Note that the SGB format is not intended
+to be easily read by humans.)
+
+------------------------- SGB Format Starts Here --------------------------
+ 
+* GraphBase graph (util_types ZZZIIZIZIZZZZZ,14V,102A)
+"geo(0,{10,10,3,0.200,0.500,0.500})",10,28,10
+* Vertices
+"0",A4,3,4
+"1",A6,8,6
+"2",A8,7,6
+"3",A14,6,0
+"4",A18,8,1
+"5",A22,0,3
+"6",A17,4,0
+"7",A24,3,6
+"8",A26,1,5
+"9",A27,7,2
+"",0,0,0
+"",0,0,0
+"",0,0,0
+"",0,0,0
+* Arcs
+V2,0,4,0
+V0,0,4,0
+V4,A0,6,0
+V0,0,6,0
+V9,A2,4,0
+V0,0,4,0
+V8,0,7,0
+V1,0,7,0
+V6,A1,7,0
+V2,0,7,0
+V5,0,7,0
+V3,0,7,0
+V8,A10,7,0
+V3,A7,7,0
+V9,A12,2,0
+V3,A5,2,0
+V6,A3,4,0
+V4,A9,4,0
+V7,A16,7,0
+V4,0,7,0
+V7,A11,4,0
+V5,A19,4,0
+V9,A20,7,0
+V5,A15,7,0
+V9,A21,6,0
+V7,A23,6,0
+V9,A13,7,0
+V8,A25,7,0
+0,0,0,0
+[NOTE:  70 lines of 0,0,0,0 deleted]
+0,0,0,0
+0,0,0,0
+0,0,0,0
+* Checksum 1029917895
+
+---------------- SGB Format Ends Here; Alternative Format Starts Here -----------------
+ 
+GRAPH (#nodes #edges id uu vv ww xx yy zz):
+10 28 geo(0,{10,10,3,0.200,0.500,0.500}) 10 
+
+VERTICES (index name u v w x y z):
+0 0 3 4 
+1 1 8 6 
+2 2 7 6 
+3 3 6 0 
+4 4 8 1 
+5 5 0 3 
+6 6 4 0 
+7 7 3 6 
+8 8 1 5 
+9 9 7 2 
+
+EDGES (from-node to-node length a b):
+0 9 4 0 
+0 4 6 0 
+0 2 4 0 
+1 8 7 0 
+2 6 7 0 
+3 9 2 0 
+3 8 7 0 
+3 5 7 0 
+4 7 7 0 
+4 6 4 0 
+5 9 7 0 
+5 7 4 0 
+7 9 6 0 
+8 9 7 0 
+
+------------- Alternative Format Ends Here -----------------------------------------
+

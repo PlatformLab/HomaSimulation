@@ -1,0 +1,80 @@
+<html>
+<head>
+<title>OTcl Autoloading (Version 0.96, Sept. 95)</title>
+</head>
+<body>
+
+<h1><a href="../README.html">OTcl</a> Autoloading (Version 0.96, Sept. 95)</h1>
+
+<h2>Overview</h2>
+
+<p>This reference page describes how arrange for OTcl classes and
+their methods to be demand loaded. The mechanism extends the existing
+Tcl autoloading scheme (with which you should be familiar) by using an
+<tt>otcl_mkindex</tt> procedure to add entries to a <tt>tclIndex</tt>
+file. It allows you to distribute classes across files without
+additional concern for inheritance dependencies, as well as distribute
+a class's methods across files.</p>
+
+<h2>Extending a tclIndex</h2>
+
+<p>To add OTcl load entries to a <tt>tclIndex</tt>, use the
+<tt>otcl_mkindex</tt> procedure, defined during OTcl
+initialization. For example, to update the <tt>tclIndex</tt> in the
+current directory for the demand loading of classes, issue this shell
+command:</p>
+
+<blockquote><pre>
+echo "otcl_mkindex Class . *.tcl" | otclsh
+</pre></blockquote>
+
+<p><tt>otcl_mkindex</tt> takes the same directory and filename pattern
+arguments as <tt>auto_mkindex</tt>, but also takes a list of classes
+as its first argument. This list, the creator list, describes the kind
+of objects that are candidates for demand loading. Usually this will
+be <tt>Class</tt>, as above, to cause index entries to be generated for
+classes. But it may also specify other classes if you are working with
+meta-classes or need loading for regular objects.
+<tt>otcl_mkindex</tt> appends the <tt>tclIndex</tt> file directly, and
+returns a string describing the number of object and method index
+entries it generated.</p>
+
+<p>Like <tt>auto_mkindex</tt>, <tt>otcl_mkindex</tt> will only find
+obvious candidates for demand loading. Both explicit creation, via the
+<tt>create</tt> method, and implicit creation, via a method name that
+is not a known method of <tt>Class</tt>, are considered in the
+search. Objects (but not methods) must be created at the hard left
+margin, and object and method names may not begin with "$".</p>
+
+<h2>How Loading Works</h2>
+
+<p>Autoloading of class and object commands is triggered via the
+regular Tcl <tt>unknown</tt> mechanism, so that invoking a missing
+class or object command will cause it to be loaded. In addition, OTcl
+demand loads in two other ways.</p>
+
+<p>First, unknown classes referenced as superclasses will be demand
+loaded. This is triggered internally by the OTcl system. It means that
+you can distribute classes across files without concern for sourcing
+the files in inheritance order. It does not mean, however, that you
+can make forward references to classes within a file, or mutually
+recursive forward references across files.</p>
+
+<p>Second, undefined methods may be demand loaded when they are
+invoked. This is arranged for autoloaded classes by the OTcl object loader,
+<tt>otcl_load</tt>. It means that you can distribute the definition of
+a class and its methods over more than one file.</p>
+
+<p>Method level loading works as follows. When a class or object is
+being autoloaded by <tt>otcl_load</tt>, only those methods defined in
+the main class file that is sourced will be fully loaded. Other
+methods that are known to exist because of <tt>auto_index</tt> entries
+are then filled with load stubs by using the <tt>auto</tt> option of
+the <tt>proc</tt> and <tt>instproc</tt> methods. This guarantees that
+if they are invoked, they will be loaded. Note that these method load
+stubs must be installed, rather than relying on an unknown-style load
+scheme, to cater for the shadowing of methods. Also, you can control
+your own load policy by rewriting <tt>otcl_load</tt>.</p>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+This directory contains the tcl/C++ interface used by vic, vat, ns,
+rtp_play, and nam.  Be very careful when you change anything as all
+these tools depend on this code.
+
+- Steve
+

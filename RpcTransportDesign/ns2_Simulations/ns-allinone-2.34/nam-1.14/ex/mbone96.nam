@@ -1,0 +1,3858 @@
+n -t * -s 1 -S UP -v circle -c black
+n -t * -s 2 -S UP -v circle -c black
+n -t * -s 3 -S UP -v circle -c black
+n -t * -s 4 -S UP -v circle -c black
+n -t * -s 5 -S UP -v circle -c black
+n -t * -s 6 -S UP -v circle -c black
+n -t * -s 7 -S UP -v circle -c black
+n -t * -s 8 -S UP -v circle -c black
+n -t * -s 9 -S UP -v circle -c black
+n -t * -s 10 -S UP -v circle -c black
+n -t * -s 11 -S UP -v circle -c black
+n -t * -s 13 -S UP -v circle -c black
+n -t * -s 15 -S UP -v circle -c black
+n -t * -s 16 -S UP -v circle -c black
+n -t * -s 17 -S UP -v circle -c black
+n -t * -s 18 -S UP -v circle -c black
+n -t * -s 19 -S UP -v circle -c black
+n -t * -s 20 -S UP -v circle -c black
+n -t * -s 21 -S UP -v circle -c black
+n -t * -s 22 -S UP -v circle -c black
+n -t * -s 23 -S UP -v circle -c black
+n -t * -s 24 -S UP -v circle -c black
+n -t * -s 25 -S UP -v circle -c black
+n -t * -s 26 -S UP -v circle -c black
+n -t * -s 27 -S UP -v circle -c black
+n -t * -s 29 -S UP -v circle -c black
+n -t * -s 30 -S UP -v circle -c black
+n -t * -s 31 -S UP -v circle -c black
+n -t * -s 32 -S UP -v circle -c black
+n -t * -s 33 -S UP -v circle -c black
+n -t * -s 34 -S UP -v circle -c black
+n -t * -s 35 -S UP -v circle -c black
+n -t * -s 36 -S UP -v circle -c black
+n -t * -s 37 -S UP -v circle -c black
+n -t * -s 38 -S UP -v circle -c black
+n -t * -s 39 -S UP -v circle -c black
+n -t * -s 40 -S UP -v circle -c black
+n -t * -s 42 -S UP -v circle -c black
+n -t * -s 43 -S UP -v circle -c black
+n -t * -s 44 -S UP -v circle -c black
+n -t * -s 45 -S UP -v circle -c black
+n -t * -s 46 -S UP -v circle -c black
+n -t * -s 47 -S UP -v circle -c black
+n -t * -s 48 -S UP -v circle -c black
+n -t * -s 49 -S UP -v circle -c black
+n -t * -s 50 -S UP -v circle -c black
+n -t * -s 52 -S UP -v circle -c black
+n -t * -s 53 -S UP -v circle -c black
+n -t * -s 54 -S UP -v circle -c black
+n -t * -s 55 -S UP -v circle -c black
+n -t * -s 56 -S UP -v circle -c black
+n -t * -s 57 -S UP -v circle -c black
+n -t * -s 58 -S UP -v circle -c black
+n -t * -s 59 -S UP -v circle -c black
+n -t * -s 60 -S UP -v circle -c black
+n -t * -s 61 -S UP -v circle -c black
+n -t * -s 62 -S UP -v circle -c black
+n -t * -s 63 -S UP -v circle -c black
+n -t * -s 64 -S UP -v circle -c black
+n -t * -s 65 -S UP -v circle -c black
+n -t * -s 66 -S UP -v circle -c black
+n -t * -s 67 -S UP -v circle -c black
+n -t * -s 68 -S UP -v circle -c black
+n -t * -s 69 -S UP -v circle -c black
+n -t * -s 70 -S UP -v circle -c black
+n -t * -s 71 -S UP -v circle -c black
+n -t * -s 72 -S UP -v circle -c black
+n -t * -s 73 -S UP -v circle -c black
+n -t * -s 74 -S UP -v circle -c black
+n -t * -s 75 -S UP -v circle -c black
+n -t * -s 76 -S UP -v circle -c black
+n -t * -s 77 -S UP -v circle -c black
+n -t * -s 78 -S UP -v circle -c black
+n -t * -s 79 -S UP -v circle -c black
+n -t * -s 80 -S UP -v circle -c black
+n -t * -s 81 -S UP -v circle -c black
+n -t * -s 82 -S UP -v circle -c black
+n -t * -s 83 -S UP -v circle -c black
+n -t * -s 84 -S UP -v circle -c black
+n -t * -s 85 -S UP -v circle -c black
+n -t * -s 86 -S UP -v circle -c black
+n -t * -s 87 -S UP -v circle -c black
+n -t * -s 88 -S UP -v circle -c black
+n -t * -s 89 -S UP -v circle -c black
+n -t * -s 90 -S UP -v circle -c black
+n -t * -s 91 -S UP -v circle -c black
+n -t * -s 92 -S UP -v circle -c black
+n -t * -s 93 -S UP -v circle -c black
+n -t * -s 94 -S UP -v circle -c black
+n -t * -s 95 -S UP -v circle -c black
+n -t * -s 96 -S UP -v circle -c black
+n -t * -s 97 -S UP -v circle -c black
+n -t * -s 98 -S UP -v circle -c black
+n -t * -s 99 -S UP -v circle -c black
+n -t * -s 100 -S UP -v circle -c black
+n -t * -s 101 -S UP -v circle -c black
+n -t * -s 102 -S UP -v circle -c black
+n -t * -s 103 -S UP -v circle -c black
+n -t * -s 104 -S UP -v circle -c black
+n -t * -s 105 -S UP -v circle -c black
+n -t * -s 106 -S UP -v circle -c black
+n -t * -s 107 -S UP -v circle -c black
+n -t * -s 108 -S UP -v circle -c black
+n -t * -s 109 -S UP -v circle -c black
+n -t * -s 110 -S UP -v circle -c black
+n -t * -s 111 -S UP -v circle -c black
+n -t * -s 112 -S UP -v circle -c black
+n -t * -s 113 -S UP -v circle -c black
+n -t * -s 114 -S UP -v circle -c black
+n -t * -s 115 -S UP -v circle -c black
+n -t * -s 116 -S UP -v circle -c black
+n -t * -s 117 -S UP -v circle -c black
+n -t * -s 118 -S UP -v circle -c black
+n -t * -s 119 -S UP -v circle -c black
+n -t * -s 120 -S UP -v circle -c black
+n -t * -s 121 -S UP -v circle -c black
+n -t * -s 122 -S UP -v circle -c black
+n -t * -s 123 -S UP -v circle -c black
+n -t * -s 125 -S UP -v circle -c black
+n -t * -s 126 -S UP -v circle -c black
+n -t * -s 127 -S UP -v circle -c black
+n -t * -s 128 -S UP -v circle -c black
+n -t * -s 129 -S UP -v circle -c black
+n -t * -s 130 -S UP -v circle -c black
+n -t * -s 131 -S UP -v circle -c black
+n -t * -s 132 -S UP -v circle -c black
+n -t * -s 133 -S UP -v circle -c black
+n -t * -s 134 -S UP -v circle -c black
+n -t * -s 135 -S UP -v circle -c black
+n -t * -s 136 -S UP -v circle -c black
+n -t * -s 137 -S UP -v circle -c black
+n -t * -s 138 -S UP -v circle -c black
+n -t * -s 139 -S UP -v circle -c black
+n -t * -s 141 -S UP -v circle -c black
+n -t * -s 142 -S UP -v circle -c black
+n -t * -s 143 -S UP -v circle -c black
+n -t * -s 144 -S UP -v circle -c black
+n -t * -s 145 -S UP -v circle -c black
+n -t * -s 146 -S UP -v circle -c black
+n -t * -s 148 -S UP -v circle -c black
+n -t * -s 149 -S UP -v circle -c black
+n -t * -s 150 -S UP -v circle -c black
+n -t * -s 152 -S UP -v circle -c black
+n -t * -s 153 -S UP -v circle -c black
+n -t * -s 154 -S UP -v circle -c black
+n -t * -s 155 -S UP -v circle -c black
+n -t * -s 156 -S UP -v circle -c black
+n -t * -s 157 -S UP -v circle -c black
+n -t * -s 158 -S UP -v circle -c black
+n -t * -s 159 -S UP -v circle -c black
+n -t * -s 160 -S UP -v circle -c black
+n -t * -s 161 -S UP -v circle -c black
+n -t * -s 162 -S UP -v circle -c black
+n -t * -s 163 -S UP -v circle -c black
+n -t * -s 164 -S UP -v circle -c black
+n -t * -s 165 -S UP -v circle -c black
+n -t * -s 166 -S UP -v circle -c black
+n -t * -s 167 -S UP -v circle -c black
+n -t * -s 168 -S UP -v circle -c black
+n -t * -s 169 -S UP -v circle -c black
+n -t * -s 170 -S UP -v circle -c black
+n -t * -s 171 -S UP -v circle -c black
+n -t * -s 172 -S UP -v circle -c black
+n -t * -s 173 -S UP -v circle -c black
+n -t * -s 174 -S UP -v circle -c black
+n -t * -s 175 -S UP -v circle -c black
+n -t * -s 176 -S UP -v circle -c black
+n -t * -s 177 -S UP -v circle -c black
+n -t * -s 178 -S UP -v circle -c black
+n -t * -s 179 -S UP -v circle -c black
+n -t * -s 180 -S UP -v circle -c black
+n -t * -s 181 -S UP -v circle -c black
+n -t * -s 182 -S UP -v circle -c black
+n -t * -s 183 -S UP -v circle -c black
+n -t * -s 184 -S UP -v circle -c black
+n -t * -s 185 -S UP -v circle -c black
+n -t * -s 187 -S UP -v circle -c black
+n -t * -s 188 -S UP -v circle -c black
+n -t * -s 189 -S UP -v circle -c black
+n -t * -s 190 -S UP -v circle -c black
+n -t * -s 191 -S UP -v circle -c black
+n -t * -s 193 -S UP -v circle -c black
+n -t * -s 194 -S UP -v circle -c black
+n -t * -s 195 -S UP -v circle -c black
+n -t * -s 196 -S UP -v circle -c black
+n -t * -s 197 -S UP -v circle -c black
+n -t * -s 198 -S UP -v circle -c black
+n -t * -s 199 -S UP -v circle -c black
+n -t * -s 200 -S UP -v circle -c black
+n -t * -s 201 -S UP -v circle -c black
+n -t * -s 202 -S UP -v circle -c black
+n -t * -s 203 -S UP -v circle -c black
+n -t * -s 204 -S UP -v circle -c black
+n -t * -s 205 -S UP -v circle -c black
+n -t * -s 206 -S UP -v circle -c black
+n -t * -s 207 -S UP -v circle -c black
+n -t * -s 208 -S UP -v circle -c black
+n -t * -s 209 -S UP -v circle -c black
+n -t * -s 210 -S UP -v circle -c black
+n -t * -s 211 -S UP -v circle -c black
+n -t * -s 212 -S UP -v circle -c black
+n -t * -s 213 -S UP -v circle -c black
+n -t * -s 214 -S UP -v circle -c black
+n -t * -s 215 -S UP -v circle -c black
+n -t * -s 217 -S UP -v circle -c black
+n -t * -s 218 -S UP -v circle -c black
+n -t * -s 219 -S UP -v circle -c black
+n -t * -s 220 -S UP -v circle -c black
+n -t * -s 221 -S UP -v circle -c black
+n -t * -s 222 -S UP -v circle -c black
+n -t * -s 223 -S UP -v circle -c black
+n -t * -s 224 -S UP -v circle -c black
+n -t * -s 225 -S UP -v circle -c black
+n -t * -s 226 -S UP -v circle -c black
+n -t * -s 227 -S UP -v circle -c black
+n -t * -s 228 -S UP -v circle -c black
+n -t * -s 229 -S UP -v circle -c black
+n -t * -s 230 -S UP -v circle -c black
+n -t * -s 231 -S UP -v circle -c black
+n -t * -s 232 -S UP -v circle -c black
+n -t * -s 233 -S UP -v circle -c black
+n -t * -s 234 -S UP -v circle -c black
+n -t * -s 235 -S UP -v circle -c black
+n -t * -s 236 -S UP -v circle -c black
+n -t * -s 237 -S UP -v circle -c black
+n -t * -s 238 -S UP -v circle -c black
+n -t * -s 239 -S UP -v circle -c black
+n -t * -s 240 -S UP -v circle -c black
+n -t * -s 241 -S UP -v circle -c black
+n -t * -s 242 -S UP -v circle -c black
+n -t * -s 243 -S UP -v circle -c black
+n -t * -s 244 -S UP -v circle -c black
+n -t * -s 245 -S UP -v circle -c black
+n -t * -s 246 -S UP -v circle -c black
+n -t * -s 247 -S UP -v circle -c black
+n -t * -s 248 -S UP -v circle -c black
+n -t * -s 249 -S UP -v circle -c black
+n -t * -s 250 -S UP -v circle -c black
+n -t * -s 251 -S UP -v circle -c black
+n -t * -s 252 -S UP -v circle -c black
+n -t * -s 253 -S UP -v circle -c black
+n -t * -s 254 -S UP -v circle -c black
+n -t * -s 255 -S UP -v circle -c black
+n -t * -s 256 -S UP -v circle -c black
+n -t * -s 257 -S UP -v circle -c black
+n -t * -s 258 -S UP -v circle -c black
+n -t * -s 259 -S UP -v circle -c black
+n -t * -s 260 -S UP -v circle -c black
+n -t * -s 261 -S UP -v circle -c black
+n -t * -s 262 -S UP -v circle -c black
+n -t * -s 263 -S UP -v circle -c black
+n -t * -s 264 -S UP -v circle -c black
+n -t * -s 265 -S UP -v circle -c black
+n -t * -s 267 -S UP -v circle -c black
+n -t * -s 268 -S UP -v circle -c black
+n -t * -s 269 -S UP -v circle -c black
+n -t * -s 270 -S UP -v circle -c black
+n -t * -s 271 -S UP -v circle -c black
+n -t * -s 272 -S UP -v circle -c black
+n -t * -s 273 -S UP -v circle -c black
+n -t * -s 274 -S UP -v circle -c black
+n -t * -s 275 -S UP -v circle -c black
+n -t * -s 276 -S UP -v circle -c black
+n -t * -s 277 -S UP -v circle -c black
+n -t * -s 278 -S UP -v circle -c black
+n -t * -s 279 -S UP -v circle -c black
+n -t * -s 280 -S UP -v circle -c black
+n -t * -s 281 -S UP -v circle -c black
+n -t * -s 282 -S UP -v circle -c black
+n -t * -s 283 -S UP -v circle -c black
+n -t * -s 284 -S UP -v circle -c black
+n -t * -s 285 -S UP -v circle -c black
+n -t * -s 286 -S UP -v circle -c black
+n -t * -s 287 -S UP -v circle -c black
+n -t * -s 288 -S UP -v circle -c black
+n -t * -s 289 -S UP -v circle -c black
+n -t * -s 290 -S UP -v circle -c black
+n -t * -s 291 -S UP -v circle -c black
+n -t * -s 292 -S UP -v circle -c black
+n -t * -s 293 -S UP -v circle -c black
+n -t * -s 294 -S UP -v circle -c black
+n -t * -s 295 -S UP -v circle -c black
+n -t * -s 296 -S UP -v circle -c black
+n -t * -s 297 -S UP -v circle -c black
+n -t * -s 298 -S UP -v circle -c black
+n -t * -s 299 -S UP -v circle -c black
+n -t * -s 300 -S UP -v circle -c black
+n -t * -s 301 -S UP -v circle -c black
+n -t * -s 303 -S UP -v circle -c black
+n -t * -s 304 -S UP -v circle -c black
+n -t * -s 305 -S UP -v circle -c black
+n -t * -s 306 -S UP -v circle -c black
+n -t * -s 307 -S UP -v circle -c black
+n -t * -s 308 -S UP -v circle -c black
+n -t * -s 309 -S UP -v circle -c black
+n -t * -s 310 -S UP -v circle -c black
+n -t * -s 311 -S UP -v circle -c black
+n -t * -s 312 -S UP -v circle -c black
+n -t * -s 313 -S UP -v circle -c black
+n -t * -s 314 -S UP -v circle -c black
+n -t * -s 316 -S UP -v circle -c black
+n -t * -s 318 -S UP -v circle -c black
+n -t * -s 320 -S UP -v circle -c black
+n -t * -s 321 -S UP -v circle -c black
+n -t * -s 322 -S UP -v circle -c black
+n -t * -s 323 -S UP -v circle -c black
+n -t * -s 324 -S UP -v circle -c black
+n -t * -s 325 -S UP -v circle -c black
+n -t * -s 326 -S UP -v circle -c black
+n -t * -s 327 -S UP -v circle -c black
+n -t * -s 328 -S UP -v circle -c black
+n -t * -s 329 -S UP -v circle -c black
+n -t * -s 330 -S UP -v circle -c black
+n -t * -s 331 -S UP -v circle -c black
+n -t * -s 332 -S UP -v circle -c black
+n -t * -s 333 -S UP -v circle -c black
+n -t * -s 334 -S UP -v circle -c black
+n -t * -s 335 -S UP -v circle -c black
+n -t * -s 336 -S UP -v circle -c black
+n -t * -s 337 -S UP -v circle -c black
+n -t * -s 338 -S UP -v circle -c black
+n -t * -s 339 -S UP -v circle -c black
+n -t * -s 340 -S UP -v circle -c black
+n -t * -s 341 -S UP -v circle -c black
+n -t * -s 342 -S UP -v circle -c black
+n -t * -s 343 -S UP -v circle -c black
+n -t * -s 344 -S UP -v circle -c black
+n -t * -s 345 -S UP -v circle -c black
+n -t * -s 346 -S UP -v circle -c black
+n -t * -s 347 -S UP -v circle -c black
+n -t * -s 348 -S UP -v circle -c black
+n -t * -s 349 -S UP -v circle -c black
+n -t * -s 350 -S UP -v circle -c black
+n -t * -s 351 -S UP -v circle -c black
+n -t * -s 352 -S UP -v circle -c black
+n -t * -s 353 -S UP -v circle -c black
+n -t * -s 354 -S UP -v circle -c black
+n -t * -s 355 -S UP -v circle -c black
+n -t * -s 356 -S UP -v circle -c black
+n -t * -s 357 -S UP -v circle -c black
+n -t * -s 358 -S UP -v circle -c black
+n -t * -s 359 -S UP -v circle -c black
+n -t * -s 361 -S UP -v circle -c black
+n -t * -s 362 -S UP -v circle -c black
+n -t * -s 363 -S UP -v circle -c black
+n -t * -s 364 -S UP -v circle -c black
+n -t * -s 365 -S UP -v circle -c black
+n -t * -s 366 -S UP -v circle -c black
+n -t * -s 367 -S UP -v circle -c black
+n -t * -s 368 -S UP -v circle -c black
+n -t * -s 369 -S UP -v circle -c black
+n -t * -s 370 -S UP -v circle -c black
+n -t * -s 371 -S UP -v circle -c black
+n -t * -s 372 -S UP -v circle -c black
+n -t * -s 373 -S UP -v circle -c black
+n -t * -s 374 -S UP -v circle -c black
+n -t * -s 375 -S UP -v circle -c black
+n -t * -s 377 -S UP -v circle -c black
+n -t * -s 378 -S UP -v circle -c black
+n -t * -s 379 -S UP -v circle -c black
+n -t * -s 380 -S UP -v circle -c black
+n -t * -s 381 -S UP -v circle -c black
+n -t * -s 382 -S UP -v circle -c black
+n -t * -s 383 -S UP -v circle -c black
+n -t * -s 384 -S UP -v circle -c black
+n -t * -s 385 -S UP -v circle -c black
+n -t * -s 386 -S UP -v circle -c black
+n -t * -s 387 -S UP -v circle -c black
+n -t * -s 388 -S UP -v circle -c black
+n -t * -s 389 -S UP -v circle -c black
+n -t * -s 390 -S UP -v circle -c black
+n -t * -s 391 -S UP -v circle -c black
+n -t * -s 392 -S UP -v circle -c black
+n -t * -s 393 -S UP -v circle -c black
+n -t * -s 394 -S UP -v circle -c black
+n -t * -s 395 -S UP -v circle -c black
+n -t * -s 396 -S UP -v circle -c black
+n -t * -s 398 -S UP -v circle -c black
+n -t * -s 399 -S UP -v circle -c black
+n -t * -s 400 -S UP -v circle -c black
+n -t * -s 401 -S UP -v circle -c black
+n -t * -s 402 -S UP -v circle -c black
+n -t * -s 404 -S UP -v circle -c black
+n -t * -s 405 -S UP -v circle -c black
+n -t * -s 406 -S UP -v circle -c black
+n -t * -s 407 -S UP -v circle -c black
+n -t * -s 408 -S UP -v circle -c black
+n -t * -s 409 -S UP -v circle -c black
+n -t * -s 410 -S UP -v circle -c black
+n -t * -s 411 -S UP -v circle -c black
+n -t * -s 412 -S UP -v circle -c black
+n -t * -s 413 -S UP -v circle -c black
+n -t * -s 414 -S UP -v circle -c black
+n -t * -s 415 -S UP -v circle -c black
+n -t * -s 416 -S UP -v circle -c black
+n -t * -s 417 -S UP -v circle -c black
+n -t * -s 418 -S UP -v circle -c black
+n -t * -s 419 -S UP -v circle -c black
+n -t * -s 421 -S UP -v circle -c black
+n -t * -s 422 -S UP -v circle -c black
+n -t * -s 423 -S UP -v circle -c black
+n -t * -s 424 -S UP -v circle -c black
+n -t * -s 425 -S UP -v circle -c black
+n -t * -s 426 -S UP -v circle -c black
+n -t * -s 427 -S UP -v circle -c black
+n -t * -s 428 -S UP -v circle -c black
+n -t * -s 429 -S UP -v circle -c black
+n -t * -s 430 -S UP -v circle -c black
+n -t * -s 431 -S UP -v circle -c black
+n -t * -s 432 -S UP -v circle -c black
+n -t * -s 433 -S UP -v circle -c black
+n -t * -s 434 -S UP -v circle -c black
+n -t * -s 435 -S UP -v circle -c black
+n -t * -s 436 -S UP -v circle -c black
+n -t * -s 437 -S UP -v circle -c black
+n -t * -s 439 -S UP -v circle -c black
+n -t * -s 440 -S UP -v circle -c black
+n -t * -s 441 -S UP -v circle -c black
+n -t * -s 442 -S UP -v circle -c black
+n -t * -s 443 -S UP -v circle -c black
+n -t * -s 444 -S UP -v circle -c black
+n -t * -s 447 -S UP -v circle -c black
+n -t * -s 448 -S UP -v circle -c black
+n -t * -s 449 -S UP -v circle -c black
+n -t * -s 450 -S UP -v circle -c black
+n -t * -s 451 -S UP -v circle -c black
+n -t * -s 452 -S UP -v circle -c black
+n -t * -s 453 -S UP -v circle -c black
+n -t * -s 455 -S UP -v circle -c black
+n -t * -s 456 -S UP -v circle -c black
+n -t * -s 457 -S UP -v circle -c black
+n -t * -s 458 -S UP -v circle -c black
+n -t * -s 459 -S UP -v circle -c black
+n -t * -s 460 -S UP -v circle -c black
+n -t * -s 462 -S UP -v circle -c black
+n -t * -s 463 -S UP -v circle -c black
+n -t * -s 464 -S UP -v circle -c black
+n -t * -s 465 -S UP -v circle -c black
+n -t * -s 466 -S UP -v circle -c black
+n -t * -s 467 -S UP -v circle -c black
+n -t * -s 468 -S UP -v circle -c black
+n -t * -s 469 -S UP -v circle -c black
+n -t * -s 470 -S UP -v circle -c black
+n -t * -s 471 -S UP -v circle -c black
+n -t * -s 472 -S UP -v circle -c black
+n -t * -s 473 -S UP -v circle -c black
+n -t * -s 474 -S UP -v circle -c black
+n -t * -s 475 -S UP -v circle -c black
+n -t * -s 476 -S UP -v circle -c black
+n -t * -s 478 -S UP -v circle -c black
+n -t * -s 479 -S UP -v circle -c black
+n -t * -s 480 -S UP -v circle -c black
+n -t * -s 482 -S UP -v circle -c black
+n -t * -s 483 -S UP -v circle -c black
+n -t * -s 484 -S UP -v circle -c black
+n -t * -s 485 -S UP -v circle -c black
+n -t * -s 486 -S UP -v circle -c black
+n -t * -s 487 -S UP -v circle -c black
+n -t * -s 488 -S UP -v circle -c black
+n -t * -s 490 -S UP -v circle -c black
+n -t * -s 491 -S UP -v circle -c black
+n -t * -s 492 -S UP -v circle -c black
+n -t * -s 493 -S UP -v circle -c black
+n -t * -s 496 -S UP -v circle -c black
+n -t * -s 497 -S UP -v circle -c black
+n -t * -s 498 -S UP -v circle -c black
+n -t * -s 499 -S UP -v circle -c black
+n -t * -s 500 -S UP -v circle -c black
+n -t * -s 501 -S UP -v circle -c black
+n -t * -s 502 -S UP -v circle -c black
+n -t * -s 503 -S UP -v circle -c black
+n -t * -s 504 -S UP -v circle -c black
+n -t * -s 505 -S UP -v circle -c black
+n -t * -s 506 -S UP -v circle -c black
+n -t * -s 508 -S UP -v circle -c black
+n -t * -s 509 -S UP -v circle -c black
+n -t * -s 510 -S UP -v circle -c black
+n -t * -s 511 -S UP -v circle -c black
+n -t * -s 512 -S UP -v circle -c black
+n -t * -s 513 -S UP -v circle -c black
+n -t * -s 514 -S UP -v circle -c black
+n -t * -s 515 -S UP -v circle -c black
+n -t * -s 516 -S UP -v circle -c black
+n -t * -s 517 -S UP -v circle -c black
+n -t * -s 518 -S UP -v circle -c black
+n -t * -s 519 -S UP -v circle -c black
+n -t * -s 520 -S UP -v circle -c black
+n -t * -s 521 -S UP -v circle -c black
+n -t * -s 522 -S UP -v circle -c black
+n -t * -s 523 -S UP -v circle -c black
+n -t * -s 524 -S UP -v circle -c black
+n -t * -s 525 -S UP -v circle -c black
+n -t * -s 526 -S UP -v circle -c black
+n -t * -s 528 -S UP -v circle -c black
+n -t * -s 529 -S UP -v circle -c black
+n -t * -s 530 -S UP -v circle -c black
+n -t * -s 531 -S UP -v circle -c black
+n -t * -s 532 -S UP -v circle -c black
+n -t * -s 533 -S UP -v circle -c black
+n -t * -s 534 -S UP -v circle -c black
+n -t * -s 535 -S UP -v circle -c black
+n -t * -s 536 -S UP -v circle -c black
+n -t * -s 537 -S UP -v circle -c black
+n -t * -s 538 -S UP -v circle -c black
+n -t * -s 539 -S UP -v circle -c black
+n -t * -s 540 -S UP -v circle -c black
+n -t * -s 541 -S UP -v circle -c black
+n -t * -s 542 -S UP -v circle -c black
+n -t * -s 543 -S UP -v circle -c black
+n -t * -s 544 -S UP -v circle -c black
+n -t * -s 545 -S UP -v circle -c black
+n -t * -s 546 -S UP -v circle -c black
+n -t * -s 547 -S UP -v circle -c black
+n -t * -s 548 -S UP -v circle -c black
+n -t * -s 549 -S UP -v circle -c black
+n -t * -s 550 -S UP -v circle -c black
+n -t * -s 551 -S UP -v circle -c black
+n -t * -s 552 -S UP -v circle -c black
+n -t * -s 553 -S UP -v circle -c black
+n -t * -s 554 -S UP -v circle -c black
+n -t * -s 555 -S UP -v circle -c black
+n -t * -s 556 -S UP -v circle -c black
+n -t * -s 557 -S UP -v circle -c black
+n -t * -s 558 -S UP -v circle -c black
+n -t * -s 559 -S UP -v circle -c black
+n -t * -s 560 -S UP -v circle -c black
+n -t * -s 562 -S UP -v circle -c black
+n -t * -s 563 -S UP -v circle -c black
+n -t * -s 564 -S UP -v circle -c black
+n -t * -s 565 -S UP -v circle -c black
+n -t * -s 566 -S UP -v circle -c black
+n -t * -s 567 -S UP -v circle -c black
+n -t * -s 568 -S UP -v circle -c black
+n -t * -s 569 -S UP -v circle -c black
+n -t * -s 570 -S UP -v circle -c black
+n -t * -s 574 -S UP -v circle -c black
+n -t * -s 575 -S UP -v circle -c black
+n -t * -s 576 -S UP -v circle -c black
+n -t * -s 577 -S UP -v circle -c black
+n -t * -s 578 -S UP -v circle -c black
+n -t * -s 579 -S UP -v circle -c black
+n -t * -s 580 -S UP -v circle -c black
+n -t * -s 581 -S UP -v circle -c black
+n -t * -s 582 -S UP -v circle -c black
+n -t * -s 583 -S UP -v circle -c black
+n -t * -s 584 -S UP -v circle -c black
+n -t * -s 585 -S UP -v circle -c black
+n -t * -s 586 -S UP -v circle -c black
+n -t * -s 587 -S UP -v circle -c black
+n -t * -s 588 -S UP -v circle -c black
+n -t * -s 589 -S UP -v circle -c black
+n -t * -s 590 -S UP -v circle -c black
+n -t * -s 591 -S UP -v circle -c black
+n -t * -s 592 -S UP -v circle -c black
+n -t * -s 593 -S UP -v circle -c black
+n -t * -s 594 -S UP -v circle -c black
+n -t * -s 595 -S UP -v circle -c black
+n -t * -s 596 -S UP -v circle -c black
+n -t * -s 597 -S UP -v circle -c black
+n -t * -s 599 -S UP -v circle -c black
+n -t * -s 600 -S UP -v circle -c black
+n -t * -s 601 -S UP -v circle -c black
+n -t * -s 602 -S UP -v circle -c black
+n -t * -s 603 -S UP -v circle -c black
+n -t * -s 604 -S UP -v circle -c black
+n -t * -s 605 -S UP -v circle -c black
+n -t * -s 606 -S UP -v circle -c black
+n -t * -s 607 -S UP -v circle -c black
+n -t * -s 609 -S UP -v circle -c black
+n -t * -s 610 -S UP -v circle -c black
+n -t * -s 611 -S UP -v circle -c black
+n -t * -s 612 -S UP -v circle -c black
+n -t * -s 613 -S UP -v circle -c black
+n -t * -s 614 -S UP -v circle -c black
+n -t * -s 615 -S UP -v circle -c black
+n -t * -s 616 -S UP -v circle -c black
+n -t * -s 617 -S UP -v circle -c black
+n -t * -s 618 -S UP -v circle -c black
+n -t * -s 619 -S UP -v circle -c black
+n -t * -s 620 -S UP -v circle -c black
+n -t * -s 621 -S UP -v circle -c black
+n -t * -s 622 -S UP -v circle -c black
+n -t * -s 623 -S UP -v circle -c black
+n -t * -s 624 -S UP -v circle -c black
+n -t * -s 625 -S UP -v circle -c black
+n -t * -s 626 -S UP -v circle -c black
+n -t * -s 627 -S UP -v circle -c black
+n -t * -s 628 -S UP -v circle -c black
+n -t * -s 629 -S UP -v circle -c black
+n -t * -s 630 -S UP -v circle -c black
+n -t * -s 631 -S UP -v circle -c black
+n -t * -s 632 -S UP -v circle -c black
+n -t * -s 633 -S UP -v circle -c black
+n -t * -s 634 -S UP -v circle -c black
+n -t * -s 635 -S UP -v circle -c black
+n -t * -s 637 -S UP -v circle -c black
+n -t * -s 638 -S UP -v circle -c black
+n -t * -s 639 -S UP -v circle -c black
+n -t * -s 640 -S UP -v circle -c black
+n -t * -s 641 -S UP -v circle -c black
+n -t * -s 642 -S UP -v circle -c black
+n -t * -s 643 -S UP -v circle -c black
+n -t * -s 644 -S UP -v circle -c black
+n -t * -s 645 -S UP -v circle -c black
+n -t * -s 646 -S UP -v circle -c black
+n -t * -s 647 -S UP -v circle -c black
+n -t * -s 648 -S UP -v circle -c black
+n -t * -s 649 -S UP -v circle -c black
+n -t * -s 650 -S UP -v circle -c black
+n -t * -s 651 -S UP -v circle -c black
+n -t * -s 652 -S UP -v circle -c black
+n -t * -s 653 -S UP -v circle -c black
+n -t * -s 654 -S UP -v circle -c black
+n -t * -s 655 -S UP -v circle -c black
+n -t * -s 656 -S UP -v circle -c black
+n -t * -s 657 -S UP -v circle -c black
+n -t * -s 658 -S UP -v circle -c black
+n -t * -s 659 -S UP -v circle -c black
+n -t * -s 660 -S UP -v circle -c black
+n -t * -s 661 -S UP -v circle -c black
+n -t * -s 662 -S UP -v circle -c black
+n -t * -s 663 -S UP -v circle -c black
+n -t * -s 664 -S UP -v circle -c black
+n -t * -s 665 -S UP -v circle -c black
+n -t * -s 666 -S UP -v circle -c black
+n -t * -s 667 -S UP -v circle -c black
+n -t * -s 668 -S UP -v circle -c black
+n -t * -s 669 -S UP -v circle -c black
+n -t * -s 670 -S UP -v circle -c black
+n -t * -s 671 -S UP -v circle -c black
+n -t * -s 672 -S UP -v circle -c black
+n -t * -s 673 -S UP -v circle -c black
+n -t * -s 674 -S UP -v circle -c black
+n -t * -s 675 -S UP -v circle -c black
+n -t * -s 676 -S UP -v circle -c black
+n -t * -s 677 -S UP -v circle -c black
+n -t * -s 678 -S UP -v circle -c black
+n -t * -s 679 -S UP -v circle -c black
+n -t * -s 680 -S UP -v circle -c black
+n -t * -s 681 -S UP -v circle -c black
+n -t * -s 682 -S UP -v circle -c black
+n -t * -s 683 -S UP -v circle -c black
+n -t * -s 684 -S UP -v circle -c black
+n -t * -s 685 -S UP -v circle -c black
+n -t * -s 686 -S UP -v circle -c black
+n -t * -s 687 -S UP -v circle -c black
+n -t * -s 688 -S UP -v circle -c black
+n -t * -s 689 -S UP -v circle -c black
+n -t * -s 690 -S UP -v circle -c black
+n -t * -s 692 -S UP -v circle -c black
+n -t * -s 693 -S UP -v circle -c black
+n -t * -s 694 -S UP -v circle -c black
+n -t * -s 695 -S UP -v circle -c black
+n -t * -s 696 -S UP -v circle -c black
+n -t * -s 697 -S UP -v circle -c black
+n -t * -s 698 -S UP -v circle -c black
+n -t * -s 699 -S UP -v circle -c black
+n -t * -s 700 -S UP -v circle -c black
+n -t * -s 709 -S UP -v circle -c black
+n -t * -s 710 -S UP -v circle -c black
+n -t * -s 711 -S UP -v circle -c black
+n -t * -s 712 -S UP -v circle -c black
+n -t * -s 713 -S UP -v circle -c black
+n -t * -s 714 -S UP -v circle -c black
+n -t * -s 715 -S UP -v circle -c black
+n -t * -s 716 -S UP -v circle -c black
+n -t * -s 717 -S UP -v circle -c black
+n -t * -s 718 -S UP -v circle -c black
+n -t * -s 719 -S UP -v circle -c black
+n -t * -s 720 -S UP -v circle -c black
+n -t * -s 721 -S UP -v circle -c black
+n -t * -s 722 -S UP -v circle -c black
+n -t * -s 723 -S UP -v circle -c black
+n -t * -s 724 -S UP -v circle -c black
+n -t * -s 725 -S UP -v circle -c black
+n -t * -s 726 -S UP -v circle -c black
+n -t * -s 727 -S UP -v circle -c black
+n -t * -s 728 -S UP -v circle -c black
+n -t * -s 729 -S UP -v circle -c black
+n -t * -s 730 -S UP -v circle -c black
+n -t * -s 731 -S UP -v circle -c black
+n -t * -s 732 -S UP -v circle -c black
+n -t * -s 733 -S UP -v circle -c black
+n -t * -s 734 -S UP -v circle -c black
+n -t * -s 735 -S UP -v circle -c black
+n -t * -s 736 -S UP -v circle -c black
+n -t * -s 737 -S UP -v circle -c black
+n -t * -s 738 -S UP -v circle -c black
+n -t * -s 739 -S UP -v circle -c black
+n -t * -s 740 -S UP -v circle -c black
+n -t * -s 741 -S UP -v circle -c black
+n -t * -s 746 -S UP -v circle -c black
+n -t * -s 747 -S UP -v circle -c black
+n -t * -s 748 -S UP -v circle -c black
+n -t * -s 749 -S UP -v circle -c black
+n -t * -s 750 -S UP -v circle -c black
+n -t * -s 751 -S UP -v circle -c black
+n -t * -s 752 -S UP -v circle -c black
+n -t * -s 753 -S UP -v circle -c black
+n -t * -s 754 -S UP -v circle -c black
+n -t * -s 755 -S UP -v circle -c black
+n -t * -s 756 -S UP -v circle -c black
+n -t * -s 757 -S UP -v circle -c black
+n -t * -s 758 -S UP -v circle -c black
+n -t * -s 759 -S UP -v circle -c black
+n -t * -s 760 -S UP -v circle -c black
+n -t * -s 761 -S UP -v circle -c black
+n -t * -s 762 -S UP -v circle -c black
+n -t * -s 763 -S UP -v circle -c black
+n -t * -s 764 -S UP -v circle -c black
+n -t * -s 765 -S UP -v circle -c black
+n -t * -s 767 -S UP -v circle -c black
+n -t * -s 768 -S UP -v circle -c black
+n -t * -s 769 -S UP -v circle -c black
+n -t * -s 770 -S UP -v circle -c black
+n -t * -s 771 -S UP -v circle -c black
+n -t * -s 772 -S UP -v circle -c black
+n -t * -s 777 -S UP -v circle -c black
+n -t * -s 778 -S UP -v circle -c black
+n -t * -s 779 -S UP -v circle -c black
+n -t * -s 780 -S UP -v circle -c black
+n -t * -s 781 -S UP -v circle -c black
+n -t * -s 783 -S UP -v circle -c black
+n -t * -s 784 -S UP -v circle -c black
+n -t * -s 785 -S UP -v circle -c black
+n -t * -s 787 -S UP -v circle -c black
+n -t * -s 788 -S UP -v circle -c black
+n -t * -s 789 -S UP -v circle -c black
+n -t * -s 790 -S UP -v circle -c black
+n -t * -s 791 -S UP -v circle -c black
+n -t * -s 792 -S UP -v circle -c black
+n -t * -s 793 -S UP -v circle -c black
+n -t * -s 794 -S UP -v circle -c black
+n -t * -s 795 -S UP -v circle -c black
+n -t * -s 796 -S UP -v circle -c black
+n -t * -s 797 -S UP -v circle -c black
+n -t * -s 798 -S UP -v circle -c black
+n -t * -s 799 -S UP -v circle -c black
+n -t * -s 800 -S UP -v circle -c black
+n -t * -s 801 -S UP -v circle -c black
+n -t * -s 802 -S UP -v circle -c black
+n -t * -s 803 -S UP -v circle -c black
+n -t * -s 804 -S UP -v circle -c black
+n -t * -s 805 -S UP -v circle -c black
+n -t * -s 806 -S UP -v circle -c black
+n -t * -s 807 -S UP -v circle -c black
+n -t * -s 808 -S UP -v circle -c black
+n -t * -s 809 -S UP -v circle -c black
+n -t * -s 811 -S UP -v circle -c black
+n -t * -s 812 -S UP -v circle -c black
+n -t * -s 813 -S UP -v circle -c black
+n -t * -s 814 -S UP -v circle -c black
+n -t * -s 817 -S UP -v circle -c black
+n -t * -s 818 -S UP -v circle -c black
+n -t * -s 819 -S UP -v circle -c black
+n -t * -s 820 -S UP -v circle -c black
+n -t * -s 821 -S UP -v circle -c black
+n -t * -s 822 -S UP -v circle -c black
+n -t * -s 825 -S UP -v circle -c black
+n -t * -s 826 -S UP -v circle -c black
+n -t * -s 827 -S UP -v circle -c black
+n -t * -s 829 -S UP -v circle -c black
+n -t * -s 830 -S UP -v circle -c black
+n -t * -s 831 -S UP -v circle -c black
+n -t * -s 832 -S UP -v circle -c black
+n -t * -s 833 -S UP -v circle -c black
+n -t * -s 834 -S UP -v circle -c black
+n -t * -s 835 -S UP -v circle -c black
+n -t * -s 836 -S UP -v circle -c black
+n -t * -s 837 -S UP -v circle -c black
+n -t * -s 838 -S UP -v circle -c black
+n -t * -s 840 -S UP -v circle -c black
+n -t * -s 841 -S UP -v circle -c black
+n -t * -s 842 -S UP -v circle -c black
+n -t * -s 843 -S UP -v circle -c black
+n -t * -s 844 -S UP -v circle -c black
+n -t * -s 845 -S UP -v circle -c black
+n -t * -s 846 -S UP -v circle -c black
+n -t * -s 849 -S UP -v circle -c black
+n -t * -s 850 -S UP -v circle -c black
+n -t * -s 852 -S UP -v circle -c black
+n -t * -s 853 -S UP -v circle -c black
+n -t * -s 854 -S UP -v circle -c black
+n -t * -s 855 -S UP -v circle -c black
+n -t * -s 858 -S UP -v circle -c black
+n -t * -s 859 -S UP -v circle -c black
+n -t * -s 860 -S UP -v circle -c black
+n -t * -s 861 -S UP -v circle -c black
+n -t * -s 862 -S UP -v circle -c black
+n -t * -s 863 -S UP -v circle -c black
+n -t * -s 864 -S UP -v circle -c black
+n -t * -s 865 -S UP -v circle -c black
+n -t * -s 866 -S UP -v circle -c black
+n -t * -s 867 -S UP -v circle -c black
+n -t * -s 868 -S UP -v circle -c black
+n -t * -s 869 -S UP -v circle -c black
+n -t * -s 870 -S UP -v circle -c black
+n -t * -s 872 -S UP -v circle -c black
+n -t * -s 873 -S UP -v circle -c black
+n -t * -s 874 -S UP -v circle -c black
+n -t * -s 875 -S UP -v circle -c black
+n -t * -s 876 -S UP -v circle -c black
+n -t * -s 877 -S UP -v circle -c black
+n -t * -s 878 -S UP -v circle -c black
+n -t * -s 879 -S UP -v circle -c black
+n -t * -s 880 -S UP -v circle -c black
+n -t * -s 881 -S UP -v circle -c black
+n -t * -s 882 -S UP -v circle -c black
+n -t * -s 883 -S UP -v circle -c black
+n -t * -s 884 -S UP -v circle -c black
+n -t * -s 885 -S UP -v circle -c black
+n -t * -s 886 -S UP -v circle -c black
+n -t * -s 888 -S UP -v circle -c black
+n -t * -s 889 -S UP -v circle -c black
+n -t * -s 890 -S UP -v circle -c black
+n -t * -s 891 -S UP -v circle -c black
+n -t * -s 892 -S UP -v circle -c black
+n -t * -s 893 -S UP -v circle -c black
+n -t * -s 894 -S UP -v circle -c black
+n -t * -s 895 -S UP -v circle -c black
+n -t * -s 896 -S UP -v circle -c black
+n -t * -s 897 -S UP -v circle -c black
+n -t * -s 898 -S UP -v circle -c black
+n -t * -s 899 -S UP -v circle -c black
+n -t * -s 900 -S UP -v circle -c black
+n -t * -s 901 -S UP -v circle -c black
+n -t * -s 902 -S UP -v circle -c black
+n -t * -s 903 -S UP -v circle -c black
+n -t * -s 904 -S UP -v circle -c black
+n -t * -s 905 -S UP -v circle -c black
+n -t * -s 906 -S UP -v circle -c black
+n -t * -s 907 -S UP -v circle -c black
+n -t * -s 908 -S UP -v circle -c black
+n -t * -s 909 -S UP -v circle -c black
+n -t * -s 910 -S UP -v circle -c black
+n -t * -s 911 -S UP -v circle -c black
+n -t * -s 912 -S UP -v circle -c black
+n -t * -s 913 -S UP -v circle -c black
+n -t * -s 914 -S UP -v circle -c black
+n -t * -s 915 -S UP -v circle -c black
+n -t * -s 917 -S UP -v circle -c black
+n -t * -s 918 -S UP -v circle -c black
+n -t * -s 919 -S UP -v circle -c black
+n -t * -s 920 -S UP -v circle -c black
+n -t * -s 921 -S UP -v circle -c black
+n -t * -s 922 -S UP -v circle -c black
+n -t * -s 923 -S UP -v circle -c black
+n -t * -s 924 -S UP -v circle -c black
+n -t * -s 925 -S UP -v circle -c black
+n -t * -s 926 -S UP -v circle -c black
+n -t * -s 927 -S UP -v circle -c black
+n -t * -s 928 -S UP -v circle -c black
+n -t * -s 929 -S UP -v circle -c black
+n -t * -s 930 -S UP -v circle -c black
+n -t * -s 931 -S UP -v circle -c black
+n -t * -s 934 -S UP -v circle -c black
+n -t * -s 935 -S UP -v circle -c black
+n -t * -s 936 -S UP -v circle -c black
+n -t * -s 938 -S UP -v circle -c black
+n -t * -s 939 -S UP -v circle -c black
+n -t * -s 940 -S UP -v circle -c black
+n -t * -s 941 -S UP -v circle -c black
+n -t * -s 942 -S UP -v circle -c black
+n -t * -s 943 -S UP -v circle -c black
+n -t * -s 944 -S UP -v circle -c black
+n -t * -s 945 -S UP -v circle -c black
+n -t * -s 946 -S UP -v circle -c black
+n -t * -s 947 -S UP -v circle -c black
+n -t * -s 948 -S UP -v circle -c black
+n -t * -s 949 -S UP -v circle -c black
+n -t * -s 950 -S UP -v circle -c black
+n -t * -s 951 -S UP -v circle -c black
+n -t * -s 952 -S UP -v circle -c black
+n -t * -s 953 -S UP -v circle -c black
+n -t * -s 954 -S UP -v circle -c black
+n -t * -s 955 -S UP -v circle -c black
+n -t * -s 956 -S UP -v circle -c black
+n -t * -s 957 -S UP -v circle -c black
+n -t * -s 959 -S UP -v circle -c black
+n -t * -s 960 -S UP -v circle -c black
+n -t * -s 962 -S UP -v circle -c black
+n -t * -s 963 -S UP -v circle -c black
+n -t * -s 964 -S UP -v circle -c black
+n -t * -s 965 -S UP -v circle -c black
+n -t * -s 966 -S UP -v circle -c black
+n -t * -s 968 -S UP -v circle -c black
+n -t * -s 969 -S UP -v circle -c black
+n -t * -s 970 -S UP -v circle -c black
+n -t * -s 971 -S UP -v circle -c black
+n -t * -s 972 -S UP -v circle -c black
+n -t * -s 973 -S UP -v circle -c black
+n -t * -s 974 -S UP -v circle -c black
+n -t * -s 975 -S UP -v circle -c black
+n -t * -s 977 -S UP -v circle -c black
+n -t * -s 978 -S UP -v circle -c black
+n -t * -s 979 -S UP -v circle -c black
+n -t * -s 980 -S UP -v circle -c black
+n -t * -s 981 -S UP -v circle -c black
+n -t * -s 982 -S UP -v circle -c black
+n -t * -s 983 -S UP -v circle -c black
+n -t * -s 984 -S UP -v circle -c black
+n -t * -s 985 -S UP -v circle -c black
+n -t * -s 991 -S UP -v circle -c black
+n -t * -s 993 -S UP -v circle -c black
+n -t * -s 994 -S UP -v circle -c black
+n -t * -s 995 -S UP -v circle -c black
+n -t * -s 996 -S UP -v circle -c black
+n -t * -s 997 -S UP -v circle -c black
+n -t * -s 998 -S UP -v circle -c black
+n -t * -s 999 -S UP -v circle -c black
+n -t * -s 1000 -S UP -v circle -c black
+n -t * -s 1001 -S UP -v circle -c black
+n -t * -s 1005 -S UP -v circle -c black
+n -t * -s 1009 -S UP -v circle -c black
+n -t * -s 1010 -S UP -v circle -c black
+n -t * -s 1011 -S UP -v circle -c black
+n -t * -s 1012 -S UP -v circle -c black
+n -t * -s 1014 -S UP -v circle -c black
+n -t * -s 1015 -S UP -v circle -c black
+n -t * -s 1016 -S UP -v circle -c black
+n -t * -s 1017 -S UP -v circle -c black
+n -t * -s 1018 -S UP -v circle -c black
+n -t * -s 1019 -S UP -v circle -c black
+n -t * -s 1020 -S UP -v circle -c black
+n -t * -s 1021 -S UP -v circle -c black
+n -t * -s 1022 -S UP -v circle -c black
+n -t * -s 1023 -S UP -v circle -c black
+n -t * -s 1024 -S UP -v circle -c black
+n -t * -s 1026 -S UP -v circle -c black
+n -t * -s 1027 -S UP -v circle -c black
+n -t * -s 1028 -S UP -v circle -c black
+n -t * -s 1029 -S UP -v circle -c black
+n -t * -s 1030 -S UP -v circle -c black
+n -t * -s 1031 -S UP -v circle -c black
+n -t * -s 1032 -S UP -v circle -c black
+n -t * -s 1033 -S UP -v circle -c black
+n -t * -s 1034 -S UP -v circle -c black
+n -t * -s 1035 -S UP -v circle -c black
+n -t * -s 1036 -S UP -v circle -c black
+n -t * -s 1037 -S UP -v circle -c black
+n -t * -s 1038 -S UP -v circle -c black
+n -t * -s 1039 -S UP -v circle -c black
+n -t * -s 1040 -S UP -v circle -c black
+n -t * -s 1041 -S UP -v circle -c black
+n -t * -s 1042 -S UP -v circle -c black
+n -t * -s 1044 -S UP -v circle -c black
+n -t * -s 1045 -S UP -v circle -c black
+n -t * -s 1048 -S UP -v circle -c black
+n -t * -s 1049 -S UP -v circle -c black
+n -t * -s 1050 -S UP -v circle -c black
+n -t * -s 1051 -S UP -v circle -c black
+n -t * -s 1052 -S UP -v circle -c black
+n -t * -s 1053 -S UP -v circle -c black
+n -t * -s 1054 -S UP -v circle -c black
+n -t * -s 1055 -S UP -v circle -c black
+n -t * -s 1056 -S UP -v circle -c black
+n -t * -s 1057 -S UP -v circle -c black
+n -t * -s 1058 -S UP -v circle -c black
+n -t * -s 1061 -S UP -v circle -c black
+n -t * -s 1062 -S UP -v circle -c black
+n -t * -s 1063 -S UP -v circle -c black
+n -t * -s 1064 -S UP -v circle -c black
+n -t * -s 1065 -S UP -v circle -c black
+n -t * -s 1067 -S UP -v circle -c black
+n -t * -s 1068 -S UP -v circle -c black
+n -t * -s 1069 -S UP -v circle -c black
+n -t * -s 1070 -S UP -v circle -c black
+n -t * -s 1071 -S UP -v circle -c black
+n -t * -s 1072 -S UP -v circle -c black
+n -t * -s 1074 -S UP -v circle -c black
+n -t * -s 1076 -S UP -v circle -c black
+n -t * -s 1077 -S UP -v circle -c black
+n -t * -s 1079 -S UP -v circle -c black
+n -t * -s 1080 -S UP -v circle -c black
+n -t * -s 1081 -S UP -v circle -c black
+n -t * -s 1082 -S UP -v circle -c black
+n -t * -s 1083 -S UP -v circle -c black
+n -t * -s 1084 -S UP -v circle -c black
+n -t * -s 1085 -S UP -v circle -c black
+n -t * -s 1087 -S UP -v circle -c black
+n -t * -s 1088 -S UP -v circle -c black
+n -t * -s 1089 -S UP -v circle -c black
+n -t * -s 1090 -S UP -v circle -c black
+n -t * -s 1091 -S UP -v circle -c black
+n -t * -s 1092 -S UP -v circle -c black
+n -t * -s 1094 -S UP -v circle -c black
+n -t * -s 1095 -S UP -v circle -c black
+n -t * -s 1097 -S UP -v circle -c black
+n -t * -s 1098 -S UP -v circle -c black
+n -t * -s 1099 -S UP -v circle -c black
+n -t * -s 1100 -S UP -v circle -c black
+n -t * -s 1101 -S UP -v circle -c black
+n -t * -s 1102 -S UP -v circle -c black
+n -t * -s 1103 -S UP -v circle -c black
+n -t * -s 1104 -S UP -v circle -c black
+n -t * -s 1105 -S UP -v circle -c black
+n -t * -s 1106 -S UP -v circle -c black
+n -t * -s 1107 -S UP -v circle -c black
+n -t * -s 1108 -S UP -v circle -c black
+n -t * -s 1109 -S UP -v circle -c black
+n -t * -s 1110 -S UP -v circle -c black
+n -t * -s 1111 -S UP -v circle -c black
+n -t * -s 1112 -S UP -v circle -c black
+n -t * -s 1113 -S UP -v circle -c black
+n -t * -s 1114 -S UP -v circle -c black
+n -t * -s 1115 -S UP -v circle -c black
+n -t * -s 1116 -S UP -v circle -c black
+n -t * -s 1118 -S UP -v circle -c black
+n -t * -s 1119 -S UP -v circle -c black
+n -t * -s 1120 -S UP -v circle -c black
+n -t * -s 1122 -S UP -v circle -c black
+n -t * -s 1123 -S UP -v circle -c black
+n -t * -s 1124 -S UP -v circle -c black
+n -t * -s 1125 -S UP -v circle -c black
+n -t * -s 1126 -S UP -v circle -c black
+n -t * -s 1129 -S UP -v circle -c black
+n -t * -s 1130 -S UP -v circle -c black
+n -t * -s 1132 -S UP -v circle -c black
+n -t * -s 1133 -S UP -v circle -c black
+n -t * -s 1134 -S UP -v circle -c black
+n -t * -s 1136 -S UP -v circle -c black
+n -t * -s 1137 -S UP -v circle -c black
+n -t * -s 1139 -S UP -v circle -c black
+n -t * -s 1140 -S UP -v circle -c black
+n -t * -s 1141 -S UP -v circle -c black
+n -t * -s 1142 -S UP -v circle -c black
+n -t * -s 1143 -S UP -v circle -c black
+n -t * -s 1144 -S UP -v circle -c black
+n -t * -s 1145 -S UP -v circle -c black
+n -t * -s 1146 -S UP -v circle -c black
+n -t * -s 1147 -S UP -v circle -c black
+n -t * -s 1150 -S UP -v circle -c black
+n -t * -s 1152 -S UP -v circle -c black
+n -t * -s 1153 -S UP -v circle -c black
+n -t * -s 1154 -S UP -v circle -c black
+n -t * -s 1155 -S UP -v circle -c black
+n -t * -s 1156 -S UP -v circle -c black
+n -t * -s 1157 -S UP -v circle -c black
+n -t * -s 1158 -S UP -v circle -c black
+n -t * -s 1159 -S UP -v circle -c black
+n -t * -s 1160 -S UP -v circle -c black
+n -t * -s 1161 -S UP -v circle -c black
+n -t * -s 1162 -S UP -v circle -c black
+n -t * -s 1163 -S UP -v circle -c black
+n -t * -s 1164 -S UP -v circle -c black
+n -t * -s 1165 -S UP -v circle -c black
+n -t * -s 1167 -S UP -v circle -c black
+n -t * -s 1168 -S UP -v circle -c black
+n -t * -s 1169 -S UP -v circle -c black
+n -t * -s 1170 -S UP -v circle -c black
+n -t * -s 1171 -S UP -v circle -c black
+n -t * -s 1172 -S UP -v circle -c black
+n -t * -s 1173 -S UP -v circle -c black
+n -t * -s 1174 -S UP -v circle -c black
+n -t * -s 1175 -S UP -v circle -c black
+n -t * -s 1176 -S UP -v circle -c black
+n -t * -s 1177 -S UP -v circle -c black
+n -t * -s 1178 -S UP -v circle -c black
+n -t * -s 1180 -S UP -v circle -c black
+n -t * -s 1181 -S UP -v circle -c black
+n -t * -s 1182 -S UP -v circle -c black
+n -t * -s 1183 -S UP -v circle -c black
+n -t * -s 1184 -S UP -v circle -c black
+n -t * -s 1186 -S UP -v circle -c black
+n -t * -s 1187 -S UP -v circle -c black
+n -t * -s 1189 -S UP -v circle -c black
+n -t * -s 1190 -S UP -v circle -c black
+n -t * -s 1191 -S UP -v circle -c black
+n -t * -s 1192 -S UP -v circle -c black
+n -t * -s 1193 -S UP -v circle -c black
+n -t * -s 1194 -S UP -v circle -c black
+n -t * -s 1195 -S UP -v circle -c black
+n -t * -s 1196 -S UP -v circle -c black
+n -t * -s 1197 -S UP -v circle -c black
+n -t * -s 1198 -S UP -v circle -c black
+n -t * -s 1199 -S UP -v circle -c black
+n -t * -s 1200 -S UP -v circle -c black
+n -t * -s 1201 -S UP -v circle -c black
+n -t * -s 1203 -S UP -v circle -c black
+n -t * -s 1205 -S UP -v circle -c black
+n -t * -s 1206 -S UP -v circle -c black
+n -t * -s 1207 -S UP -v circle -c black
+n -t * -s 1209 -S UP -v circle -c black
+n -t * -s 1210 -S UP -v circle -c black
+n -t * -s 1211 -S UP -v circle -c black
+n -t * -s 1212 -S UP -v circle -c black
+n -t * -s 1213 -S UP -v circle -c black
+n -t * -s 1214 -S UP -v circle -c black
+n -t * -s 1215 -S UP -v circle -c black
+n -t * -s 1216 -S UP -v circle -c black
+n -t * -s 1217 -S UP -v circle -c black
+n -t * -s 1218 -S UP -v circle -c black
+n -t * -s 1219 -S UP -v circle -c black
+n -t * -s 1220 -S UP -v circle -c black
+n -t * -s 1221 -S UP -v circle -c black
+n -t * -s 1222 -S UP -v circle -c black
+n -t * -s 1223 -S UP -v circle -c black
+n -t * -s 1224 -S UP -v circle -c black
+n -t * -s 1225 -S UP -v circle -c black
+n -t * -s 1226 -S UP -v circle -c black
+n -t * -s 1227 -S UP -v circle -c black
+n -t * -s 1228 -S UP -v circle -c black
+n -t * -s 1229 -S UP -v circle -c black
+n -t * -s 1230 -S UP -v circle -c black
+n -t * -s 1231 -S UP -v circle -c black
+n -t * -s 1232 -S UP -v circle -c black
+n -t * -s 1233 -S UP -v circle -c black
+n -t * -s 1234 -S UP -v circle -c black
+n -t * -s 1235 -S UP -v circle -c black
+n -t * -s 1236 -S UP -v circle -c black
+n -t * -s 1237 -S UP -v circle -c black
+n -t * -s 1238 -S UP -v circle -c black
+n -t * -s 1239 -S UP -v circle -c black
+n -t * -s 1240 -S UP -v circle -c black
+n -t * -s 1241 -S UP -v circle -c black
+n -t * -s 1243 -S UP -v circle -c black
+n -t * -s 1244 -S UP -v circle -c black
+n -t * -s 1245 -S UP -v circle -c black
+n -t * -s 1247 -S UP -v circle -c black
+n -t * -s 1248 -S UP -v circle -c black
+n -t * -s 1249 -S UP -v circle -c black
+n -t * -s 1250 -S UP -v circle -c black
+n -t * -s 1251 -S UP -v circle -c black
+n -t * -s 1252 -S UP -v circle -c black
+n -t * -s 1253 -S UP -v circle -c black
+n -t * -s 1254 -S UP -v circle -c black
+n -t * -s 1255 -S UP -v circle -c black
+n -t * -s 1256 -S UP -v circle -c black
+n -t * -s 1258 -S UP -v circle -c black
+n -t * -s 1262 -S UP -v circle -c black
+n -t * -s 1263 -S UP -v circle -c black
+n -t * -s 1264 -S UP -v circle -c black
+n -t * -s 1265 -S UP -v circle -c black
+n -t * -s 1266 -S UP -v circle -c black
+n -t * -s 1267 -S UP -v circle -c black
+n -t * -s 1268 -S UP -v circle -c black
+n -t * -s 1269 -S UP -v circle -c black
+n -t * -s 1270 -S UP -v circle -c black
+n -t * -s 1271 -S UP -v circle -c black
+n -t * -s 1272 -S UP -v circle -c black
+n -t * -s 1273 -S UP -v circle -c black
+n -t * -s 1274 -S UP -v circle -c black
+n -t * -s 1275 -S UP -v circle -c black
+n -t * -s 1276 -S UP -v circle -c black
+n -t * -s 1277 -S UP -v circle -c black
+n -t * -s 1278 -S UP -v circle -c black
+n -t * -s 1279 -S UP -v circle -c black
+n -t * -s 1280 -S UP -v circle -c black
+n -t * -s 1281 -S UP -v circle -c black
+n -t * -s 1282 -S UP -v circle -c black
+n -t * -s 1283 -S UP -v circle -c black
+n -t * -s 1284 -S UP -v circle -c black
+n -t * -s 1285 -S UP -v circle -c black
+n -t * -s 1286 -S UP -v circle -c black
+n -t * -s 1287 -S UP -v circle -c black
+n -t * -s 1288 -S UP -v circle -c black
+n -t * -s 1290 -S UP -v circle -c black
+n -t * -s 1291 -S UP -v circle -c black
+n -t * -s 1292 -S UP -v circle -c black
+n -t * -s 1293 -S UP -v circle -c black
+n -t * -s 1294 -S UP -v circle -c black
+n -t * -s 1295 -S UP -v circle -c black
+n -t * -s 1296 -S UP -v circle -c black
+n -t * -s 1297 -S UP -v circle -c black
+n -t * -s 1298 -S UP -v circle -c black
+n -t * -s 1299 -S UP -v circle -c black
+n -t * -s 1300 -S UP -v circle -c black
+n -t * -s 1301 -S UP -v circle -c black
+n -t * -s 1302 -S UP -v circle -c black
+n -t * -s 1303 -S UP -v circle -c black
+n -t * -s 1304 -S UP -v circle -c black
+n -t * -s 1305 -S UP -v circle -c black
+n -t * -s 1307 -S UP -v circle -c black
+n -t * -s 1308 -S UP -v circle -c black
+n -t * -s 1309 -S UP -v circle -c black
+n -t * -s 1310 -S UP -v circle -c black
+n -t * -s 1311 -S UP -v circle -c black
+n -t * -s 1312 -S UP -v circle -c black
+n -t * -s 1313 -S UP -v circle -c black
+n -t * -s 1316 -S UP -v circle -c black
+n -t * -s 1319 -S UP -v circle -c black
+n -t * -s 1321 -S UP -v circle -c black
+n -t * -s 1322 -S UP -v circle -c black
+n -t * -s 1323 -S UP -v circle -c black
+n -t * -s 1324 -S UP -v circle -c black
+n -t * -s 1325 -S UP -v circle -c black
+n -t * -s 1326 -S UP -v circle -c black
+n -t * -s 1327 -S UP -v circle -c black
+n -t * -s 1328 -S UP -v circle -c black
+n -t * -s 1329 -S UP -v circle -c black
+n -t * -s 1330 -S UP -v circle -c black
+n -t * -s 1332 -S UP -v circle -c black
+n -t * -s 1333 -S UP -v circle -c black
+n -t * -s 1334 -S UP -v circle -c black
+n -t * -s 1335 -S UP -v circle -c black
+n -t * -s 1336 -S UP -v circle -c black
+n -t * -s 1337 -S UP -v circle -c black
+n -t * -s 1339 -S UP -v circle -c black
+n -t * -s 1340 -S UP -v circle -c black
+n -t * -s 1341 -S UP -v circle -c black
+n -t * -s 1342 -S UP -v circle -c black
+n -t * -s 1343 -S UP -v circle -c black
+n -t * -s 1344 -S UP -v circle -c black
+n -t * -s 1345 -S UP -v circle -c black
+n -t * -s 1348 -S UP -v circle -c black
+n -t * -s 1349 -S UP -v circle -c black
+n -t * -s 1350 -S UP -v circle -c black
+n -t * -s 1351 -S UP -v circle -c black
+n -t * -s 1352 -S UP -v circle -c black
+n -t * -s 1353 -S UP -v circle -c black
+n -t * -s 1354 -S UP -v circle -c black
+n -t * -s 1355 -S UP -v circle -c black
+n -t * -s 1356 -S UP -v circle -c black
+n -t * -s 1357 -S UP -v circle -c black
+n -t * -s 1358 -S UP -v circle -c black
+n -t * -s 1359 -S UP -v circle -c black
+n -t * -s 1360 -S UP -v circle -c black
+n -t * -s 1361 -S UP -v circle -c black
+n -t * -s 1364 -S UP -v circle -c black
+n -t * -s 1366 -S UP -v circle -c black
+n -t * -s 1367 -S UP -v circle -c black
+n -t * -s 1368 -S UP -v circle -c black
+n -t * -s 1369 -S UP -v circle -c black
+n -t * -s 1370 -S UP -v circle -c black
+n -t * -s 1371 -S UP -v circle -c black
+n -t * -s 1372 -S UP -v circle -c black
+n -t * -s 1373 -S UP -v circle -c black
+n -t * -s 1374 -S UP -v circle -c black
+n -t * -s 1377 -S UP -v circle -c black
+n -t * -s 1378 -S UP -v circle -c black
+n -t * -s 1379 -S UP -v circle -c black
+n -t * -s 1381 -S UP -v circle -c black
+n -t * -s 1383 -S UP -v circle -c black
+n -t * -s 1385 -S UP -v circle -c black
+n -t * -s 1386 -S UP -v circle -c black
+n -t * -s 1387 -S UP -v circle -c black
+n -t * -s 1388 -S UP -v circle -c black
+n -t * -s 1390 -S UP -v circle -c black
+n -t * -s 1391 -S UP -v circle -c black
+n -t * -s 1393 -S UP -v circle -c black
+n -t * -s 1394 -S UP -v circle -c black
+n -t * -s 1396 -S UP -v circle -c black
+n -t * -s 1397 -S UP -v circle -c black
+n -t * -s 1398 -S UP -v circle -c black
+n -t * -s 1400 -S UP -v circle -c black
+n -t * -s 1401 -S UP -v circle -c black
+n -t * -s 1402 -S UP -v circle -c black
+n -t * -s 1403 -S UP -v circle -c black
+n -t * -s 1404 -S UP -v circle -c black
+n -t * -s 1405 -S UP -v circle -c black
+n -t * -s 1406 -S UP -v circle -c black
+n -t * -s 1407 -S UP -v circle -c black
+n -t * -s 1409 -S UP -v circle -c black
+n -t * -s 1410 -S UP -v circle -c black
+n -t * -s 1411 -S UP -v circle -c black
+n -t * -s 1412 -S UP -v circle -c black
+n -t * -s 1413 -S UP -v circle -c black
+n -t * -s 1416 -S UP -v circle -c black
+n -t * -s 1417 -S UP -v circle -c black
+n -t * -s 1418 -S UP -v circle -c black
+n -t * -s 1419 -S UP -v circle -c black
+n -t * -s 1420 -S UP -v circle -c black
+n -t * -s 1421 -S UP -v circle -c black
+n -t * -s 1423 -S UP -v circle -c black
+n -t * -s 1424 -S UP -v circle -c black
+n -t * -s 1425 -S UP -v circle -c black
+n -t * -s 1426 -S UP -v circle -c black
+n -t * -s 1427 -S UP -v circle -c black
+n -t * -s 1428 -S UP -v circle -c black
+n -t * -s 1429 -S UP -v circle -c black
+n -t * -s 1430 -S UP -v circle -c black
+n -t * -s 1431 -S UP -v circle -c black
+n -t * -s 1432 -S UP -v circle -c black
+n -t * -s 1433 -S UP -v circle -c black
+n -t * -s 1434 -S UP -v circle -c black
+n -t * -s 1435 -S UP -v circle -c black
+n -t * -s 1436 -S UP -v circle -c black
+n -t * -s 1437 -S UP -v circle -c black
+n -t * -s 1438 -S UP -v circle -c black
+n -t * -s 1439 -S UP -v circle -c black
+n -t * -s 1440 -S UP -v circle -c black
+n -t * -s 1441 -S UP -v circle -c black
+n -t * -s 1442 -S UP -v circle -c black
+n -t * -s 1443 -S UP -v circle -c black
+n -t * -s 1444 -S UP -v circle -c black
+n -t * -s 1445 -S UP -v circle -c black
+n -t * -s 1446 -S UP -v circle -c black
+n -t * -s 1447 -S UP -v circle -c black
+n -t * -s 1448 -S UP -v circle -c black
+n -t * -s 1449 -S UP -v circle -c black
+n -t * -s 1450 -S UP -v circle -c black
+n -t * -s 1451 -S UP -v circle -c black
+n -t * -s 1452 -S UP -v circle -c black
+n -t * -s 1454 -S UP -v circle -c black
+n -t * -s 1455 -S UP -v circle -c black
+n -t * -s 1456 -S UP -v circle -c black
+n -t * -s 1457 -S UP -v circle -c black
+n -t * -s 1459 -S UP -v circle -c black
+n -t * -s 1460 -S UP -v circle -c black
+n -t * -s 1461 -S UP -v circle -c black
+n -t * -s 1462 -S UP -v circle -c black
+n -t * -s 1463 -S UP -v circle -c black
+n -t * -s 1464 -S UP -v circle -c black
+n -t * -s 1465 -S UP -v circle -c black
+n -t * -s 1468 -S UP -v circle -c black
+n -t * -s 1469 -S UP -v circle -c black
+n -t * -s 1470 -S UP -v circle -c black
+n -t * -s 1471 -S UP -v circle -c black
+n -t * -s 1472 -S UP -v circle -c black
+n -t * -s 1473 -S UP -v circle -c black
+n -t * -s 1474 -S UP -v circle -c black
+n -t * -s 1475 -S UP -v circle -c black
+n -t * -s 1476 -S UP -v circle -c black
+n -t * -s 1477 -S UP -v circle -c black
+n -t * -s 1478 -S UP -v circle -c black
+n -t * -s 1479 -S UP -v circle -c black
+n -t * -s 1480 -S UP -v circle -c black
+n -t * -s 1482 -S UP -v circle -c black
+n -t * -s 1483 -S UP -v circle -c black
+n -t * -s 1484 -S UP -v circle -c black
+n -t * -s 1485 -S UP -v circle -c black
+n -t * -s 1488 -S UP -v circle -c black
+n -t * -s 1489 -S UP -v circle -c black
+n -t * -s 1490 -S UP -v circle -c black
+n -t * -s 1491 -S UP -v circle -c black
+n -t * -s 1492 -S UP -v circle -c black
+n -t * -s 1493 -S UP -v circle -c black
+n -t * -s 1494 -S UP -v circle -c black
+n -t * -s 1495 -S UP -v circle -c black
+n -t * -s 1497 -S UP -v circle -c black
+n -t * -s 1498 -S UP -v circle -c black
+n -t * -s 1499 -S UP -v circle -c black
+n -t * -s 1500 -S UP -v circle -c black
+n -t * -s 1501 -S UP -v circle -c black
+n -t * -s 1502 -S UP -v circle -c black
+n -t * -s 1505 -S UP -v circle -c black
+n -t * -s 1506 -S UP -v circle -c black
+n -t * -s 1507 -S UP -v circle -c black
+n -t * -s 1509 -S UP -v circle -c black
+n -t * -s 1510 -S UP -v circle -c black
+n -t * -s 1511 -S UP -v circle -c black
+n -t * -s 1512 -S UP -v circle -c black
+n -t * -s 1513 -S UP -v circle -c black
+n -t * -s 1514 -S UP -v circle -c black
+n -t * -s 1515 -S UP -v circle -c black
+n -t * -s 1516 -S UP -v circle -c black
+n -t * -s 1517 -S UP -v circle -c black
+n -t * -s 1518 -S UP -v circle -c black
+n -t * -s 1519 -S UP -v circle -c black
+n -t * -s 1520 -S UP -v circle -c black
+n -t * -s 1521 -S UP -v circle -c black
+n -t * -s 1522 -S UP -v circle -c black
+n -t * -s 1523 -S UP -v circle -c black
+n -t * -s 1524 -S UP -v circle -c black
+n -t * -s 1525 -S UP -v circle -c black
+n -t * -s 1526 -S UP -v circle -c black
+n -t * -s 1527 -S UP -v circle -c black
+n -t * -s 1528 -S UP -v circle -c black
+n -t * -s 1529 -S UP -v circle -c black
+n -t * -s 1530 -S UP -v circle -c black
+n -t * -s 1531 -S UP -v circle -c black
+n -t * -s 1532 -S UP -v circle -c black
+n -t * -s 1533 -S UP -v circle -c black
+n -t * -s 1534 -S UP -v circle -c black
+n -t * -s 1535 -S UP -v circle -c black
+n -t * -s 1536 -S UP -v circle -c black
+n -t * -s 1537 -S UP -v circle -c black
+n -t * -s 1538 -S UP -v circle -c black
+n -t * -s 1539 -S UP -v circle -c black
+n -t * -s 1540 -S UP -v circle -c black
+n -t * -s 1541 -S UP -v circle -c black
+n -t * -s 1543 -S UP -v circle -c black
+n -t * -s 1544 -S UP -v circle -c black
+n -t * -s 1545 -S UP -v circle -c black
+n -t * -s 1546 -S UP -v circle -c black
+n -t * -s 1547 -S UP -v circle -c black
+n -t * -s 1548 -S UP -v circle -c black
+n -t * -s 1549 -S UP -v circle -c black
+n -t * -s 1550 -S UP -v circle -c black
+n -t * -s 1551 -S UP -v circle -c black
+n -t * -s 1552 -S UP -v circle -c black
+n -t * -s 1553 -S UP -v circle -c black
+n -t * -s 1554 -S UP -v circle -c black
+n -t * -s 1555 -S UP -v circle -c black
+n -t * -s 1556 -S UP -v circle -c black
+n -t * -s 1558 -S UP -v circle -c black
+n -t * -s 1559 -S UP -v circle -c black
+n -t * -s 1560 -S UP -v circle -c black
+n -t * -s 1561 -S UP -v circle -c black
+n -t * -s 1562 -S UP -v circle -c black
+n -t * -s 1563 -S UP -v circle -c black
+n -t * -s 1564 -S UP -v circle -c black
+n -t * -s 1565 -S UP -v circle -c black
+n -t * -s 1566 -S UP -v circle -c black
+n -t * -s 1567 -S UP -v circle -c black
+n -t * -s 1568 -S UP -v circle -c black
+n -t * -s 1569 -S UP -v circle -c black
+n -t * -s 1570 -S UP -v circle -c black
+n -t * -s 1572 -S UP -v circle -c black
+n -t * -s 1573 -S UP -v circle -c black
+n -t * -s 1574 -S UP -v circle -c black
+n -t * -s 1575 -S UP -v circle -c black
+n -t * -s 1576 -S UP -v circle -c black
+n -t * -s 1577 -S UP -v circle -c black
+n -t * -s 1578 -S UP -v circle -c black
+n -t * -s 1579 -S UP -v circle -c black
+n -t * -s 1580 -S UP -v circle -c black
+n -t * -s 1581 -S UP -v circle -c black
+n -t * -s 1582 -S UP -v circle -c black
+n -t * -s 1583 -S UP -v circle -c black
+n -t * -s 1584 -S UP -v circle -c black
+n -t * -s 1585 -S UP -v circle -c black
+n -t * -s 1586 -S UP -v circle -c black
+n -t * -s 1587 -S UP -v circle -c black
+n -t * -s 1588 -S UP -v circle -c black
+n -t * -s 1590 -S UP -v circle -c black
+n -t * -s 1591 -S UP -v circle -c black
+n -t * -s 1592 -S UP -v circle -c black
+n -t * -s 1593 -S UP -v circle -c black
+n -t * -s 1594 -S UP -v circle -c black
+n -t * -s 1595 -S UP -v circle -c black
+n -t * -s 1596 -S UP -v circle -c black
+n -t * -s 1597 -S UP -v circle -c black
+n -t * -s 1598 -S UP -v circle -c black
+n -t * -s 1599 -S UP -v circle -c black
+n -t * -s 1600 -S UP -v circle -c black
+n -t * -s 1601 -S UP -v circle -c black
+n -t * -s 1603 -S UP -v circle -c black
+n -t * -s 1604 -S UP -v circle -c black
+n -t * -s 1605 -S UP -v circle -c black
+n -t * -s 1606 -S UP -v circle -c black
+n -t * -s 1608 -S UP -v circle -c black
+n -t * -s 1609 -S UP -v circle -c black
+n -t * -s 1610 -S UP -v circle -c black
+n -t * -s 1611 -S UP -v circle -c black
+n -t * -s 1612 -S UP -v circle -c black
+n -t * -s 1613 -S UP -v circle -c black
+n -t * -s 1614 -S UP -v circle -c black
+n -t * -s 1615 -S UP -v circle -c black
+n -t * -s 1616 -S UP -v circle -c black
+n -t * -s 1617 -S UP -v circle -c black
+n -t * -s 1618 -S UP -v circle -c black
+n -t * -s 1619 -S UP -v circle -c black
+n -t * -s 1620 -S UP -v circle -c black
+n -t * -s 1621 -S UP -v circle -c black
+n -t * -s 1622 -S UP -v circle -c black
+n -t * -s 1623 -S UP -v circle -c black
+n -t * -s 1624 -S UP -v circle -c black
+n -t * -s 1625 -S UP -v circle -c black
+n -t * -s 1626 -S UP -v circle -c black
+n -t * -s 1628 -S UP -v circle -c black
+n -t * -s 1629 -S UP -v circle -c black
+n -t * -s 1630 -S UP -v circle -c black
+n -t * -s 1631 -S UP -v circle -c black
+n -t * -s 1632 -S UP -v circle -c black
+n -t * -s 1633 -S UP -v circle -c black
+n -t * -s 1634 -S UP -v circle -c black
+n -t * -s 1635 -S UP -v circle -c black
+n -t * -s 1637 -S UP -v circle -c black
+n -t * -s 1638 -S UP -v circle -c black
+n -t * -s 1640 -S UP -v circle -c black
+n -t * -s 1641 -S UP -v circle -c black
+n -t * -s 1644 -S UP -v circle -c black
+n -t * -s 1645 -S UP -v circle -c black
+n -t * -s 1646 -S UP -v circle -c black
+n -t * -s 1647 -S UP -v circle -c black
+n -t * -s 1648 -S UP -v circle -c black
+n -t * -s 1650 -S UP -v circle -c black
+n -t * -s 1651 -S UP -v circle -c black
+n -t * -s 1652 -S UP -v circle -c black
+n -t * -s 1653 -S UP -v circle -c black
+n -t * -s 1655 -S UP -v circle -c black
+n -t * -s 1656 -S UP -v circle -c black
+n -t * -s 1657 -S UP -v circle -c black
+n -t * -s 1658 -S UP -v circle -c black
+n -t * -s 1659 -S UP -v circle -c black
+n -t * -s 1660 -S UP -v circle -c black
+n -t * -s 1661 -S UP -v circle -c black
+n -t * -s 1662 -S UP -v circle -c black
+n -t * -s 1663 -S UP -v circle -c black
+n -t * -s 1664 -S UP -v circle -c black
+n -t * -s 1666 -S UP -v circle -c black
+n -t * -s 1667 -S UP -v circle -c black
+n -t * -s 1668 -S UP -v circle -c black
+n -t * -s 1669 -S UP -v circle -c black
+n -t * -s 1670 -S UP -v circle -c black
+n -t * -s 1671 -S UP -v circle -c black
+n -t * -s 1672 -S UP -v circle -c black
+n -t * -s 1673 -S UP -v circle -c black
+n -t * -s 1674 -S UP -v circle -c black
+n -t * -s 1675 -S UP -v circle -c black
+n -t * -s 1676 -S UP -v circle -c black
+n -t * -s 1677 -S UP -v circle -c black
+n -t * -s 1678 -S UP -v circle -c black
+n -t * -s 1679 -S UP -v circle -c black
+n -t * -s 1680 -S UP -v circle -c black
+n -t * -s 1681 -S UP -v circle -c black
+n -t * -s 1682 -S UP -v circle -c black
+n -t * -s 1683 -S UP -v circle -c black
+n -t * -s 1684 -S UP -v circle -c black
+n -t * -s 1685 -S UP -v circle -c black
+n -t * -s 1686 -S UP -v circle -c black
+n -t * -s 1687 -S UP -v circle -c black
+n -t * -s 1688 -S UP -v circle -c black
+n -t * -s 1689 -S UP -v circle -c black
+n -t * -s 1690 -S UP -v circle -c black
+n -t * -s 1691 -S UP -v circle -c black
+n -t * -s 1692 -S UP -v circle -c black
+n -t * -s 1693 -S UP -v circle -c black
+n -t * -s 1694 -S UP -v circle -c black
+n -t * -s 1695 -S UP -v circle -c black
+n -t * -s 1696 -S UP -v circle -c black
+n -t * -s 1702 -S UP -v circle -c black
+n -t * -s 1703 -S UP -v circle -c black
+n -t * -s 1704 -S UP -v circle -c black
+n -t * -s 1705 -S UP -v circle -c black
+n -t * -s 1707 -S UP -v circle -c black
+n -t * -s 1710 -S UP -v circle -c black
+n -t * -s 1711 -S UP -v circle -c black
+n -t * -s 1712 -S UP -v circle -c black
+n -t * -s 1713 -S UP -v circle -c black
+n -t * -s 1714 -S UP -v circle -c black
+n -t * -s 1715 -S UP -v circle -c black
+n -t * -s 1716 -S UP -v circle -c black
+n -t * -s 1717 -S UP -v circle -c black
+n -t * -s 1718 -S UP -v circle -c black
+n -t * -s 1719 -S UP -v circle -c black
+n -t * -s 1720 -S UP -v circle -c black
+n -t * -s 1721 -S UP -v circle -c black
+n -t * -s 1722 -S UP -v circle -c black
+n -t * -s 1723 -S UP -v circle -c black
+n -t * -s 1724 -S UP -v circle -c black
+n -t * -s 1725 -S UP -v circle -c black
+n -t * -s 1726 -S UP -v circle -c black
+n -t * -s 1727 -S UP -v circle -c black
+n -t * -s 1728 -S UP -v circle -c black
+n -t * -s 1729 -S UP -v circle -c black
+n -t * -s 1730 -S UP -v circle -c black
+n -t * -s 1731 -S UP -v circle -c black
+n -t * -s 1732 -S UP -v circle -c black
+n -t * -s 1733 -S UP -v circle -c black
+n -t * -s 1734 -S UP -v circle -c black
+n -t * -s 1735 -S UP -v circle -c black
+n -t * -s 1736 -S UP -v circle -c black
+n -t * -s 1737 -S UP -v circle -c black
+n -t * -s 1738 -S UP -v circle -c black
+n -t * -s 1739 -S UP -v circle -c black
+n -t * -s 1740 -S UP -v circle -c black
+n -t * -s 1741 -S UP -v circle -c black
+n -t * -s 1742 -S UP -v circle -c black
+n -t * -s 1743 -S UP -v circle -c black
+n -t * -s 1744 -S UP -v circle -c black
+n -t * -s 1745 -S UP -v circle -c black
+n -t * -s 1746 -S UP -v circle -c black
+n -t * -s 1747 -S UP -v circle -c black
+n -t * -s 1748 -S UP -v circle -c black
+n -t * -s 1749 -S UP -v circle -c black
+n -t * -s 1750 -S UP -v circle -c black
+n -t * -s 1751 -S UP -v circle -c black
+n -t * -s 1752 -S UP -v circle -c black
+n -t * -s 1753 -S UP -v circle -c black
+n -t * -s 1754 -S UP -v circle -c black
+n -t * -s 1755 -S UP -v circle -c black
+n -t * -s 1757 -S UP -v circle -c black
+n -t * -s 1758 -S UP -v circle -c black
+n -t * -s 1759 -S UP -v circle -c black
+n -t * -s 1760 -S UP -v circle -c black
+n -t * -s 1761 -S UP -v circle -c black
+n -t * -s 1762 -S UP -v circle -c black
+n -t * -s 1763 -S UP -v circle -c black
+n -t * -s 1764 -S UP -v circle -c black
+n -t * -s 1765 -S UP -v circle -c black
+n -t * -s 1766 -S UP -v circle -c black
+n -t * -s 1767 -S UP -v circle -c black
+n -t * -s 1768 -S UP -v circle -c black
+n -t * -s 1769 -S UP -v circle -c black
+n -t * -s 1770 -S UP -v circle -c black
+n -t * -s 1771 -S UP -v circle -c black
+n -t * -s 1772 -S UP -v circle -c black
+n -t * -s 1773 -S UP -v circle -c black
+n -t * -s 1774 -S UP -v circle -c black
+n -t * -s 1775 -S UP -v circle -c black
+n -t * -s 1776 -S UP -v circle -c black
+n -t * -s 1778 -S UP -v circle -c black
+n -t * -s 1779 -S UP -v circle -c black
+n -t * -s 1781 -S UP -v circle -c black
+n -t * -s 1782 -S UP -v circle -c black
+n -t * -s 1783 -S UP -v circle -c black
+n -t * -s 1784 -S UP -v circle -c black
+n -t * -s 1788 -S UP -v circle -c black
+n -t * -s 1790 -S UP -v circle -c black
+n -t * -s 1791 -S UP -v circle -c black
+n -t * -s 1792 -S UP -v circle -c black
+n -t * -s 1793 -S UP -v circle -c black
+n -t * -s 1794 -S UP -v circle -c black
+n -t * -s 1795 -S UP -v circle -c black
+n -t * -s 1796 -S UP -v circle -c black
+n -t * -s 1798 -S UP -v circle -c black
+n -t * -s 1799 -S UP -v circle -c black
+n -t * -s 1800 -S UP -v circle -c black
+n -t * -s 1801 -S UP -v circle -c black
+n -t * -s 1802 -S UP -v circle -c black
+n -t * -s 1803 -S UP -v circle -c black
+n -t * -s 1804 -S UP -v circle -c black
+n -t * -s 1805 -S UP -v circle -c black
+n -t * -s 1806 -S UP -v circle -c black
+n -t * -s 1807 -S UP -v circle -c black
+n -t * -s 1808 -S UP -v circle -c black
+n -t * -s 1809 -S UP -v circle -c black
+n -t * -s 1810 -S UP -v circle -c black
+n -t * -s 1811 -S UP -v circle -c black
+n -t * -s 1812 -S UP -v circle -c black
+n -t * -s 1813 -S UP -v circle -c black
+n -t * -s 1815 -S UP -v circle -c black
+n -t * -s 1816 -S UP -v circle -c black
+n -t * -s 1818 -S UP -v circle -c black
+n -t * -s 1819 -S UP -v circle -c black
+n -t * -s 1820 -S UP -v circle -c black
+n -t * -s 1821 -S UP -v circle -c black
+n -t * -s 1824 -S UP -v circle -c black
+n -t * -s 1825 -S UP -v circle -c black
+n -t * -s 1826 -S UP -v circle -c black
+n -t * -s 1827 -S UP -v circle -c black
+n -t * -s 1828 -S UP -v circle -c black
+n -t * -s 1829 -S UP -v circle -c black
+n -t * -s 1830 -S UP -v circle -c black
+n -t * -s 1831 -S UP -v circle -c black
+n -t * -s 1832 -S UP -v circle -c black
+n -t * -s 1833 -S UP -v circle -c black
+n -t * -s 1834 -S UP -v circle -c black
+n -t * -s 1835 -S UP -v circle -c black
+n -t * -s 1836 -S UP -v circle -c black
+n -t * -s 1837 -S UP -v circle -c black
+n -t * -s 1838 -S UP -v circle -c black
+n -t * -s 1839 -S UP -v circle -c black
+n -t * -s 1840 -S UP -v circle -c black
+n -t * -s 1842 -S UP -v circle -c black
+n -t * -s 1843 -S UP -v circle -c black
+n -t * -s 1844 -S UP -v circle -c black
+n -t * -s 1845 -S UP -v circle -c black
+n -t * -s 1846 -S UP -v circle -c black
+n -t * -s 1847 -S UP -v circle -c black
+n -t * -s 1848 -S UP -v circle -c black
+n -t * -s 1849 -S UP -v circle -c black
+n -t * -s 1851 -S UP -v circle -c black
+n -t * -s 1852 -S UP -v circle -c black
+n -t * -s 1853 -S UP -v circle -c black
+n -t * -s 1854 -S UP -v circle -c black
+n -t * -s 1855 -S UP -v circle -c black
+n -t * -s 1856 -S UP -v circle -c black
+n -t * -s 1857 -S UP -v circle -c black
+n -t * -s 1858 -S UP -v circle -c black
+n -t * -s 1859 -S UP -v circle -c black
+n -t * -s 1860 -S UP -v circle -c black
+n -t * -s 1861 -S UP -v circle -c black
+n -t * -s 1862 -S UP -v circle -c black
+n -t * -s 1863 -S UP -v circle -c black
+n -t * -s 1864 -S UP -v circle -c black
+n -t * -s 1865 -S UP -v circle -c black
+n -t * -s 1866 -S UP -v circle -c black
+n -t * -s 1867 -S UP -v circle -c black
+n -t * -s 1868 -S UP -v circle -c black
+n -t * -s 1869 -S UP -v circle -c black
+n -t * -s 1870 -S UP -v circle -c black
+n -t * -s 1871 -S UP -v circle -c black
+n -t * -s 1872 -S UP -v circle -c black
+n -t * -s 1873 -S UP -v circle -c black
+n -t * -s 1874 -S UP -v circle -c black
+n -t * -s 1875 -S UP -v circle -c black
+n -t * -s 1876 -S UP -v circle -c black
+n -t * -s 1877 -S UP -v circle -c black
+n -t * -s 1878 -S UP -v circle -c black
+n -t * -s 1879 -S UP -v circle -c black
+n -t * -s 1880 -S UP -v circle -c black
+n -t * -s 1881 -S UP -v circle -c black
+n -t * -s 1882 -S UP -v circle -c black
+n -t * -s 1883 -S UP -v circle -c black
+n -t * -s 1884 -S UP -v circle -c black
+n -t * -s 1885 -S UP -v circle -c black
+n -t * -s 1886 -S UP -v circle -c black
+n -t * -s 1887 -S UP -v circle -c black
+n -t * -s 1888 -S UP -v circle -c black
+n -t * -s 1890 -S UP -v circle -c black
+n -t * -s 1891 -S UP -v circle -c black
+n -t * -s 1892 -S UP -v circle -c black
+n -t * -s 1893 -S UP -v circle -c black
+n -t * -s 1894 -S UP -v circle -c black
+n -t * -s 1895 -S UP -v circle -c black
+n -t * -s 1896 -S UP -v circle -c black
+n -t * -s 1897 -S UP -v circle -c black
+n -t * -s 1898 -S UP -v circle -c black
+n -t * -s 1899 -S UP -v circle -c black
+n -t * -s 1900 -S UP -v circle -c black
+n -t * -s 1901 -S UP -v circle -c black
+n -t * -s 1902 -S UP -v circle -c black
+n -t * -s 1903 -S UP -v circle -c black
+n -t * -s 1904 -S UP -v circle -c black
+n -t * -s 1905 -S UP -v circle -c black
+n -t * -s 1906 -S UP -v circle -c black
+n -t * -s 1907 -S UP -v circle -c black
+n -t * -s 1908 -S UP -v circle -c black
+n -t * -s 1909 -S UP -v circle -c black
+n -t * -s 1910 -S UP -v circle -c black
+n -t * -s 1911 -S UP -v circle -c black
+n -t * -s 1912 -S UP -v circle -c black
+n -t * -s 1913 -S UP -v circle -c black
+n -t * -s 1914 -S UP -v circle -c black
+n -t * -s 1915 -S UP -v circle -c black
+n -t * -s 1916 -S UP -v circle -c black
+n -t * -s 1917 -S UP -v circle -c black
+n -t * -s 1918 -S UP -v circle -c black
+n -t * -s 1919 -S UP -v circle -c black
+n -t * -s 1926 -S UP -v circle -c black
+n -t * -s 1928 -S UP -v circle -c black
+n -t * -s 1929 -S UP -v circle -c black
+n -t * -s 1930 -S UP -v circle -c black
+n -t * -s 1931 -S UP -v circle -c black
+n -t * -s 1932 -S UP -v circle -c black
+n -t * -s 1933 -S UP -v circle -c black
+n -t * -s 1934 -S UP -v circle -c black
+n -t * -s 1935 -S UP -v circle -c black
+n -t * -s 1936 -S UP -v circle -c black
+n -t * -s 1937 -S UP -v circle -c black
+n -t * -s 1938 -S UP -v circle -c black
+n -t * -s 1939 -S UP -v circle -c black
+n -t * -s 1940 -S UP -v circle -c black
+n -t * -s 1941 -S UP -v circle -c black
+n -t * -s 1942 -S UP -v circle -c black
+n -t * -s 1943 -S UP -v circle -c black
+n -t * -s 1944 -S UP -v circle -c black
+n -t * -s 1945 -S UP -v circle -c black
+n -t * -s 1946 -S UP -v circle -c black
+n -t * -s 1947 -S UP -v circle -c black
+n -t * -s 1948 -S UP -v circle -c black
+n -t * -s 1949 -S UP -v circle -c black
+n -t * -s 1950 -S UP -v circle -c black
+n -t * -s 1951 -S UP -v circle -c black
+n -t * -s 1952 -S UP -v circle -c black
+n -t * -s 1953 -S UP -v circle -c black
+n -t * -s 1954 -S UP -v circle -c black
+n -t * -s 1955 -S UP -v circle -c black
+n -t * -s 1956 -S UP -v circle -c black
+n -t * -s 1958 -S UP -v circle -c black
+n -t * -s 1959 -S UP -v circle -c black
+n -t * -s 1961 -S UP -v circle -c black
+n -t * -s 1962 -S UP -v circle -c black
+n -t * -s 1963 -S UP -v circle -c black
+n -t * -s 1964 -S UP -v circle -c black
+n -t * -s 1967 -S UP -v circle -c black
+n -t * -s 1968 -S UP -v circle -c black
+n -t * -s 1969 -S UP -v circle -c black
+n -t * -s 1971 -S UP -v circle -c black
+l -t * -s 1 -d 10 -S UP -r 512000 -D 0.03125
+l -t * -s 1 -d 11 -S UP -r 512000 -D 0.03125
+l -t * -s 2 -d 3 -S UP -r 512000 -D 0.0009765625
+l -t * -s 2 -d 1594 -S UP -r 512000 -D 0.046875
+l -t * -s 2 -d 1104 -S UP -r 512000 -D 0.03125
+l -t * -s 2 -d 474 -S UP -r 512000 -D 0.03125
+l -t * -s 2 -d 1115 -S UP -r 512000 -D 0.03125
+l -t * -s 2 -d 13 -S UP -r 512000 -D 0.0234375
+l -t * -s 2 -d 4 -S UP -r 512000 -D 0.0009765625
+l -t * -s 2 -d 1430 -S UP -r 512000 -D 0.0009765625
+l -t * -s 3 -d 22 -S UP -r 512000 -D 0.0625
+l -t * -s 3 -d 19 -S UP -r 512000 -D 0.015625
+l -t * -s 3 -d 20 -S UP -r 512000 -D 0.0234375
+l -t * -s 3 -d 4 -S UP -r 512000 -D 0.0009765625
+l -t * -s 3 -d 21 -S UP -r 512000 -D 0.125
+l -t * -s 3 -d 1430 -S UP -r 512000 -D 0.0009765625
+l -t * -s 4 -d 398 -S UP -r 512000 -D 0.0234375
+l -t * -s 5 -d 24 -S UP -r 512000 -D 0.0009765625
+l -t * -s 6 -d 1112 -S UP -r 512000 -D 0.0009765625
+l -t * -s 7 -d 1112 -S UP -r 512000 -D 0.0009765625
+l -t * -s 8 -d 29 -S UP -r 512000 -D 0.0625
+l -t * -s 9 -d 29 -S UP -r 512000 -D 0.0625
+l -t * -s 10 -d 644 -S UP -r 512000 -D 0.03125
+l -t * -s 10 -d 143 -S UP -r 512000 -D 0.015625
+l -t * -s 10 -d 952 -S UP -r 512000 -D 0.0009765625
+l -t * -s 11 -d 33 -S UP -r 512000 -D 0.03125
+l -t * -s 13 -d 38 -S UP -r 512000 -D 0.0009765625
+l -t * -s 13 -d 39 -S UP -r 512000 -D 0.0234375
+l -t * -s 13 -d 40 -S UP -r 512000 -D 0.0234375
+l -t * -s 13 -d 1596 -S UP -r 512000 -D 0.046875
+l -t * -s 15 -d 42 -S UP -r 512000 -D 0.0078125
+l -t * -s 16 -d 47 -S UP -r 512000 -D 0.015625
+l -t * -s 16 -d 1707 -S UP -r 512000 -D 0.0078125
+l -t * -s 16 -d 1300 -S UP -r 512000 -D 0.0078125
+l -t * -s 17 -d 47 -S UP -r 512000 -D 0.015625
+l -t * -s 18 -d 47 -S UP -r 512000 -D 0.015625
+l -t * -s 19 -d 1596 -S UP -r 512000 -D 0.046875
+l -t * -s 19 -d 474 -S UP -r 512000 -D 0.046875
+l -t * -s 19 -d 1824 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 353 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 289 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 1800 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 1825 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 185 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 945 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 944 -S UP -r 512000 -D 0.005859375
+l -t * -s 19 -d 303 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 1310 -S UP -r 512000 -D 0.03125
+l -t * -s 19 -d 1690 -S UP -r 512000 -D 0.03125
+l -t * -s 20 -d 1194 -S UP -r 512000 -D 0.0009765625
+l -t * -s 20 -d 50 -S UP -r 512000 -D 0.0009765625
+l -t * -s 20 -d 1287 -S UP -r 512000 -D 0.0009765625
+l -t * -s 22 -d 53 -S UP -r 512000 -D 0.03125
+l -t * -s 22 -d 1826 -S UP -r 512000 -D 0.03125
+l -t * -s 22 -d 1608 -S UP -r 512000 -D 0.03125
+l -t * -s 22 -d 1827 -S UP -r 512000 -D 0.03125
+l -t * -s 22 -d 1067 -S UP -r 512000 -D 0.03125
+l -t * -s 22 -d 1333 -S UP -r 512000 -D 0.03125
+l -t * -s 23 -d 57 -S UP -r 512000 -D 0.029296875
+l -t * -s 24 -d 551 -S UP -r 512000 -D 0.0625
+l -t * -s 24 -d 552 -S UP -r 512000 -D 0.0009765625
+l -t * -s 24 -d 553 -S UP -r 512000 -D 0.0009765625
+l -t * -s 24 -d 1263 -S UP -r 512000 -D 0.0009765625
+l -t * -s 25 -d 59 -S UP -r 512000 -D 0.0078125
+l -t * -s 25 -d 60 -S UP -r 512000 -D 0.0078125
+l -t * -s 25 -d 1112 -S UP -r 512000 -D 0.03125
+l -t * -s 25 -d 61 -S UP -r 512000 -D 0.03125
+l -t * -s 25 -d 62 -S UP -r 512000 -D 0.03125
+l -t * -s 26 -d 902 -S UP -r 512000 -D 0.0625
+l -t * -s 26 -d 1014 -S UP -r 512000 -D 0.0078125
+l -t * -s 26 -d 637 -S UP -r 512000 -D 0.015625
+l -t * -s 26 -d 638 -S UP -r 512000 -D 0.0107421875
+l -t * -s 26 -d 1224 -S UP -r 512000 -D 0.0625
+l -t * -s 26 -d 1226 -S UP -r 512000 -D 0.015625
+l -t * -s 26 -d 1356 -S UP -r 512000 -D 0.0009765625
+l -t * -s 27 -d 1356 -S UP -r 512000 -D 0.03125
+l -t * -s 29 -d 1356 -S UP -r 512000 -D 0.03125
+l -t * -s 30 -d 1356 -S UP -r 512000 -D 0.0009765625
+l -t * -s 31 -d 1356 -S UP -r 512000 -D 0.03125
+l -t * -s 32 -d 66 -S UP -r 512000 -D 0.0009765625
+l -t * -s 32 -d 1247 -S UP -r 512000 -D 0.0009765625
+l -t * -s 33 -d 560 -S UP -r 512000 -D 0.0009765625
+l -t * -s 33 -d 1116 -S UP -r 512000 -D 0.0009765625
+l -t * -s 34 -d 1514 -S UP -r 512000 -D 0.0009765625
+l -t * -s 34 -d 1280 -S UP -r 512000 -D 0.046875
+l -t * -s 35 -d 74 -S UP -r 512000 -D 0.015625
+l -t * -s 36 -d 74 -S UP -r 512000 -D 0.0625
+l -t * -s 37 -d 76 -S UP -r 512000 -D 0.0009765625
+l -t * -s 38 -d 78 -S UP -r 512000 -D 0.0234375
+l -t * -s 38 -d 79 -S UP -r 512000 -D 0.0234375
+l -t * -s 38 -d 80 -S UP -r 512000 -D 0.0234375
+l -t * -s 38 -d 81 -S UP -r 512000 -D 0.0234375
+l -t * -s 38 -d 82 -S UP -r 512000 -D 0.03515625
+l -t * -s 39 -d 84 -S UP -r 512000 -D 0.0234375
+l -t * -s 39 -d 85 -S UP -r 512000 -D 0.0234375
+l -t * -s 39 -d 86 -S UP -r 512000 -D 0.0234375
+l -t * -s 39 -d 87 -S UP -r 512000 -D 0.0234375
+l -t * -s 39 -d 88 -S UP -r 512000 -D 0.0234375
+l -t * -s 40 -d 79 -S UP -r 512000 -D 0.0234375
+l -t * -s 40 -d 84 -S UP -r 512000 -D 0.0234375
+l -t * -s 40 -d 92 -S UP -r 512000 -D 0.0234375
+l -t * -s 40 -d 93 -S UP -r 512000 -D 0.0234375
+l -t * -s 40 -d 94 -S UP -r 512000 -D 0.0234375
+l -t * -s 40 -d 1287 -S UP -r 512000 -D 0.0078125
+l -t * -s 42 -d 1545 -S UP -r 512000 -D 0.015625
+l -t * -s 43 -d 1710 -S UP -r 512000 -D 0.0009765625
+l -t * -s 43 -d 113 -S UP -r 512000 -D 0.0009765625
+l -t * -s 44 -d 1664 -S UP -r 512000 -D 0.0009765625
+l -t * -s 44 -d 113 -S UP -r 512000 -D 0.0009765625
+l -t * -s 44 -d 45 -S UP -r 512000 -D 0.0009765625
+l -t * -s 45 -d 113 -S UP -r 512000 -D 0.0009765625
+l -t * -s 46 -d 113 -S UP -r 512000 -D 0.0009765625
+l -t * -s 47 -d 1545 -S UP -r 512000 -D 0.03125
+l -t * -s 47 -d 1434 -S UP -r 512000 -D 0.03125
+l -t * -s 48 -d 117 -S UP -r 512000 -D 0.0009765625
+l -t * -s 49 -d 120 -S UP -r 512000 -D 0.0078125
+l -t * -s 49 -d 117 -S UP -r 512000 -D 0.0078125
+l -t * -s 50 -d 1194 -S UP -r 512000 -D 0.0009765625
+l -t * -s 52 -d 132 -S UP -r 512000 -D 0.0009765625
+l -t * -s 53 -d 1608 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 1826 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 587 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 218 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 1828 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 589 -S UP -r 512000 -D 0.125
+l -t * -s 53 -d 145 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 588 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 1323 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 1340 -S UP -r 512000 -D 0.0625
+l -t * -s 53 -d 1432 -S UP -r 512000 -D 0.03125
+l -t * -s 53 -d 1678 -S UP -r 512000 -D 0.0439453125
+l -t * -s 54 -d 1829 -S UP -r 512000 -D 0.0009765625
+l -t * -s 54 -d 137 -S UP -r 512000 -D 0.0625
+l -t * -s 54 -d 138 -S UP -r 512000 -D 0.0625
+l -t * -s 54 -d 1184 -S UP -r 512000 -D 0.0625
+l -t * -s 54 -d 139 -S UP -r 512000 -D 0.0625
+l -t * -s 54 -d 56 -S UP -r 512000 -D 0.0625
+l -t * -s 54 -d 1788 -S UP -r 512000 -D 0.0625
+l -t * -s 55 -d 141 -S UP -r 512000 -D 0.03125
+l -t * -s 56 -d 99 -S UP -r 512000 -D 0.0625
+l -t * -s 56 -d 107 -S UP -r 512000 -D 0.0625
+l -t * -s 56 -d 1830 -S UP -r 512000 -D 0.03125
+l -t * -s 56 -d 148 -S UP -r 512000 -D 0.0625
+l -t * -s 56 -d 247 -S UP -r 512000 -D 0.0625
+l -t * -s 57 -d 1545 -S UP -r 512000 -D 0.03125
+l -t * -s 57 -d 152 -S UP -r 512000 -D 0.029296875
+l -t * -s 58 -d 156 -S UP -r 512000 -D 0.03125
+l -t * -s 58 -d 157 -S UP -r 512000 -D 0.03125
+l -t * -s 58 -d 158 -S UP -r 512000 -D 0.03125
+l -t * -s 58 -d 159 -S UP -r 512000 -D 0.03125
+l -t * -s 58 -d 160 -S UP -r 512000 -D 0.03125
+l -t * -s 58 -d 161 -S UP -r 512000 -D 0.03125
+l -t * -s 58 -d 162 -S UP -r 512000 -D 0.0009765625
+l -t * -s 59 -d 164 -S UP -r 512000 -D 0.0078125
+l -t * -s 59 -d 165 -S UP -r 512000 -D 0.0078125
+l -t * -s 59 -d 166 -S UP -r 512000 -D 0.03125
+l -t * -s 59 -d 167 -S UP -r 512000 -D 0.03125
+l -t * -s 60 -d 1405 -S UP -r 512000 -D 0.03125
+l -t * -s 60 -d 695 -S UP -r 512000 -D 0.03125
+l -t * -s 60 -d 818 -S UP -r 512000 -D 0.03125
+l -t * -s 61 -d 177 -S UP -r 512000 -D 0.0009765625
+l -t * -s 61 -d 176 -S UP -r 512000 -D 0.0009765625
+l -t * -s 63 -d 179 -S UP -r 512000 -D 0.0234375
+l -t * -s 64 -d 179 -S UP -r 512000 -D 0.0234375
+l -t * -s 64 -d 180 -S UP -r 512000 -D 0.0234375
+l -t * -s 65 -d 183 -S UP -r 512000 -D 0.0009765625
+l -t * -s 65 -d 179 -S UP -r 512000 -D 0.03125
+l -t * -s 65 -d 1462 -S UP -r 512000 -D 0.015625
+l -t * -s 65 -d 1831 -S UP -r 512000 -D 0.015625
+l -t * -s 65 -d 185 -S UP -r 512000 -D 0.03125
+l -t * -s 65 -d 170 -S UP -r 512000 -D 0.03125
+l -t * -s 65 -d 1169 -S UP -r 512000 -D 0.0078125
+l -t * -s 67 -d 158 -S UP -r 512000 -D 0.03125
+l -t * -s 67 -d 1126 -S UP -r 512000 -D 0.0068359375
+l -t * -s 68 -d 1775 -S UP -r 512000 -D 0.015625
+l -t * -s 68 -d 602 -S UP -r 512000 -D 0.0009765625
+l -t * -s 68 -d 603 -S UP -r 512000 -D 0.0009765625
+l -t * -s 68 -d 1248 -S UP -r 512000 -D 0.0009765625
+l -t * -s 68 -d 1273 -S UP -r 512000 -D 0.0009765625
+l -t * -s 69 -d 179 -S UP -r 512000 -D 0.125
+l -t * -s 70 -d 193 -S UP -r 512000 -D 0.00390625
+l -t * -s 71 -d 193 -S UP -r 512000 -D 0.0078125
+l -t * -s 72 -d 1484 -S UP -r 512000 -D 0.0078125
+l -t * -s 73 -d 1484 -S UP -r 512000 -D 0.0078125
+l -t * -s 74 -d 1546 -S UP -r 512000 -D 0.0009765625
+l -t * -s 74 -d 1775 -S UP -r 512000 -D 0.015625
+l -t * -s 74 -d 1484 -S UP -r 512000 -D 0.046875
+l -t * -s 74 -d 145 -S UP -r 512000 -D 0.0625
+l -t * -s 74 -d 606 -S UP -r 512000 -D 0.015625
+l -t * -s 74 -d 1357 -S UP -r 512000 -D 0.015625
+l -t * -s 75 -d 1484 -S UP -r 512000 -D 0.03125
+l -t * -s 76 -d 80 -S UP -r 512000 -D 0.0234375
+l -t * -s 77 -d 195 -S UP -r 512000 -D 0.0078125
+l -t * -s 77 -d 1832 -S UP -r 512000 -D 0.015625
+l -t * -s 78 -d 201 -S UP -r 512000 -D 0.0078125
+l -t * -s 78 -d 202 -S UP -r 512000 -D 0.0078125
+l -t * -s 78 -d 203 -S UP -r 512000 -D 0.0078125
+l -t * -s 78 -d 204 -S UP -r 512000 -D 0.0078125
+l -t * -s 79 -d 206 -S UP -r 512000 -D 0.0234375
+l -t * -s 79 -d 207 -S UP -r 512000 -D 0.0078125
+l -t * -s 79 -d 209 -S UP -r 512000 -D 0.0234375
+l -t * -s 79 -d 210 -S UP -r 512000 -D 0.0234375
+l -t * -s 79 -d 211 -S UP -r 512000 -D 0.0234375
+l -t * -s 80 -d 206 -S UP -r 512000 -D 0.0234375
+l -t * -s 80 -d 214 -S UP -r 512000 -D 0.0234375
+l -t * -s 80 -d 1721 -S UP -r 512000 -D 0.0234375
+l -t * -s 80 -d 215 -S UP -r 512000 -D 0.0234375
+l -t * -s 81 -d 1783 -S UP -r 512000 -D 0.0009765625
+l -t * -s 81 -d 110 -S UP -r 512000 -D 0.0009765625
+l -t * -s 81 -d 1781 -S UP -r 512000 -D 0.0009765625
+l -t * -s 81 -d 1688 -S UP -r 512000 -D 0.0009765625
+l -t * -s 81 -d 113 -S UP -r 512000 -D 0.0009765625
+l -t * -s 82 -d 1274 -S UP -r 512000 -D 0.0009765625
+l -t * -s 82 -d 1506 -S UP -r 512000 -D 0.03515625
+l -t * -s 83 -d 217 -S UP -r 512000 -D 0.0009765625
+l -t * -s 83 -d 218 -S UP -r 512000 -D 0.03125
+l -t * -s 83 -d 1068 -S UP -r 512000 -D 0.0009765625
+l -t * -s 83 -d 219 -S UP -r 512000 -D 0.0009765625
+l -t * -s 84 -d 220 -S UP -r 512000 -D 0.0078125
+l -t * -s 84 -d 221 -S UP -r 512000 -D 0.0234375
+l -t * -s 84 -d 222 -S UP -r 512000 -D 0.0234375
+l -t * -s 84 -d 223 -S UP -r 512000 -D 0.0234375
+l -t * -s 85 -d 224 -S UP -r 512000 -D 0.0009765625
+l -t * -s 88 -d 225 -S UP -r 512000 -D 0.0234375
+l -t * -s 89 -d 226 -S UP -r 512000 -D 0.015625
+l -t * -s 90 -d 227 -S UP -r 512000 -D 0.0625
+l -t * -s 90 -d 229 -S UP -r 512000 -D 0.0009765625
+l -t * -s 90 -d 230 -S UP -r 512000 -D 0.0009765625
+l -t * -s 91 -d 230 -S UP -r 512000 -D 0.0009765625
+l -t * -s 93 -d 231 -S UP -r 512000 -D 0.0234375
+l -t * -s 95 -d 232 -S UP -r 512000 -D 0.0009765625
+l -t * -s 96 -d 232 -S UP -r 512000 -D 0.0009765625
+l -t * -s 97 -d 1596 -S UP -r 512000 -D 0.0009765625
+l -t * -s 97 -d 1594 -S UP -r 512000 -D 0.0009765625
+l -t * -s 97 -d 1195 -S UP -r 512000 -D 0.015625
+l -t * -s 98 -d 1596 -S UP -r 512000 -D 0.046875
+l -t * -s 99 -d 1596 -S UP -r 512000 -D 0.046875
+l -t * -s 99 -d 237 -S UP -r 512000 -D 0.0625
+l -t * -s 99 -d 238 -S UP -r 512000 -D 0.046875
+l -t * -s 99 -d 156 -S UP -r 512000 -D 0.0625
+l -t * -s 99 -d 239 -S UP -r 512000 -D 0.015625
+l -t * -s 99 -d 240 -S UP -r 512000 -D 0.0078125
+l -t * -s 99 -d 1358 -S UP -r 512000 -D 0.0078125
+l -t * -s 100 -d 1596 -S UP -r 512000 -D 0.015625
+l -t * -s 100 -d 241 -S UP -r 512000 -D 0.015625
+l -t * -s 101 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 102 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 103 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 103 -d 244 -S UP -r 512000 -D 0.03125
+l -t * -s 104 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 105 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 106 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 106 -d 245 -S UP -r 512000 -D 0.03125
+l -t * -s 107 -d 1593 -S UP -r 512000 -D 0.03125
+l -t * -s 107 -d 1833 -S UP -r 512000 -D 0.0625
+l -t * -s 107 -d 246 -S UP -r 512000 -D 0.0390625
+l -t * -s 107 -d 118 -S UP -r 512000 -D 0.0390625
+l -t * -s 107 -d 119 -S UP -r 512000 -D 0.0390625
+l -t * -s 107 -d 1129 -S UP -r 512000 -D 0.0390625
+l -t * -s 107 -d 156 -S UP -r 512000 -D 0.046875
+l -t * -s 107 -d 293 -S UP -r 512000 -D 0.046875
+l -t * -s 107 -d 1596 -S UP -r 512000 -D 0.046875
+l -t * -s 107 -d 247 -S UP -r 512000 -D 0.015625
+l -t * -s 108 -d 305 -S UP -r 512000 -D 0.0009765625
+l -t * -s 108 -d 1416 -S UP -r 512000 -D 0.0009765625
+l -t * -s 109 -d 1753 -S UP -r 512000 -D 0.0009765625
+l -t * -s 109 -d 1754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 109 -d 1622 -S UP -r 512000 -D 0.0009765625
+l -t * -s 109 -d 1290 -S UP -r 512000 -D 0.0009765625
+l -t * -s 110 -d 1753 -S UP -r 512000 -D 0.0009765625
+l -t * -s 110 -d 1622 -S UP -r 512000 -D 0.0009765625
+l -t * -s 110 -d 1783 -S UP -r 512000 -D 0.0009765625
+l -t * -s 110 -d 1781 -S UP -r 512000 -D 0.0009765625
+l -t * -s 110 -d 113 -S UP -r 512000 -D 0.0009765625
+l -t * -s 110 -d 1688 -S UP -r 512000 -D 0.0009765625
+l -t * -s 111 -d 1834 -S UP -r 512000 -D 0.0009765625
+l -t * -s 111 -d 248 -S UP -r 512000 -D 0.03125
+l -t * -s 112 -d 248 -S UP -r 512000 -D 0.03125
+l -t * -s 113 -d 1783 -S UP -r 512000 -D 0.0009765625
+l -t * -s 113 -d 1781 -S UP -r 512000 -D 0.0009765625
+l -t * -s 113 -d 1688 -S UP -r 512000 -D 0.0009765625
+l -t * -s 114 -d 254 -S UP -r 512000 -D 0.0009765625
+l -t * -s 115 -d 1835 -S UP -r 512000 -D 0.0009765625
+l -t * -s 115 -d 1836 -S UP -r 512000 -D 0.0009765625
+l -t * -s 115 -d 254 -S UP -r 512000 -D 0.0009765625
+l -t * -s 116 -d 156 -S UP -r 512000 -D 0.0625
+l -t * -s 116 -d 258 -S UP -r 512000 -D 0.03125
+l -t * -s 116 -d 259 -S UP -r 512000 -D 0.03125
+l -t * -s 116 -d 260 -S UP -r 512000 -D 0.03125
+l -t * -s 116 -d 261 -S UP -r 512000 -D 0.03125
+l -t * -s 116 -d 1837 -S UP -r 512000 -D 0.03125
+l -t * -s 116 -d 1692 -S UP -r 512000 -D 0.0009765625
+l -t * -s 118 -d 1104 -S UP -r 512000 -D 0.005859375
+l -t * -s 118 -d 268 -S UP -r 512000 -D 0.005859375
+l -t * -s 118 -d 269 -S UP -r 512000 -D 0.005859375
+l -t * -s 118 -d 270 -S UP -r 512000 -D 0.005859375
+l -t * -s 119 -d 272 -S UP -r 512000 -D 0.0078125
+l -t * -s 119 -d 273 -S UP -r 512000 -D 0.0078125
+l -t * -s 119 -d 274 -S UP -r 512000 -D 0.015625
+l -t * -s 119 -d 1463 -S UP -r 512000 -D 0.015625
+l -t * -s 119 -d 275 -S UP -r 512000 -D 0.0078125
+l -t * -s 119 -d 1170 -S UP -r 512000 -D 0.03125
+l -t * -s 120 -d 283 -S UP -r 512000 -D 0.0009765625
+l -t * -s 120 -d 282 -S UP -r 512000 -D 0.0009765625
+l -t * -s 120 -d 284 -S UP -r 512000 -D 0.0078125
+l -t * -s 121 -d 156 -S UP -r 512000 -D 0.0625
+l -t * -s 121 -d 285 -S UP -r 512000 -D 0.0009765625
+l -t * -s 122 -d 285 -S UP -r 512000 -D 0.0009765625
+l -t * -s 123 -d 285 -S UP -r 512000 -D 0.0009765625
+l -t * -s 125 -d 1287 -S UP -r 512000 -D 0.00390625
+l -t * -s 126 -d 1287 -S UP -r 512000 -D 0.00390625
+l -t * -s 127 -d 289 -S UP -r 512000 -D 0.0009765625
+l -t * -s 128 -d 289 -S UP -r 512000 -D 0.0087890625
+l -t * -s 128 -d 1582 -S UP -r 512000 -D 0.0009765625
+l -t * -s 129 -d 289 -S UP -r 512000 -D 0.0087890625
+l -t * -s 130 -d 289 -S UP -r 512000 -D 0.0087890625
+l -t * -s 131 -d 289 -S UP -r 512000 -D 0.0087890625
+l -t * -s 132 -d 249 -S UP -r 512000 -D 0.03125
+l -t * -s 133 -d 290 -S UP -r 512000 -D 0.0009765625
+l -t * -s 134 -d 290 -S UP -r 512000 -D 0.0009765625
+l -t * -s 135 -d 289 -S UP -r 512000 -D 0.0087890625
+l -t * -s 136 -d 292 -S UP -r 512000 -D 0.0009765625
+l -t * -s 137 -d 1022 -S UP -r 512000 -D 0.0625
+l -t * -s 137 -d 432 -S UP -r 512000 -D 0.03125
+l -t * -s 137 -d 506 -S UP -r 512000 -D 0.00390625
+l -t * -s 137 -d 969 -S UP -r 512000 -D 0.001953125
+l -t * -s 138 -d 226 -S UP -r 512000 -D 0.03125
+l -t * -s 138 -d 295 -S UP -r 512000 -D 0.03125
+l -t * -s 138 -d 296 -S UP -r 512000 -D 0.03125
+l -t * -s 138 -d 297 -S UP -r 512000 -D 0.03125
+l -t * -s 138 -d 1309 -S UP -r 512000 -D 0.015625
+l -t * -s 139 -d 1304 -S UP -r 512000 -D 0.0009765625
+l -t * -s 139 -d 298 -S UP -r 512000 -D 0.03125
+l -t * -s 139 -d 299 -S UP -r 512000 -D 0.0625
+l -t * -s 139 -d 300 -S UP -r 512000 -D 0.0625
+l -t * -s 139 -d 1351 -S UP -r 512000 -D 0.0625
+l -t * -s 139 -d 1196 -S UP -r 512000 -D 0.0625
+l -t * -s 141 -d 249 -S UP -r 512000 -D 0.0009765625
+l -t * -s 141 -d 232 -S UP -r 512000 -D 0.03125
+l -t * -s 141 -d 1416 -S UP -r 512000 -D 0.03125
+l -t * -s 141 -d 1838 -S UP -r 512000 -D 0.03125
+l -t * -s 141 -d 1839 -S UP -r 512000 -D 0.0625
+l -t * -s 141 -d 612 -S UP -r 512000 -D 0.0625
+l -t * -s 141 -d 254 -S UP -r 512000 -D 0.09375
+l -t * -s 141 -d 1601 -S UP -r 512000 -D 0.0625
+l -t * -s 141 -d 1762 -S UP -r 512000 -D 0.0625
+l -t * -s 141 -d 248 -S UP -r 512000 -D 0.0625
+l -t * -s 141 -d 1258 -S UP -r 512000 -D 0.015625
+l -t * -s 141 -d 1407 -S UP -r 512000 -D 0.0625
+l -t * -s 142 -d 150 -S UP -r 512000 -D 0.0009765625
+l -t * -s 142 -d 143 -S UP -r 512000 -D 0.0009765625
+l -t * -s 143 -d 150 -S UP -r 512000 -D 0.0009765625
+l -t * -s 143 -d 309 -S UP -r 512000 -D 0.03125
+l -t * -s 143 -d 311 -S UP -r 512000 -D 0.015625
+l -t * -s 143 -d 312 -S UP -r 512000 -D 0.015625
+l -t * -s 143 -d 310 -S UP -r 512000 -D 0.0009765625
+l -t * -s 144 -d 1087 -S UP -r 512000 -D 0.0009765625
+l -t * -s 144 -d 145 -S UP -r 512000 -D 0.03125
+l -t * -s 144 -d 1603 -S UP -r 512000 -D 0.0009765625
+l -t * -s 145 -d 1603 -S UP -r 512000 -D 0.03125
+l -t * -s 145 -d 1840 -S UP -r 512000 -D 0.03125
+l -t * -s 145 -d 1833 -S UP -r 512000 -D 0.03125
+l -t * -s 145 -d 313 -S UP -r 512000 -D 0.03125
+l -t * -s 145 -d 314 -S UP -r 512000 -D 0.03125
+l -t * -s 145 -d 146 -S UP -r 512000 -D 0.03125
+l -t * -s 146 -d 318 -S UP -r 512000 -D 0.0009765625
+l -t * -s 146 -d 320 -S UP -r 512000 -D 0.03125
+l -t * -s 146 -d 321 -S UP -r 512000 -D 0.0078125
+l -t * -s 146 -d 193 -S UP -r 512000 -D 0.015625
+l -t * -s 146 -d 322 -S UP -r 512000 -D 0.03125
+l -t * -s 146 -d 195 -S UP -r 512000 -D 0.03125
+l -t * -s 146 -d 323 -S UP -r 512000 -D 0.0078125
+l -t * -s 146 -d 324 -S UP -r 512000 -D 0.0078125
+l -t * -s 146 -d 1231 -S UP -r 512000 -D 0.0625
+l -t * -s 146 -d 1307 -S UP -r 512000 -D 0.03125
+l -t * -s 149 -d 1525 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 615 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 1356 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 1350 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 617 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 1842 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 619 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 620 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 621 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 1197 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 1056 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 953 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 613 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 614 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 616 -S UP -r 512000 -D 0.0009765625
+l -t * -s 149 -d 618 -S UP -r 512000 -D 0.0009765625
+l -t * -s 149 -d 1160 -S UP -r 512000 -D 0.03125
+l -t * -s 149 -d 1198 -S UP -r 512000 -D 0.0009765625
+l -t * -s 149 -d 1509 -S UP -r 512000 -D 0.0625
+l -t * -s 149 -d 1656 -S UP -r 512000 -D 0.0009765625
+l -t * -s 152 -d 681 -S UP -r 512000 -D 0.029296875
+l -t * -s 152 -d 1322 -S UP -r 512000 -D 0.029296875
+l -t * -s 153 -d 311 -S UP -r 512000 -D 0.0009765625
+l -t * -s 154 -d 326 -S UP -r 512000 -D 0.0078125
+l -t * -s 155 -d 326 -S UP -r 512000 -D 0.03125
+l -t * -s 155 -d 330 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 1843 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 293 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 331 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 332 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 1585 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 1844 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 294 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 1833 -S UP -r 512000 -D 0.0625
+l -t * -s 156 -d 333 -S UP -r 512000 -D 0.03125
+l -t * -s 156 -d 1657 -S UP -r 512000 -D 0.0625
+l -t * -s 158 -d 332 -S UP -r 512000 -D 0.03125
+l -t * -s 159 -d 332 -S UP -r 512000 -D 0.03125
+l -t * -s 159 -d 339 -S UP -r 512000 -D 0.03125
+l -t * -s 159 -d 340 -S UP -r 512000 -D 0.0009765625
+l -t * -s 161 -d 332 -S UP -r 512000 -D 0.03125
+l -t * -s 161 -d 1225 -S UP -r 512000 -D 0.001953125
+l -t * -s 163 -d 342 -S UP -r 512000 -D 0.03125
+l -t * -s 163 -d 1845 -S UP -r 512000 -D 0.03125
+l -t * -s 164 -d 623 -S UP -r 512000 -D 0.0078125
+l -t * -s 164 -d 624 -S UP -r 512000 -D 0.03125
+l -t * -s 164 -d 625 -S UP -r 512000 -D 0.03125
+l -t * -s 164 -d 626 -S UP -r 512000 -D 0.03125
+l -t * -s 165 -d 346 -S UP -r 512000 -D 0.03125
+l -t * -s 165 -d 347 -S UP -r 512000 -D 0.03125
+l -t * -s 165 -d 1633 -S UP -r 512000 -D 0.03125
+l -t * -s 165 -d 345 -S UP -r 512000 -D 0.03125
+l -t * -s 167 -d 348 -S UP -r 512000 -D 0.0166015625
+l -t * -s 168 -d 1690 -S UP -r 512000 -D 0.03125
+l -t * -s 168 -d 174 -S UP -r 512000 -D 0.03125
+l -t * -s 168 -d 1383 -S UP -r 512000 -D 0.03125
+l -t * -s 168 -d 1562 -S UP -r 512000 -D 0.03125
+l -t * -s 168 -d 353 -S UP -r 512000 -D 0.03125
+l -t * -s 168 -d 355 -S UP -r 512000 -D 0.0009765625
+l -t * -s 168 -d 354 -S UP -r 512000 -D 0.0009765625
+l -t * -s 169 -d 353 -S UP -r 512000 -D 0.015625
+l -t * -s 169 -d 174 -S UP -r 512000 -D 0.03125
+l -t * -s 169 -d 356 -S UP -r 512000 -D 0.03125
+l -t * -s 169 -d 357 -S UP -r 512000 -D 0.015625
+l -t * -s 169 -d 1471 -S UP -r 512000 -D 0.015625
+l -t * -s 170 -d 308 -S UP -r 512000 -D 0.0009765625
+l -t * -s 170 -d 307 -S UP -r 512000 -D 0.0009765625
+l -t * -s 170 -d 353 -S UP -r 512000 -D 0.03125
+l -t * -s 171 -d 172 -S UP -r 512000 -D 0.0009765625
+l -t * -s 171 -d 1336 -S UP -r 512000 -D 0.0009765625
+l -t * -s 171 -d 353 -S UP -r 512000 -D 0.0009765625
+l -t * -s 172 -d 1336 -S UP -r 512000 -D 0.0009765625
+l -t * -s 172 -d 353 -S UP -r 512000 -D 0.0009765625
+l -t * -s 173 -d 353 -S UP -r 512000 -D 0.0009765625
+l -t * -s 174 -d 358 -S UP -r 512000 -D 0.001953125
+l -t * -s 174 -d 359 -S UP -r 512000 -D 0.03125
+l -t * -s 174 -d 361 -S UP -r 512000 -D 0.03125
+l -t * -s 174 -d 362 -S UP -r 512000 -D 0.03125
+l -t * -s 174 -d 353 -S UP -r 512000 -D 0.03125
+l -t * -s 174 -d 363 -S UP -r 512000 -D 0.03125
+l -t * -s 174 -d 1372 -S UP -r 512000 -D 0.001953125
+l -t * -s 174 -d 1373 -S UP -r 512000 -D 0.001953125
+l -t * -s 174 -d 1641 -S UP -r 512000 -D 0.001953125
+l -t * -s 174 -d 1715 -S UP -r 512000 -D 0.001953125
+l -t * -s 175 -d 353 -S UP -r 512000 -D 0.125
+l -t * -s 178 -d 364 -S UP -r 512000 -D 0.0009765625
+l -t * -s 179 -d 1846 -S UP -r 512000 -D 0.015625
+l -t * -s 179 -d 1847 -S UP -r 512000 -D 0.015625
+l -t * -s 181 -d 1524 -S UP -r 512000 -D 0.0009765625
+l -t * -s 181 -d 366 -S UP -r 512000 -D 0.0009765625
+l -t * -s 181 -d 365 -S UP -r 512000 -D 0.0009765625
+l -t * -s 181 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 181 -d 367 -S UP -r 512000 -D 0.0009765625
+l -t * -s 181 -d 368 -S UP -r 512000 -D 0.0009765625
+l -t * -s 182 -d 368 -S UP -r 512000 -D 0.03125
+l -t * -s 183 -d 1552 -S UP -r 512000 -D 0.03125
+l -t * -s 183 -d 1241 -S UP -r 512000 -D 0.03125
+l -t * -s 184 -d 304 -S UP -r 512000 -D 0.0009765625
+l -t * -s 187 -d 369 -S UP -r 512000 -D 0.0009765625
+l -t * -s 188 -d 370 -S UP -r 512000 -D 0.0009765625
+l -t * -s 189 -d 370 -S UP -r 512000 -D 0.00390625
+l -t * -s 190 -d 370 -S UP -r 512000 -D 0.0078125
+l -t * -s 190 -d 1446 -S UP -r 512000 -D 0.0078125
+l -t * -s 191 -d 370 -S UP -r 512000 -D 0.0078125
+l -t * -s 194 -d 371 -S UP -r 512000 -D 0.0078125
+l -t * -s 196 -d 372 -S UP -r 512000 -D 0.0009765625
+l -t * -s 197 -d 372 -S UP -r 512000 -D 0.0009765625
+l -t * -s 198 -d 200 -S UP -r 512000 -D 0.0009765625
+l -t * -s 198 -d 372 -S UP -r 512000 -D 0.0009765625
+l -t * -s 199 -d 372 -S UP -r 512000 -D 0.0009765625
+l -t * -s 205 -d 246 -S UP -r 512000 -D 0.015625
+l -t * -s 205 -d 374 -S UP -r 512000 -D 0.0078125
+l -t * -s 205 -d 373 -S UP -r 512000 -D 0.0009765625
+l -t * -s 206 -d 375 -S UP -r 512000 -D 0.0234375
+l -t * -s 206 -d 1171 -S UP -r 512000 -D 0.0234375
+l -t * -s 206 -d 377 -S UP -r 512000 -D 0.0234375
+l -t * -s 206 -d 378 -S UP -r 512000 -D 0.0234375
+l -t * -s 206 -d 1695 -S UP -r 512000 -D 0.0234375
+l -t * -s 207 -d 379 -S UP -r 512000 -D 0.00390625
+l -t * -s 207 -d 380 -S UP -r 512000 -D 0.00390625
+l -t * -s 207 -d 382 -S UP -r 512000 -D 0.00390625
+l -t * -s 207 -d 381 -S UP -r 512000 -D 0.00390625
+l -t * -s 208 -d 209 -S UP -r 512000 -D 0.0009765625
+l -t * -s 208 -d 385 -S UP -r 512000 -D 0.0029296875
+l -t * -s 208 -d 384 -S UP -r 512000 -D 0.0029296875
+l -t * -s 209 -d 386 -S UP -r 512000 -D 0.0078125
+l -t * -s 209 -d 383 -S UP -r 512000 -D 0.0029296875
+l -t * -s 209 -d 1232 -S UP -r 512000 -D 0.0029296875
+l -t * -s 210 -d 387 -S UP -r 512000 -D 0.0078125
+l -t * -s 210 -d 388 -S UP -r 512000 -D 0.0078125
+l -t * -s 210 -d 389 -S UP -r 512000 -D 0.0078125
+l -t * -s 211 -d 1848 -S UP -r 512000 -D 0.015625
+l -t * -s 212 -d 325 -S UP -r 512000 -D 0.015625
+l -t * -s 212 -d 246 -S UP -r 512000 -D 0.015625
+l -t * -s 213 -d 246 -S UP -r 512000 -D 0.015625
+l -t * -s 213 -d 1294 -S UP -r 512000 -D 0.0625
+l -t * -s 213 -d 328 -S UP -r 512000 -D 0.015625
+l -t * -s 213 -d 327 -S UP -r 512000 -D 0.0078125
+l -t * -s 213 -d 1849 -S UP -r 512000 -D 0.015625
+l -t * -s 213 -d 329 -S UP -r 512000 -D 0.0078125
+l -t * -s 213 -d 271 -S UP -r 512000 -D 0.015625
+l -t * -s 217 -d 1759 -S UP -r 512000 -D 0.0009765625
+l -t * -s 218 -d 1759 -S UP -r 512000 -D 0.03125
+l -t * -s 218 -d 588 -S UP -r 512000 -D 0.03125
+l -t * -s 220 -d 398 -S UP -r 512000 -D 0.0009765625
+l -t * -s 221 -d 399 -S UP -r 512000 -D 0.015625
+l -t * -s 221 -d 1510 -S UP -r 512000 -D 0.015625
+l -t * -s 222 -d 400 -S UP -r 512000 -D 0.0234375
+l -t * -s 224 -d 1223 -S UP -r 512000 -D 0.0078125
+l -t * -s 227 -d 237 -S UP -r 512000 -D 0.0625
+l -t * -s 227 -d 291 -S UP -r 512000 -D 0.0625
+l -t * -s 227 -d 401 -S UP -r 512000 -D 0.0625
+l -t * -s 227 -d 1239 -S UP -r 512000 -D 0.0625
+l -t * -s 227 -d 228 -S UP -r 512000 -D 0.0625
+l -t * -s 232 -d 1851 -S UP -r 512000 -D 0.0009765625
+l -t * -s 233 -d 1594 -S UP -r 512000 -D 0.0009765625
+l -t * -s 233 -d 1819 -S UP -r 512000 -D 0.0009765625
+l -t * -s 234 -d 1645 -S UP -r 512000 -D 0.0009765625
+l -t * -s 234 -d 1080 -S UP -r 512000 -D 0.0009765625
+l -t * -s 234 -d 1594 -S UP -r 512000 -D 0.0625
+l -t * -s 234 -d 405 -S UP -r 512000 -D 0.0625
+l -t * -s 234 -d 404 -S UP -r 512000 -D 0.0009765625
+l -t * -s 234 -d 1095 -S UP -r 512000 -D 0.146484375
+l -t * -s 235 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 235 -d 1195 -S UP -r 512000 -D 0.015625
+l -t * -s 236 -d 1594 -S UP -r 512000 -D 0.015625
+l -t * -s 236 -d 1195 -S UP -r 512000 -D 0.015625
+l -t * -s 237 -d 291 -S UP -r 512000 -D 0.0625
+l -t * -s 237 -d 1249 -S UP -r 512000 -D 0.0625
+l -t * -s 238 -d 406 -S UP -r 512000 -D 0.0234375
+l -t * -s 238 -d 407 -S UP -r 512000 -D 0.0234375
+l -t * -s 238 -d 411 -S UP -r 512000 -D 0.0234375
+l -t * -s 238 -d 412 -S UP -r 512000 -D 0.0234375
+l -t * -s 238 -d 408 -S UP -r 512000 -D 0.0234375
+l -t * -s 238 -d 409 -S UP -r 512000 -D 0.03125
+l -t * -s 238 -d 410 -S UP -r 512000 -D 0.0234375
+l -t * -s 239 -d 413 -S UP -r 512000 -D 0.009765625
+l -t * -s 239 -d 414 -S UP -r 512000 -D 0.009765625
+l -t * -s 239 -d 415 -S UP -r 512000 -D 0.009765625
+l -t * -s 239 -d 1441 -S UP -r 512000 -D 0.009765625
+l -t * -s 239 -d 1547 -S UP -r 512000 -D 0.009765625
+l -t * -s 239 -d 1553 -S UP -r 512000 -D 0.009765625
+l -t * -s 240 -d 1358 -S UP -r 512000 -D 0.0009765625
+l -t * -s 242 -d 417 -S UP -r 512000 -D 0.0009765625
+l -t * -s 242 -d 1595 -S UP -r 512000 -D 0.015625
+l -t * -s 243 -d 1595 -S UP -r 512000 -D 0.015625
+l -t * -s 245 -d 1852 -S UP -r 512000 -D 0.0009765625
+l -t * -s 246 -d 1853 -S UP -r 512000 -D 0.015625
+l -t * -s 246 -d 1610 -S UP -r 512000 -D 0.01171875
+l -t * -s 247 -d 421 -S UP -r 512000 -D 0.00390625
+l -t * -s 247 -d 293 -S UP -r 512000 -D 0.046875
+l -t * -s 247 -d 1594 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 643 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 623 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 644 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 1545 -S UP -r 512000 -D 0.03125
+l -t * -s 249 -d 784 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 645 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 676 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 646 -S UP -r 512000 -D 0.0625
+l -t * -s 249 -d 647 -S UP -r 512000 -D 0.125
+l -t * -s 249 -d 284 -S UP -r 512000 -D 0.03125
+l -t * -s 249 -d 642 -S UP -r 512000 -D 0.0009765625
+l -t * -s 250 -d 1545 -S UP -r 512000 -D 0.015625
+l -t * -s 250 -d 422 -S UP -r 512000 -D 0.015625
+l -t * -s 250 -d 1130 -S UP -r 512000 -D 0.015625
+l -t * -s 251 -d 1545 -S UP -r 512000 -D 0.015625
+l -t * -s 251 -d 424 -S UP -r 512000 -D 0.0078125
+l -t * -s 252 -d 1545 -S UP -r 512000 -D 0.03125
+l -t * -s 252 -d 1507 -S UP -r 512000 -D 0.0009765625
+l -t * -s 252 -d 1566 -S UP -r 512000 -D 0.0009765625
+l -t * -s 253 -d 1545 -S UP -r 512000 -D 0.03125
+l -t * -s 253 -d 1854 -S UP -r 512000 -D 0.03125
+l -t * -s 255 -d 1664 -S UP -r 512000 -D 0.0009765625
+l -t * -s 255 -d 1685 -S UP -r 512000 -D 0.0009765625
+l -t * -s 255 -d 1781 -S UP -r 512000 -D 0.0009765625
+l -t * -s 256 -d 1182 -S UP -r 512000 -D 0.0009765625
+l -t * -s 257 -d 392 -S UP -r 512000 -D 0.0078125
+l -t * -s 258 -d 425 -S UP -r 512000 -D 0.015625
+l -t * -s 262 -d 1305 -S UP -r 512000 -D 0.0009765625
+l -t * -s 263 -d 1305 -S UP -r 512000 -D 0.0009765625
+l -t * -s 264 -d 1305 -S UP -r 512000 -D 0.0009765625
+l -t * -s 265 -d 1305 -S UP -r 512000 -D 0.0009765625
+l -t * -s 267 -d 395 -S UP -r 512000 -D 0.015625
+l -t * -s 268 -d 341 -S UP -r 512000 -D 0.005859375
+l -t * -s 268 -d 1437 -S UP -r 512000 -D 0.005859375
+l -t * -s 269 -d 1199 -S UP -r 512000 -D 0.005859375
+l -t * -s 269 -d 334 -S UP -r 512000 -D 0.005859375
+l -t * -s 270 -d 335 -S UP -r 512000 -D 0.0009765625
+l -t * -s 270 -d 338 -S UP -r 512000 -D 0.0009765625
+l -t * -s 270 -d 336 -S UP -r 512000 -D 0.0009765625
+l -t * -s 270 -d 337 -S UP -r 512000 -D 0.0009765625
+l -t * -s 273 -d 343 -S UP -r 512000 -D 0.0078125
+l -t * -s 273 -d 344 -S UP -r 512000 -D 0.0078125
+l -t * -s 274 -d 1551 -S UP -r 512000 -D 0.0009765625
+l -t * -s 276 -d 1104 -S UP -r 512000 -D 0.0009765625
+l -t * -s 276 -d 1319 -S UP -r 512000 -D 0.0009765625
+l -t * -s 277 -d 1104 -S UP -r 512000 -D 0.0009765625
+l -t * -s 278 -d 1104 -S UP -r 512000 -D 0.0009765625
+l -t * -s 279 -d 1104 -S UP -r 512000 -D 0.0009765625
+l -t * -s 279 -d 1342 -S UP -r 512000 -D 0.0009765625
+l -t * -s 280 -d 1104 -S UP -r 512000 -D 0.005859375
+l -t * -s 280 -d 427 -S UP -r 512000 -D 0.0029296875
+l -t * -s 281 -d 1104 -S UP -r 512000 -D 0.005859375
+l -t * -s 282 -d 283 -S UP -r 512000 -D 0.0009765625
+l -t * -s 284 -d 390 -S UP -r 512000 -D 0.0078125
+l -t * -s 284 -d 1089 -S UP -r 512000 -D 0.0078125
+l -t * -s 284 -d 391 -S UP -r 512000 -D 0.015625
+l -t * -s 285 -d 286 -S UP -r 512000 -D 0.0009765625
+l -t * -s 285 -d 288 -S UP -r 512000 -D 0.0009765625
+l -t * -s 285 -d 287 -S UP -r 512000 -D 0.0009765625
+l -t * -s 286 -d 288 -S UP -r 512000 -D 0.0009765625
+l -t * -s 286 -d 287 -S UP -r 512000 -D 0.0009765625
+l -t * -s 287 -d 288 -S UP -r 512000 -D 0.0009765625
+l -t * -s 289 -d 290 -S UP -r 512000 -D 0.0087890625
+l -t * -s 289 -d 1180 -S UP -r 512000 -D 0.0087890625
+l -t * -s 291 -d 1132 -S UP -r 512000 -D 0.015625
+l -t * -s 291 -d 1133 -S UP -r 512000 -D 0.015625
+l -t * -s 292 -d 592 -S UP -r 512000 -D 0.03125
+l -t * -s 293 -d 294 -S UP -r 512000 -D 0.03125
+l -t * -s 293 -d 1657 -S UP -r 512000 -D 0.0625
+l -t * -s 293 -d 1843 -S UP -r 512000 -D 0.03125
+l -t * -s 296 -d 500 -S UP -r 512000 -D 0.015625
+l -t * -s 296 -d 1586 -S UP -r 512000 -D 0.03125
+l -t * -s 296 -d 1618 -S UP -r 512000 -D 0.015625
+l -t * -s 298 -d 942 -S UP -r 512000 -D 0.03125
+l -t * -s 298 -d 1001 -S UP -r 512000 -D 0.03125
+l -t * -s 298 -d 831 -S UP -r 512000 -D 0.03125
+l -t * -s 298 -d 899 -S UP -r 512000 -D 0.015625
+l -t * -s 298 -d 926 -S UP -r 512000 -D 0.0009765625
+l -t * -s 298 -d 1686 -S UP -r 512000 -D 0.0009765625
+l -t * -s 298 -d 643 -S UP -r 512000 -D 0.0625
+l -t * -s 298 -d 925 -S UP -r 512000 -D 0.0625
+l -t * -s 298 -d 921 -S UP -r 512000 -D 0.0009765625
+l -t * -s 298 -d 927 -S UP -r 512000 -D 0.03125
+l -t * -s 298 -d 1812 -S UP -r 512000 -D 0.03125
+l -t * -s 301 -d 1351 -S UP -r 512000 -D 0.0009765625
+l -t * -s 303 -d 476 -S UP -r 512000 -D 0.015625
+l -t * -s 303 -d 1855 -S UP -r 512000 -D 0.015625
+l -t * -s 304 -d 1831 -S UP -r 512000 -D 0.0009765625
+l -t * -s 304 -d 1856 -S UP -r 512000 -D 0.0009765625
+l -t * -s 304 -d 1857 -S UP -r 512000 -D 0.0009765625
+l -t * -s 305 -d 1416 -S UP -r 512000 -D 0.0009765625
+l -t * -s 305 -d 1669 -S UP -r 512000 -D 0.0009765625
+l -t * -s 306 -d 1416 -S UP -r 512000 -D 0.015625
+l -t * -s 308 -d 426 -S UP -r 512000 -D 0.0009765625
+l -t * -s 309 -d 666 -S UP -r 512000 -D 0.015625
+l -t * -s 309 -d 644 -S UP -r 512000 -D 0.03125
+l -t * -s 309 -d 1858 -S UP -r 512000 -D 0.03125
+l -t * -s 309 -d 1364 -S UP -r 512000 -D 0.03125
+l -t * -s 311 -d 1238 -S UP -r 512000 -D 0.03125
+l -t * -s 313 -d 609 -S UP -r 512000 -D 0.0009765625
+l -t * -s 314 -d 610 -S UP -r 512000 -D 0.03125
+l -t * -s 314 -d 523 -S UP -r 512000 -D 0.03125
+l -t * -s 314 -d 520 -S UP -r 512000 -D 0.03125
+l -t * -s 314 -d 1703 -S UP -r 512000 -D 0.03125
+l -t * -s 314 -d 611 -S UP -r 512000 -D 0.03125
+l -t * -s 316 -d 586 -S UP -r 512000 -D 0.03125
+l -t * -s 316 -d 1603 -S UP -r 512000 -D 0.0009765625
+l -t * -s 320 -d 667 -S UP -r 512000 -D 0.03125
+l -t * -s 320 -d 1158 -S UP -r 512000 -D 0.03125
+l -t * -s 322 -d 1634 -S UP -r 512000 -D 0.0009765625
+l -t * -s 323 -d 519 -S UP -r 512000 -D 0.0078125
+l -t * -s 323 -d 538 -S UP -r 512000 -D 0.0078125
+l -t * -s 323 -d 537 -S UP -r 512000 -D 0.0078125
+l -t * -s 323 -d 522 -S UP -r 512000 -D 0.0078125
+l -t * -s 323 -d 521 -S UP -r 512000 -D 0.0078125
+l -t * -s 323 -d 539 -S UP -r 512000 -D 0.0078125
+l -t * -s 324 -d 668 -S UP -r 512000 -D 0.0009765625
+l -t * -s 325 -d 1418 -S UP -r 512000 -D 0.015625
+l -t * -s 325 -d 1606 -S UP -r 512000 -D 0.015625
+l -t * -s 326 -d 644 -S UP -r 512000 -D 0.03125
+l -t * -s 326 -d 1233 -S UP -r 512000 -D 0.0078125
+l -t * -s 328 -d 1535 -S UP -r 512000 -D 0.015625
+l -t * -s 330 -d 1859 -S UP -r 512000 -D 0.03125
+l -t * -s 331 -d 1816 -S UP -r 512000 -D 0.015625
+l -t * -s 331 -d 429 -S UP -r 512000 -D 0.03125
+l -t * -s 331 -d 430 -S UP -r 512000 -D 0.03125
+l -t * -s 331 -d 431 -S UP -r 512000 -D 0.03125
+l -t * -s 331 -d 432 -S UP -r 512000 -D 0.03125
+l -t * -s 331 -d 1860 -S UP -r 512000 -D 0.03125
+l -t * -s 333 -d 432 -S UP -r 512000 -D 0.03125
+l -t * -s 333 -d 1860 -S UP -r 512000 -D 0.03125
+l -t * -s 333 -d 430 -S UP -r 512000 -D 0.03125
+l -t * -s 333 -d 429 -S UP -r 512000 -D 0.03125
+l -t * -s 335 -d 1366 -S UP -r 512000 -D 0.0009765625
+l -t * -s 335 -d 336 -S UP -r 512000 -D 0.0009765625
+l -t * -s 335 -d 337 -S UP -r 512000 -D 0.0009765625
+l -t * -s 335 -d 338 -S UP -r 512000 -D 0.0009765625
+l -t * -s 336 -d 338 -S UP -r 512000 -D 0.0009765625
+l -t * -s 336 -d 337 -S UP -r 512000 -D 0.0009765625
+l -t * -s 336 -d 1694 -S UP -r 512000 -D 0.0009765625
+l -t * -s 337 -d 338 -S UP -r 512000 -D 0.0009765625
+l -t * -s 339 -d 1572 -S UP -r 512000 -D 0.0078125
+l -t * -s 342 -d 1861 -S UP -r 512000 -D 0.0009765625
+l -t * -s 342 -d 644 -S UP -r 512000 -D 0.03125
+l -t * -s 345 -d 1520 -S UP -r 512000 -D 0.0009765625
+l -t * -s 346 -d 1419 -S UP -r 512000 -D 0.0078125
+l -t * -s 346 -d 1445 -S UP -r 512000 -D 0.0078125
+l -t * -s 349 -d 350 -S UP -r 512000 -D 0.0078125
+l -t * -s 349 -d 1598 -S UP -r 512000 -D 0.0078125
+l -t * -s 349 -d 351 -S UP -r 512000 -D 0.0078125
+l -t * -s 349 -d 1599 -S UP -r 512000 -D 0.0078125
+l -t * -s 349 -d 1757 -S UP -r 512000 -D 0.0078125
+l -t * -s 350 -d 1757 -S UP -r 512000 -D 0.0078125
+l -t * -s 350 -d 351 -S UP -r 512000 -D 0.0078125
+l -t * -s 350 -d 1598 -S UP -r 512000 -D 0.0078125
+l -t * -s 350 -d 1599 -S UP -r 512000 -D 0.0078125
+l -t * -s 350 -d 435 -S UP -r 512000 -D 0.015625
+l -t * -s 351 -d 1757 -S UP -r 512000 -D 0.0078125
+l -t * -s 351 -d 1598 -S UP -r 512000 -D 0.0078125
+l -t * -s 351 -d 1599 -S UP -r 512000 -D 0.0078125
+l -t * -s 352 -d 1598 -S UP -r 512000 -D 0.0234375
+l -t * -s 352 -d 1690 -S UP -r 512000 -D 0.0234375
+l -t * -s 353 -d 1336 -S UP -r 512000 -D 0.0009765625
+l -t * -s 353 -d 1471 -S UP -r 512000 -D 0.015625
+l -t * -s 353 -d 1359 -S UP -r 512000 -D 0.03125
+l -t * -s 356 -d 436 -S UP -r 512000 -D 0.001953125
+l -t * -s 358 -d 1715 -S UP -r 512000 -D 0.001953125
+l -t * -s 361 -d 1576 -S UP -r 512000 -D 0.0009765625
+l -t * -s 361 -d 437 -S UP -r 512000 -D 0.001953125
+l -t * -s 361 -d 1717 -S UP -r 512000 -D 0.001953125
+l -t * -s 361 -d 1234 -S UP -r 512000 -D 0.001953125
+l -t * -s 363 -d 433 -S UP -r 512000 -D 0.0009765625
+l -t * -s 364 -d 1077 -S UP -r 512000 -D 0.0009765625
+l -t * -s 364 -d 1489 -S UP -r 512000 -D 0.0625
+l -t * -s 364 -d 1367 -S UP -r 512000 -D 0.0009765625
+l -t * -s 365 -d 1689 -S UP -r 512000 -D 0.0009765625
+l -t * -s 365 -d 367 -S UP -r 512000 -D 0.0009765625
+l -t * -s 365 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 365 -d 366 -S UP -r 512000 -D 0.0009765625
+l -t * -s 365 -d 1524 -S UP -r 512000 -D 0.0009765625
+l -t * -s 365 -d 1544 -S UP -r 512000 -D 0.0009765625
+l -t * -s 366 -d 1578 -S UP -r 512000 -D 0.0009765625
+l -t * -s 366 -d 1689 -S UP -r 512000 -D 0.0009765625
+l -t * -s 366 -d 367 -S UP -r 512000 -D 0.0009765625
+l -t * -s 366 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 366 -d 1524 -S UP -r 512000 -D 0.0009765625
+l -t * -s 366 -d 1544 -S UP -r 512000 -D 0.0009765625
+l -t * -s 367 -d 1689 -S UP -r 512000 -D 0.0009765625
+l -t * -s 367 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 367 -d 1544 -S UP -r 512000 -D 0.0009765625
+l -t * -s 367 -d 1524 -S UP -r 512000 -D 0.0009765625
+l -t * -s 368 -d 672 -S UP -r 512000 -D 0.0625
+l -t * -s 368 -d 1544 -S UP -r 512000 -D 0.0009765625
+l -t * -s 368 -d 1172 -S UP -r 512000 -D 0.0625
+l -t * -s 368 -d 1540 -S UP -r 512000 -D 0.0009765625
+l -t * -s 369 -d 1593 -S UP -r 512000 -D 0.015625
+l -t * -s 369 -d 1124 -S UP -r 512000 -D 0.0078125
+l -t * -s 369 -d 1368 -S UP -r 512000 -D 0.00390625
+l -t * -s 370 -d 1593 -S UP -r 512000 -D 0.0078125
+l -t * -s 370 -d 1070 -S UP -r 512000 -D 0.00390625
+l -t * -s 371 -d 1593 -S UP -r 512000 -D 0.0078125
+l -t * -s 371 -d 1449 -S UP -r 512000 -D 0.0078125
+l -t * -s 371 -d 1447 -S UP -r 512000 -D 0.015625
+l -t * -s 372 -d 1593 -S UP -r 512000 -D 0.0078125
+l -t * -s 372 -d 1114 -S UP -r 512000 -D 0.0009765625
+l -t * -s 373 -d 1610 -S UP -r 512000 -D 0.01171875
+l -t * -s 373 -d 374 -S UP -r 512000 -D 0.0078125
+l -t * -s 375 -d 484 -S UP -r 512000 -D 0.0009765625
+l -t * -s 375 -d 483 -S UP -r 512000 -D 0.0009765625
+l -t * -s 375 -d 485 -S UP -r 512000 -D 0.0009765625
+l -t * -s 375 -d 486 -S UP -r 512000 -D 0.0009765625
+l -t * -s 375 -d 487 -S UP -r 512000 -D 0.0009765625
+l -t * -s 375 -d 501 -S UP -r 512000 -D 0.0009765625
+l -t * -s 375 -d 1587 -S UP -r 512000 -D 0.0009765625
+l -t * -s 377 -d 439 -S UP -r 512000 -D 0.0009765625
+l -t * -s 379 -d 440 -S UP -r 512000 -D 0.0009765625
+l -t * -s 383 -d 1297 -S UP -r 512000 -D 0.0029296875
+l -t * -s 386 -d 441 -S UP -r 512000 -D 0.00390625
+l -t * -s 386 -d 442 -S UP -r 512000 -D 0.00390625
+l -t * -s 390 -d 443 -S UP -r 512000 -D 0.0009765625
+l -t * -s 392 -d 1610 -S UP -r 512000 -D 0.015625
+l -t * -s 392 -d 1182 -S UP -r 512000 -D 0.0078125
+l -t * -s 393 -d 1610 -S UP -r 512000 -D 0.015625
+l -t * -s 394 -d 1610 -S UP -r 512000 -D 0.015625
+l -t * -s 395 -d 1610 -S UP -r 512000 -D 0.015625
+l -t * -s 396 -d 1610 -S UP -r 512000 -D 0.015625
+l -t * -s 402 -d 1239 -S UP -r 512000 -D 0.0625
+l -t * -s 404 -d 1080 -S UP -r 512000 -D 0.0009765625
+l -t * -s 406 -d 449 -S UP -r 512000 -D 0.0009765625
+l -t * -s 406 -d 450 -S UP -r 512000 -D 0.046875
+l -t * -s 406 -d 451 -S UP -r 512000 -D 0.015625
+l -t * -s 407 -d 412 -S UP -r 512000 -D 0.0234375
+l -t * -s 407 -d 452 -S UP -r 512000 -D 0.015625
+l -t * -s 407 -d 1134 -S UP -r 512000 -D 0.015625
+l -t * -s 413 -d 455 -S UP -r 512000 -D 0.0009765625
+l -t * -s 416 -d 456 -S UP -r 512000 -D 0.0009765625
+l -t * -s 416 -d 1294 -S UP -r 512000 -D 0.0048828125
+l -t * -s 416 -d 457 -S UP -r 512000 -D 0.0029296875
+l -t * -s 416 -d 448 -S UP -r 512000 -D 0.001953125
+l -t * -s 416 -d 1298 -S UP -r 512000 -D 0.001953125
+l -t * -s 418 -d 1593 -S UP -r 512000 -D 0.015625
+l -t * -s 418 -d 1480 -S UP -r 512000 -D 0.015625
+l -t * -s 418 -d 458 -S UP -r 512000 -D 0.0009765625
+l -t * -s 418 -d 459 -S UP -r 512000 -D 0.0078125
+l -t * -s 418 -d 460 -S UP -r 512000 -D 0.0009765625
+l -t * -s 418 -d 1647 -S UP -r 512000 -D 0.0625
+l -t * -s 419 -d 1593 -S UP -r 512000 -D 0.015625
+l -t * -s 421 -d 1104 -S UP -r 512000 -D 0.03125
+l -t * -s 423 -d 1136 -S UP -r 512000 -D 0.0009765625
+l -t * -s 426 -d 1550 -S UP -r 512000 -D 0.0009765625
+l -t * -s 427 -d 1360 -S UP -r 512000 -D 0.0029296875
+l -t * -s 428 -d 1360 -S UP -r 512000 -D 0.0029296875
+l -t * -s 429 -d 462 -S UP -r 512000 -D 0.03125
+l -t * -s 429 -d 463 -S UP -r 512000 -D 0.03125
+l -t * -s 429 -d 464 -S UP -r 512000 -D 0.03125
+l -t * -s 430 -d 453 -S UP -r 512000 -D 0.03125
+l -t * -s 431 -d 1736 -S UP -r 512000 -D 0.0009765625
+l -t * -s 432 -d 465 -S UP -r 512000 -D 0.03125
+l -t * -s 432 -d 1623 -S UP -r 512000 -D 0.013671875
+l -t * -s 432 -d 468 -S UP -r 512000 -D 0.013671875
+l -t * -s 432 -d 469 -S UP -r 512000 -D 0.013671875
+l -t * -s 432 -d 470 -S UP -r 512000 -D 0.013671875
+l -t * -s 432 -d 466 -S UP -r 512000 -D 0.013671875
+l -t * -s 432 -d 467 -S UP -r 512000 -D 0.013671875
+l -t * -s 434 -d 1416 -S UP -r 512000 -D 0.015625
+l -t * -s 434 -d 642 -S UP -r 512000 -D 0.0009765625
+l -t * -s 439 -d 1518 -S UP -r 512000 -D 0.0009765625
+l -t * -s 442 -d 472 -S UP -r 512000 -D 0.0009765625
+l -t * -s 442 -d 471 -S UP -r 512000 -D 0.0009765625
+l -t * -s 442 -d 1519 -S UP -r 512000 -D 0.0009765625
+l -t * -s 444 -d 759 -S UP -r 512000 -D 0.015625
+l -t * -s 444 -d 622 -S UP -r 512000 -D 0.0625
+l -t * -s 447 -d 1181 -S UP -r 512000 -D 0.0009765625
+l -t * -s 450 -d 474 -S UP -r 512000 -D 0.046875
+l -t * -s 450 -d 1324 -S UP -r 512000 -D 0.0234375
+l -t * -s 450 -d 475 -S UP -r 512000 -D 0.0234375
+l -t * -s 451 -d 478 -S UP -r 512000 -D 0.015625
+l -t * -s 451 -d 1712 -S UP -r 512000 -D 0.015625
+l -t * -s 452 -d 479 -S UP -r 512000 -D 0.0009765625
+l -t * -s 452 -d 480 -S UP -r 512000 -D 0.015625
+l -t * -s 464 -d 497 -S UP -r 512000 -D 0.03125
+l -t * -s 465 -d 473 -S UP -r 512000 -D 0.0009765625
+l -t * -s 471 -d 472 -S UP -r 512000 -D 0.0009765625
+l -t * -s 471 -d 1519 -S UP -r 512000 -D 0.0009765625
+l -t * -s 472 -d 1519 -S UP -r 512000 -D 0.0009765625
+l -t * -s 474 -d 482 -S UP -r 512000 -D 0.03125
+l -t * -s 474 -d 1220 -S UP -r 512000 -D 0.03125
+l -t * -s 476 -d 1800 -S UP -r 512000 -D 0.015625
+l -t * -s 483 -d 503 -S UP -r 512000 -D 0.0009765625
+l -t * -s 483 -d 504 -S UP -r 512000 -D 0.0009765625
+l -t * -s 488 -d 506 -S UP -r 512000 -D 0.00390625
+l -t * -s 490 -d 508 -S UP -r 512000 -D 0.001953125
+l -t * -s 491 -d 508 -S UP -r 512000 -D 0.0078125
+l -t * -s 491 -d 509 -S UP -r 512000 -D 0.0009765625
+l -t * -s 492 -d 508 -S UP -r 512000 -D 0.001953125
+l -t * -s 493 -d 709 -S UP -r 512000 -D 0.0048828125
+l -t * -s 496 -d 1438 -S UP -r 512000 -D 0.015625
+l -t * -s 496 -d 510 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 511 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 512 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 513 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 514 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 515 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 516 -S UP -r 512000 -D 0.0625
+l -t * -s 496 -d 1668 -S UP -r 512000 -D 0.0625
+l -t * -s 496 -d 1443 -S UP -r 512000 -D 0.15625
+l -t * -s 496 -d 517 -S UP -r 512000 -D 0.046875
+l -t * -s 496 -d 518 -S UP -r 512000 -D 0.03125
+l -t * -s 496 -d 1679 -S UP -r 512000 -D 0.03125
+l -t * -s 498 -d 520 -S UP -r 512000 -D 0.03125
+l -t * -s 499 -d 523 -S UP -r 512000 -D 0.03125
+l -t * -s 502 -d 1587 -S UP -r 512000 -D 0.0009765625
+l -t * -s 505 -d 1565 -S UP -r 512000 -D 0.0009765625
+l -t * -s 505 -d 1580 -S UP -r 512000 -D 0.0009765625
+l -t * -s 505 -d 1862 -S UP -r 512000 -D 0.0009765625
+l -t * -s 505 -d 606 -S UP -r 512000 -D 0.0009765625
+l -t * -s 508 -d 524 -S UP -r 512000 -D 0.03125
+l -t * -s 508 -d 1186 -S UP -r 512000 -D 0.0078125
+l -t * -s 510 -d 1468 -S UP -r 512000 -D 0.0009765625
+l -t * -s 510 -d 635 -S UP -r 512000 -D 0.0009765625
+l -t * -s 510 -d 1772 -S UP -r 512000 -D 0.03125
+l -t * -s 510 -d 526 -S UP -r 512000 -D 0.0009765625
+l -t * -s 510 -d 1150 -S UP -r 512000 -D 0.00390625
+l -t * -s 510 -d 528 -S UP -r 512000 -D 0.00390625
+l -t * -s 510 -d 529 -S UP -r 512000 -D 0.0078125
+l -t * -s 510 -d 1548 -S UP -r 512000 -D 0.03125
+l -t * -s 510 -d 525 -S UP -r 512000 -D 0.03125
+l -t * -s 510 -d 530 -S UP -r 512000 -D 0.03125
+l -t * -s 511 -d 721 -S UP -r 512000 -D 0.0078125
+l -t * -s 511 -d 722 -S UP -r 512000 -D 0.0078125
+l -t * -s 511 -d 723 -S UP -r 512000 -D 0.0078125
+l -t * -s 511 -d 1420 -S UP -r 512000 -D 0.0078125
+l -t * -s 512 -d 804 -S UP -r 512000 -D 0.015625
+l -t * -s 512 -d 805 -S UP -r 512000 -D 0.0625
+l -t * -s 512 -d 1012 -S UP -r 512000 -D 0.169921875
+l -t * -s 513 -d 531 -S UP -r 512000 -D 0.0009765625
+l -t * -s 513 -d 532 -S UP -r 512000 -D 0.0625
+l -t * -s 513 -d 533 -S UP -r 512000 -D 0.15625
+l -t * -s 513 -d 1577 -S UP -r 512000 -D 0.0009765625
+l -t * -s 513 -d 535 -S UP -r 512000 -D 0.0009765625
+l -t * -s 513 -d 534 -S UP -r 512000 -D 0.0009765625
+l -t * -s 514 -d 1178 -S UP -r 512000 -D 0.015625
+l -t * -s 514 -d 1803 -S UP -r 512000 -D 0.0009765625
+l -t * -s 514 -d 1804 -S UP -r 512000 -D 0.0009765625
+l -t * -s 515 -d 1105 -S UP -r 512000 -D 0.03125
+l -t * -s 516 -d 1624 -S UP -r 512000 -D 0.03125
+l -t * -s 516 -d 1020 -S UP -r 512000 -D 0.03125
+l -t * -s 518 -d 676 -S UP -r 512000 -D 0.03125
+l -t * -s 518 -d 536 -S UP -r 512000 -D 0.0009765625
+l -t * -s 518 -d 1218 -S UP -r 512000 -D 0.09375
+l -t * -s 519 -d 537 -S UP -r 512000 -D 0.0078125
+l -t * -s 519 -d 538 -S UP -r 512000 -D 0.0078125
+l -t * -s 521 -d 539 -S UP -r 512000 -D 0.0078125
+l -t * -s 521 -d 522 -S UP -r 512000 -D 0.0078125
+l -t * -s 522 -d 539 -S UP -r 512000 -D 0.0078125
+l -t * -s 523 -d 1765 -S UP -r 512000 -D 0.015625
+l -t * -s 523 -d 1758 -S UP -r 512000 -D 0.0078125
+l -t * -s 523 -d 1720 -S UP -r 512000 -D 0.03125
+l -t * -s 524 -d 1525 -S UP -r 512000 -D 0.0625
+l -t * -s 524 -d 1295 -S UP -r 512000 -D 0.0625
+l -t * -s 524 -d 541 -S UP -r 512000 -D 0.0625
+l -t * -s 524 -d 540 -S UP -r 512000 -D 0.0009765625
+l -t * -s 529 -d 683 -S UP -r 512000 -D 0.0009765625
+l -t * -s 529 -d 682 -S UP -r 512000 -D 0.0009765625
+l -t * -s 537 -d 538 -S UP -r 512000 -D 0.0078125
+l -t * -s 541 -d 599 -S UP -r 512000 -D 0.001953125
+l -t * -s 541 -d 600 -S UP -r 512000 -D 0.001953125
+l -t * -s 542 -d 1468 -S UP -r 512000 -D 0.046875
+l -t * -s 543 -d 729 -S UP -r 512000 -D 0.015625
+l -t * -s 544 -d 729 -S UP -r 512000 -D 0.0009765625
+l -t * -s 545 -d 1348 -S UP -r 512000 -D 0.03125
+l -t * -s 545 -d 1137 -S UP -r 512000 -D 0.0009765625
+l -t * -s 545 -d 730 -S UP -r 512000 -D 0.0009765625
+l -t * -s 546 -d 1304 -S UP -r 512000 -D 0.03125
+l -t * -s 546 -d 732 -S UP -r 512000 -D 0.0625
+l -t * -s 546 -d 733 -S UP -r 512000 -D 0.0625
+l -t * -s 546 -d 1191 -S UP -r 512000 -D 0.0625
+l -t * -s 546 -d 731 -S UP -r 512000 -D 0.03125
+l -t * -s 546 -d 1064 -S UP -r 512000 -D 0.0029296875
+l -t * -s 547 -d 623 -S UP -r 512000 -D 0.0078125
+l -t * -s 547 -d 1077 -S UP -r 512000 -D 0.046875
+l -t * -s 547 -d 1778 -S UP -r 512000 -D 0.03125
+l -t * -s 547 -d 1200 -S UP -r 512000 -D 0.03125
+l -t * -s 548 -d 1077 -S UP -r 512000 -D 0.0625
+l -t * -s 549 -d 1863 -S UP -r 512000 -D 0.015625
+l -t * -s 549 -d 1077 -S UP -r 512000 -D 0.0009765625
+l -t * -s 549 -d 1296 -S UP -r 512000 -D 0.0009765625
+l -t * -s 550 -d 627 -S UP -r 512000 -D 0.0009765625
+l -t * -s 550 -d 1077 -S UP -r 512000 -D 0.0009765625
+l -t * -s 551 -d 740 -S UP -r 512000 -D 0.015625
+l -t * -s 551 -d 1611 -S UP -r 512000 -D 0.15625
+l -t * -s 551 -d 709 -S UP -r 512000 -D 0.0625
+l -t * -s 551 -d 1272 -S UP -r 512000 -D 0.0625
+l -t * -s 551 -d 1400 -S UP -r 512000 -D 0.09375
+l -t * -s 551 -d 735 -S UP -r 512000 -D 0.09375
+l -t * -s 551 -d 736 -S UP -r 512000 -D 0.0625
+l -t * -s 551 -d 737 -S UP -r 512000 -D 0.0625
+l -t * -s 551 -d 738 -S UP -r 512000 -D 0.125
+l -t * -s 554 -d 679 -S UP -r 512000 -D 0.00390625
+l -t * -s 555 -d 563 -S UP -r 512000 -D 0.03125
+l -t * -s 555 -d 1500 -S UP -r 512000 -D 0.0009765625
+l -t * -s 556 -d 563 -S UP -r 512000 -D 0.0625
+l -t * -s 556 -d 1864 -S UP -r 512000 -D 0.0009765625
+l -t * -s 556 -d 1865 -S UP -r 512000 -D 0.0009765625
+l -t * -s 556 -d 1866 -S UP -r 512000 -D 0.0009765625
+l -t * -s 556 -d 1867 -S UP -r 512000 -D 0.0009765625
+l -t * -s 557 -d 563 -S UP -r 512000 -D 0.0625
+l -t * -s 557 -d 1868 -S UP -r 512000 -D 0.0009765625
+l -t * -s 557 -d 1869 -S UP -r 512000 -D 0.0009765625
+l -t * -s 558 -d 563 -S UP -r 512000 -D 0.03125
+l -t * -s 558 -d 1167 -S UP -r 512000 -D 0.0009765625
+l -t * -s 559 -d 563 -S UP -r 512000 -D 0.0625
+l -t * -s 559 -d 741 -S UP -r 512000 -D 0.0029296875
+l -t * -s 560 -d 1116 -S UP -r 512000 -D 0.0009765625
+l -t * -s 562 -d 563 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 645 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 1870 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 789 -S UP -r 512000 -D 0.0625
+l -t * -s 563 -d 754 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 748 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 1871 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 749 -S UP -r 512000 -D 0.03125
+l -t * -s 563 -d 1872 -S UP -r 512000 -D 0.03125
+l -t * -s 564 -d 645 -S UP -r 512000 -D 0.03125
+l -t * -s 565 -d 645 -S UP -r 512000 -D 0.03125
+l -t * -s 565 -d 750 -S UP -r 512000 -D 0.03125
+l -t * -s 565 -d 1873 -S UP -r 512000 -D 0.03125
+l -t * -s 566 -d 1118 -S UP -r 512000 -D 0.015625
+l -t * -s 566 -d 1575 -S UP -r 512000 -D 0.0078125
+l -t * -s 567 -d 754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 568 -d 754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 569 -d 754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 570 -d 754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 574 -d 614 -S UP -r 512000 -D 0.0625
+l -t * -s 574 -d 1509 -S UP -r 512000 -D 0.0625
+l -t * -s 575 -d 758 -S UP -r 512000 -D 0.0625
+l -t * -s 576 -d 758 -S UP -r 512000 -D 0.0625
+l -t * -s 577 -d 619 -S UP -r 512000 -D 0.0009765625
+l -t * -s 578 -d 619 -S UP -r 512000 -D 0.0009765625
+l -t * -s 579 -d 619 -S UP -r 512000 -D 0.0009765625
+l -t * -s 580 -d 619 -S UP -r 512000 -D 0.0009765625
+l -t * -s 581 -d 619 -S UP -r 512000 -D 0.0009765625
+l -t * -s 582 -d 619 -S UP -r 512000 -D 0.0009765625
+l -t * -s 583 -d 620 -S UP -r 512000 -D 0.03125
+l -t * -s 583 -d 1072 -S UP -r 512000 -D 0.046875
+l -t * -s 584 -d 620 -S UP -r 512000 -D 0.03125
+l -t * -s 585 -d 620 -S UP -r 512000 -D 0.03125
+l -t * -s 586 -d 640 -S UP -r 512000 -D 0.015625
+l -t * -s 586 -d 641 -S UP -r 512000 -D 0.015625
+l -t * -s 587 -d 1292 -S UP -r 512000 -D 0.0009765625
+l -t * -s 587 -d 1321 -S UP -r 512000 -D 0.0009765625
+l -t * -s 589 -d 1874 -S UP -r 512000 -D 0.0625
+l -t * -s 589 -d 1875 -S UP -r 512000 -D 0.0625
+l -t * -s 590 -d 760 -S UP -r 512000 -D 0.0078125
+l -t * -s 591 -d 760 -S UP -r 512000 -D 0.0078125
+l -t * -s 592 -d 760 -S UP -r 512000 -D 0.03125
+l -t * -s 593 -d 760 -S UP -r 512000 -D 0.0625
+l -t * -s 593 -d 669 -S UP -r 512000 -D 0.0009765625
+l -t * -s 594 -d 672 -S UP -r 512000 -D 0.0009765625
+l -t * -s 594 -d 1833 -S UP -r 512000 -D 0.0625
+l -t * -s 594 -d 612 -S UP -r 512000 -D 0.0625
+l -t * -s 594 -d 784 -S UP -r 512000 -D 0.0625
+l -t * -s 594 -d 764 -S UP -r 512000 -D 0.015625
+l -t * -s 595 -d 672 -S UP -r 512000 -D 0.0009765625
+l -t * -s 596 -d 784 -S UP -r 512000 -D 0.0625
+l -t * -s 596 -d 652 -S UP -r 512000 -D 0.03125
+l -t * -s 596 -d 651 -S UP -r 512000 -D 0.03125
+l -t * -s 596 -d 1484 -S UP -r 512000 -D 0.046875
+l -t * -s 596 -d 1876 -S UP -r 512000 -D 0.015625
+l -t * -s 596 -d 649 -S UP -r 512000 -D 0.03125
+l -t * -s 596 -d 650 -S UP -r 512000 -D 0.03125
+l -t * -s 596 -d 1155 -S UP -r 512000 -D 0.03125
+l -t * -s 597 -d 1435 -S UP -r 512000 -D 0.0009765625
+l -t * -s 597 -d 1085 -S UP -r 512000 -D 0.0009765625
+l -t * -s 597 -d 1057 -S UP -r 512000 -D 0.0009765625
+l -t * -s 597 -d 1388 -S UP -r 512000 -D 0.015625
+l -t * -s 597 -d 1433 -S UP -r 512000 -D 0.0078125
+l -t * -s 597 -d 1444 -S UP -r 512000 -D 0.0009765625
+l -t * -s 601 -d 1341 -S UP -r 512000 -D 0.0009765625
+l -t * -s 601 -d 653 -S UP -r 512000 -D 0.0009765625
+l -t * -s 601 -d 654 -S UP -r 512000 -D 0.0009765625
+l -t * -s 601 -d 655 -S UP -r 512000 -D 0.0009765625
+l -t * -s 602 -d 1156 -S UP -r 512000 -D 0.0009765625
+l -t * -s 602 -d 1235 -S UP -r 512000 -D 0.0009765625
+l -t * -s 604 -d 623 -S UP -r 512000 -D 0.015625
+l -t * -s 604 -d 770 -S UP -r 512000 -D 0.0078125
+l -t * -s 604 -d 656 -S UP -r 512000 -D 0.0078125
+l -t * -s 604 -d 657 -S UP -r 512000 -D 0.0078125
+l -t * -s 604 -d 771 -S UP -r 512000 -D 0.0078125
+l -t * -s 604 -d 772 -S UP -r 512000 -D 0.0078125
+l -t * -s 605 -d 657 -S UP -r 512000 -D 0.0078125
+l -t * -s 606 -d 1580 -S UP -r 512000 -D 0.0009765625
+l -t * -s 606 -d 1862 -S UP -r 512000 -D 0.0009765625
+l -t * -s 607 -d 623 -S UP -r 512000 -D 0.03125
+l -t * -s 607 -d 664 -S UP -r 512000 -D 0.0009765625
+l -t * -s 607 -d 665 -S UP -r 512000 -D 0.0009765625
+l -t * -s 611 -d 778 -S UP -r 512000 -D 0.0009765625
+l -t * -s 611 -d 777 -S UP -r 512000 -D 0.0009765625
+l -t * -s 611 -d 1617 -S UP -r 512000 -D 0.0009765625
+l -t * -s 611 -d 1227 -S UP -r 512000 -D 0.03125
+l -t * -s 611 -d 1386 -S UP -r 512000 -D 0.03125
+l -t * -s 612 -d 1094 -S UP -r 512000 -D 0.03125
+l -t * -s 612 -d 1168 -S UP -r 512000 -D 0.03125
+l -t * -s 612 -d 622 -S UP -r 512000 -D 0.046875
+l -t * -s 612 -d 1877 -S UP -r 512000 -D 0.0625
+l -t * -s 612 -d 1878 -S UP -r 512000 -D 0.0625
+l -t * -s 613 -d 959 -S UP -r 512000 -D 0.0625
+l -t * -s 613 -d 960 -S UP -r 512000 -D 0.0625
+l -t * -s 613 -d 934 -S UP -r 512000 -D 0.0625
+l -t * -s 613 -d 901 -S UP -r 512000 -D 0.0625
+l -t * -s 613 -d 758 -S UP -r 512000 -D 0.0625
+l -t * -s 613 -d 1252 -S UP -r 512000 -D 0.0009765625
+l -t * -s 613 -d 1559 -S UP -r 512000 -D 0.0009765625
+l -t * -s 614 -d 1818 -S UP -r 512000 -D 0.0009765625
+l -t * -s 616 -d 1192 -S UP -r 512000 -D 0.0009765625
+l -t * -s 619 -d 1293 -S UP -r 512000 -D 0.0009765625
+l -t * -s 620 -d 1879 -S UP -r 512000 -D 0.03125
+l -t * -s 620 -d 1631 -S UP -r 512000 -D 0.03125
+l -t * -s 622 -d 697 -S UP -r 512000 -D 0.015625
+l -t * -s 622 -d 1880 -S UP -r 512000 -D 0.0625
+l -t * -s 622 -d 700 -S UP -r 512000 -D 0.0009765625
+l -t * -s 622 -d 779 -S UP -r 512000 -D 0.0009765625
+l -t * -s 622 -d 780 -S UP -r 512000 -D 0.0009765625
+l -t * -s 622 -d 698 -S UP -r 512000 -D 0.0009765625
+l -t * -s 622 -d 699 -S UP -r 512000 -D 0.0009765625
+l -t * -s 623 -d 1881 -S UP -r 512000 -D 0.03125
+l -t * -s 623 -d 1341 -S UP -r 512000 -D 0.0009765625
+l -t * -s 625 -d 1811 -S UP -r 512000 -D 0.0029296875
+l -t * -s 627 -d 663 -S UP -r 512000 -D 0.03125
+l -t * -s 628 -d 1264 -S UP -r 512000 -D 0.0009765625
+l -t * -s 629 -d 671 -S UP -r 512000 -D 0.125
+l -t * -s 630 -d 671 -S UP -r 512000 -D 0.125
+l -t * -s 631 -d 671 -S UP -r 512000 -D 0.15625
+l -t * -s 631 -d 1569 -S UP -r 512000 -D 0.0009765625
+l -t * -s 632 -d 671 -S UP -r 512000 -D 0.1875
+l -t * -s 633 -d 673 -S UP -r 512000 -D 0.015625
+l -t * -s 634 -d 674 -S UP -r 512000 -D 0.03125
+l -t * -s 634 -d 1497 -S UP -r 512000 -D 0.0009765625
+l -t * -s 634 -d 1696 -S UP -r 512000 -D 0.0009765625
+l -t * -s 635 -d 1468 -S UP -r 512000 -D 0.00390625
+l -t * -s 635 -d 1543 -S UP -r 512000 -D 0.00390625
+l -t * -s 639 -d 1125 -S UP -r 512000 -D 0.0009765625
+l -t * -s 641 -d 1773 -S UP -r 512000 -D 0.0009765625
+l -t * -s 643 -d 1790 -S UP -r 512000 -D 0.0625
+l -t * -s 643 -d 886 -S UP -r 512000 -D 0.0625
+l -t * -s 643 -d 884 -S UP -r 512000 -D 0.0625
+l -t * -s 643 -d 1882 -S UP -r 512000 -D 0.03125
+l -t * -s 643 -d 885 -S UP -r 512000 -D 0.0625
+l -t * -s 643 -d 1327 -S UP -r 512000 -D 0.0625
+l -t * -s 643 -d 1640 -S UP -r 512000 -D 0.0009765625
+l -t * -s 643 -d 882 -S UP -r 512000 -D 0.0009765625
+l -t * -s 643 -d 883 -S UP -r 512000 -D 0.0625
+l -t * -s 643 -d 1369 -S UP -r 512000 -D 0.0625
+l -t * -s 644 -d 1883 -S UP -r 512000 -D 0.03125
+l -t * -s 644 -d 648 -S UP -r 512000 -D 0.03125
+l -t * -s 644 -d 1884 -S UP -r 512000 -D 0.03125
+l -t * -s 644 -d 1364 -S UP -r 512000 -D 0.03125
+l -t * -s 645 -d 1885 -S UP -r 512000 -D 0.0009765625
+l -t * -s 645 -d 1820 -S UP -r 512000 -D 0.0009765625
+l -t * -s 645 -d 1886 -S UP -r 512000 -D 0.03125
+l -t * -s 645 -d 1747 -S UP -r 512000 -D 0.03125
+l -t * -s 645 -d 788 -S UP -r 512000 -D 0.03125
+l -t * -s 646 -d 688 -S UP -r 512000 -D 0.0625
+l -t * -s 646 -d 792 -S UP -r 512000 -D 0.0068359375
+l -t * -s 646 -d 1538 -S UP -r 512000 -D 0.0068359375
+l -t * -s 646 -d 791 -S UP -r 512000 -D 0.0068359375
+l -t * -s 646 -d 793 -S UP -r 512000 -D 0.0625
+l -t * -s 647 -d 729 -S UP -r 512000 -D 0.03125
+l -t * -s 647 -d 1301 -S UP -r 512000 -D 0.03125
+l -t * -s 647 -d 734 -S UP -r 512000 -D 0.03125
+l -t * -s 647 -d 1470 -S UP -r 512000 -D 0.03125
+l -t * -s 648 -d 724 -S UP -r 512000 -D 0.0078125
+l -t * -s 652 -d 795 -S UP -r 512000 -D 0.03125
+l -t * -s 652 -d 796 -S UP -r 512000 -D 0.03125
+l -t * -s 653 -d 1343 -S UP -r 512000 -D 0.0009765625
+l -t * -s 653 -d 687 -S UP -r 512000 -D 0.0009765625
+l -t * -s 658 -d 798 -S UP -r 512000 -D 0.03125
+l -t * -s 658 -d 1351 -S UP -r 512000 -D 0.015625
+l -t * -s 658 -d 799 -S UP -r 512000 -D 0.03125
+l -t * -s 658 -d 1173 -S UP -r 512000 -D 0.015625
+l -t * -s 658 -d 1388 -S UP -r 512000 -D 0.0009765625
+l -t * -s 659 -d 1351 -S UP -r 512000 -D 0.0078125
+l -t * -s 660 -d 1351 -S UP -r 512000 -D 0.0078125
+l -t * -s 661 -d 1351 -S UP -r 512000 -D 0.0078125
+l -t * -s 662 -d 1662 -S UP -r 512000 -D 0.015625
+l -t * -s 662 -d 1396 -S UP -r 512000 -D 0.00390625
+l -t * -s 664 -d 1651 -S UP -r 512000 -D 0.0009765625
+l -t * -s 669 -d 1887 -S UP -r 512000 -D 0.0009765625
+l -t * -s 670 -d 1772 -S UP -r 512000 -D 0.03125
+l -t * -s 670 -d 1123 -S UP -r 512000 -D 0.0078125
+l -t * -s 670 -d 1394 -S UP -r 512000 -D 0.15625
+l -t * -s 670 -d 1655 -S UP -r 512000 -D 0.0009765625
+l -t * -s 671 -d 1772 -S UP -r 512000 -D 0.0009765625
+l -t * -s 671 -d 806 -S UP -r 512000 -D 0.15625
+l -t * -s 672 -d 1588 -S UP -r 512000 -D 0.015625
+l -t * -s 672 -d 1010 -S UP -r 512000 -D 0.0625
+l -t * -s 672 -d 1009 -S UP -r 512000 -D 0.0625
+l -t * -s 672 -d 1015 -S UP -r 512000 -D 0.0625
+l -t * -s 673 -d 1772 -S UP -r 512000 -D 0.125
+l -t * -s 674 -d 808 -S UP -r 512000 -D 0.0625
+l -t * -s 674 -d 1772 -S UP -r 512000 -D 0.03125
+l -t * -s 674 -d 809 -S UP -r 512000 -D 0.03125
+l -t * -s 674 -d 1119 -S UP -r 512000 -D 0.0625
+l -t * -s 675 -d 812 -S UP -r 512000 -D 0.0009765625
+l -t * -s 675 -d 811 -S UP -r 512000 -D 0.0009765625
+l -t * -s 675 -d 1772 -S UP -r 512000 -D 0.03125
+l -t * -s 675 -d 1533 -S UP -r 512000 -D 0.0009765625
+l -t * -s 675 -d 1288 -S UP -r 512000 -D 0.01953125
+l -t * -s 675 -d 1796 -S UP -r 512000 -D 0.0009765625
+l -t * -s 676 -d 1772 -S UP -r 512000 -D 0.03125
+l -t * -s 676 -d 1270 -S UP -r 512000 -D 0.0009765625
+l -t * -s 676 -d 746 -S UP -r 512000 -D 0.0625
+l -t * -s 676 -d 684 -S UP -r 512000 -D 0.0625
+l -t * -s 676 -d 1139 -S UP -r 512000 -D 0.03125
+l -t * -s 676 -d 747 -S UP -r 512000 -D 0.0625
+l -t * -s 677 -d 809 -S UP -r 512000 -D 0.0009765625
+l -t * -s 677 -d 1352 -S UP -r 512000 -D 0.0009765625
+l -t * -s 678 -d 809 -S UP -r 512000 -D 0.0625
+l -t * -s 679 -d 740 -S UP -r 512000 -D 0.0009765625
+l -t * -s 679 -d 813 -S UP -r 512000 -D 0.0009765625
+l -t * -s 679 -d 1532 -S UP -r 512000 -D 0.0009765625
+l -t * -s 679 -d 808 -S UP -r 512000 -D 0.09375
+l -t * -s 679 -d 814 -S UP -r 512000 -D 0.0625
+l -t * -s 680 -d 808 -S UP -r 512000 -D 0.03125
+l -t * -s 684 -d 757 -S UP -r 512000 -D 0.0009765625
+l -t * -s 684 -d 756 -S UP -r 512000 -D 0.0009765625
+l -t * -s 684 -d 755 -S UP -r 512000 -D 0.0009765625
+l -t * -s 685 -d 747 -S UP -r 512000 -D 0.0009765625
+l -t * -s 686 -d 1139 -S UP -r 512000 -D 0.03125
+l -t * -s 687 -d 1343 -S UP -r 512000 -D 0.0009765625
+l -t * -s 688 -d 1559 -S UP -r 512000 -D 0.0009765625
+l -t * -s 689 -d 1275 -S UP -r 512000 -D 0.0009765625
+l -t * -s 689 -d 818 -S UP -r 512000 -D 0.03125
+l -t * -s 690 -d 1276 -S UP -r 512000 -D 0.0009765625
+l -t * -s 690 -d 761 -S UP -r 512000 -D 0.03125
+l -t * -s 690 -d 762 -S UP -r 512000 -D 0.03125
+l -t * -s 690 -d 763 -S UP -r 512000 -D 0.03125
+l -t * -s 690 -d 819 -S UP -r 512000 -D 0.03125
+l -t * -s 690 -d 818 -S UP -r 512000 -D 0.03125
+l -t * -s 692 -d 1275 -S UP -r 512000 -D 0.0009765625
+l -t * -s 692 -d 818 -S UP -r 512000 -D 0.03125
+l -t * -s 693 -d 1330 -S UP -r 512000 -D 0.0009765625
+l -t * -s 693 -d 818 -S UP -r 512000 -D 0.03125
+l -t * -s 694 -d 1291 -S UP -r 512000 -D 0.0009765625
+l -t * -s 694 -d 818 -S UP -r 512000 -D 0.03125
+l -t * -s 695 -d 825 -S UP -r 512000 -D 0.03125
+l -t * -s 696 -d 1094 -S UP -r 512000 -D 0.0009765625
+l -t * -s 696 -d 1888 -S UP -r 512000 -D 0.0009765625
+l -t * -s 698 -d 767 -S UP -r 512000 -D 0.0009765625
+l -t * -s 700 -d 765 -S UP -r 512000 -D 0.0009765625
+l -t * -s 709 -d 822 -S UP -r 512000 -D 0.0029296875
+l -t * -s 710 -d 832 -S UP -r 512000 -D 0.0078125
+l -t * -s 711 -d 832 -S UP -r 512000 -D 0.0078125
+l -t * -s 712 -d 832 -S UP -r 512000 -D 0.0009765625
+l -t * -s 713 -d 833 -S UP -r 512000 -D 0.0009765625
+l -t * -s 713 -d 832 -S UP -r 512000 -D 0.0078125
+l -t * -s 714 -d 1421 -S UP -r 512000 -D 0.0009765625
+l -t * -s 714 -d 832 -S UP -r 512000 -D 0.0078125
+l -t * -s 715 -d 832 -S UP -r 512000 -D 0.0009765625
+l -t * -s 715 -d 785 -S UP -r 512000 -D 0.0009765625
+l -t * -s 716 -d 832 -S UP -r 512000 -D 0.0078125
+l -t * -s 717 -d 1397 -S UP -r 512000 -D 0.0009765625
+l -t * -s 717 -d 834 -S UP -r 512000 -D 0.03125
+l -t * -s 718 -d 787 -S UP -r 512000 -D 0.0009765625
+l -t * -s 718 -d 834 -S UP -r 512000 -D 0.03125
+l -t * -s 719 -d 834 -S UP -r 512000 -D 0.03125
+l -t * -s 720 -d 835 -S UP -r 512000 -D 0.0009765625
+l -t * -s 721 -d 1216 -S UP -r 512000 -D 0.0009765625
+l -t * -s 725 -d 1570 -S UP -r 512000 -D 0.0009765625
+l -t * -s 725 -d 726 -S UP -r 512000 -D 0.0009765625
+l -t * -s 726 -d 1570 -S UP -r 512000 -D 0.0009765625
+l -t * -s 727 -d 728 -S UP -r 512000 -D 0.0009765625
+l -t * -s 727 -d 1111 -S UP -r 512000 -D 0.0009765625
+l -t * -s 727 -d 1201 -S UP -r 512000 -D 0.0009765625
+l -t * -s 727 -d 1465 -S UP -r 512000 -D 0.0009765625
+l -t * -s 727 -d 1663 -S UP -r 512000 -D 0.0009765625
+l -t * -s 728 -d 1111 -S UP -r 512000 -D 0.0009765625
+l -t * -s 729 -d 1111 -S UP -r 512000 -D 0.0009765625
+l -t * -s 729 -d 1140 -S UP -r 512000 -D 0.015625
+l -t * -s 729 -d 1201 -S UP -r 512000 -D 0.0009765625
+l -t * -s 729 -d 1464 -S UP -r 512000 -D 0.015625
+l -t * -s 731 -d 1890 -S UP -r 512000 -D 0.0625
+l -t * -s 732 -d 1074 -S UP -r 512000 -D 0.0625
+l -t * -s 736 -d 971 -S UP -r 512000 -D 0.015625
+l -t * -s 736 -d 1409 -S UP -r 512000 -D 0.09375
+l -t * -s 739 -d 842 -S UP -r 512000 -D 0.1875
+l -t * -s 740 -d 813 -S UP -r 512000 -D 0.0009765625
+l -t * -s 748 -d 1000 -S UP -r 512000 -D 0.03125
+l -t * -s 750 -d 1891 -S UP -r 512000 -D 0.0009765625
+l -t * -s 751 -d 1543 -S UP -r 512000 -D 0.0009765625
+l -t * -s 752 -d 1543 -S UP -r 512000 -D 0.00390625
+l -t * -s 753 -d 1892 -S UP -r 512000 -D 0.0009765625
+l -t * -s 753 -d 1543 -S UP -r 512000 -D 0.15625
+l -t * -s 755 -d 757 -S UP -r 512000 -D 0.0009765625
+l -t * -s 758 -d 1479 -S UP -r 512000 -D 0.0625
+l -t * -s 758 -d 1632 -S UP -r 512000 -D 0.0625
+l -t * -s 760 -d 849 -S UP -r 512000 -D 0.0625
+l -t * -s 760 -d 1748 -S UP -r 512000 -D 0.0234375
+l -t * -s 760 -d 1511 -S UP -r 512000 -D 0.0234375
+l -t * -s 760 -d 1348 -S UP -r 512000 -D 0.03125
+l -t * -s 760 -d 850 -S UP -r 512000 -D 0.0625
+l -t * -s 760 -d 941 -S UP -r 512000 -D 0.0625
+l -t * -s 760 -d 1228 -S UP -r 512000 -D 0.0234375
+l -t * -s 760 -d 1344 -S UP -r 512000 -D 0.0078125
+l -t * -s 760 -d 1454 -S UP -r 512000 -D 0.00390625
+l -t * -s 761 -d 1276 -S UP -r 512000 -D 0.0009765625
+l -t * -s 762 -d 1276 -S UP -r 512000 -D 0.0009765625
+l -t * -s 763 -d 1278 -S UP -r 512000 -D 0.0009765625
+l -t * -s 768 -d 1335 -S UP -r 512000 -D 0.0009765625
+l -t * -s 769 -d 1893 -S UP -r 512000 -D 0.0009765625
+l -t * -s 769 -d 931 -S UP -r 512000 -D 0.0009765625
+l -t * -s 769 -d 1213 -S UP -r 512000 -D 0.0009765625
+l -t * -s 769 -d 1335 -S UP -r 512000 -D 0.0009765625
+l -t * -s 772 -d 853 -S UP -r 512000 -D 0.0078125
+l -t * -s 777 -d 778 -S UP -r 512000 -D 0.0009765625
+l -t * -s 777 -d 1617 -S UP -r 512000 -D 0.0009765625
+l -t * -s 777 -d 1227 -S UP -r 512000 -D 0.03125
+l -t * -s 778 -d 1617 -S UP -r 512000 -D 0.0009765625
+l -t * -s 778 -d 1227 -S UP -r 512000 -D 0.03125
+l -t * -s 781 -d 855 -S UP -r 512000 -D 0.015625
+l -t * -s 783 -d 1106 -S UP -r 512000 -D 0.00390625
+l -t * -s 784 -d 1203 -S UP -r 512000 -D 0.0625
+l -t * -s 784 -d 1653 -S UP -r 512000 -D 0.0625
+l -t * -s 784 -d 1801 -S UP -r 512000 -D 0.03125
+l -t * -s 784 -d 1113 -S UP -r 512000 -D 0.0625
+l -t * -s 789 -d 1894 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1895 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1896 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1897 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1898 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1899 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1900 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1901 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1902 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1903 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1904 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1905 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1906 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1907 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1908 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1909 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1910 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1911 -S UP -r 512000 -D 0.0009765625
+l -t * -s 789 -d 1912 -S UP -r 512000 -D 0.0009765625
+l -t * -s 790 -d 1026 -S UP -r 512000 -D 0.00390625
+l -t * -s 794 -d 1301 -S UP -r 512000 -D 0.0009765625
+l -t * -s 795 -d 838 -S UP -r 512000 -D 0.03125
+l -t * -s 797 -d 800 -S UP -r 512000 -D 0.0009765625
+l -t * -s 798 -d 858 -S UP -r 512000 -D 0.03125
+l -t * -s 798 -d 968 -S UP -r 512000 -D 0.0009765625
+l -t * -s 800 -d 859 -S UP -r 512000 -D 0.0009765625
+l -t * -s 801 -d 859 -S UP -r 512000 -D 0.0009765625
+l -t * -s 802 -d 859 -S UP -r 512000 -D 0.0009765625
+l -t * -s 803 -d 859 -S UP -r 512000 -D 0.0009765625
+l -t * -s 803 -d 1556 -S UP -r 512000 -D 0.0009765625
+l -t * -s 804 -d 1492 -S UP -r 512000 -D 0.0078125
+l -t * -s 805 -d 1311 -S UP -r 512000 -D 0.0009765625
+l -t * -s 805 -d 1581 -S UP -r 512000 -D 0.0009765625
+l -t * -s 805 -d 1705 -S UP -r 512000 -D 0.0009765625
+l -t * -s 805 -d 1560 -S UP -r 512000 -D 0.0009765625
+l -t * -s 807 -d 860 -S UP -r 512000 -D 0.03125
+l -t * -s 808 -d 1118 -S UP -r 512000 -D 0.09375
+l -t * -s 808 -d 1394 -S UP -r 512000 -D 0.0009765625
+l -t * -s 809 -d 861 -S UP -r 512000 -D 0.09375
+l -t * -s 809 -d 842 -S UP -r 512000 -D 0.03125
+l -t * -s 809 -d 862 -S UP -r 512000 -D 0.046875
+l -t * -s 811 -d 812 -S UP -r 512000 -D 0.0009765625
+l -t * -s 811 -d 1796 -S UP -r 512000 -D 0.0009765625
+l -t * -s 812 -d 1796 -S UP -r 512000 -D 0.0009765625
+l -t * -s 813 -d 1021 -S UP -r 512000 -D 0.00390625
+l -t * -s 813 -d 1264 -S UP -r 512000 -D 0.00390625
+l -t * -s 817 -d 864 -S UP -r 512000 -D 0.015625
+l -t * -s 818 -d 1236 -S UP -r 512000 -D 0.03125
+l -t * -s 818 -d 1065 -S UP -r 512000 -D 0.03125
+l -t * -s 818 -d 1268 -S UP -r 512000 -D 0.03125
+l -t * -s 819 -d 1276 -S UP -r 512000 -D 0.0009765625
+l -t * -s 820 -d 865 -S UP -r 512000 -D 0.0009765625
+l -t * -s 820 -d 827 -S UP -r 512000 -D 0.0009765625
+l -t * -s 821 -d 865 -S UP -r 512000 -D 0.0234375
+l -t * -s 821 -d 1325 -S UP -r 512000 -D 0.015625
+l -t * -s 826 -d 869 -S UP -r 512000 -D 0.0009765625
+l -t * -s 829 -d 870 -S UP -r 512000 -D 0.0009765625
+l -t * -s 830 -d 873 -S UP -r 512000 -D 0.03125
+l -t * -s 831 -d 1106 -S UP -r 512000 -D 0.00390625
+l -t * -s 832 -d 1022 -S UP -r 512000 -D 0.0009765625
+l -t * -s 832 -d 1667 -S UP -r 512000 -D 0.0009765625
+l -t * -s 832 -d 1766 -S UP -r 512000 -D 0.0078125
+l -t * -s 833 -d 881 -S UP -r 512000 -D 0.0625
+l -t * -s 834 -d 1022 -S UP -r 512000 -D 0.03125
+l -t * -s 834 -d 1691 -S UP -r 512000 -D 0.03125
+l -t * -s 835 -d 1327 -S UP -r 512000 -D 0.0009765625
+l -t * -s 836 -d 1327 -S UP -r 512000 -D 0.0009765625
+l -t * -s 837 -d 1772 -S UP -r 512000 -D 0.125
+l -t * -s 837 -d 1023 -S UP -r 512000 -D 0.00390625
+l -t * -s 837 -d 1024 -S UP -r 512000 -D 0.00390625
+l -t * -s 838 -d 840 -S UP -r 512000 -D 0.03125
+l -t * -s 838 -d 888 -S UP -r 512000 -D 0.03125
+l -t * -s 841 -d 1304 -S UP -r 512000 -D 0.03125
+l -t * -s 842 -d 1019 -S UP -r 512000 -D 0.015625
+l -t * -s 843 -d 1593 -S UP -r 512000 -D 0.0078125
+l -t * -s 843 -d 846 -S UP -r 512000 -D 0.0078125
+l -t * -s 844 -d 1249 -S UP -r 512000 -D 0.015625
+l -t * -s 845 -d 1249 -S UP -r 512000 -D 0.0009765625
+l -t * -s 849 -d 925 -S UP -r 512000 -D 0.0625
+l -t * -s 849 -d 997 -S UP -r 512000 -D 0.0625
+l -t * -s 849 -d 996 -S UP -r 512000 -D 0.015625
+l -t * -s 849 -d 1743 -S UP -r 512000 -D 0.0009765625
+l -t * -s 849 -d 998 -S UP -r 512000 -D 0.0009765625
+l -t * -s 850 -d 889 -S UP -r 512000 -D 0.0439453125
+l -t * -s 850 -d 890 -S UP -r 512000 -D 0.0439453125
+l -t * -s 850 -d 859 -S UP -r 512000 -D 0.03125
+l -t * -s 850 -d 865 -S UP -r 512000 -D 0.0625
+l -t * -s 850 -d 1746 -S UP -r 512000 -D 0.0439453125
+l -t * -s 850 -d 870 -S UP -r 512000 -D 0.03125
+l -t * -s 850 -d 893 -S UP -r 512000 -D 0.03125
+l -t * -s 850 -d 891 -S UP -r 512000 -D 0.0439453125
+l -t * -s 850 -d 892 -S UP -r 512000 -D 0.03125
+l -t * -s 852 -d 894 -S UP -r 512000 -D 0.0078125
+l -t * -s 854 -d 995 -S UP -r 512000 -D 0.0009765625
+l -t * -s 855 -d 899 -S UP -r 512000 -D 0.015625
+l -t * -s 860 -d 901 -S UP -r 512000 -D 0.0625
+l -t * -s 861 -d 1176 -S UP -r 512000 -D 0.0078125
+l -t * -s 862 -d 1120 -S UP -r 512000 -D 0.02734375
+l -t * -s 863 -d 902 -S UP -r 512000 -D 0.03125
+l -t * -s 864 -d 1356 -S UP -r 512000 -D 0.03125
+l -t * -s 865 -d 1568 -S UP -r 512000 -D 0.0234375
+l -t * -s 865 -d 1502 -S UP -r 512000 -D 0.0234375
+l -t * -s 866 -d 903 -S UP -r 512000 -D 0.0009765625
+l -t * -s 867 -d 903 -S UP -r 512000 -D 0.0009765625
+l -t * -s 868 -d 903 -S UP -r 512000 -D 0.0009765625
+l -t * -s 869 -d 1497 -S UP -r 512000 -D 0.0009765625
+l -t * -s 869 -d 1247 -S UP -r 512000 -D 0.0009765625
+l -t * -s 872 -d 1107 -S UP -r 512000 -D 0.00390625
+l -t * -s 873 -d 957 -S UP -r 512000 -D 0.03125
+l -t * -s 874 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 875 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 876 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 877 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 878 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 879 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 880 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 883 -d 1640 -S UP -r 512000 -D 0.0009765625
+l -t * -s 883 -d 907 -S UP -r 512000 -D 0.0625
+l -t * -s 885 -d 1681 -S UP -r 512000 -D 0.0009765625
+l -t * -s 886 -d 1141 -S UP -r 512000 -D 0.0625
+l -t * -s 889 -d 906 -S UP -r 512000 -D 0.0439453125
+l -t * -s 889 -d 909 -S UP -r 512000 -D 0.015625
+l -t * -s 889 -d 910 -S UP -r 512000 -D 0.015625
+l -t * -s 889 -d 911 -S UP -r 512000 -D 0.015625
+l -t * -s 890 -d 1028 -S UP -r 512000 -D 0.0439453125
+l -t * -s 891 -d 949 -S UP -r 512000 -D 0.0009765625
+l -t * -s 891 -d 950 -S UP -r 512000 -D 0.03125
+l -t * -s 891 -d 951 -S UP -r 512000 -D 0.03125
+l -t * -s 892 -d 948 -S UP -r 512000 -D 0.0009765625
+l -t * -s 893 -d 1029 -S UP -r 512000 -D 0.0009765625
+l -t * -s 894 -d 902 -S UP -r 512000 -D 0.03125
+l -t * -s 894 -d 1097 -S UP -r 512000 -D 0.0009765625
+l -t * -s 895 -d 1790 -S UP -r 512000 -D 0.03125
+l -t * -s 895 -d 912 -S UP -r 512000 -D 0.1875
+l -t * -s 895 -d 913 -S UP -r 512000 -D 0.03125
+l -t * -s 895 -d 1456 -S UP -r 512000 -D 0.03125
+l -t * -s 895 -d 914 -S UP -r 512000 -D 0.03125
+l -t * -s 895 -d 1913 -S UP -r 512000 -D 0.03125
+l -t * -s 895 -d 1098 -S UP -r 512000 -D 0.03125
+l -t * -s 895 -d 1281 -S UP -r 512000 -D 0.03125
+l -t * -s 896 -d 1022 -S UP -r 512000 -D 0.03125
+l -t * -s 897 -d 917 -S UP -r 512000 -D 0.0009765625
+l -t * -s 897 -d 1022 -S UP -r 512000 -D 0.0029296875
+l -t * -s 898 -d 1914 -S UP -r 512000 -D 0.03125
+l -t * -s 898 -d 1022 -S UP -r 512000 -D 0.03125
+l -t * -s 899 -d 922 -S UP -r 512000 -D 0.015625
+l -t * -s 899 -d 1174 -S UP -r 512000 -D 0.0009765625
+l -t * -s 900 -d 923 -S UP -r 512000 -D 0.0078125
+l -t * -s 901 -d 985 -S UP -r 512000 -D 0.0625
+l -t * -s 901 -d 984 -S UP -r 512000 -D 0.0625
+l -t * -s 901 -d 1479 -S UP -r 512000 -D 0.0625
+l -t * -s 901 -d 1619 -S UP -r 512000 -D 0.0625
+l -t * -s 902 -d 925 -S UP -r 512000 -D 0.0009765625
+l -t * -s 902 -d 993 -S UP -r 512000 -D 0.0625
+l -t * -s 902 -d 994 -S UP -r 512000 -D 0.03125
+l -t * -s 902 -d 1539 -S UP -r 512000 -D 0.03125
+l -t * -s 902 -d 995 -S UP -r 512000 -D 0.03125
+l -t * -s 902 -d 1061 -S UP -r 512000 -D 0.03125
+l -t * -s 902 -d 1142 -S UP -r 512000 -D 0.0625
+l -t * -s 903 -d 923 -S UP -r 512000 -D 0.0078125
+l -t * -s 904 -d 1601 -S UP -r 512000 -D 0.0009765625
+l -t * -s 904 -d 1604 -S UP -r 512000 -D 0.0009765625
+l -t * -s 904 -d 1329 -S UP -r 512000 -D 0.0009765625
+l -t * -s 905 -d 1821 -S UP -r 512000 -D 0.0009765625
+l -t * -s 905 -d 1109 -S UP -r 512000 -D 0.0009765625
+l -t * -s 905 -d 1215 -S UP -r 512000 -D 0.0009765625
+l -t * -s 906 -d 1028 -S UP -r 512000 -D 0.0439453125
+l -t * -s 906 -d 1821 -S UP -r 512000 -D 0.015625
+l -t * -s 907 -d 1613 -S UP -r 512000 -D 0.0009765625
+l -t * -s 907 -d 1640 -S UP -r 512000 -D 0.0009765625
+l -t * -s 908 -d 1528 -S UP -r 512000 -D 0.0009765625
+l -t * -s 908 -d 1461 -S UP -r 512000 -D 0.0009765625
+l -t * -s 908 -d 1460 -S UP -r 512000 -D 0.0009765625
+l -t * -s 908 -d 1614 -S UP -r 512000 -D 0.0009765625
+l -t * -s 908 -d 983 -S UP -r 512000 -D 0.0009765625
+l -t * -s 908 -d 929 -S UP -r 512000 -D 0.0009765625
+l -t * -s 910 -d 946 -S UP -r 512000 -D 0.0009765625
+l -t * -s 910 -d 947 -S UP -r 512000 -D 0.0009765625
+l -t * -s 910 -d 1417 -S UP -r 512000 -D 0.0009765625
+l -t * -s 910 -d 1429 -S UP -r 512000 -D 0.0009765625
+l -t * -s 911 -d 1329 -S UP -r 512000 -D 0.0009765625
+l -t * -s 911 -d 924 -S UP -r 512000 -D 0.0009765625
+l -t * -s 913 -d 970 -S UP -r 512000 -D 0.015625
+l -t * -s 913 -d 1567 -S UP -r 512000 -D 0.015625
+l -t * -s 913 -d 1031 -S UP -r 512000 -D 0.015625
+l -t * -s 914 -d 1887 -S UP -r 512000 -D 0.0009765625
+l -t * -s 915 -d 1792 -S UP -r 512000 -D 0.0009765625
+l -t * -s 918 -d 934 -S UP -r 512000 -D 0.0625
+l -t * -s 919 -d 934 -S UP -r 512000 -D 0.0625
+l -t * -s 920 -d 934 -S UP -r 512000 -D 0.0009765625
+l -t * -s 920 -d 938 -S UP -r 512000 -D 0.0009765625
+l -t * -s 921 -d 1450 -S UP -r 512000 -D 0.0009765625
+l -t * -s 921 -d 1451 -S UP -r 512000 -D 0.0009765625
+l -t * -s 923 -d 1203 -S UP -r 512000 -D 0.0625
+l -t * -s 923 -d 1107 -S UP -r 512000 -D 0.0625
+l -t * -s 923 -d 1048 -S UP -r 512000 -D 0.0078125
+l -t * -s 923 -d 1177 -S UP -r 512000 -D 0.0078125
+l -t * -s 923 -d 1795 -S UP -r 512000 -D 0.0078125
+l -t * -s 923 -d 1044 -S UP -r 512000 -D 0.0078125
+l -t * -s 923 -d 1211 -S UP -r 512000 -D 0.0078125
+l -t * -s 923 -d 1616 -S UP -r 512000 -D 0.0078125
+l -t * -s 924 -d 1329 -S UP -r 512000 -D 0.0009765625
+l -t * -s 926 -d 1682 -S UP -r 512000 -D 0.0009765625
+l -t * -s 926 -d 1451 -S UP -r 512000 -D 0.0009765625
+l -t * -s 927 -d 939 -S UP -r 512000 -D 0.015625
+l -t * -s 927 -d 940 -S UP -r 512000 -D 0.015625
+l -t * -s 928 -d 942 -S UP -r 512000 -D 0.0078125
+l -t * -s 928 -d 943 -S UP -r 512000 -D 0.03125
+l -t * -s 929 -d 1345 -S UP -r 512000 -D 0.0009765625
+l -t * -s 930 -d 1345 -S UP -r 512000 -D 0.0009765625
+l -t * -s 931 -d 1345 -S UP -r 512000 -D 0.0009765625
+l -t * -s 934 -d 1479 -S UP -r 512000 -D 0.125
+l -t * -s 934 -d 1027 -S UP -r 512000 -D 0.0625
+l -t * -s 935 -d 1109 -S UP -r 512000 -D 0.0009765625
+l -t * -s 936 -d 1109 -S UP -r 512000 -D 0.0009765625
+l -t * -s 950 -d 1746 -S UP -r 512000 -D 0.03125
+l -t * -s 953 -d 959 -S UP -r 512000 -D 0.0009765625
+l -t * -s 953 -d 956 -S UP -r 512000 -D 0.0009765625
+l -t * -s 953 -d 954 -S UP -r 512000 -D 0.0009765625
+l -t * -s 954 -d 980 -S UP -r 512000 -D 0.0009765625
+l -t * -s 954 -d 1776 -S UP -r 512000 -D 0.0009765625
+l -t * -s 955 -d 956 -S UP -r 512000 -D 0.0009765625
+l -t * -s 955 -d 1749 -S UP -r 512000 -D 0.0009765625
+l -t * -s 957 -d 960 -S UP -r 512000 -D 0.0625
+l -t * -s 957 -d 1038 -S UP -r 512000 -D 0.0078125
+l -t * -s 957 -d 1915 -S UP -r 512000 -D 0.03125
+l -t * -s 957 -d 1039 -S UP -r 512000 -D 0.03125
+l -t * -s 957 -d 982 -S UP -r 512000 -D 0.03125
+l -t * -s 957 -d 1574 -S UP -r 512000 -D 0.0009765625
+l -t * -s 960 -d 1303 -S UP -r 512000 -D 0.0009765625
+l -t * -s 960 -d 1479 -S UP -r 512000 -D 0.0625
+l -t * -s 960 -d 1040 -S UP -r 512000 -D 0.0625
+l -t * -s 960 -d 1144 -S UP -r 512000 -D 0.0625
+l -t * -s 962 -d 1175 -S UP -r 512000 -D 0.0009765625
+l -t * -s 963 -d 965 -S UP -r 512000 -D 0.0009765625
+l -t * -s 963 -d 1016 -S UP -r 512000 -D 0.0009765625
+l -t * -s 963 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 963 -d 1018 -S UP -r 512000 -D 0.0009765625
+l -t * -s 963 -d 964 -S UP -r 512000 -D 0.0009765625
+l -t * -s 963 -d 1017 -S UP -r 512000 -D 0.0009765625
+l -t * -s 964 -d 965 -S UP -r 512000 -D 0.0009765625
+l -t * -s 964 -d 1016 -S UP -r 512000 -D 0.0009765625
+l -t * -s 964 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 964 -d 1018 -S UP -r 512000 -D 0.0009765625
+l -t * -s 964 -d 1017 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 1016 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 1017 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 1018 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 966 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 1152 -S UP -r 512000 -D 0.0009765625
+l -t * -s 965 -d 1230 -S UP -r 512000 -D 0.0048828125
+l -t * -s 972 -d 973 -S UP -r 512000 -D 0.0009765625
+l -t * -s 972 -d 1041 -S UP -r 512000 -D 0.0009765625
+l -t * -s 973 -d 1041 -S UP -r 512000 -D 0.0009765625
+l -t * -s 974 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 975 -d 1483 -S UP -r 512000 -D 0.0009765625
+l -t * -s 975 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 977 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 978 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 979 -d 999 -S UP -r 512000 -D 0.0625
+l -t * -s 979 -d 1916 -S UP -r 512000 -D 0.0009765625
+l -t * -s 981 -d 1324 -S UP -r 512000 -D 0.015625
+l -t * -s 983 -d 1528 -S UP -r 512000 -D 0.0009765625
+l -t * -s 983 -d 1460 -S UP -r 512000 -D 0.0009765625
+l -t * -s 983 -d 1461 -S UP -r 512000 -D 0.0009765625
+l -t * -s 983 -d 1614 -S UP -r 512000 -D 0.0009765625
+l -t * -s 983 -d 1005 -S UP -r 512000 -D 0.0009765625
+l -t * -s 991 -d 1042 -S UP -r 512000 -D 0.0009765625
+l -t * -s 991 -d 1108 -S UP -r 512000 -D 0.0234375
+l -t * -s 991 -d 1011 -S UP -r 512000 -D 0.0009765625
+l -t * -s 993 -d 1145 -S UP -r 512000 -D 0.0009765625
+l -t * -s 993 -d 1452 -S UP -r 512000 -D 0.0009765625
+l -t * -s 993 -d 1767 -S UP -r 512000 -D 0.03125
+l -t * -s 998 -d 1485 -S UP -r 512000 -D 0.0009765625
+l -t * -s 999 -d 1118 -S UP -r 512000 -D 0.109375
+l -t * -s 1010 -d 1549 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1010 -d 1718 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1015 -d 1917 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1016 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1016 -d 1017 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1016 -d 1018 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1017 -d 1018 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1017 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1018 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1021 -d 1265 -S UP -r 512000 -D 0.001953125
+l -t * -s 1022 -d 1790 -S UP -r 512000 -D 0.03125
+l -t * -s 1022 -d 1918 -S UP -r 512000 -D 0.03125
+l -t * -s 1026 -d 1351 -S UP -r 512000 -D 0.03125
+l -t * -s 1027 -d 1175 -S UP -r 512000 -D 0.015625
+l -t * -s 1030 -d 1067 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1030 -d 1482 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1030 -d 1045 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1032 -d 1402 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1032 -d 1190 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1032 -d 1034 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1032 -d 1770 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1033 -d 1770 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1035 -d 1702 -S UP -r 512000 -D 0.0625
+l -t * -s 1036 -d 1483 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1037 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1039 -d 1919 -S UP -r 512000 -D 0.03125
+l -t * -s 1041 -d 1454 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1049 -d 1067 -S UP -r 512000 -D 0.03125
+l -t * -s 1049 -d 1051 -S UP -r 512000 -D 0.015625
+l -t * -s 1049 -d 1050 -S UP -r 512000 -D 0.015625
+l -t * -s 1049 -d 1055 -S UP -r 512000 -D 0.015625
+l -t * -s 1051 -d 1055 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1052 -d 1484 -S UP -r 512000 -D 0.001953125
+l -t * -s 1052 -d 1808 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1053 -d 1054 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1053 -d 1302 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1056 -d 1100 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1057 -d 1085 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1058 -d 1107 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1058 -d 1666 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1058 -d 1684 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1062 -d 1784 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1062 -d 1079 -S UP -r 512000 -D 0.0048828125
+l -t * -s 1063 -d 1074 -S UP -r 512000 -D 0.03125
+l -t * -s 1067 -d 1833 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1525 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1074 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1090 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1079 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1083 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1084 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1436 -S UP -r 512000 -D 0.03125
+l -t * -s 1067 -d 1243 -S UP -r 512000 -D 0.03125
+l -t * -s 1067 -d 1439 -S UP -r 512000 -D 0.03125
+l -t * -s 1067 -d 1926 -S UP -r 512000 -D 0.0625
+l -t * -s 1067 -d 1644 -S UP -r 512000 -D 0.03125
+l -t * -s 1067 -d 1794 -S UP -r 512000 -D 0.03125
+l -t * -s 1068 -d 1759 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1069 -d 1104 -S UP -r 512000 -D 0.0029296875
+l -t * -s 1069 -d 1103 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1071 -d 1303 -S UP -r 512000 -D 0.03125
+l -t * -s 1072 -d 1484 -S UP -r 512000 -D 0.046875
+l -t * -s 1072 -d 1146 -S UP -r 512000 -D 0.03125
+l -t * -s 1074 -d 1790 -S UP -r 512000 -D 0.0625
+l -t * -s 1074 -d 1088 -S UP -r 512000 -D 0.0625
+l -t * -s 1074 -d 1082 -S UP -r 512000 -D 0.0625
+l -t * -s 1074 -d 1091 -S UP -r 512000 -D 0.03125
+l -t * -s 1074 -d 1092 -S UP -r 512000 -D 0.03125
+l -t * -s 1074 -d 1099 -S UP -r 512000 -D 0.03125
+l -t * -s 1076 -d 1559 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1077 -d 1751 -S UP -r 512000 -D 0.03125
+l -t * -s 1079 -d 1081 -S UP -r 512000 -D 0.0625
+l -t * -s 1079 -d 1240 -S UP -r 512000 -D 0.0048828125
+l -t * -s 1080 -d 1626 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1080 -d 1645 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1082 -d 1928 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1083 -d 1929 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1083 -d 1930 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1089 -d 1161 -S UP -r 512000 -D 0.0078125
+l -t * -s 1089 -d 1513 -S UP -r 512000 -D 0.0078125
+l -t * -s 1089 -d 1530 -S UP -r 512000 -D 0.0078125
+l -t * -s 1089 -d 1584 -S UP -r 512000 -D 0.0078125
+l -t * -s 1094 -d 1168 -S UP -r 512000 -D 0.03125
+l -t * -s 1094 -d 1888 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1099 -d 1102 -S UP -r 512000 -D 0.03125
+l -t * -s 1101 -d 1931 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1101 -d 1210 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1101 -d 1112 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1103 -d 1206 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1104 -d 1932 -S UP -r 512000 -D 0.005859375
+l -t * -s 1104 -d 1154 -S UP -r 512000 -D 0.0029296875
+l -t * -s 1104 -d 1360 -S UP -r 512000 -D 0.005859375
+l -t * -s 1104 -d 1782 -S UP -r 512000 -D 0.005859375
+l -t * -s 1104 -d 1319 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1107 -d 1212 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1107 -d 1209 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1673 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1672 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1675 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1674 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1671 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1108 -d 1608 -S UP -r 512000 -D 0.03125
+l -t * -s 1108 -d 1670 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1109 -d 1821 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1109 -d 1495 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1109 -d 1215 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1110 -d 1821 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1110 -d 1933 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1110 -d 1215 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1112 -d 1210 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1112 -d 1931 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1112 -d 1934 -S UP -r 512000 -D 0.03125
+l -t * -s 1112 -d 1935 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1113 -d 1637 -S UP -r 512000 -D 0.03125
+l -t * -s 1120 -d 1936 -S UP -r 512000 -D 0.0234375
+l -t * -s 1122 -d 1772 -S UP -r 512000 -D 0.03125
+l -t * -s 1122 -d 1937 -S UP -r 512000 -D 0.03125
+l -t * -s 1122 -d 1522 -S UP -r 512000 -D 0.03125
+l -t * -s 1122 -d 1620 -S UP -r 512000 -D 0.03125
+l -t * -s 1122 -d 1704 -S UP -r 512000 -D 0.125
+l -t * -s 1122 -d 1711 -S UP -r 512000 -D 0.15625
+l -t * -s 1123 -d 1147 -S UP -r 512000 -D 0.0078125
+l -t * -s 1123 -d 1370 -S UP -r 512000 -D 0.0078125
+l -t * -s 1125 -d 1356 -S UP -r 512000 -D 0.0625
+l -t * -s 1129 -d 1806 -S UP -r 512000 -D 0.03125
+l -t * -s 1129 -d 1262 -S UP -r 512000 -D 0.03125
+l -t * -s 1129 -d 1612 -S UP -r 512000 -D 0.015625
+l -t * -s 1129 -d 1722 -S UP -r 512000 -D 0.03125
+l -t * -s 1129 -d 1217 -S UP -r 512000 -D 0.03125
+l -t * -s 1132 -d 1133 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1134 -d 1938 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1134 -d 1755 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1136 -d 1807 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1136 -d 1939 -S UP -r 512000 -D 0.0625
+l -t * -s 1139 -d 1207 -S UP -r 512000 -D 0.0625
+l -t * -s 1140 -d 1428 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1140 -d 1411 -S UP -r 512000 -D 0.015625
+l -t * -s 1140 -d 1448 -S UP -r 512000 -D 0.015625
+l -t * -s 1141 -d 1555 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1142 -d 1539 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1143 -d 1940 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1143 -d 1609 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1143 -d 1215 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1145 -d 1163 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1145 -d 1164 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1145 -d 1165 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1145 -d 1378 -S UP -r 512000 -D 0.03125
+l -t * -s 1145 -d 1810 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1146 -d 1303 -S UP -r 512000 -D 0.03125
+l -t * -s 1147 -d 1284 -S UP -r 512000 -D 0.0078125
+l -t * -s 1152 -d 1713 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1153 -d 1762 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1154 -d 1157 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1158 -d 1941 -S UP -r 512000 -D 0.03125
+l -t * -s 1159 -d 1593 -S UP -r 512000 -D 0.0078125
+l -t * -s 1160 -d 1183 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1162 -d 1333 -S UP -r 512000 -D 0.015625
+l -t * -s 1165 -d 1378 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1169 -d 1339 -S UP -r 512000 -D 0.0078125
+l -t * -s 1175 -d 1312 -S UP -r 512000 -D 0.0625
+l -t * -s 1181 -d 1625 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1181 -d 1629 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1181 -d 1628 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1181 -d 1630 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1181 -d 1626 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1724 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1725 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1726 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1942 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1727 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1728 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1768 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1729 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1943 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1730 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1744 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1731 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1732 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1733 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1734 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1735 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1183 -d 1944 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1184 -d 1570 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1186 -d 1193 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1187 -d 1272 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1187 -d 1440 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1187 -d 1531 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1187 -d 1750 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1187 -d 1771 -S UP -r 512000 -D 0.05859375
+l -t * -s 1189 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1194 -d 1287 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1195 -d 1337 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1195 -d 1945 -S UP -r 512000 -D 0.015625
+l -t * -s 1203 -d 1693 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1205 -d 1230 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1205 -d 1219 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1209 -d 1212 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1210 -d 1931 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1211 -d 1795 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1213 -d 1818 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1213 -d 1335 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1213 -d 1334 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1214 -d 1772 -S UP -r 512000 -D 0.15625
+l -t * -s 1214 -d 1256 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1214 -d 1652 -S UP -r 512000 -D 0.029296875
+l -t * -s 1215 -d 1821 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1215 -d 1940 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1215 -d 1609 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1219 -d 1230 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1221 -d 1946 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1221 -d 1222 -S UP -r 512000 -D 0.09765625
+l -t * -s 1221 -d 1333 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1226 -d 1244 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1227 -d 1353 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1227 -d 1349 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1229 -d 1611 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1237 -d 1348 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1237 -d 1279 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1241 -d 1354 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1243 -d 1947 -S UP -r 512000 -D 0.001953125
+l -t * -s 1245 -d 1356 -S UP -r 512000 -D 0.03125
+l -t * -s 1247 -d 1253 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1247 -d 1379 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1247 -d 1254 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1247 -d 1255 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1247 -d 1267 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1249 -d 1505 -S UP -r 512000 -D 0.015625
+l -t * -s 1249 -d 1723 -S UP -r 512000 -D 0.015625
+l -t * -s 1249 -d 1277 -S UP -r 512000 -D 0.015625
+l -t * -s 1249 -d 1442 -S UP -r 512000 -D 0.015625
+l -t * -s 1250 -d 1489 -S UP -r 512000 -D 0.0625
+l -t * -s 1251 -d 1703 -S UP -r 512000 -D 0.03125
+l -t * -s 1264 -d 1313 -S UP -r 512000 -D 0.001953125
+l -t * -s 1264 -d 1316 -S UP -r 512000 -D 0.001953125
+l -t * -s 1266 -d 1669 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1269 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1270 -d 1326 -S UP -r 512000 -D 0.109375
+l -t * -s 1271 -d 1304 -S UP -r 512000 -D 0.0625
+l -t * -s 1272 -d 1805 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1272 -d 1440 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1272 -d 1750 -S UP -r 512000 -D 0.0302734375
+l -t * -s 1272 -d 1771 -S UP -r 512000 -D 0.05859375
+l -t * -s 1275 -d 1291 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1275 -d 1760 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1275 -d 1401 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1275 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1276 -d 1283 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1278 -d 1283 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1279 -d 1377 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1280 -d 1484 -S UP -r 512000 -D 0.046875
+l -t * -s 1282 -d 1283 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1282 -d 1328 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1282 -d 1330 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1282 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1282 -d 1405 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1283 -d 1328 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1283 -d 1330 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1283 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1283 -d 1405 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1284 -d 1285 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1285 -d 1286 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1290 -d 1754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1290 -d 1753 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1291 -d 1760 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1291 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1291 -d 1401 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1295 -d 1299 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1296 -d 1948 -S UP -r 512000 -D 0.015625
+l -t * -s 1296 -d 1747 -S UP -r 512000 -D 0.015625
+l -t * -s 1297 -d 1561 -S UP -r 512000 -D 0.0029296875
+l -t * -s 1301 -d 1371 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1302 -d 1813 -S UP -r 512000 -D 0.001953125
+l -t * -s 1304 -d 1890 -S UP -r 512000 -D 0.0625
+l -t * -s 1305 -d 1610 -S UP -r 512000 -D 0.01171875
+l -t * -s 1305 -d 1621 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1305 -d 1949 -S UP -r 512000 -D 0.009765625
+l -t * -s 1307 -d 1308 -S UP -r 512000 -D 0.0625
+l -t * -s 1308 -d 1488 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1310 -d 1374 -S UP -r 512000 -D 0.03125
+l -t * -s 1311 -d 1469 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1319 -d 1342 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1324 -d 1534 -S UP -r 512000 -D 0.015625
+l -t * -s 1328 -d 1405 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1328 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1328 -d 1330 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1329 -d 1601 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1329 -d 1604 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1330 -d 1405 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1330 -d 1332 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1332 -d 1405 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1332 -d 1760 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1332 -d 1401 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1334 -d 1335 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1337 -d 1594 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1341 -d 1343 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1341 -d 1501 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1348 -d 1950 -S UP -r 512000 -D 0.0625
+l -t * -s 1348 -d 1951 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1351 -d 1662 -S UP -r 512000 -D 0.03125
+l -t * -s 1354 -d 1552 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1355 -d 1552 -S UP -r 512000 -D 0.03125
+l -t * -s 1356 -d 1952 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1356 -d 1515 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1356 -d 1953 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1356 -d 1954 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1356 -d 1523 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1356 -d 1955 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1356 -d 1791 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1357 -d 1361 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1364 -d 1381 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1364 -d 1390 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1370 -d 1799 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1372 -d 1373 -S UP -r 512000 -D 0.001953125
+l -t * -s 1372 -d 1498 -S UP -r 512000 -D 0.001953125
+l -t * -s 1383 -d 1412 -S UP -r 512000 -D 0.015625
+l -t * -s 1383 -d 1385 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1383 -d 1431 -S UP -r 512000 -D 0.015625
+l -t * -s 1386 -d 1387 -S UP -r 512000 -D 0.0390625
+l -t * -s 1390 -d 1406 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1391 -d 1559 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1393 -d 1559 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1398 -d 1559 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1400 -d 1403 -S UP -r 512000 -D 0.15625
+l -t * -s 1400 -d 1558 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1401 -d 1760 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1403 -d 1404 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1410 -d 1417 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1410 -d 1429 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1412 -d 1413 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1416 -d 1716 -S UP -r 512000 -D 0.015625
+l -t * -s 1416 -d 1635 -S UP -r 512000 -D 0.015625
+l -t * -s 1416 -d 1669 -S UP -r 512000 -D 0.015625
+l -t * -s 1418 -d 1606 -S UP -r 512000 -D 0.015625
+l -t * -s 1423 -d 1606 -S UP -r 512000 -D 0.0078125
+l -t * -s 1423 -d 1426 -S UP -r 512000 -D 0.01171875
+l -t * -s 1424 -d 1427 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1424 -d 1535 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1425 -d 1427 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1425 -d 1491 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1425 -d 1490 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1427 -d 1491 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1427 -d 1490 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1427 -d 1535 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1430 -d 1956 -S UP -r 512000 -D 0.0234375
+l -t * -s 1432 -d 1527 -S UP -r 512000 -D 0.03125
+l -t * -s 1447 -d 1449 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1447 -d 1650 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1450 -d 1451 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1451 -d 1682 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1451 -d 1686 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1451 -d 1752 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1455 -d 1483 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1455 -d 1702 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1456 -d 1457 -S UP -r 512000 -D 0.03125
+l -t * -s 1457 -d 1459 -S UP -r 512000 -D 0.0078125
+l -t * -s 1460 -d 1528 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1460 -d 1461 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1460 -d 1614 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1461 -d 1528 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1461 -d 1614 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1462 -d 1472 -S UP -r 512000 -D 0.015625
+l -t * -s 1462 -d 1474 -S UP -r 512000 -D 0.015625
+l -t * -s 1462 -d 1473 -S UP -r 512000 -D 0.015625
+l -t * -s 1462 -d 1475 -S UP -r 512000 -D 0.015625
+l -t * -s 1462 -d 1478 -S UP -r 512000 -D 0.015625
+l -t * -s 1462 -d 1477 -S UP -r 512000 -D 0.015625
+l -t * -s 1462 -d 1476 -S UP -r 512000 -D 0.015625
+l -t * -s 1465 -d 1661 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1479 -d 1525 -S UP -r 512000 -D 0.0625
+l -t * -s 1479 -d 1680 -S UP -r 512000 -D 0.0625
+l -t * -s 1483 -d 1770 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1484 -d 1813 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1484 -d 1499 -S UP -r 512000 -D 0.0078125
+l -t * -s 1484 -d 1958 -S UP -r 512000 -D 0.046875
+l -t * -s 1484 -d 1959 -S UP -r 512000 -D 0.046875
+l -t * -s 1484 -d 1573 -S UP -r 512000 -D 0.046875
+l -t * -s 1484 -d 1802 -S UP -r 512000 -D 0.046875
+l -t * -s 1490 -d 1491 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1493 -d 1546 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1493 -d 1745 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1493 -d 1494 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1494 -d 1546 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1502 -d 1516 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1509 -d 1818 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1509 -d 1526 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1511 -d 1512 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1514 -d 1813 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1514 -d 1615 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1515 -d 1521 -S UP -r 512000 -D 0.03125
+l -t * -s 1517 -d 1599 -S UP -r 512000 -D 0.0078125
+l -t * -s 1520 -d 1633 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1524 -d 1689 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1524 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1524 -d 1544 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1525 -d 1526 -S UP -r 512000 -D 0.0625
+l -t * -s 1525 -d 1926 -S UP -r 512000 -D 0.0625
+l -t * -s 1525 -d 1683 -S UP -r 512000 -D 0.0625
+l -t * -s 1526 -d 1818 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1528 -d 1614 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1529 -d 1533 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1535 -d 1536 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1537 -d 1538 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1541 -d 1633 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1544 -d 1689 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1544 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1544 -d 1683 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1545 -d 1961 -S UP -r 512000 -D 0.0625
+l -t * -s 1545 -d 1807 -S UP -r 512000 -D 0.03125
+l -t * -s 1546 -d 1745 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1546 -d 1565 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1547 -d 1553 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1548 -d 1554 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1555 -d 1962 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1562 -d 1563 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1563 -d 1564 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1565 -d 1600 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1565 -d 1580 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1565 -d 1862 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1569 -d 1963 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1579 -d 1592 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1580 -d 1862 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1583 -d 1662 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1590 -d 1591 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1590 -d 1597 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1592 -d 1689 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1593 -d 1597 -S UP -r 512000 -D 0.015625
+l -t * -s 1593 -d 1660 -S UP -r 512000 -D 0.015625
+l -t * -s 1594 -d 1596 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1594 -d 1945 -S UP -r 512000 -D 0.015625
+l -t * -s 1595 -d 1596 -S UP -r 512000 -D 0.03125
+l -t * -s 1596 -d 1852 -S UP -r 512000 -D 0.03125
+l -t * -s 1596 -d 1687 -S UP -r 512000 -D 0.03125
+l -t * -s 1598 -d 1599 -S UP -r 512000 -D 0.0234375
+l -t * -s 1598 -d 1690 -S UP -r 512000 -D 0.0234375
+l -t * -s 1598 -d 1757 -S UP -r 512000 -D 0.0078125
+l -t * -s 1599 -d 1757 -S UP -r 512000 -D 0.0234375
+l -t * -s 1599 -d 1690 -S UP -r 512000 -D 0.0078125
+l -t * -s 1601 -d 1604 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1601 -d 1821 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1601 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1603 -d 1833 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1603 -d 1840 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1604 -d 1605 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1608 -d 1826 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1608 -d 1827 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1609 -d 1940 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1613 -d 1640 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1615 -d 1813 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1616 -d 1964 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1622 -d 1753 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1625 -d 1628 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1625 -d 1630 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1625 -d 1629 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1625 -d 1626 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1626 -d 1646 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1626 -d 1645 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1626 -d 1629 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1626 -d 1628 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1626 -d 1630 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1628 -d 1629 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1628 -d 1630 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1629 -d 1630 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1637 -d 1638 -S UP -r 512000 -D 0.001953125
+l -t * -s 1645 -d 1646 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1648 -d 1798 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1658 -d 1666 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1659 -d 1679 -S UP -r 512000 -D 0.03125
+l -t * -s 1661 -d 1663 -S UP -r 512000 -D 0.0078125
+l -t * -s 1666 -d 1684 -S UP -r 512000 -D 0.03125
+l -t * -s 1668 -d 1714 -S UP -r 512000 -D 0.0615234375
+l -t * -s 1670 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1670 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1670 -d 1673 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1670 -d 1674 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1670 -d 1671 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1670 -d 1672 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1670 -d 1675 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1671 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1671 -d 1673 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1671 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1671 -d 1674 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1671 -d 1675 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1671 -d 1672 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1672 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1672 -d 1673 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1672 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1672 -d 1674 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1672 -d 1675 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1673 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1673 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1673 -d 1675 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1673 -d 1674 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1674 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1674 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1674 -d 1675 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1675 -d 1676 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1675 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1676 -d 1677 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1682 -d 1686 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1682 -d 1752 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1685 -d 1781 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1685 -d 1783 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1686 -d 1752 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1687 -d 1779 -S UP -r 512000 -D 0.0078125
+l -t * -s 1688 -d 1783 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1688 -d 1781 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1690 -d 1825 -S UP -r 512000 -D 0.0234375
+l -t * -s 1719 -d 1825 -S UP -r 512000 -D 0.015625
+l -t * -s 1724 -d 1725 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1793 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1967 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1968 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1737 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1738 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1739 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1725 -d 1740 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1732 -d 1742 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1741 -d 1793 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1746 -d 1764 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1751 -d 1770 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1753 -d 1754 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1755 -d 1969 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1760 -d 1761 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1762 -d 1774 -S UP -r 512000 -D 0.0625
+l -t * -s 1762 -d 1830 -S UP -r 512000 -D 0.0625
+l -t * -s 1762 -d 1809 -S UP -r 512000 -D 0.0625
+l -t * -s 1762 -d 1815 -S UP -r 512000 -D 0.0625
+l -t * -s 1762 -d 1763 -S UP -r 512000 -D 0.0625
+l -t * -s 1769 -d 1770 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1781 -d 1783 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1788 -d 1829 -S UP -r 512000 -D 0.0625
+l -t * -s 1788 -d 1971 -S UP -r 512000 -D 0.0625
+l -t * -s 1790 -d 1792 -S UP -r 512000 -D 0.03125
+l -t * -s 1798 -d 1821 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1820 -d 1885 -S UP -r 512000 -D 0.0009765625
+l -t * -s 1821 -d 1933 -S UP -r 512000 -D 0.0009765625

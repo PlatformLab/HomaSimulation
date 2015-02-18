@@ -1,0 +1,14 @@
+config.cache
+config.log
+embedded-tclobj.cc
+embedded-console.cc
+embedded-tk.cc
+gen
+config.status
+Makefile
+tcl2c++
+vc50.pdb
+vc50.pch
+vc50.idb
+tclcl.libembedded-tcl.cc 
+.configure

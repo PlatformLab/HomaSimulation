@@ -1,0 +1,443 @@
+<html>
+<head>
+<title>OTcl Tutorial (Version 0.96, September 95)</title>
+</head>
+<body>
+
+<h1><a href="../README.html">OTcl</a> Tutorial (Version 0.96, September 95)</h1>
+
+<p>This tutorial is intended to start you programming in OTcl quickly,
+assuming you are already familiar with object-oriented programming. It
+omits many details of the language that can be found in the reference
+pages <a href="object.html">Objects in OTcl</a> and <a
+href="class.html">Classes in OTcl</a>. It also doesn't mention the <a
+href="capi.html">C API</a> or describe how to <a
+href="autoload.html">autoload</a> classes.</p>
+
+
+<h2>Comparison with C++</h2>
+
+<p>To the C++ programmer, object-oriented programming in OTcl may feel
+unfamiliar at first. Here are some of the differences to help you
+orient yourself.</p>
+
+<ul>
+
+<li>Instead of a single class declaration in C++, write multiple
+definitions in OTcl. Each method definition (with <tt>instproc</tt>)
+adds a method to a class. Each instance variable definition (with
+<tt>set</tt> or via <tt>instvar</tt> in a method body) adds an
+instance variable to an object.
+
+<li>Instead of a constructor in C++, write an <tt>init</tt> instproc
+in OTcl. Instead of a destructor in C++, write a <tt>destroy</tt>
+instproc in OTcl. Unlike constructors and destructors, init and
+destroy methods do not combine with base classes automatically. They
+should be combined explicitly with <tt>next</tt>.
+
+<li>Unlike C++, OTcl methods are always called through the object. The
+name <tt>self</tt>, which is equivalent to <tt>this</tt> in C++, may
+be used inside method bodies. Unlike C++, OTcl methods are always
+virtual.
+
+<li>Instead of calling shadowed methods by naming the method
+explicitly as in C++, call them with <tt>next</tt>. <tt>next</tt>
+searches further up the inheritance graph to find shadowed methods
+automatically. It allows methods to be combined without naming
+dependencies.
+
+<li>Avoid using static methods and variables, since there is no exact
+analogue in OTcl. Place shared variables on the class object and
+access them from methods by using <tt>$class</tt>. This behavior will
+then be inherited. For inherited methods on classes, program with
+meta-classes. If inheritance is not needed, use <tt>proc</tt> methods
+on the class object.
+
+</ul>
+
+
+<h2>Programming in OTcl</h2>
+
+<p>Suppose we need to work with many bagels in our application. We
+might start by creating a <tt>Bagel</tt> class.</p>
+
+<blockquote><pre>
+% Class Bagel
+Bagel
+</pre></blockquote>
+
+<p>We can now create bagels and keep track of them using the
+<tt>info</tt> method.</p>
+
+<blockquote><pre>
+% Bagel abagel
+abagel
+% abagel info class
+Bagel
+% Bagel info instances
+abagel
+</pre></blockquote>
+
+<p>Of course, bagels don't do much yet. They should remember whether
+they've been toasted. We can create and access an instance variable
+with the <tt>set</tt> method. All instance variables are public in the
+sense of C++. Again, the <tt>info</tt> method helps us keep track of
+things.</p>
+
+<blockquote><pre>
+% abagel set toasted 0
+0
+% abagel info vars
+toasted
+% abagel set toasted
+0
+</pre></blockquote>
+
+<p>But we really want them to begin in an untoasted state to start
+with. We can achieve this by adding an <tt>init</tt> instproc to the
+<tt>Bagel</tt> class. Generally, whenever you want newly created
+objects to be initialized, you'll write an <tt>init</tt> instproc for
+their class.</p>
+
+<blockquote><pre>
+% Bagel instproc init {args} {
+  $self set toasted 0  
+  eval $self next $args
+}
+% Bagel bagel2
+bagel2
+% bagel2 info vars
+toasted
+% bagel2 set toasted
+0
+</pre></blockquote>
+
+<p>There are several things going on here. As part of creating
+objects, the system arranges for <tt>init</tt> to be called on them
+just after they are allocated. The <tt>instproc</tt> method added a
+method to the <tt>Bagel</tt> class for use by its instances. Since it
+is called init, the system found it and called it when a new bagel was
+created.</p>
+
+<p>The body of the <tt>init</tt> instproc also has some interesting
+details. The call to <tt>next</tt> is typical for init methods, and
+has to do with combining all inherited init methods into an aggregate
+init. We'll discuss it more later. The variable called <tt>self</tt>
+is set when a method is invoked, and contains the name of the object
+on behalf of which it is running, or <tt>bagel2</tt> in this
+case. It's used to reach further methods on the object or inherited
+through the object's class, and is like <tt>this</tt> in C++. There
+are also two other special variables that you may be interested in,
+<tt>proc</tt> and <tt>class</tt>.</p>
+
+<p>Our bagels now remember whether they've been toasted, except for
+the first one that was created before we wrote an init. Let's destroy
+it and start again.</p>
+
+<blockquote><pre>
+% Bagel info instances
+bagel2 abagel
+% abagel destroy
+% Bagel info instances
+bagel2
+% Bagel abagel
+abagel
+</pre></blockquote>
+
+<p>Now we're ready to add a method to bagels so that we can toast
+them. Methods stored on classes for use by their instances are called
+instprocs. They have an argument list and body like regular Tcl
+procs. Here's the toast instproc.</p>
+
+<blockquote><pre>
+% Bagel instproc toast {} {
+  $self instvar toasted
+  incr toasted
+  if {$toasted>1} then {
+    error "something's burning!"
+  }
+  return {}
+}
+% Bagel info instprocs
+init toast
+</pre></blockquote>
+
+<p>Aside from setting the <tt>toasted</tt> variable, the body of the
+toast instproc demonstrates the <tt>instvar</tt> method. It is used to
+declare instance variables and bring them into local scope. The
+instance variable <tt>toasted</tt>, previously initialized with the
+<tt>set</tt> method, can now be manipulated through the local variable
+<tt>toasted</tt>.</p>
+
+<p>We invoke the toast instproc on bagels in the same way we use the
+<tt>info</tt> and <tt>destroy</tt> instprocs that were provided by the
+system. That is, there is no distinction between user and system
+methods.</p>
+
+<blockquote><pre>
+% abagel toast
+% abagel toast
+something's burning!
+</pre></blockquote>
+
+<p>Now we can add spreads to the bagels and start tasting them. If we
+have bagels that aren't topped, as well as bagels that are, we may
+want to make toppable bagels a separate class. Let explore inheritance
+with these two classes, starting by making a new class
+<tt>SpreadableBagel</tt> that inherits from <tt>Bagel</tt>.</p>
+
+<blockquote><pre>
+% Class SpreadableBagel -superclass Bagel
+SpreadableBagel
+% SpreadableBagel info superclass
+Bagel
+% SpreadableBagel info heritage
+Bagel Object
+</pre></blockquote>
+
+<p>More options on the <tt>info</tt> method let us determine that
+<tt>SpreadableBagel</tt> does indeed inherit from <tt>Bagel</tt>, and
+further that it also inherits from <tt>Object</tt>. <tt>Object</tt>
+embodies the basic functionality of all objects, from which new
+classes inherit by default. Thus <tt>Bagel</tt> inherits from
+<tt>Object</tt> directly (we didn't tell the system otherwise) while
+<tt>SpreadableBagel</tt> inherits from <tt>Object</tt> indirectly via
+<tt>Bagel</tt>.</p>
+
+<p>The creation syntax, with its "-superclass", requires more
+explanation. First, you might be wondering why all methods except
+<tt>create</tt> are called by using their name after the object name,
+as the second argument. The answer is that <tt>create</tt> is called
+as part of the system's unknown mechanism if no other method can be
+found. This is done to provide the familiar widget-like creation
+syntax, but you may call <tt>create</tt> explicitly if you prefer.</p>
+
+<p>Second, as part of object initialization, each pair of arguments is
+interpreted as a (dash-preceded) procedure name to invoke on the
+object with a corresponding argument. This initialization
+functionality is provided by the <tt>init</tt> instproc on the
+<tt>Object</tt> class, and is why the <tt>Bagel</tt> <tt>init</tt>
+instproc calls <tt>next</tt>. The following two code snippets are
+equivalent (except in terms of return value). The shorthand it what
+you use most of the time, the longhand explains the operation of the
+shorthand.</p>
+
+<blockquote><pre>
+% Class SpreadableBagel
+SpreadableBagel
+% SpreadableBagel superclass Bagel
+</pre></blockquote>
+
+<blockquote><pre>
+% Class create SpreadableBagel
+SpreadableBagel
+% SpreadableBagel superclass Bagel
+</pre></blockquote>
+
+<blockquote><pre>
+% Class SpreadableBagel -superclass Bagel
+SpreadableBagel
+</pre></blockquote>
+
+<p>Once you understand this relationship, you will realize that there
+is nothing special about object creation. For example, you can add
+other options, such as one specifying the size of a bagel in
+bites.</p>
+
+<blockquote><pre>
+% Bagel instproc size {n} {
+  $self set bites $n
+}
+% SpreadableBagel abagel -size 12
+abagel
+% abagel set bites
+12
+</pre></blockquote>
+
+
+<p>We need to add methods to spread toppings to
+<tt>SpreadableBagel</tt>, along with a list of current toppings. If we
+wish to always start with an empty list of toppings, we will also need
+an <tt>init</tt> instproc.</p>
+
+<blockquote><pre>
+% SpreadableBagel instproc init {args} {
+  $self set toppings {}
+  eval $self next $args
+}
+% SpreadableBagel instproc spread {args} {
+  $self instvar toppings
+  set toppings [concat $toppings $args]
+  return $toppings
+}
+</pre></blockquote>
+
+
+<p>Now the use of <tt>next</tt> in the <tt>init</tt> method can be
+further explained. <tt>SpreadableBagels</tt> are also bagels, and need
+their <tt>toasted</tt> variable initialized to zero. The call to
+<tt>next</tt> arranges for the next method up the inheritance tree to
+be found and invoked. It provides functionality similar to
+call-next-method in CLOS.</p>
+
+<p>In this case, the <tt>init</tt> instproc on the <tt>Bagel</tt>
+class is found and invoked. Eval is being used only to flatten the
+argument list in <tt>args</tt>. When <tt>next</tt> is called again in
+<tt>Bagels</tt> <tt>init</tt> instproc, the <tt>init</tt> method on
+<tt>Object</tt> is found and invoked. It interprets its arguments as
+pairs of procedure name and argument values, calling each in turn, and
+providing the option initialization functionality of all
+objects. Forgetting to call <tt>next</tt> in an <tt>init</tt> instproc
+would result in no option initializations.</p>
+
+<p>Let's add a taste instproc to bagels, splitting its functionality
+between the two classes and combining it with <tt>next</tt>.</p>
+
+<blockquote><pre>
+% Bagel instproc taste {} {
+  $self instvar toasted
+  if {$toasted == 0} then {
+    return raw!
+  } elseif {$toasted == 1} then {
+    return toasty
+  } else {
+    return burnt!
+  }
+}
+
+% SpreadableBagel instproc taste {} {
+  $self instvar toppings
+  set t [$self next]
+  foreach i $toppings {
+    lappend t $i
+  }
+  return $t
+}
+
+% SpreadableBagel abagel
+abagel
+% abagel toast
+% abagel spread jam
+jam
+% abagel taste
+toasty jam
+</pre></blockquote>
+
+<p>Of course, along come sesame, onion, poppy, and a host of other
+bagels, requiring us to expand our scheme. We could keep track of
+flavor with an instance variable, but this may not be
+appropriate. Flavor is an innate property of the bagels, and one that
+can affect other behavior - you wouldn't put jam on an onion bagel,
+would you? Instead of making a class heirarchy, let's use multiple
+inheritance to make the flavor classes mixins that add a their taste
+independent trait to bagels or whatever other food they are mixed
+with.</p>
+
+<blockquote><pre>
+% Class Sesame
+Sesame
+% Sesame instproc taste {} {
+  concat [$self next] "sesame"
+}
+% Class Onion
+Onion
+% Onion instproc taste {} {
+  concat [$self next] "onion"
+}
+% Class Poppy
+Poppy
+% Poppy instproc taste {} {
+  concat [$self next] "poppy"
+}
+</pre></blockquote>
+
+<p>Well, they don't appear to do much, but the use of <tt>next</tt>
+allows them to be freely mixed.</p>
+
+<blockquote><pre>
+% Class SesameOnionBagel -superclass {Sesame Onion SpreadableBagel}
+SesameOnionBagel
+% SesameOnionBagel abagel -spread butter
+% abagel taste
+raw! butter onion sesame
+</pre></blockquote>
+
+
+<p>For multiple inheritance, the system determines a linear
+inheritance ordering that respects all of the local superclass
+orderings. You can examine this ordering with an <tt>info</tt>
+option. <tt>next</tt> follows this ordering when it combines
+behavior.</p>
+
+<blockquote><pre>
+% SesameOnionBagel info heritage
+Sesame Onion SpreadableBagel Bagel Object
+</pre></blockquote>
+
+
+<p>We can also combine our mixins with other classes, classes that
+need have nothing to do with bagels, leading to a family of chips.</p>
+
+<blockquote><pre>
+% Class Chips
+Chips
+% Chips instproc taste {} {
+  return "crunchy"
+}
+% Class OnionChips -superclass {Onion Chips}
+OnionChips
+% OnionChips abag
+abag
+% abag taste
+crunchy onion
+</pre></blockquote>
+
+
+<h2>Other Directions</h2>
+
+<p>There are many other things we could do with bagels, but it's time
+to consult the reference pages. The OTcl language aims to provide you
+with the basic object-oriented programming features that you need for
+most tasks, while being extensible enough to allow you to customize
+existing features or create your own.</p>
+
+<p>Here are several important areas that the tutorial hasn't
+discussed.</p>
+
+<ul>
+
+<li>There is support for autoloading libraries of classes and
+methods. See <a href="autoload.html">OTcl Autoloading</a> for details.
+
+<li>There is a C level interface (as defined by <tt>otcl.h</tt>) that
+allows new objects and classes to be created, and methods implemented
+in C to be added to objects. See <a href="capi.html">OTcl C API</a>
+for details.
+
+<li>Classes are special kinds of objects, and have all of the
+properties of regular objects. Thus classes are a convenient
+repository for procedures and data that are shared by their
+instances. And the behavior of classes may be controlled by the
+standard inheritance mechanisms and the class <tt>Class</tt>.
+
+<li>Methods called procs can be added to individual object, for sole
+use by that object. This allows particular objects to be hand-crafted,
+perhaps storing their associated procedures and data.
+
+<li>User defined methods are treated in the same way as system
+provided methods (such as <tt>set</tt> and <tt>info</tt>). You can use
+the standard inheritance mechanisms to provide your own implementation
+in place of a system method.
+
+<li>There are several other system methods that haven't been
+described. <tt>array</tt> gives information on array instance
+variables, <tt>unset</tt> removes instance variables, there are
+further info options, and so forth.
+
+</ul>
+
+</body>
+</html>
+
+
+

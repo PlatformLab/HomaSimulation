@@ -1,0 +1,306 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>nam TODO list</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.01Gold (X11; U; SunOS 4.1.3_U1 sun4m) [Netscape]">
+</HEAD>
+<BODY>
+
+<P><!-- @(#) $Header: /cvsroot/nsnam/nam-1/TODO.html,v 1.10 2000/03/24 03:49:03 haoboy Exp $--><!-- Changed by: Sandeep Bajaj, 31-Mar-1997 --></P>
+
+<H1>nam: TODO list</H1>
+
+<p><i>
+The person who recommends the todo work does not necessarily do them 
+by him/herself.
+<p></i>
+
+<ul><hr>
+  <li>
+       <b>introduction</b><br>
+       ( Here's the format )  a boldface set of keywords about what
+       part of ns is relevant,
+       text describing what's going on,
+       then a signature and date.
+       <em>(<a href="http://www.isi.edu/~johnh/">[johnh]</a>
+       Thu Jun 17 18:04:37 PDT 1999)</em>
+<hr>
+  <li>
+  	<b>Multi-threading in auto layout</b> <br>
+
+
+  <li>
+  	<b>Autolayout on regions of a graph</b> <br>
+	Now we have unified editview and normal views, users should be able to 
+	specify a particular region, and do auto layout only in that region. 
+	This would be useful in large graphs. The first step would be to add flags
+	to nodes and to instruct auto layout to only work on marked nodes.
+	<p>
+
+  <li>
+  	<b>Tree layout</b><br>
+	If one knows that a topology is a tree, she/he should be able to specify
+	the root of the tree, and nam will starting layout from that point, and put 
+	all nodes at equal distance to the root on concentric circles. The first 
+	step would be to spread all nodes at equal distance to the root evenly on 
+	their circle. We can later optimize the algorithm to find a nice fanout 
+	angle for every node based on the size of its subtree.
+	<em>(<a href="http://www.isi.edu/~haoboy/">[haoboy]</a>
+	Wed Jan 26 16:33:44 PST 2000)</em>
+	<p>
+
+  <li>
+       <b>Wireless</b>
+       Visualization of data flowing between wireless nodes . Showing the
+        signal has been transmitted from some sender and received by the receiver
+       <em>(<a href="http://www.isi.edu/~johnh/">[johnh]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>Topology</b>
+        The topology isn't scaled very well when nam starts up (nodes, links, or annotations may go off the visible screen, requiring you to horizontally scroll to see it all)
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>Queue</b>
+       Queue occupancy indicator, when exceeding bounding box, scribbles on screen , sometimes hangs X sever .
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>Labeling links</b>
+       A more flexible way to label links (like: label above, below, or next to object, different colors and fonts for the labels) 
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>TCP</b>
+        When turning off tcp_cong, the segments
+        probably should not disappear, but instead
+        revert back to the color of regular segments.  tcp_cong
+        segments still are regular tcp segments, just
+        that happen to be marked.
+        it probably should work this way for ecn-echo
+        acks also
+
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+
+  <li>
+       <b>TCP</b>
+       Display grid lines in the seq# vs. time plot will be nice
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>TCP</b>
+       Showing axis labels in the session view window would be nice
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>Link</b>
+       Being able to control the displayed link and width of a link
+       would be nice sometimes
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>TCP</b>
+       It would be nice if one could highlight two points on the
+       seq# vs time graph and have a little box tell you
+       x and y axis deltas between them.  That is, you could
+       highlight, say, a packet and its ack and it would tell you
+       how many seconds they are apart.  Or, you could highlight
+       two forward segments and it would tell you how many
+       sequence numbers and secs there are between them.
+       would be nice sometimes
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>chrome</b>
+       Is there a way to hit a key which will forward the animation
+       time slider to the point a new src/dest pair is seen in the trace?
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+
+  <li>
+       <b>TCP packet</b>
+       It would be really cool if one could arrange to have the
+       next packet after a dropped packet turn a different color.
+       In this way, one can illustrate the amount of time needed
+       for a tcp to "learn" that a packet has been dropped.  It helps
+       to illustrate that the tcp need wait not only the min RTT, but
+       also the amount of time to drain the queue where this (packet
+       after the dropped one) is queued.
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>goodput</b>
+       A measure of goodput over the time range would be nice.
+       it would be especially cool if when you zoom in to a
+       region you get goodput measures averaged over that particular
+        region you zoomed in on.
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>RED queue</b>
+       It would be very cool if, for RED queues, one could have a sort
+       of little thermometer indicating the average queue size, the
+       ewma gain constant, whether it was marking or dropping, and
+       maxprob in addition to little marks on it indicating maxth and minth
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>Queue</b>
+       Some sort of box that would compute a fairness index
+       (say, from Jain p.36) at a queue might be useful in illustrating
+       the behavior of say FQ or DRR
+       <em>(<a href="http://www.cs.berkeley.edu/~kfall">[kfall]</a>
+        before Mon Oct 4 23:57:07 PDT 1999)</em>
+      <p>
+
+  <li> <b>Asymmetric links</b>: Nam supports symmetric links and simplex links 
+	only, it does not support asymmetric link, i.e., two simplex links 
+	attached to the same two nodes but with different bandwidth and/or 
+	delay. This is a design fault inherent in manual layout and auto-layout
+	and correcting it probably requires changing these two parts. 
+	<a href="http://www.isi.edu/~haoboy">[haoboy]</a>.
+	Wed Aug 25 09:32:58 PDT 1999.
+
+  <p>
+  <li> <b>Labeling links</b>: Currently the only way to label a link
+  is to use link color. It would be good to allow add dynamic textual
+  labels to links, in the same way as they are added to nodes. This
+  would only require two (quite straightforward) modifications: (1)
+  add an extra field in 
+  the link trace line to indicate the label, and (2) display the label
+  in Edge::draw().
+  <a href="http://www.isi.edu/~haoboy">[haoboy]</a>. 
+  Mon Aug  9 14:58:04 PDT 1999. 
+
+  <p>
+  <li>
+       <b>annotations</b>
+       Should be able to label packets with arbitrary strings.
+       <em>(<a href="http://www.isi.edu/~johnh/">[johnh]</a> and [hyunahpa]
+       Thu Jun 24 13:08:12 PDT 1999)</em>
+
+  <p>
+  <li>
+       <b>dynamics</b>
+ I'd like to be able to create/remove nodes (not necessarily
+  wireless) on the fly (so that I could pipe surveyor output directly
+  to nam and create new nodes as surveyor discovers them).
+       <em>(<a href="http://www.isi.edu/~yuri/">[yuri]</a>
+       before Thu Jun 17 18:04:37 PDT 1999)</em>
+      <p>
+
+  <li>
+       <b>chrome</b>
+       Would be nice to be able to add arrows to the links (as an option)
+  to see if this link is unidirection/bi-directional.  I suppose this
+  should be very easy to do.
+       <em>(<a href="http://www.isi.edu/~yuri/">[yuri]</a>
+       before Thu Jun 17 18:04:37 PDT 1999)</em>
+       <br> All links in nam is bi-directional. So this is not an
+       option, I think. -haoboy.
+
+         <p>
+  <li>
+       <b>customization, interactivity</b>
+Now when I click on a link or node a window appears which holds
+  BW/delay information for the link and a node number for the node.
+  It would be great if a user had more control over the contents of
+  this window.  For example, when I click on a link I'd like to see IP
+  addresses of the endpoints (for a router typically has several
+  ifaces); and when I click at a node, I'd like to see some
+  information about the node, e.g. it's distance from current
+  surveyors).
+       <em>(<a href="http://www.isi.edu/~yuri/">[yuri]</a>
+       before Thu Jun 17 18:04:37 PDT 1999)</em>
+
+         <p>
+  <li>
+       <b>chrome</b>
+       Finally, changing/removing node labels (inside node circles) could
+       be useful.
+       <em>(<a href="http://www.isi.edu/~yuri/">[yuri]</a>
+       before Thu Jun 17 18:04:37 PDT 1999)</em>
+       <p>
+       Can't this be done already with text node labels (the ones
+       beneath the nodes?).   --johnh
+       <p>
+       
+       The visual effect of this can be quite ugly though. Imagine a
+       200 node graph with a 12-digit IP address in each of the
+       node. The right way to do this is perhaps to allow users to
+       toggle showing the current textual labels either UNDER a node,
+       or INSIDE a node's pane when clicked. -haoboy
+       <p>
+  <li>
+       <b>parsing, cruft</b>
+Another thing with is sort of related is the parsing code.
+Currently there's a lot of hand-written code in trace.cc
+switch big switch statements and lots of atoi stuff
+and rudimentory error checking (did I get > 2 fields?)
+
+       <p>
+It might be lot easier to maintin/add to this code if there was some
+kind of table-driven parser something like getopt for argc/argv,
+or like widget parsing in X11.
+       <em>(<a href="http://www.isi.edu/~yuri/">[johnh]</a>
+       Thu Jun 17 18:04:37 PDT 1999)</em>
+
+  <p>
+  <li>
+       <b>annotations</b>
+An artifact, not a bug: I just realised that nam does not
+show multiple simultaneously occurring annotations in its
+annotations window.  This appears counter-intuitive.  As an
+example, see http://www.isi.edu/~kannan/out-cmcast.nam.
+
+       <p>
+The annotations show only node 0 joining group 65520.  In
+reality, all nodes in the topology join this group at the
+same time, at startup.  Seeing only one line made me believe
+there was a strange bug in my code, when it turns out to be
+an artifact of nam.  It would be nice if this were fixed in
+some way, and otherwise documented someplace.
+
+       <p>
+(One suggestion is that for subsequent simultaneous
+annotations, an single annotation line be added as "0 others".
+ A popup menu on that line could show other annotations when
+requested, but that is getting more featureful than I need
+for my requirements. :-)
+       <em>([kannan],
+       before Thu Jun 17 18:04:37 PDT 1999)</em>
+
+
+</ul>
+
+
+
+
+

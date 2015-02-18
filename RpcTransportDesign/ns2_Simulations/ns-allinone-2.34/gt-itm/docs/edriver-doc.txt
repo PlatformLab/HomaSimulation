@@ -1,0 +1,64 @@
+$Id: edriver-doc.txt,v 1.1 1996/10/04 13:28:51 ewz Exp $
+
+Name: edriver
+
+Function: Driver program to call evaluation routines. 
+
+Usage:  edriver <filestem> [-nd] [-<f0><f1>]* 
+
+Details:
+
+    A set of metrics are computed by edriver and stored into
+    a set of files.  The metrics are divided into two categories:
+    scalar metrics and distribution metrics.  The scalar metrics
+    are all stored in the file "./<filestem>-ev".  They are:
+
+	average node degree
+	diameter of graph (using each <f0><f1> combination (see below))
+	average depth (using each <f0><f1> combination (see below))
+	number of biconnected components
+
+    The distribution metrics and filenames are as follows:
+
+	node degree distribution ("./<filestem>-dd")
+	depth distribution using <f0><f1> ("./<filestem>-<f0><f1>d")
+
+    The purpose of the <f0><f1> specification(s) are to allow 
+    computation of metrics using one or more edge weight fields.
+    The edges in a graph may have up to three integer valued
+    weights.  These weights are stored in the SGB arc fields
+    named "len", "a" and "b".  We use the "len" field to store
+    the Euclidean length of the arc; we use the "a" field in
+    the hierarchical models to store a routing policy weight.
+    The "b" field is currently not used in any of the graph models.
+    Each edge can also be assumed to have unit weight.
+
+    
+    For each -<f0><f1> pair, shortest paths will be computed using 
+    <f0> as the distance metric and <f1> as the measurement metric, 
+    where <f0> and <f1> are one of {l, a, b, h}, indicating the arc 
+    field to use (l = len, a = a, b = b) or to use unit weight (h).  
+    The scalar properties of diameter and average depth will be stored 
+    in the scalar file; if the -nd option is not present, the depth 
+    distribution will be stored in the file <filestem>-<f0><f1>d.
+
+
+    The file "./<filestem>.gb" is expected to contain a
+    graph in SGB format, as created by gb_save().
+
+    If the -nd option is given, only the scalar characteristics
+    will be computed, and the distribution files will not
+    created.  They take up lots of space for larger graphs.
+    (Though it probably shouldn't be) the default is to evaluate 
+    the distributions. 
+
+    
+Example usage:  edriver r10-0 -nd -hh -ll -hl 
+
+     This will evaluate the graph in ./r10-0.gb without creating
+     the distribution files.  Three types of shortest path metrics
+     will be evaluated, corresponding to hops (hh), length (ll) and
+     hop-computed-routes with length-computed-metrics (hl).
+     Only one file will be produced, namely ./r10-0-0-ev.
+     (The output file can be found in sample-graphs/rand/r10.)
+

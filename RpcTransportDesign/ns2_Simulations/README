@@ -4,8 +4,9 @@ Install required libraries for ns2 using terminal
             sudo apt-get install build-essential autoconf automake libxmu-dev
  Then, sudo ./install
 
+################################################################################
 For errors,
-
+################################################################################
 
 1.
 ld: libotcl.so: hidden symbol `__stack_chk_fail_local' isn't defined
@@ -90,8 +91,10 @@ to
 void eraseAll() { this->erase(baseMap::begin(), baseMap::end()); }
 
 
-
+################################################################################
 Path Setup:
+################################################################################
+
 In terminal vim ~/.bashrc
 Then update the environmrnt variable
 

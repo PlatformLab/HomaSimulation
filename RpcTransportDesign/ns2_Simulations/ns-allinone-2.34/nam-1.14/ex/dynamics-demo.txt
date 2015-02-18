@@ -1,0 +1,32 @@
+***** tahoe-dynamic-demo.txt*******
+
+
+A demo to illustrate the dynamic scenario using tcp tahoe. The
+topology consistes of 5 nodes
+0-2 and 1-2 are fast links sending at 8Mb with a delay of 5ms.
+2-3 and 2-4 are slower links sending at 800Kb with a delay of 100ms.
+
+TCP connections are setup between nodes 0&3 and nodes 1&3.
+There is one ftp sources at node 0(brown pkts for data & ack) and node
+1(blue pkts for data & ack) each.
+Routing updates are in black.
+
+simulation strats at time 0.5 when src 1 starts sending data to 3.
+link 2-3 goes down at time 0.824 (shown in red).
+
+src 0 also starts to send pkts at time 1.0 to receiver 3.
+
+with the link going down src 1 loses the pkts and goes back to slow-start while src 0
+rapidly increases the window size and goesinto congestion avoidance
+phase pumping large no. of pkts into the network.src 1 continues conservatively.
+with link 2-3 down all pkts are send via 2-4 and 4-3.
+
+The link 2-3 comes up at 3.53.
+
+with the coming up of link both the sources start pumping data onto the
+link 2-3. The buffer at node 2 fills up and pkts get dropped for both
+src 0 as well 1. both go back to TCP's slowstart phase.
+
+Here the interesting behaviour of the network to note is that the coming
+up of link 2-3 actually causes pkts to be dropped as opposed to
+increasing the efficiency of the network as one would normally assume.

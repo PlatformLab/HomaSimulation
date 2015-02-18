@@ -1,0 +1,56 @@
+#
+# Makefile for Internetwork Topology Models
+#
+
+# $Id: Makefile,v 1.1 1996/10/04 14:01:24 ewz Exp $
+
+# Note: If you are using Solaris, you MUST edit the Makefile to 
+#       uncomment the two Solaris lines below, and comment the SunOS line.
+# 
+# For Solaris: uncomment the next two lines
+SYS = -DSYSV
+LIBS = -lm -lgb5
+
+# For SunOS: uncomment the next line
+#LIBS = -lm -lgb4
+
+GT_ITM = ..
+IDIR = $(GT_ITM)/include
+LDIR = $(GT_ITM)/lib
+BDIR = $(GT_ITM)/bin
+
+CFLAGS = -I$(IDIR) -L$(LDIR) $(SYS)
+CC = gcc 
+
+GO = itm.o geog.o ts.o dfs.o
+CO = sgb2alt.o 
+CN = sgb2ns.o
+EO = edriver.o eval.o
+
+GH = $(IDIR)/geog.h $(IDIR)/gb_graph.h $(IDIR)/gb_flip.h
+CH = $(IDIR)/geog.h $(IDIR)/gb_graph.h $(IDIR)/gb_save.h
+EH = $(IDIR)/gb_graph.h $(IDIR)/gb_save.h $(IDIR)/gb_dijk.h \
+     $(IDIR)/eval.h
+
+
+all:	sgb2ns
+
+itm.o:	$(GH)
+
+geog.o:	$(GH)
+
+ts.o: $(GH)	
+
+dfs.o: $(GH)
+
+sgb2ns: $(CN)
+	$(CC) $(CFLAGS) -o $(BDIR)/sgb2ns $(CN) $(LIBS) 
+
+sgb2ns.o: $(CH)
+
+clean:  
+	\rm -f *.o
+
+veryclean:  clean
+	\rm -f $(BDIR)/*
+

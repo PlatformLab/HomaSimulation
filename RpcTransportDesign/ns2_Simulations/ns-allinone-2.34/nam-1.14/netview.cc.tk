@@ -1,0 +1,478 @@
+/*
+ * Copyright (c) 1991,1993 Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the Computer Systems
+ *	Engineering Group at Lawrence Berkeley Laboratory.
+ * 4. Neither the name of the University nor of the Laboratory may be used
+ *    to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#ifndef lint
+static char rcsid[] =
+    "@(#) $Header: /cvsroot/nsnam/nam-1/netview.cc.tk,v 1.1.1.1 1997/06/16 22:40:30 mjh Exp $ (LBL)";
+#endif
+
+#define OLDX
+
+#include <osfcn.h>
+#include <ctype.h>
+
+extern "C" {
+#include <tk.h>
+}
+
+#include "bbox.h"
+#include "netview.h"
+#include "netmodel.h"
+#include "Tcl.h"
+#include "paint.h"
+#include "packet.h"
+#include "xstuff.h"
+
+void NetView::resize(int width, int height)
+{
+	width_ = width;
+	height_ = height;
+
+	matrix_.clear();
+
+	BBox bb;
+	model_->BoundingBox(bb);
+	
+	double x = 0;
+	double y = 0;
+	double w = width;
+	double h = height;
+	/*
+	 * Set up a transform that maps bb -> canvas.  I.e,
+	 * bb -> unit square -> allocation, but which retains
+	 * the aspect ratio.  Also, add a margin.
+	 */
+	double nw = bb.xmax - bb.xmin;
+	double nh = bb.ymax - bb.ymin;
+	
+	/* 
+	 * Grow a margin.
+	 */
+	double bbw = 1.1 * nw;
+	double bbh = 1.1 * nh;
+	double tx = bb.xmin - 0.5 * (bbw - nw);
+	double ty = bb.ymin - 0.5 * (bbh - nh);
+	
+	/*
+	 * move base coordinate system to origin
+	 */
+	matrix_.translate(-tx, -ty);
+	/*
+	 * flip vertical axis because X is backwards.
+	 */
+	matrix_.scale(1., -1.);
+	matrix_.translate(0., bbh);
+	
+	double ws = w / bbw;
+	double hs = h / bbh;
+	
+	if (ws <= hs) {
+		matrix_.scale(ws, ws);
+		matrix_.translate(x, y + 0.5 * (h - ws * bbh));
+	} else {
+		matrix_.scale(hs, hs);
+		matrix_.translate(x + 0.5 * (w - hs * bbw), y);
+	}
+	XWindowAttributes xwa;
+	XGetWindowAttributes(dpy_, drawable_, &xwa);
+	offscreen_ = XCreatePixmap(dpy_, drawable_, width_, height_, xwa.depth);
+}
+
+void NetView::draw()
+{
+	if (offscreen_ == 0)
+		return;
+	#ifdef OLDX
+	XFillRectangle(dpy_, offscreen_, background_, 0, 0, width_, height_);
+	#endif
+	ClearDisplay();
+	model_->render(this);
+	#ifdef OLDX
+	XCopyArea(dpy_, offscreen_, drawable_, background_,
+		  0, 0, width_, height_, 0, 0);
+	#endif
+	UpdateDisplay();
+}
+
+NetView::NetView(const char* name, NetModel* m) 
+        : model_(m)
+{
+	Tcl& tcl = Tcl::instance();
+	tk_ = Tk_CreateWindowFromPath(tcl.interp(), tcl.tkmain(),
+				      (char*)name, 0);
+	if (tk_ == 0)
+		abort();
+	
+	Tk_SetClass(tk_, "NetView");
+	
+	/*XXX*/
+	/* Specify preferred window size. */
+	Tk_GeometryRequest(tk_, 50, 50);
+
+	Tk_CreateEventHandler(tk_, ExposureMask|StructureNotifyMask,
+			      handle, (ClientData)this);
+
+	width_ = height_ = 0;
+
+	tcl.CreateCommand(Tk_PathName(tk_), command, (ClientData)this, 0);
+    
+	dpy_ = Tk_Display(tk_);
+	background_ = Paint::instance()->background_gc();
+
+	Tk_MakeWindowExist(tk_);
+    
+	drawable_ = Tk_WindowId(tk_);
+	offscreen_ = 0;
+    
+	load_fonts();
+}
+
+/* Handler for the Expose, DestroyNotify and ConfigureNotify events. */
+void NetView::handle(ClientData cd, XEvent* ep)
+{
+	NetView* nv = (NetView*)cd;
+	
+	switch (ep->type) {
+	case Expose:
+		if (ep->xexpose.count == 0)
+			/*XXX*/
+			nv->draw();
+		break;
+		
+	case DestroyNotify:
+		/*XXX kill ourself */
+		break;
+		
+	case ConfigureNotify:
+		if (nv->width_ != ep->xconfigure.width ||
+		    nv->height_ != ep->xconfigure.height)
+			nv->resize(ep->xconfigure.width,
+				   ep->xconfigure.height);
+		break;
+	}
+}
+
+extern void Parse(NetModel*, const char* layout);
+
+int NetView::command(ClientData cd, Tcl_Interp* tcl, int argc, char **argv)
+{
+	if (argc < 2) {
+		Tcl_AppendResult(tcl, "\"", argv[0], "\": arg mismatch", 0);
+		return (TCL_ERROR);
+	}
+#ifdef notdef
+	/*
+	 * $w chart -v variable -s src -d dst -w width -h height
+	 */
+	NetView* nv = (NetView*)cd;
+	if (strcmp(argv[1], "layout") == 0) {
+		/*   <window> layout <net> */
+		if (argc != 3) {
+			Tcl_AppendResult(tcl, "\"", argv[0],
+					 "\": arg mismatch", 0);
+			return (TCL_ERROR);
+		}
+		Parse(nv->model_, argv[2]);
+		return (TCL_OK);
+	}
+	if (strcmp(argv[1], "clock") == 0) {
+		/*   <window> clock <proc> <interval> */
+		if (argc != 4) {
+			Tcl_AppendResult(tcl, "\"", argv[0],
+					 "\": arg mismatch", 0);
+			return (TCL_ERROR);		}
+		const char* proc = argv[2];
+		double interval = atof(argv[3]);
+		master->clock(proc, interval);
+		return (TCL_OK);
+	}
+	/*
+	 * $nv trace callback var
+	 * $nv trace callback etype src dst tag
+	 */
+	if (strcmp(argv[1], "trace") == 0) {
+		if (argc == 4)
+			nv->trace(argv[2], argv[3]);
+		else if (argc == 7)
+			nv->trace(argv[2], argv[3], argv[4], argv[5], argv[6]);
+		else {
+			Tcl_AppendResult(tcl, "\"", argv[0],
+					 "\": arg mismatch", 0);
+			return (TCL_ERROR);
+		}
+		return (TCL_OK);
+	}
+#endif
+	if (strcmp(argv[1], "info") == 0) {
+		if (argc == 3) {
+			NetView *nv = (NetView *)cd;
+			Tcl& tcl = Tcl::instance();
+			Animation* a;
+			double now = atof(argv[2]);
+			Window root, child;
+			int rootX, rootY, winX, winY;
+			unsigned int state;
+			float px, py;
+#ifdef OLDX
+ 			XQueryPointer(nv->dpy_, Tk_WindowId(nv->tk_), &root,
+ 				      &child, &rootX, &rootY, &winX, &winY,
+ 				      &state);
+ 			nv->matrix_.imap(float(winX), float(winY), px, py);
+			if ((a = nv->model_->inside(now, px, py)) != 0) {
+				tcl.result(a->info());
+				return TCL_OK;
+			}
+#endif
+			return TCL_OK;
+		}
+		Tcl_AppendResult(tcl, "\"", argv[0],
+				 "\": arg mismatch", 0);
+		return TCL_ERROR;
+	}
+	Tcl_AppendResult(tcl, "\"", argv[0], "\": unknown arg: ", argv[1], 0);
+	return (TCL_ERROR);
+}
+
+#ifdef notdef
+void 
+NetView::trace(const char* cmd, const char* varname)
+{
+	master->addFilter(new VarFilter(tcl_, cmd, varname));
+}
+
+void 
+NetView::trace(const char* cmd, const char* etype,
+	       const char* src, const char* dst, const char* tag)
+{
+	master->addFilter(new GenericFilter(tcl_, cmd, etype, src, dst, tag));
+}
+#endif
+
+void 
+NetView::line(float x0, float y0, float x1, float y1, int paint)
+{
+	int ax, ay;
+	matrix_.map(x0, y0, ax, ay);
+	int bx, by;
+	matrix_.map(x1, y1, bx, by);
+#ifdef OLDX
+	GC gc = Paint::instance()->paint_to_gc(paint);
+	XDrawLine(dpy_, offscreen_, gc, ax, ay, bx, by);
+#endif
+	DrawLine(ax, ay, bx, by, 1);
+}
+
+void NetView::rect(float x0, float y0, float x1, float y1, int paint)
+{
+	int x, y;
+	matrix_.map(x0, y0, x, y);
+	int xx, yy;
+	matrix_.map(x1, y1, xx, yy);
+	
+	int w = xx - x;
+	if (w < 0) {
+		x = xx;
+		w = -w;
+	}
+	int h = yy - y;
+	if (h < 0) {
+		h = -h;
+		y = yy;
+	}
+#ifdef OLDX	
+	GC gc = Paint::instance()->paint_to_gc(paint);
+	XDrawRectangle(dpy_, offscreen_, gc, x, y, w, h);
+#endif
+	DrawRectangle(x, y, w, h, 1);
+}
+
+void NetView::polygon(const float* x, const float* y, int n, int paint)
+{
+	/*XXX*/
+	XPoint pts[10];
+	
+	for (int i = 0; i < n; ++i) {
+		float tx, ty;
+		matrix_.map(x[i], y[i], tx, ty);
+		pts[i].x = int(tx);
+		pts[i].y = int(ty);
+	}
+	pts[n] = pts[0];
+#ifdef OLDX
+	GC gc = Paint::instance()->paint_to_gc(paint);
+	XDrawLines(dpy_, offscreen_, gc, pts, n + 1, CoordModeOrigin);
+#endif
+	DrawPolygon(pts, n+1, 1);
+}
+
+void NetView::fill(const float* x, const float* y, int n, int paint)
+{
+	/*XXX*/
+	XPoint pts[10];
+	
+	for (int i = 0; i < n; ++i) {
+		float tx, ty;
+		matrix_.map(x[i], y[i], tx, ty);
+		pts[i].x = int(tx);
+		pts[i].y = int(ty);
+	}
+	pts[n] = pts[0];
+#ifdef OLDX       
+	GC gc = Paint::instance()->paint_to_gc(paint);
+	XFillPolygon(dpy_, offscreen_, gc, pts, n + 1,
+		     Convex, CoordModeOrigin);
+#endif
+        FillPolygon(pts, n+1, 1);
+}
+
+void NetView::circle(float x, float y, float r, int paint)
+{
+	int tx, ty;
+	matrix_.map(x, y, tx, ty);
+	int tr, dummy;
+	matrix_.map(x + r, y, tr, dummy);
+	tr -= tx;
+	tx -= tr;
+	ty -= tr;
+	tr *= 2;
+#ifdef OLDX
+	GC gc = Paint::instance()->paint_to_gc(paint);
+	XDrawArc(dpy_, offscreen_, gc, tx, ty, tr, tr, 0, 64 * 360);
+#endif
+	DrawOval(tx, ty, tr, tr, 1);
+}
+
+static char* fontName[NFONT] = {
+	"-adobe-times-medium-r-normal-*-8-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-10-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-12-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-14-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-18-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-20-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-24-*-*-*-*-*-*-*",
+	"-adobe-times-medium-r-normal-*-34-*-*-*-*-*-*-*",
+};
+static Font* font[sizeof(fontName)/sizeof(fontName[0])];
+
+/* Set the font structures using values in 'fontName' (defined above). */
+void NetView::load_fonts()
+{
+	Tcl_Interp* tcl = Tcl::instance().interp();
+	nfont_ = 0;
+	for (int i = 0; i < NFONT; ++i) {
+		fonts_[nfont_] = Tk_GetFontStruct(tcl, tk_, fontName[i]);
+		if (fonts_[nfont_] == 0)
+			continue;
+		font_gc_[nfont_] =
+			Paint::instance()->text_gc(fonts_[nfont_]->fid);
+		++nfont_;
+	}
+	if (nfont_ == 0)
+		fprintf(stderr, "nam: warning no fonts found\n");
+}
+
+void NetView::free_fonts()
+{
+	/*XXX Tk_FreeFontStruct*/
+}
+
+int NetView::lookup_font(int d)
+{
+	int i = nfont_;
+	while (--i > 0) {
+		XFontStruct* p = fonts_[i];
+		if (d >= p->ascent + p->descent)
+			return (i);
+	}
+	return (0);
+}
+
+void NetView::string(float fx, float fy, float dim, const char* s, int anchor)
+{
+	if (nfont_ <= 0)
+		return;
+	
+	int dummy;
+	int dlow, dhigh;
+	
+	/*XXX this could be cached*/
+	matrix_.map(0., 0., dummy, dlow);
+	matrix_.map(0., 0.9 * dim, dummy, dhigh);
+	int d = dhigh - dlow;
+	if (d < 0)
+		d = -d;
+	int font = lookup_font(d);
+	XFontStruct* p = fonts_[font];
+	
+	/*int h = p->ascent + p->descent;*/
+	int h = p->ascent;
+	int len = strlen(s);
+	int w = XTextWidth(p, s, len);
+	
+	int x, y;
+	matrix_.map(fx, fy, x, y);
+	
+	/* XXX still need to adjust for mismatch between d and actual height*/
+	
+	switch (anchor) {
+		
+	case ANCHOR_CENTER:
+		x -= w / 2;
+		y += h / 2;
+		break;
+		
+	case ANCHOR_NORTH:
+		x -= w / 2;
+		y -= d;
+		break;
+		
+	case ANCHOR_SOUTH:
+		x -= w / 2;
+		y += d + h;
+		break;
+		
+	case ANCHOR_WEST:
+		x -= d + w;
+		y += h / 2;
+		break;
+		
+	case ANCHOR_EAST:
+		x += d;
+		y += h / 2;
+		break;
+	}
+#ifdef OLDX	
+	XDrawString(dpy_, offscreen_, font_gc_[font], x, y, s, len);
+#endif
+	DrawString("fixed", s, x, y, 1);
+}

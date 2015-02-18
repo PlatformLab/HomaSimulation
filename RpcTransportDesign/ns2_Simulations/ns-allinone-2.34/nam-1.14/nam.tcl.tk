@@ -1,0 +1,892 @@
+#
+# Copyright (c) 1993-1994 Regents of the University of California.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. All advertising materials mentioning features or use of this software
+#    must display the following acknowledgement:
+#	This product includes software developed by the Computer Systems
+#	Engineering Group at Lawrence Berkeley Laboratory.
+# 4. Neither the name of the University nor of the Laboratory may be used
+#    to endorse or promote products derived from this software without
+#    specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# @(#) $Header: /cvsroot/nsnam/nam-1/nam.tcl.tk,v 1.1.1.1 1997/06/16 22:40:30 mjh Exp $ (LBL)
+#
+
+source canvas.tcl
+
+set tk_strictMotif 0
+
+set uscale(m) 1e-3
+set uscale(u) 1e-6
+set uscale(k) 1e3
+set uscale(M) 1e6
+
+proc time2real v {
+	global uscale
+	foreach u [array names uscale] {
+		set k [string first $u $v]
+		if { $k >= 0 } {
+			set scale $uscale($u)
+			break
+		}
+	}
+	if { $k > 0 } {
+		set v [string range $v 0 [expr $k - 1]]
+		set v [expr $scale * $v]
+	}
+	return $v
+}
+#XXX
+proc bw2real v {
+	return [time2real $v]
+}
+
+#XXX
+proc mapf s { return $s }
+
+option add Nam.foundry adobe startupFile
+set ff [option get . foundry Nam]
+set helv10 [mapf "-$ff-helvetica-medium-r-normal--*-100-75-75-*-*-*-*"]
+set helv10b [mapf "-$ff-helvetica-bold-r-normal--*-100-75-75-*-*-*-*"]
+set helv10o [mapf "-$ff-helvetica-bold-o-normal--*-100-75-75-*-*-*-*"]
+set helv12 [mapf "-$ff-helvetica-medium-r-normal--*-120-75-75-*-*-*-*"]
+set helv12b [mapf "-$ff-helvetica-bold-r-normal--*-120-75-75-*-*-*-*"]
+set helv14 [mapf "-$ff-helvetica-medium-r-normal--*-140-75-75-*-*-*-*"]
+set helv14b [mapf "-$ff-helvetica-bold-r-normal--*-140-75-75-*-*-*-*"]
+set times14 [mapf  "-$ff-times-medium-r-normal--*-140-75-75-*-*-*-*"]
+
+option add Nam.viewBackground gray80 startupFile
+option add *font $helv12b startupFile
+option add *Font $helv12b startupFile
+
+option add Nam.disablefont $helv10o startupFile
+option add Nam.smallfont $helv10b startupFile
+option add Nam.medfont $helv12b  startupFile
+option add Nam.helpFont $times14 startupFile
+option add Nam.entryFont $helv10 startupFile
+
+option add *Radiobutton.relief flat startupFile
+
+option add Nam.rate		2ms	startupFile
+option add Nam.movie		0	startupFile
+option add Nam.granularity	40	startupFile
+option add Nam.pause		1	startupFile
+
+#
+# use 2 pixels of padding by default
+#
+option add *padX 2 startupFile
+option add *padY 2 startupFile
+#
+# don't put tearoffs in pull-down menus
+#
+option add *tearOff 0 startupFile
+
+proc smallfont { } {
+	return [option get . smallfont Nam]
+}
+proc mediumfont { } {
+	return [option get . medfont Nam]
+}
+
+proc toggle_window w {
+	if ![winfo exists $w] { build$w }
+	global created$w
+	if ![info exists created$w] {
+		set created$w 1
+		wm transient $w .
+		update idletasks
+		set x [winfo rootx .]
+		set y [winfo rooty .]
+		incr y [winfo height .]
+		incr y -[winfo reqheight $w]
+		incr y -20
+ 		# adjust for virtual desktops
+		incr x [winfo vrootx .]
+		incr y [winfo vrooty .]
+		if { $y < 0 } { set y 0 }
+		if { $x < 0 } {
+			set x 0
+		} else {
+			set right [expr [winfo screenwidth .] - \
+					   [winfo reqwidth $w]]
+			if { $x > $right } {
+				set x $right
+			}
+		}
+		wm geometry $w +$x+$y
+		wm deiconify $w
+	} elseif [winfo ismapped $w] {
+		wm withdraw $w
+	} else {
+		wm deiconify $w
+	}
+}
+
+proc backFrame { } {
+	global now timeStep
+	settime [expr $now - $timeStep]
+}
+
+proc nextFrame { } {
+	global now timeStep
+	settime [expr $now + $timeStep]
+}
+
+proc net_settime t {}
+
+#
+# Set time slider to a tick value between 0 and 100.
+#
+set sliderPressed 0
+proc settime t {
+	#XXX
+	net_settime $t    
+
+        global sliderPressed range mintime timeSlider trace now nowDisp \
+		maxtime graphName
+        if { $t > $maxtime } {
+		stop 1
+		return
+	} elseif { $t < $mintime } {
+	        set t $mintime
+	}
+	set now $t
+	set nowDisp [format %.6f $now]
+	if { $sliderPressed == 0 } {
+	        $timeSlider set [expr int(100. * ($now - $mintime) / $range)]
+	}
+	set event [$trace settime $now $sliderPressed]
+	if { [string length $graphName] > 0 } {
+		if { [string length $event] > 0 } {
+			graph_update $event
+		}
+	}
+}
+
+proc draw_data_pnt { tim id } {
+	global prevAckId prevPktId clearDataCmd clearAckCmd lastDrawCmd \
+	       graphName
+	if { $prevAckId != 0 } {
+		tkgraph_cmd 0 $clearAckCmd
+		set prevAckId 0
+	} elseif { $prevPktId != 0 } {
+		tkgraph_cmd 0 $clearDataCmd
+	}
+	set lastDrawCmd "draw_point $graphName $tim $id"
+	tkgraph_cmd 1 $lastDrawCmd
+	set clearDataCmd "clear_point $graphName $tim $id"
+	set prevPktId $id
+}
+
+proc draw_ack_pnt { tim id } {
+	global prevAckId prevPktId delay01 graphName lastDrawCmd clearAckCmd \
+	       clearDataCmd
+	if { $prevAckId != 0 } {
+		tkgraph_cmd 0 $clearAckCmd
+	} elseif { $prevPktId != 0 } {
+		tkgraph_cmd 0 $clearDataCmd
+		set prevPktId 0
+	}
+	set prevAckId $id
+	set arriv [expr $tim + $delay01]
+	set lastDrawCmd "draw_point $graphName $arriv $id"
+	tkgraph_cmd 1 $lastDrawCmd
+	set clearAckCmd "clear_point $graphName $arriv $id"
+}
+
+proc graph_update_interval tim {
+	global intervalStart intervalEnd mintime maxtime lastDrawCmd \
+	       interval graphName
+
+	# Update graph interval as needed.
+	set overlap [expr 0.2 * $interval]
+	if { $tim > $intervalStart && $tim < $intervalEnd } {
+		return
+	}
+	if { $tim > $maxtime } {
+		stop 1
+		return
+	}
+	if { $tim >= [expr $intervalEnd - $overlap] } {
+		set intervalStart [expr $intervalEnd - $overlap]
+	} elseif { $tim < $intervalStart } {
+		set intervalStart [expr $tim - 0.5 * $interval]
+	}
+	set intervalEnd [expr $intervalStart + $interval]
+		
+	# Check if going beyond max x or min x and update interval
+	# accordingly.
+	if { $intervalEnd > $maxtime } {
+		set intervalEnd [expr $maxtime + $overlap]
+		set intervalStart [expr $intervalEnd - $interval]
+	} elseif { $intervalStart <= $mintime } {
+		set intervalStart 0.0
+		set intervalEnd [expr $intervalStart + $interval]
+	}
+
+	set cmd [format "update_graph %s %.17g %.17g" \
+			 $graphName $intervalStart $intervalEnd]
+	tkgraph_cmd 1 $cmd
+	
+	# Redraw last point drawn.
+	tkgraph_cmd 1 $lastDrawCmd
+}
+
+proc graph_update events {
+
+	set el [split $events /]
+	
+	foreach e $el {
+		scan $e "%d %d %g %g" src dst tim id
+
+		# Draw and/or clear any points as needed.
+		if { $src == 0 } {
+			# data packet leaving node 0
+			draw_data_pnt $tim $id
+
+		} elseif { $dst == 0 } {
+			# Ack packet leaving node 1 (to 0).  Just need to save
+			# ack id. Point for ack will be drawn later when the
+			# first data packet sent as a result of this ack leaves
+			# node 0.
+			draw_ack_pnt $tim $id
+		}
+		graph_update_interval $tim
+	}
+}
+
+proc slidetime { tick remote } {
+	global now range mintime trace
+	set now [expr ($tick * $range) / 100. + $mintime]
+	settime $now
+	if { $remote } {
+		peer_cmd 1 "slidetime $tick 0"
+	}
+}
+
+proc bumpstepper { amt remote } {
+	set v [.right.rate get]
+	incr v [expr - $amt]
+	if { $v > 100 } {
+		.right.rate set 100
+	} {
+		if { $v < 0 } {
+			.right.rate set 0
+		} {
+			.right.rate set $v
+		}
+	}
+	if { $remote } {
+		peer_cmd 1 "bumpstepper $amt 0"
+	}
+}
+
+proc renderFrame { } {
+	global running sliderPressed granularity
+	if { $running && !$sliderPressed } {
+		nextFrame
+		update idletasks
+		after $granularity renderFrame
+	}
+}
+
+proc remote_play t {
+        global timeSlider
+        settime $t
+        play 0
+}
+
+proc play remote {
+	global running now
+	set running 1
+	after 0 renderFrame
+	if { $remote } {
+		peer_cmd 1 "remote_play $now"
+	}
+}
+
+proc remote_stop t {
+        stop 0
+        settime $t
+}
+
+proc stop remote {
+	global running now
+	set running 0
+	if { $remote } {
+		peer_cmd 1 "remote_stop $now"
+	}
+}
+
+proc remote_set_time t {
+        global timeSlider
+        settime $t
+}
+
+proc reset { } {
+	settime 0.
+	peer_cmd 1 "remote_set_time 0."
+}
+
+proc rewind { } {
+	global now timeStep
+	set t [expr $now - $timeStep*25.0]
+	settime $t
+	peer_cmd 1 "remote_set_time $t"
+#	settime 0.
+#	peer_cmd 1 "remote_set_time 0."
+}
+
+proc fast_fwd { } {
+	global now timeStep
+        set t [expr $now + $timeStep*25.0]
+        settime $t
+	peer_cmd 1 "remote_set_time $t"
+}
+
+proc next_event { } {
+	global trace running
+	set t [$trace nxtevent]
+	settime $t
+	peer_cmd 1 "remote_set_time $t"
+	if { !$running } {
+		nextFrame
+		peer_cmd 1 nextFrame
+	}
+}
+
+proc step_format t {
+	if { $t < 1e-3 } {
+		return [format "%.1f" [expr $t * 1e6]]us
+	} elseif { $t < 1. } {
+		return [format "%.1f" [expr $t * 1e3]]ms
+	}
+	return [format "%.1f" $t]s
+}
+
+proc set_rate { v remote } {
+	global timeStep stepDisp rateSlider currRate
+	set timeStep [expr pow(10, $v / 10.)]
+	set stepDisp [step_format $timeStep]
+        if { [$rateSlider get] != $v } { $rateSlider set $v }
+	set currRate $v
+	if { $remote } {
+		peer_cmd 1 "set_rate $v 0"
+	}
+}
+
+# Set time to its previous value (before it was changed by
+# pressing mouse button 1 on the time slider).
+proc time_undo { } {
+        global timeSlider prevTime now
+        set currTime $now
+        settime $prevTime
+	peer_cmd 1 "settime $prevTime"
+        set prevTime $currTime
+}
+
+# Set rate to its previous value (before it was changed by
+# pressing mouse button 1 on the rate slider).
+proc rate_undo { } {
+        global prevRate rateSlider
+        set tmpRate [$rateSlider get]
+        set_rate $prevRate 1
+        $rateSlider set $prevRate
+        set prevRate $tmpRate
+}
+
+proc button_release_1 t {
+        global timeSlider
+	slidetime $t 1
+        $timeSlider set $t
+	global sliderPressed
+	set sliderPressed 0
+}
+
+proc button_press_1 s {
+	global sliderPressed prevTime
+	set sliderPressed 1
+        set prevTime $s
+}
+
+proc build.p0 w {
+	scale $w.slider -orient horizontal -width 7p \
+			-from 0 -to 100 -showvalue false -relief groove \
+			-borderwidth 1
+
+	#
+	# We want slightly different semantics.  Instead of tracking
+	# the time slider continuously, we just update it when the
+	# button is released.
+	# E.g., it takes too long to do a fast-forward each time.
+	#
+	global timeSlider 
+	set timeSlider $w.slider
+	bind $timeSlider <ButtonRelease-1> {
+	        set t [%W get]
+		slidetime $t 1
+		global sliderPressed running
+		set sliderPressed 0
+		peer_cmd 1 "button_release_1 $t"
+		if $running {
+			renderFrame
+		}
+	}
+	bind $timeSlider <ButtonPress-1> {
+		global sliderPressed prevTime
+		set sliderPressed 1
+	        set prevTime $now
+		peer_cmd 1 "button_press_1 $prevTime"
+	}
+	bind $timeSlider <B1-Motion> {
+		global range mintime trace nowDisp
+		set tick [%W get]
+		set now [expr ($tick * $range) / 100. + $mintime]
+		set nowDisp [format %%.6f $now]
+	}
+
+#	button $w.rew -bitmap rewind \
+#		-command rewind -anchor center -relief ridge
+#	button $w.stop -bitmap stop \
+#		-command stop -anchor center -relief ridge
+#	button $w.idle -bitmap play \
+#			-command play -anchor center -relief ridge
+#	button $w.ff -bitmap "ff" \
+#			-command fast_fwd -anchor center -relief ridge
+
+	pack $w.slider -side left -fill x -expand 1
+#	pack $w.rew $w.stop $w.idle $w.ff -side left
+}
+
+proc build.p1 w {
+	set f [smallfont]
+	frame $w.bar -relief ridge -borderwidth 2
+	label $w.bar.title -text "   LBL Network Animator v[version]" \
+		-anchor w -font $f -borderwidth 1
+#	label $w.bar.timer -text Time: -font $f -borderwidth 1
+	label $w.bar.timerVal -textvariable nowDisp -width 10 -anchor w -font $f \
+		-borderwidth 1 -relief groove -anchor e
+#	label $v.step -text "  Step:" -font $f -borderwidth 1
+	label $w.bar.stepVal -textvariable stepDisp -width 8 -anchor w -font $f \
+		-borderwidth 1 -relief groove -anchor e
+
+	pack $w.bar.title -side left -fill x -expand 1
+	pack $w.bar.timerVal $w.bar.stepVal -side left -pady 1 \
+		-ipady 1 -padx 1 -padx 1
+
+#	button $w.help -text Help -borderwidth 2 -relief raised \
+#		-font $f -command "toggle_window .help" -width 5
+
+	checkbutton $w.bar.run -text Run -borderwidth 1 -relief raised \
+		-highlightthickness 1 -font $f -variable running \
+		-command renderFrame
+
+	button $w.bar.rew -text Rew -borderwidth 1 -relief raised \
+		-highlightthickness 1 -font $f -command rewind
+
+	button $w.bar.quit -text Quit -borderwidth 1 -relief raised \
+		-highlightthickness 1 -font $f -command done
+
+
+	pack $w.bar.run $w.bar.rew $w.bar.quit -side left \
+		-padx 1 -pady 1 -ipadx 2
+#	pack $w.bar.run -side left -padx 1 -pady 1
+	pack $w.bar -fill x
+}
+
+proc back_step { } {
+        global running
+        if $running { stop 1 }
+	backFrame
+	peer_cmd 1 backFrame
+}
+
+proc toggle_pause { } {
+        global running
+        if $running {
+		stop 1
+	} else {
+		play 1
+	}
+}
+
+proc single_step { } {
+        global running
+        if $running { stop 1 }
+        nextFrame
+	peer_cmd 1 nextFrame
+}
+
+proc dead name {
+	global peers
+	set i [lsearch -exact $peers $name]
+	set peers [lreplace $peers $i $i]
+}
+
+proc done { } {
+        peer_cmd 1 "dead \"[winfo name .]\""
+#	peer_cmd 1 "destroy ."
+#	tkgraph_cmd 1 "destroy ."
+        destroy .
+}
+
+proc all_done { } {
+	peer_cmd 1 "destroy ."
+	tkgraph_cmd 1 "destroy ."
+	destroy .
+}
+
+proc remote_change_rate r {
+        global timeStep stepDisp
+        set timeStep $r
+        set stepDisp [step_format $r]
+}
+
+proc change_rate inc {
+        global timeStep stepDisp
+        if $inc {
+	        set timeStep [expr $timeStep + $timeStep*0.05]
+	} else {
+	        set timeStep [expr $timeStep - $timeStep*0.05]
+	}	    
+        set stepDisp [step_format $timeStep]
+	peer_cmd 1 "remote_change_rate $timeStep"
+}
+
+proc start_info { x y } {
+	global running resume nowDisp netView
+	if $running {
+	        set resume 1 
+        } else {
+	        set resume 0
+	}
+	stop 1
+	set text [$netView info $nowDisp]
+	if { [string length $text] > 0 } {
+		message $netView.msg -width 8c -text $text
+		place $netView.msg -x $x -y $y
+	}
+}
+
+proc end_info {} { 
+        global resume netView
+	catch { destroy $netView.msg }
+        if $resume { play 1 }
+}
+
+proc graph_init graphInput {
+	global prevAckId prevPktId interval intervalStart intervalEnd range \
+	       clearDataCmd graphName delay01 graphTool
+	set prevAckId 0
+	set prevPktId 0
+	set delay01 0
+	set clearDataCmd ""
+	set intervalStart 0.0
+	set intervalEnd [expr $intervalStart + $interval]
+	exec tkgraph $graphInput &
+	after 1000
+	set interps [winfo interps]
+	foreach i $interps {
+		if [regexp ^tkgraph* $i] {
+			after 1000
+			set graphTool $i
+			set graphName [send $i {graph_name}]
+			tkgraph_cmd 0 \
+			  "update_graph $graphName $intervalStart $intervalEnd"
+			break
+		}
+	}
+}
+
+proc tkgraph_cmd { async cmd } {
+	global graphName graphTool
+	if { [string length $graphName] > 0 } {
+		remote_cmd $async $graphTool $cmd
+	}
+}
+proc remote_cmd { async interp cmd } {
+	if $async {
+		set rcmd "send -async \"$interp\" {$cmd}"
+	} else {
+		set rcmd "send \"$interp\" {$cmd}"
+	}
+	eval $rcmd
+}
+
+#proc master_cmd { async cmd } {
+#	global master
+#	if { [llength $master] > 0 } {
+#		remote_cmd $async $master $cmd
+#	}
+#}
+
+proc peer_cmd { async cmd } {
+	global peers
+	foreach s $peers {
+		remote_cmd $async $s $cmd
+	}
+}
+
+proc peer_init name {
+	peer $name 0
+	peer_cmd 0 "peer \"[winfo name .]\" 1"
+}
+
+proc peer { name remote } {
+	global peers
+	if { $remote } {
+		peer_cmd 1 "peer \"$name\" 0"
+		foreach s $peers {
+			remote_cmd 1 $name "peer \"$s\" 0"
+		}
+	}
+	lappend peers $name
+}
+
+# nam_init trace-name [g=graph-input] [i=graph-interval]
+# where trace-name is the nam trace input file
+#       graph-input is the input tcl file to tkgraph (optional)
+#       graph-interval is the graph interval to be used (optional)
+#                      and is only meaningful when a graph input file
+#                      is provided
+proc nam_init { tracefile args } {
+	. configure -background [option get . background Nam]
+
+	global trace now mintime range maxtime timeStep prevTime prevRate \
+               rateSlider netView netModel currRate graphName \
+	       interval running peers peerName granularity
+	set netModel [new NetworkModel]
+	set trace [new Trace $tracefile]
+	set now [$trace mintime]
+	set mintime $now
+        set maxtime [expr [$trace maxtime] + .05]
+	set range [expr $maxtime - $mintime]
+        set prevTime $mintime
+	$trace connect $netModel
+
+        canvas .view2 -width 400 -height 150 -background white
+        global canv
+        set canv .view2
+	frame .view
+	nam_config $netModel
+	$netModel layout
+	$netModel view .view.net
+        set netView .view.net
+	set running 0
+
+	set interval [expr $range / 7.]
+	set graphName ""
+	set graphInput ""
+	set peerName ""
+	set peers ""
+	set i 0
+	foreach a $args {
+		set x [lindex $args [expr $i+1]]
+		set aa [split $a "="]
+		set pn [format "%s %s" [lindex $aa 1] $x]
+		switch [lindex $aa 0] {
+			g {set graphInput [lindex $aa 1]}
+			i {set interval [lindex $aa 1]}
+			p {
+				if {[string length $x] > 0} {
+					set peerName $pn
+				} else {
+					set peerName [lindex $aa 1]
+				}
+			}
+		}
+		incr i
+	}
+
+	if { [llength $graphInput] > 0 } {
+		graph_init $graphInput
+	}
+	if { [llength $peerName] > 0 } {
+		peer_init $peerName
+	}
+
+	scale .view.rate -orient vertical -width 7p \
+			-from 1 -to -60 -showvalue false \
+			-relief groove
+        set rateSlider .view.rate
+	set granularity [option get . granularity Nam]
+	set timeStep [time2real [option get . rate Nam]]
+        set currRate [expr 10*log10($timeStep)]
+        set prevRate $currRate
+	$rateSlider set $currRate
+
+	pack .view.net -side left -expand 1 -fill both
+	pack .view.rate -side left -fill y
+	
+        bind $rateSlider <ButtonRelease-1> { 
+		set v [%W get]
+		set_rate $v 1
+	}
+	bind $rateSlider <ButtonPress-1> {
+		global currRate prevRate
+		set prevRate $currRate
+	}
+	bind $rateSlider <B1-Motion> {
+		global timeStep stepDisp
+		set v [%W get]
+		set timeStep [expr pow(10, $v / 10.)]
+		set stepDisp [step_format $timeStep]
+	}
+	
+	frame .ctrl -relief flat -borderwidth 0
+	frame .ctrl.p0 -relief flat -borderwidth 0
+	build.p0 .ctrl.p0
+	frame .ctrl.p1 -relief flat -borderwidth 0
+	build.p1 .ctrl.p1
+
+	pack .ctrl.p0 .ctrl.p1 -side top -fill x
+	pack .view -fill both -expand 1
+	pack .view2 -side top -expand 1
+	pack .ctrl -fill x
+	wm minsize . 200 200
+
+	settime $now
+	set_rate $currRate 1
+	
+        bind . <q> { done }
+	bind . <Q> { all_done }
+	bind . <Control-c> { done }
+	bind . <Control-d> { done }
+
+	bind . <space> { toggle_pause }
+	bind . <Return> { single_step }
+        bind . <b> { back_step }
+        bind . <B> { back_step }
+	bind . <BackSpace> { back_step }
+	bind . <Delete> { back_step }
+
+	bind .view.net <ButtonPress-3> { start_info %x %y }
+	bind .view.net <ButtonRelease-3> { end_info }
+
+	bind . <0> { reset }
+	bind . <c> { play 1 }
+	bind . <C> { play 1 }
+	bind . <f> { fast_fwd }
+	bind . <F> { fast_fwd }
+	bind . <n> { next_event }
+	bind . <N> { next_event }
+	bind . <p> { stop 1 }
+	bind . <P> { stop 1 }
+	bind . <r> { rewind }
+	bind . <R> { rewind }
+	bind . <u> { time_undo }
+	bind . <U> { time_undo }
+	bind . <x> { rate_undo }
+	bind . <X> { rate_undo }
+	bind . <period> { change_rate 1 }
+	bind . <greater> { change_rate 1 }
+	bind . <comma> { change_rate 0 }
+	bind . <less> { change_rate 0 }
+}
+
+
+set helpno 0
+proc helpitem { w text } {
+	global helpno
+	set f [option get . helpFont Nam]
+	set h $w.h$helpno
+	incr helpno
+	frame $h
+	canvas $h.bullet -width 12 -height 12 
+	$h.bullet create oval 6 3 12 9 -fill black
+	message $h.msg -justify left -anchor w -font $f -width 460 -text $text
+	pack $h.bullet -side left -anchor ne -pady 5
+	pack $h.msg -side left -expand 1 -fill x -anchor nw
+	pack $h -expand 1 -fill both
+}
+
+proc build.help { } {
+	set w .help
+	if [winfo exists $w] { return }
+	toplevel $w
+	bind $w <Enter> "focus $w"
+	wm withdraw $w
+	wm iconname $w "nam help"
+	wm title $w "nam help"
+
+	frame $w.frame -borderwidth 2 -relief raised
+	set p $w.frame
+	helpitem $p "Sorry, nothing here yet."
+
+	button $w.frame.ok -text " Dismiss " -borderwidth 2 -relief raised \
+		-command "wm withdraw $w" -font [mediumfont] 
+	pack $w.frame.ok -pady 6 -padx 6 -anchor e
+
+	pack $w.frame -expand 1 -fill both
+}
+
+#
+# helper functions
+#
+proc nam_angle { v } {
+	switch $v {
+		up-right -
+		right-up	{ return 0.25 }
+		up		{ return 0.5 }
+		up-left -
+		left-up		{ return 0.75 }
+		left		{ return 1. }
+		left-down -
+		down-left	{ return 1.25 }
+		down		{ return 1.5 }
+		down-right -
+		right-down	{ return 1.75 }
+		default		{ return 0.0 }
+	}
+}
+
+proc mklink { net n0 n1 bandwidth delay angle } {
+	global delay01
+	set th [nam_angle $angle]
+	set result [$net link $n0 $n1 \
+			[bw2real $bandwidth]  [time2real $delay] $th]
+	$net link $n1 $n0 \
+		[bw2real $bandwidth] [time2real $delay] [expr $th + 1]
+	if { $n0 == 0 && $n1 == 1 } {
+		set delay01 $result
+	}
+}
+
+proc mklinkq { net n0 n1 bandwidth delay angle } {
+	mklink $net $n0 $n1 $bandwidth $delay $angle
+	$net queue $n0 $n1 0.5
+	$net queue $n1 $n0 0.5
+}
+
+proc ncolor {n0 color} {
+	global netModel
+	$netModel ncolor $n0 $color
+}
+
+proc ecolor {n0 n1 color} {
+	global netModel
+	$netModel ecolor $n0 $n1 $color
+	$netModel ecolor $n1 $n0 $color
+}

@@ -1,0 +1,8 @@
+config.cache
+config.log
+config.status
+gen
+Makefile
+nam
+nam-src*.tar.gz
+autoconf.h

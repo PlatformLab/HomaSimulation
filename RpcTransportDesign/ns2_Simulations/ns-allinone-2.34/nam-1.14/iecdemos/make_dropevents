@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# this script looks for drops in the trace (.tr) file, and
+# creates tcl code that will trigger nam annotations corresponding to them
+#
+egrep "^d" $1 | \
+	awk 'BEGIN { n=1 } { print "$ns at " $2 " \"$ns trace-annotate \\\"packet drop " n " (t=" $2 ")" "\\\"\""; ++n }';

@@ -1,0 +1,60 @@
+[ August 1999 ]
+
+Following tcl files are ns-scripts for Directed Research with Dr.Heidemann.
+You could see the explanation about those files 
+at http://www-scf.usc.edu/~hyunahpa/D-Research/DR-home.html
+
+There are 3 kinds of files per each mechanism, which are xx.tcl, xx.nam, and xx.tr.
+
+All of the scripts whose file name start with 'B#- ' have same configuration, which
+has 6 nodes and 5 linkes like this.. 
+
+There are 2 flows which are TCP (between s1 & s3) and CBR (between s2 & s4).
+
+s1  		   s3
+  \		  /
+   r1 ----------r2  
+  /		  \
+s2		   s4
+	
+
+*** for better viewing, adjust Step from default 2.0ms to 1.3ms ***
+  
+FILE NAME	 	DESCRIPTION
+--------------------------------------------------------------------------------
+
+B0-README		This file
+
+B1-stop-n-wait		Stop-and-wait protocol between s1 and s3.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+B2-stop-n-wait-loss     Stop-and-wait protocol in congestion.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+B3-sliding-window       Sliding-window protocol between s1 and s3.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+B4-sliding-window-loss  Sliding-window protocol in congestion.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+B5-slow-start           Slow start protocol between s1 and s3.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                To see nam-graph, click 'Active Sessions' under
+                                'Analysis' in the nam menu, then click 'TCP session'
+
+B6-slow-start-loss       Slow start protocol with a packet loss.
+                         feature : label, annotation, nam-graph, and cwnd monitor
+                                To see nam-graph, click 'Active Sessions' under
+                                'Analysis' in the nam menu, then click 'TCP session'
+
+---------------------------------------------------------------------------------------
+
+written by Hyunah Park ( hyunahpa@usc.edu )

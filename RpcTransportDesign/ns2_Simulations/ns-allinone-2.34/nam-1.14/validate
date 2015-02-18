@@ -1,0 +1,54 @@
+#!/bin/sh
+
+#
+# validate -- run all the test scripts
+#
+# Copyright (c) 1997 University of Southern California.
+# All rights reserved.                                            
+#                                                                
+# Redistribution and use in source and binary forms are permitted
+# provided that the above copyright notice and this paragraph are
+# duplicated in all such forms and that any documentation, advertising
+# materials, and other materials related to such distribution and use
+# acknowledge that the software was developed by the University of
+# Southern California, Information Sciences Institute.  The name of the
+# University may not be used to endorse or promote products derived from
+# this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+
+try () {
+	echo "*** $1"
+  $1 || {
+		any_failed=true
+		failed_list="$failed_list $1"
+	}
+	return $?
+}
+
+any_failed=false
+failed_list=""
+
+cd tcl/test
+
+for i in ptp lan wireless dynamic
+do
+  try ./test-all-$i
+done
+
+if  $any_failed
+		then
+				echo "validate overall report: some tests failed:"
+				echo "$failed_list"
+				echo "to re-run a specific: cd tcl/test; ./test-all-TEST-NAME"
+				exit 1
+else
+		echo "validate overall report: all tests passed" 
+		exit 0
+fi
+
+
+

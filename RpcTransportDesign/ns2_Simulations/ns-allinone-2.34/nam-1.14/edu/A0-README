@@ -1,0 +1,57 @@
+[ August 1999 ]
+
+Following tcl files are ns-scripts for Directed Research with Dr.Heidemann. 
+You could see the explanation about those files 
+at http://www-scf.usc.edu/~hyunahpa/D-Research/DR-home.html 
+
+All of the files which are using slidingwindow protocol are not
+actually executing when users run it, instead it run old nam trace
+file which are made before. 
+
+There are 3 kinds of files per each mechanism, which are xx.tcl, xx.nam, and xx.tr.
+
+All of the scripts whose file name start with 'A#- ' have same configuration, which
+has 2 nodes and 1 link between them like this..
+
+n0 ---------- n1
+
+
+FILE NAME	 	DESCRIPTION
+---------------------------------------------------------------------------------------
+
+A0-README		This file
+
+A1-stop-n-wait		Simple stop-and-wait protocol between 2 nodes. 
+			feature	: label, annotation, nam-graph, and cwnd monitor
+			  	  To see nam-graph, click 'Active Sessions' under 
+                          	  'Analysis' in the nam menu, then click 'TCP session' 
+
+A2-stop-n-wait-loss	Simple stop-and-wait protocol with a packet loss.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                  To see nam-graph, click 'Active Sessions' under
+                                  'Analysis' in the nam menu, then click 'TCP session'
+
+A3-sliding-window	Simple sliding-window protocol between 2 nodes.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+
+A4-slow-start		Simple slow start protocol between 2 nodes.
+                        feature : label, annotation, nam-graph, and cwnd monitor
+                                To see nam-graph, click 'Active Sessions' under
+                                'Analysis' in the nam menu, then click 'TCP session'
+
+A5-slow-start-loss	 Simple slow start protocol with a packet loss.
+                         feature : label, annotation, nam-graph, and cwnd monitor
+                                To see nam-graph, click 'Active Sessions' under
+                                'Analysis' in the nam menu, then click 'TCP session'
+
+---------------------------------------------------------------------------------------
+
+written by Hyunah Park ( hyunahpa@usc.edu )
+
+
+
+
+
+
+
+
