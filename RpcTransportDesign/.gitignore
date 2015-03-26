@@ -1,1 +1,6 @@
-OMNeT++Simulation/
+#ignore everything in OMNeT++Simulation directory
+#except the homatransport directory
+!OMNeT++Simulation
+OMNeT++Simulation/*
+!OMNeT++Simulation/homatransport
+

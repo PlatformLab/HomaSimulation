@@ -1,0 +1,43 @@
+# ignore generated files
+*_m.h
+*_m.cc
+*_sm.h
+*_sm.cc
+**/Makefile
+**/Makefile.vc
+**/results*/
+*.log
+*.sim
+*.pyc
+*.pcap
+*.sca
+*.vec
+.buildlog*
+
+# ignore binary files
+out/
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.o
+*.obj
+*.pdb
+*.idb
+*.manifest
+.tkenvrc
+.tkenvlog
+.cmdenv-log
+netanim-trace.txt
+*.out
+gcc-debug
+
+# ignore backup and temp files
+*.bak
+backups
+*~
+xxx
+/3rdparty
+/tmp/
