@@ -26,7 +26,7 @@ module Rack
         double linkDelay @unit(us);
         int nicLinkSpeed @unit(Gbps);
         int numServersPerTor;
-        @display("bgb=764,443");
+        @display("bgb=394,286");
     gates:
         inout upLink[];
 
@@ -40,7 +40,7 @@ module Rack
     submodules:
         tor: Router {
             parameters:
-                @display("p=382,237");
+                @display("p=177,170");
         }
 
         host[numServersPerTor]: StandardHost {
@@ -61,11 +61,11 @@ module Rack
 network DcnTopo
 {
     parameters:
-        int numServersPerTor = default(16);
+        int numServersPerTor = default(4);
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
         int numTors = default(2);
-        int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
+        int fabricLinkSpeed @unit(Gbps) = default(10Gbps); // greater and equal
                                                            // to nicLinkSpeed
         double fabricLinkDelay @unit(us) = default(0.2us);
         int numAggSwitches = default(2);
@@ -80,7 +80,7 @@ network DcnTopo
                 (overSubFactor* numAggSwitches * fabricLinkSpeed);
 
 
-        @display("bgb=880,325");
+        @display("bgb=319,325");
     types:
         channel FabricChannel extends DatarateChannel
         {
@@ -102,7 +102,7 @@ network DcnTopo
 
     connections allowunconnected:
         for i=0..numTors-1, for j=0..numAggSwitches-1,
-                for k=0..numAggLinksPerTor-1 {
+                    for k=0..numAggLinksPerTor-1 {
             rack[i].upLink++ <--> FabricChannel <--> aggRouter[j].ethg++;
         }
 }

@@ -1,0 +1,12 @@
+2014-11-07  ------ inet-2.99.0 released ------
+
+2014-10-31  Levente Meszaros
+
+	Added initial implementation:
+	AntennaBase, AttenuationBase, ErrorModelBase, FlatNoiseBase,
+	FlatReceiverBase, FlatReceptionBase, FlatTransmissionBase,
+	FlatTransmitterBase, ListeningBase, NoiseBase, PhysicalLayerBase,
+	PropagationBase, ReceiverBase, ReceptionBase, SNIRBase, SNIRReceiverBase,
+	TransmissionBase, TransmitterBase
+
+2013-07-25  ====== inet-3.x development started (integration branch) ======
