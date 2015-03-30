@@ -1,0 +1,10 @@
+2014-11-07  ------ inet-2.99.0 released ------
+
+2014-10-31  Levente Meszaros
+
+	Added initial implementation:
+	BreakpointPathLoss, FreeSpacePathLoss, LogNormalShadowing, NakagamiFading, 
+	RayleighFading, RicianFading, SUIPathLoss, TwoRayGroundReflection,
+	UWBIRStochasticPathLoss
+
+2013-07-25  ====== inet-3.x development started (integration branch) ======
