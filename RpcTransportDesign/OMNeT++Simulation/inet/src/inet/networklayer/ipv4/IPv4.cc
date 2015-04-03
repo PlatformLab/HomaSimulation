@@ -63,6 +63,8 @@ void IPv4::initialize(int stage)
         fragmentTimeoutTime = par("fragmentTimeout");
         forceBroadcast = par("forceBroadcast");
         useProxyARP = par("useProxyARP");
+        numUpLinks = par("numUpLinks");
+        multipathEnabled = par("supportMultiPathRouting");
 
         curFragmentId = 0;
         lastCheckTime = 0;
@@ -436,6 +438,28 @@ void IPv4::routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *from
         if (re) {
             destIE = re->getInterface();
             nextHopAddr = re->getGateway();
+
+            // If interface is uplink, choose a random route instead of this one
+            if (multipathEnabled && (numUpLinks > 0)) {
+
+                // Assumption here is that first id is the loopback interface,
+                // then comes downLink interfaces and highest ids belong to
+                // uplink interfaces. If you add or delete interfaces after
+                // initialization, this piece of code will cause bugs in the
+                // router.
+                int firstUplinkIfaceId = ift->getNumInterfaces() - numUpLinks;
+                if (destIE->getInterfaceId() >= firstUplinkIfaceId) {
+                    
+                    // choose a random uplink interface for destIE
+                    int randomIfaceId = (rand() % numUpLinks) + firstUplinkIfaceId;
+                    destIE = ift->getInterfaceById(randomIfaceId); 
+
+                    // set nextHopAddr
+                    nextHopAddr = ;
+                }
+
+
+            }
         }
     }
 

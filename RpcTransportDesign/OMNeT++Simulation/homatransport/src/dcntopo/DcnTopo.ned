@@ -79,6 +79,8 @@ network DcnTopo
         int numAggLinksPerTor = numServersPerTor * nicLinkSpeed / 
                 (overSubFactor* numAggSwitches * fabricLinkSpeed);
 
+        rack[*].tor.networkLayer.ip.numUpLinks = numAggLinksPerTor * numAggSwitches;
+        rack[*].tor.networkLayer.ip.supportMultiPathRouting = true;
 
         @display("bgb=319,325");
     types:
@@ -101,8 +103,8 @@ network DcnTopo
         }
 
     connections allowunconnected:
-        for i=0..numTors-1, for j=0..numAggSwitches-1,
-                    for k=0..numAggLinksPerTor-1 {
-            rack[i].upLink++ <--> FabricChannel <--> aggRouter[j].ethg++;
+        for j=0..numAggSwitches-1, for k=0..numAggLinksPerTor-1,
+                for i=0..numTors-1 {
+            aggRouter[j].ethg++ <--> FabricChannel <--> rack[i].upLink++ ;
         }
 }

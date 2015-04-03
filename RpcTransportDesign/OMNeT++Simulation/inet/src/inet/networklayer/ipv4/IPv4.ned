@@ -96,6 +96,8 @@ simple IPv4
         double fragmentTimeout @unit("s") = default(60s);
         bool forceBroadcast = default(false);
         bool useProxyARP = default(true);
+        bool supportMultiPathRouting = default(false); // <Behnam> if true, the packets will be forwarded on a random path in the uplink direction 
+        int numUpLinks = default(0); // <Behnam> number of links connected to up layer switches. 
         @display("i=block/routing");
         @signal[NF_IPv4_NEW_MULTICAST](type=IPv4Datagram);
         @signal[NF_IPv4_DATA_ON_NONRPF](type=IPv4Datagram);

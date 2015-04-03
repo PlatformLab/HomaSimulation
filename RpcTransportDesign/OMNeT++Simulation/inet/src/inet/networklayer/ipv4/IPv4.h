@@ -102,6 +102,10 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle, pu
     typedef std::list<QueuedDatagramForHook> DatagramQueueForHooks;
     DatagramQueueForHooks queuedDatagramsForHooks;
 
+    // multipath routing for routers in upward direction
+    int numUpLinks;
+    bool multipathEnabled;
+
   protected:
     // utility: look up interface from getArrivalGate()
     virtual const InterfaceEntry *getSourceInterfaceFrom(cPacket *packet);
