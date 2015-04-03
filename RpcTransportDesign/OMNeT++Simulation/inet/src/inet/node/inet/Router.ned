@@ -57,6 +57,7 @@ module Router extends NodeBase
         bool hasBGP = default(false);
         string tcpType = default(firstAvailable("TCP", "TCP_lwIP", "TCP_NSC", "TCP_None"));  // tcp implementation (e.g. ~TCP, ~TCP_lwIP, ~TCP_NSC) or ~TCPSpoof
         string udpType = default("UDP");
+        int numUpLinks = default(0);
     submodules:
         ospf: OSPFRouting if hasOSPF {
             parameters:

@@ -63,6 +63,8 @@ void IPv4::initialize(int stage)
         fragmentTimeoutTime = par("fragmentTimeout");
         forceBroadcast = par("forceBroadcast");
         useProxyARP = par("useProxyARP");
+        numUpLinks = par("numUpLinks");
+        multipathSupported = par("supportMultiPathRouting");
 
         curFragmentId = 0;
         lastCheckTime = 0;
