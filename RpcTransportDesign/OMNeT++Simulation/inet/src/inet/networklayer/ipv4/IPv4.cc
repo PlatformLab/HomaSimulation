@@ -447,15 +447,16 @@ void IPv4::routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *from
                 // uplink interfaces. If you add or delete interfaces after
                 // initialization, this piece of code will cause bugs in the
                 // router.
-                int firstUplinkIfaceId = ift->getNumInterfaces() - numUpLinks;
+                int firstUplinkIfaceId = ift->getInterface(0)->getInterfaceId() + ift->getNumInterfaces() - numUpLinks;
                 if (destIE->getInterfaceId() >= firstUplinkIfaceId) {
                     
                     // choose a random uplink interface for destIE
                     int randomIfaceId = (rand() % numUpLinks) + firstUplinkIfaceId;
+                    EV_DETAIL << "\nOriginal interfaceId: " << destIE->getInterfaceId() << "InterfaceId chosen: " << randomIfaceId <<" \n";
                     destIE = ift->getInterfaceById(randomIfaceId); 
 
                     // set nextHopAddr
-                    nextHopAddr = ;
+                    nextHopAddr = IPv4Address::UNSPECIFIED_ADDRESS;
                 }
 
 
