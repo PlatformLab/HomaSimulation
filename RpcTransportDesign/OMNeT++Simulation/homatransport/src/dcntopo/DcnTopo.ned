@@ -61,25 +61,25 @@ module Rack
 network DcnTopo
 {
     parameters:
-        int numServersPerTor = default(4);
+        int numServersPerTor = default(12);
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
-        int numTors = default(2);
-        int fabricLinkSpeed @unit(Gbps) = default(10Gbps); // greater and equal
+        int numTors = default(4);
+        int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
                                                            // to nicLinkSpeed
+
         double fabricLinkDelay @unit(us) = default(0.2us);
-        int numAggSwitches = default(2);
         double overSubFactor = default(1.0); // must be larger than 1.0
                                              // 1.0 means full bisection bw
+
+        int numAggSwitches = (numServersPerTor * nicLinkSpeed) / 
+                (overSubFactor * fabricLinkSpeed);
 
         rack[*].numServersPerTor = numServersPerTor;
         rack[*].nicLinkSpeed = nicLinkSpeed;
         rack[*].linkDelay = default(0.05us);
 
-        int numAggLinksPerTor = numServersPerTor * nicLinkSpeed / 
-                (overSubFactor* numAggSwitches * fabricLinkSpeed);
-
-        rack[*].tor.networkLayer.ip.numUpLinks = numAggLinksPerTor * numAggSwitches;
+        rack[*].tor.networkLayer.ip.numUpLinks =  numAggSwitches;
         rack[*].tor.networkLayer.ip.supportMultiPathRouting = true;
 
         @display("bgb=319,325");
@@ -103,8 +103,7 @@ network DcnTopo
         }
 
     connections allowunconnected:
-        for j=0..numAggSwitches-1, for k=0..numAggLinksPerTor-1,
-                for i=0..numTors-1 {
+        for j=0..numAggSwitches-1, for i=0..numTors-1 {
             aggRouter[j].ethg++ <--> FabricChannel <--> rack[i].upLink++ ;
         }
 }
