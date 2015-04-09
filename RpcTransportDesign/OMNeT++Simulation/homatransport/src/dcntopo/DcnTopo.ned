@@ -61,14 +61,14 @@ module Rack
 network DcnTopo
 {
     parameters:
-        int numServersPerTor = default(12);
+        int numServersPerTor = default(4);
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
         int numTors = default(4);
         int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
                                                            // to nicLinkSpeed
 
-        double fabricLinkDelay @unit(us) = default(0.2us);
+        double fabricLinkDelay @unit(us) = default(0.02us);
         double overSubFactor = default(1.0); // must be larger than 1.0
                                              // 1.0 means full bisection bw
 
@@ -81,6 +81,7 @@ network DcnTopo
 
         rack[*].tor.networkLayer.ip.numUpLinks =  numAggSwitches;
         rack[*].tor.networkLayer.ip.supportMultiPathRouting = true;
+        rack[*].tor.**.promiscuous = true;
 
         @display("bgb=319,325");
     types:
@@ -93,6 +94,7 @@ network DcnTopo
     submodules:
         aggRouter[numAggSwitches]: Router {
             @display("i=abstract/router2");
+            **.promiscuous = true;
         }
         rack[numTors]: Rack {
             @display("i=misc/city");

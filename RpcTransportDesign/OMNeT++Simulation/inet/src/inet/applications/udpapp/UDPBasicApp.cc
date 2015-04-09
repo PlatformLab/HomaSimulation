@@ -109,6 +109,8 @@ L3Address UDPBasicApp::chooseDestAddr()
             token = tokenizer.nextToken();
         destAddresses[k] = L3AddressResolver().resolve(token);
     }
+
+    EV_DETAIL << "Selected destination address: " << destAddresses[k].str() << " among " << destAddresses.size() <<" available destinations.\n";
     return destAddresses[k];
 }
 
