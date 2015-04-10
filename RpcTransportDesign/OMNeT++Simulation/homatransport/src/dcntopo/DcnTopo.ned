@@ -20,70 +20,33 @@ import inet.node.inet.StandardHost;
 import ned.DatarateChannel;
 import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
 
-module Rack
-{
-    parameters:
-        double linkDelay @unit(us);
-        int nicLinkSpeed @unit(Gbps);
-        int numServersPerTor;
-        @display("bgb=394,286");
-    gates:
-        inout upLink[];
-
-    types:
-        channel EdgeChannel extends DatarateChannel
-        {
-            datarate = nicLinkSpeed;
-            delay = linkDelay;
-        }
-
-    submodules:
-        tor: Router {
-            parameters:
-                @display("p=177,170");
-        }
-
-        host[numServersPerTor]: StandardHost {
-            parameters:
-                @display("i=device/server2");
-        }
-
-    connections:
-        for i=0..numServersPerTor-1 {
-            tor.ethg++ <--> EdgeChannel <--> host[i].ethg++;
-        }
-
-        for i=0..sizeof(upLink)-1 {
-            tor.ethg++ <--> upLink[i];
-        }
-}
-
 network DcnTopo
 {
     parameters:
-        int numServersPerTor = default(4);
+        int numServersPerTor = default(8);
+        double edgeLinkDelay @unit(us) = default(0.05us);
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
         int numTors = default(4);
+        double fabricLinkDelay @unit(us) = default(0.02us);
         int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
                                                            // to nicLinkSpeed
 
-        double fabricLinkDelay @unit(us) = default(0.02us);
         double overSubFactor = default(1.0); // must be larger than 1.0
                                              // 1.0 means full bisection bw
 
         int numAggSwitches = (numServersPerTor * nicLinkSpeed) / 
                 (overSubFactor * fabricLinkSpeed);
 
-        rack[*].numServersPerTor = numServersPerTor;
-        rack[*].nicLinkSpeed = nicLinkSpeed;
-        rack[*].linkDelay = default(0.05us);
 
-        rack[*].tor.networkLayer.ip.numUpLinks =  numAggSwitches;
-        rack[*].tor.networkLayer.ip.supportMultiPathRouting = true;
-        rack[*].tor.**.promiscuous = true;
+        tor[*].networkLayer.ip.numUpLinks =  numAggSwitches;
+        tor[*].networkLayer.ip.supportMultiPathRouting = true;
+        aggRouter[*].networkLayer.ip.supportMultiPathRouting = true;
+
+        int numHosts = numServersPerTor * numTors;
 
         @display("bgb=319,325");
+
     types:
         channel FabricChannel extends DatarateChannel
         {
@@ -91,21 +54,40 @@ network DcnTopo
             delay = fabricLinkDelay;
         }
 
+        channel EdgeChannel extends DatarateChannel
+        {
+            datarate = nicLinkSpeed;
+            delay = edgeLinkDelay;
+        }
+
     submodules:
         aggRouter[numAggSwitches]: Router {
             @display("i=abstract/router2");
             **.promiscuous = true;
         }
-        rack[numTors]: Rack {
-            @display("i=misc/city");
+
+        tor[numTors]: Router {
+            @display("i=abstract/router");
+            **.promiscuous = true;
         }
+
+        host[numHosts]: StandardHost {
+            parameters:
+                @display("i=device/server2");
+        }
+
         configurator: IPv4NetworkConfigurator {
             parameters:
                 @display("p=26,25");
         }
 
     connections allowunconnected:
-        for j=0..numAggSwitches-1, for i=0..numTors-1 {
-            aggRouter[j].ethg++ <--> FabricChannel <--> rack[i].upLink++ ;
+        for i=0..numTors-1, for j=0..numServersPerTor-1 {
+            tor[i].ethg++ <--> EdgeChannel <--> host[i * numServersPerTor + j].ethg++ ;
         }
+        
+        for i=0..numAggSwitches-1, for j=0..numTors-1 {
+            aggRouter[i].ethg++ <--> FabricChannel <--> tor[j].ethg++ ;
+        }
+
 }
