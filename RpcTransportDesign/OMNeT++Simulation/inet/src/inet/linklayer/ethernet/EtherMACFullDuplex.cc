@@ -257,6 +257,8 @@ void EtherMACFullDuplex::handleEndTxPeriod()
 
     emit(packetSentToLowerSignal, curTxFrame);    //consider: emit with start time of frame
 
+    emit(frameSentTimeStamptAtMACSignal, curTxFrame->getEncapsulationTreeId());
+
     if (dynamic_cast<EtherPauseFrame *>(curTxFrame) != NULL) {
         numPauseFramesSent++;
         emit(txPausePkUnitsSignal, ((EtherPauseFrame *)curTxFrame)->getPauseTime());
@@ -309,6 +311,8 @@ void EtherMACFullDuplex::handleEndPausePeriod()
 void EtherMACFullDuplex::processReceivedDataFrame(EtherFrame *frame)
 {
     emit(packetReceivedFromLowerSignal, frame);
+
+    emit(frameRcvdTimeStamptAtMACSignal, frame->getEncapsulationTreeId());
 
     // strip physical layer overhead (preamble, SFD) from frame
     frame->setByteLength(frame->getFrameByteLength());

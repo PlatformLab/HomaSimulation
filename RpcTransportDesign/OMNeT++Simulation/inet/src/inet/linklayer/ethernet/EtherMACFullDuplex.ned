@@ -147,6 +147,9 @@ simple EtherMACFullDuplex like IEtherMAC
         @signal[packetReceivedFromLower](type=EtherFrame);
         @signal[packetSentToUpper](type=EtherFrame);
         @signal[packetReceivedFromUpper](type=EtherFrame);
+        
+        @signal[frameRcvdTimeStamptAtMAC](type=long);
+        @signal[frameSendTimeStamptAtMAC](type=long);
 
         @statistic[txPk](title="packets transmitted"; source=txPk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[rxPkOk](title="packets received OK"; source=rxPkOk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
@@ -157,6 +160,10 @@ simple EtherMACFullDuplex like IEtherMAC
         @statistic[droppedPkIfaceDown](title="packets dropped/interface down"; source=dropPkIfaceDown; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[droppedPkBitError](title="packets dropped/bit error"; source=dropPkBitError; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[droppedPkNotForUs](title="packets dropped/not for us"; source=dropPkNotForUs; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        
+        @statistic[frameRcvdTimeStamptAtMAC](title="EthFrame Received At MAC"; source=frameRcvdTimeStamptAtMAC; record=vector; interpolationmode=none);
+        @statistic[frameSentTimeStamptAtMAC](title="EthFrame Sent From MAC"; source=frameSentTimeStamptAtMAC; record=vector; interpolationmode=none);
+        
 
     gates:
         input upperLayerIn @labels(EtherFrame);    // to ~EtherLLC or ~EtherEncap or ~IMACRelayUnit

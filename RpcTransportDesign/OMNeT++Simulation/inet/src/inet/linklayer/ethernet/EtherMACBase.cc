@@ -135,6 +135,8 @@ simsignal_t EtherMACBase::packetSentToLowerSignal = registerSignal("packetSentTo
 simsignal_t EtherMACBase::packetReceivedFromLowerSignal = registerSignal("packetReceivedFromLower");
 simsignal_t EtherMACBase::packetSentToUpperSignal = registerSignal("packetSentToUpper");
 simsignal_t EtherMACBase::packetReceivedFromUpperSignal = registerSignal("packetReceivedFromUpper");
+simsignal_t EtherMACBase::frameRcvdTimeStamptAtMACSignal = registerSignal("frameRcvdTimeStamptAtMAC");
+simsignal_t EtherMACBase::frameSentTimeStamptAtMACSignal = registerSignal("frameSentTimeStamptAtMAC");
 
 EtherMACBase::EtherMACBase()
 {
