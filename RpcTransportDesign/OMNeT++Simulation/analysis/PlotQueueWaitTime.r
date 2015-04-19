@@ -1,0 +1,77 @@
+#!/usr/bin/Rscript
+
+library(reshape2)
+library(ggplot2)
+library(gridExtra)
+
+pktWaits = c()
+waitCDF = c()
+loadFactor = c()
+
+pktDelaysRawData <- read.table("Host16QueueDelays", col.names=c('vecId','handle','simTime','waitTime'))
+waitRange <- seq(min(pktDelaysRawData$waitTime), max(pktDelaysRawData$waitTime), (max(pktDelaysRawData$waitTime)-min(pktDelaysRawData$waitTime))/10000 )
+pktWaits <- c(pktWaits, waitRange)
+loadFactor <- c(loadFactor, rep(0.83, length(waitRange)))
+P <- ecdf(pktDelaysRawData$waitTime)
+waitCDF <- c(waitCDF, P(waitRange))
+
+pktWaitsCDF <- data.frame(load_factor=loadFactor, waitTimes=pktWaits, CDF=waitCDF)
+pktWaitsCDF$load_factor <- factor(pktWaitsCDF$load_factor)
+CDFWaitPlot <- ggplot(pktWaitsCDF, aes(x=waitTimes, y=1-CDF))
+pdf("waitTimeInHost16TxQueueDist.pdf")
+CDFWaitPlot + facet_wrap(~load_factor)+ geom_line(size = 2, alpha = 1/2) + labs(title="waitTimeInHost16TxQueue")
+dev.off()
+
+pktWaits = c()
+waitCDF = c()
+loadFactor = c()
+
+pktDelaysRawData <- read.table("HostsQueueWaitTimes", col.names=c('vecId','handle','simTime','waitTime'))
+waitRange <- seq(min(pktDelaysRawData$waitTime), max(pktDelaysRawData$waitTime), (max(pktDelaysRawData$waitTime)-min(pktDelaysRawData$waitTime))/10000 )
+pktWaits <- c(pktWaits, waitRange)
+loadFactor <- c(loadFactor, rep(0.83, length(waitRange)))
+P <- ecdf(pktDelaysRawData$waitTime)
+waitCDF <- c(waitCDF, P(waitRange))
+
+pktWaitsCDF <- data.frame(load_factor=loadFactor, waitTimes=pktWaits, CDF=waitCDF)
+pktWaitsCDF$load_factor <- factor(pktWaitsCDF$load_factor)
+CDFWaitPlot <- ggplot(pktWaitsCDF, aes(x=waitTimes, y=1-CDF))
+pdf("waitTimeInAllHostsTxQueueDist.pdf")
+CDFWaitPlot + facet_wrap(~load_factor)+ geom_line(size = 2, alpha = 1/2) + labs(title="waitTimeInAllHostsTxQueue")
+dev.off()
+
+pktWaits = c()
+waitCDF = c()
+loadFactor = c()
+
+pktDelaysRawData <- read.table("TorQueueWaitTimes", col.names=c('vecId','handle','simTime','waitTime'))
+waitRange <- seq(min(pktDelaysRawData$waitTime), max(pktDelaysRawData$waitTime), (max(pktDelaysRawData$waitTime)-min(pktDelaysRawData$waitTime))/10000 )
+pktWaits <- c(pktWaits, waitRange)
+loadFactor <- c(loadFactor, rep(0.83, length(waitRange)))
+P <- ecdf(pktDelaysRawData$waitTime)
+waitCDF <- c(waitCDF, P(waitRange))
+
+pktWaitsCDF <- data.frame(load_factor=loadFactor, waitTimes=pktWaits, CDF=waitCDF)
+pktWaitsCDF$load_factor <- factor(pktWaitsCDF$load_factor)
+CDFWaitPlot <- ggplot(pktWaitsCDF, aes(x=waitTimes, y=1-CDF))
+pdf("waitTimeInTorsTxQueueDist.pdf")
+CDFWaitPlot + facet_wrap(~load_factor)+ geom_line(size = 2, alpha = 1/2) + labs(titla="waitTimeInTorsTxQueue")
+dev.off()
+
+pktWaits = c()
+waitCDF = c()
+loadFactor = c()
+
+pktDelaysRawData <- read.table("CoreQueueWaitTimes", col.names=c('vecId','handle','simTime','waitTime'))
+waitRange <- seq(min(pktDelaysRawData$waitTime), max(pktDelaysRawData$waitTime), (max(pktDelaysRawData$waitTime)-min(pktDelaysRawData$waitTime))/10000 )
+pktWaits <- c(pktWaits, waitRange)
+loadFactor <- c(loadFactor, rep(0.83, length(waitRange)))
+P <- ecdf(pktDelaysRawData$waitTime)
+waitCDF <- c(waitCDF, P(waitRange))
+
+pktWaitsCDF <- data.frame(load_factor=loadFactor, waitTimes=pktWaits, CDF=waitCDF)
+pktWaitsCDF$load_factor <- factor(pktWaitsCDF$load_factor)
+CDFWaitPlot <- ggplot(pktWaitsCDF, aes(x=waitTimes, y=1-CDF))
+pdf("waitTimeInCoreTxQueueDist.pdf")
+CDFWaitPlot + facet_wrap(~load_factor)+ geom_line(size = 2, alpha = 1/2) + labs(title="waitTimeInCoreTxQueue")
+dev.off()
