@@ -3,8 +3,8 @@
 *_m.cc
 *_sm.h
 *_sm.cc
-**/Makefile
-**/Makefile.vc
+*/**/Makefile
+*/**/Makefile.vc
 **/results*/
 *.log
 *.sim
