@@ -161,6 +161,8 @@ simple EtherMACFullDuplex like IEtherMAC
         @statistic[droppedPkBitError](title="packets dropped/bit error"; source=dropPkBitError; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[droppedPkNotForUs](title="packets dropped/not for us"; source=dropPkNotForUs; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         
+        // Similar to txPk and rxPkOk statistics excepts that it records the
+        // packet treeId. Helps to track a packet as it travels in the model.
         @statistic[frameRcvdTimeStamptAtMAC](title="EthFrame Received At MAC"; source=frameRcvdTimeStamptAtMAC; record=vector; interpolationmode=none);
         @statistic[frameSentTimeStamptAtMAC](title="EthFrame Sent From MAC"; source=frameSentTimeStamptAtMAC; record=vector; interpolationmode=none);
         
