@@ -31,10 +31,14 @@ for (i in seq(4, length(args), 2)) {
     fileName <- paste(filePath, '/', args[i], sep="")
     loadFactor <- as.numeric(args[i+1])
 
-    # Some of the lines in the file start with 'time'. We specify comment.char
-    # as letter 't' to filter out those lines.
+    # Some of the lines in the file start with 'time' OR 'X' and so on. We set
+    # comment.char to the first letter of the first line in the file to filter
+    # out those lines.  
+    firstLine <- read.table(fileName, nrows=1, col.names=c('commentLine'))
+    commentChar <- substring(firstLine$commentLine,1,1)
+
     rawDataList[[length(rawDataList) + 1]] <- 
-        read.table(fileName, comment.char='t', sep=",", colClasses='numeric',
+        read.table(fileName, comment.char=commentChar, sep=",", colClasses='numeric',
             col.names = c('time', 'value'))
 
     rawDataList[[length(rawDataList)]]$loadFactor <- 
@@ -68,11 +72,12 @@ if (identical(plotType, "cdf")) {
     cdfPlot <- ggplot(cdfDataFrame, aes(x=value, y=CDF))
     pdf(paste(plotTitle,".","pdf",sep=""), width=20, height=20)
 
-    print(cdfPlot + facet_wrap(~loadFactor, nrow=3)+
-            geom_line(aes(color=loadFactor), size = 2, alpha = 1/2) +
-            labs(title = plotTitle)) +
-            theme(axis.text=element_text(size=16),
-            axis.title=element_text(size=16,face="bold"))
+    print(cdfPlot + facet_wrap(~loadFactor, nrow=3, scales="free_y")+
+            geom_line(aes(color=loadFactor), size = 2, alpha = 1/2) + 
+            labs(title = plotTitle) + 
+            scale_y_continuous(limit = c(0, 1)) + 
+            theme(axis.text=element_text(size=20),
+            axis.title=element_text(size=20, face="bold")))
 
     dev.off()
 }
