@@ -1,0 +1,41 @@
+CPP = g++
+
+#include directory specific to this project
+INC_DIR = .
+
+#obj directory specific to this project
+OBJ_DIR = bin
+
+#binary directory for this project
+BIN_DIR = bin
+
+#contains all of the include paths
+IFLAGS = -I$(INC_DIR)
+
+#contains all library paths in -LPATH format
+LFLAGS=
+
+#compiler flags
+CFLAGS = -Wall -g -std=c++0x
+
+#library .a or .so file names are added here
+#drop trailing extension and word "lib" from the begining of file name and 
+#add -l flag to remaining part
+LIBS = -lm
+
+DEPS_ = MsgSizeDistributions.h
+DEPS = $(patsubst %,$(INC_DIR)/%,$(DEPS_))
+
+OBJ_ = MsgSizeDistributions.o TestMain.o
+OBJ=$(patsubst %,$(OBJ_DIR)/%,$(OBJ_))
+
+$(OBJ_DIR)/%.o: %.cc $(DEPS)
+	$(CPP) $(CFLAGS) $(IFLAGS) -c $< -o $@
+
+$(BIN_DIR)/TestMain: $(OBJ)
+	$(CPP) $(CFLAGS) $(IFLAGS) $(LFLAGS) $(LIBS) $^ -o $@ 
+
+.PHONY: clean
+
+clean:
+	rm -f $(OBJ_DIR)/* $(BIN_DIR)/* 
