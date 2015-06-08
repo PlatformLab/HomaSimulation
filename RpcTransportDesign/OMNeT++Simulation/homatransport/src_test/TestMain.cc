@@ -2,8 +2,10 @@
 #include "MsgSizeDistributions.h"
 
 int main() {
-    MsgSizeDistributions dctcpDist("../DCTCP_MsgSizeDist.txt");
-    MsgSizeDistributions facebookDist("../FacebookKeyValueMsgSizeDist.txt");
+    MsgSizeDistributions dctcpDist(
+            "../../sizeDistributions/DCTCP_MsgSizeDist.txt");
+    MsgSizeDistributions facebookDist(
+            "../../sizeDistributions/FacebookKeyValueMsgSizeDist.txt");
     std::ofstream outDctcpStream;
     std::ofstream outFacebookStream;
     outDctcpStream.open("/tmp/dctcpSampleSizes.txt");

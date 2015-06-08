@@ -31,7 +31,7 @@ simsignal_t UDPBasicApp::sentPkSignal = registerSignal("sentPk");
 simsignal_t UDPBasicApp::rcvdPkSignal = registerSignal("rcvdPk");
 
 UDPBasicApp::UDPBasicApp()
-: msgSizeGenerator("/home/neverhood/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/application/DCTCP_MsgSizeDist.txt"){
+{
     selfMsg = NULL;
 }
 
@@ -119,8 +119,7 @@ void UDPBasicApp::sendPacket()
     char msgName[32];
     sprintf(msgName, "UDPBasicAppData-%d", numSent);
     cPacket *payload = new cPacket(msgName);
-    //payload->setByteLength(par("messageLength").longValue());
-    payload->setByteLength(msgSizeGenerator.generateSizeFromDctcpDist(0));
+    payload->setByteLength(par("messageLength").longValue());
 
     L3Address destAddr = chooseDestAddr();
 
