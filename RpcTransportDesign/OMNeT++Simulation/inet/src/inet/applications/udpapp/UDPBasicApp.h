@@ -25,6 +25,7 @@
 
 #include "inet/applications/common/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
+#include "../../homatransport/src/application/MsgSizeDistributions.h"
 
 namespace inet {
 
@@ -35,6 +36,8 @@ class INET_API UDPBasicApp : public ApplicationBase
 {
   protected:
     enum SelfMsgKinds { START = 1, SEND, STOP };
+
+    MsgSizeDistributions msgSizeGenerator;
 
     // parameters
     std::vector<L3Address> destAddresses;
@@ -52,6 +55,10 @@ class INET_API UDPBasicApp : public ApplicationBase
 
     static simsignal_t sentPkSignal;
     static simsignal_t rcvdPkSignal;
+
+    static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
+    static const uint32_t IP_HEADER_SIZE = 20;
+    static const uint32_t UDP_HEADER_SIZE = 8;
 
   protected:
     virtual int numInitStages() const { return NUM_INIT_STAGES; }

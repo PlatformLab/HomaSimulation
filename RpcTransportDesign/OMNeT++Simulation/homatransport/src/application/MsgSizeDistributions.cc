@@ -32,18 +32,14 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName)
 }
 
 int
-MsgSizeDistributions::generateSizeFromDctcpDist(int maxPayloadBytes)
+MsgSizeDistributions::generateSizeFromDctcpDist()
 {
-    if (maxPayloadBytes == 0) {
-        maxPayloadBytes = 
-                MAX_ETHERNET_FRAME_SIZE - IP_HEADER_SIZE - UDP_HEADER_SIZE;
-    }
     
     double prob = dist(randGen);
     for (size_t i = 0; i < msgSizeProbDistVector.size(); ++i)
     {
         if (msgSizeProbDistVector[i].second >= prob)
-            return (msgSizeProbDistVector[i].first) * maxPayloadBytes; 
+            return msgSizeProbDistVector[i].first; 
     }
 
     return 0;

@@ -31,7 +31,7 @@ simsignal_t UDPBasicApp::sentPkSignal = registerSignal("sentPk");
 simsignal_t UDPBasicApp::rcvdPkSignal = registerSignal("rcvdPk");
 
 UDPBasicApp::UDPBasicApp()
-{
+: msgSizeGenerator("/home/neverhood/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/sizeDistributions/DCTCP_MsgSizeDist.txt"){
     selfMsg = NULL;
 }
 
@@ -116,16 +116,32 @@ L3Address UDPBasicApp::chooseDestAddr()
 
 void UDPBasicApp::sendPacket()
 {
-    char msgName[32];
-    sprintf(msgName, "UDPBasicAppData-%d", numSent);
-    cPacket *payload = new cPacket(msgName);
-    payload->setByteLength(par("messageLength").longValue());
 
+    //payload->setByteLength(par("messageLength").longValue());
     L3Address destAddr = chooseDestAddr();
-
-    emit(sentPkSignal, payload);
-    socket.sendTo(payload, destAddr, destPort);
-    numSent++;
+    int maxUdpPayloadSize = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE;
+    int udpMsgBytes = (msgSizeGenerator.generateSizeFromDctcpDist()) * maxUdpPayloadSize;
+    char msgName[32];
+    if (udpMsgBytes == 0) {
+        sprintf(msgName, "UDPBasicAppData-%d", numSent);
+        cPacket *payload = new cPacket(msgName);
+        payload->setByteLength(0);
+        emit(sentPkSignal, payload);
+        socket.sendTo(payload, destAddr, destPort);
+        numSent++;
+    } else {
+        int bytesLeftToSend = udpMsgBytes;
+        while (bytesLeftToSend > 0){
+            int currentBytesToSend = (bytesLeftToSend >= maxUdpPayloadSize) ? maxUdpPayloadSize : bytesLeftToSend;
+            bytesLeftToSend -= maxUdpPayloadSize;
+            sprintf(msgName, "UDPBasicAppData-%d", numSent);
+            cPacket *payload = new cPacket(msgName);
+            payload->setByteLength(currentBytesToSend);
+            emit(sentPkSignal, payload);
+            socket.sendTo(payload, destAddr, destPort);
+            numSent++;
+        }
+    }
 }
 
 void UDPBasicApp::processStart()
