@@ -19,6 +19,7 @@ import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 import ned.DatarateChannel;
 import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
+import homatransport.common.HostBase;
 
 network DcnTopo
 {
@@ -71,7 +72,7 @@ network DcnTopo
             **.promiscuous = true;
         }
 
-        host[numHosts]: StandardHost {
+        host[numHosts]: HostBase {
             parameters:
                 @display("i=device/server2");
         }
