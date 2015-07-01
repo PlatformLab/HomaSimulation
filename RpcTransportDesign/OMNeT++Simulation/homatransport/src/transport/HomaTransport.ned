@@ -23,21 +23,14 @@ simple HomaTransport like ITransportScheme
 {
     parameters:
         int linkSpeed @unit(Gbps) = default(10Gbps);
-        int grantMinBytes @unit(byte) = defualt(500B);
+        int grantMinBytes @unit(byte) = default(500B);
         int localPort = default(-1);
         int destPort;
 
         @signal[sentPkt](type=cPacket);
         @signal[rcvdPkt](type=cPacket);
-        @statistic[rcvdPkt](title="packets received"; source=rcvdPkt;
-                record=count, "sum(packetBytes)", "vector(packetBytes)";
-                interpolationmode=none);
-        @statistic[sentPkt](title="packets sent"; source=sentPkt; record=count,
-                "sum(packetBytes)", "vector(packetBytes)";
-                interpolationmode=none);
-        @statistic[rcvdPktLifetime](title="received packet lifetime";
-                source="messageAge(rcvdPkt)"; unit=s; record=stats,
-                histogram, vector; interpolationmode=none);
+        @statistic[rcvdPkt](title="packets received"; source=rcvdPkt; record=count, "sum(packetBytes)", "vector(packetBytes)"; interpolationmode=none);
+        @statistic[sentPkt](title="packets sent"; source=sentPkt; record=count, "sum(packetBytes)", "vector(packetBytes)"; interpolationmode=none);
 
     gates:
         input appIn[] @labels(AppMessage/down);

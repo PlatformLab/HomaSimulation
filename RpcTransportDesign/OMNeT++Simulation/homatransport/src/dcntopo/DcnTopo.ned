@@ -25,11 +25,11 @@ network DcnTopo
 {
     parameters:
         int numServersPerTor = default(8);
-        double edgeLinkDelay @unit(us) = default(0.05us);
+        double edgeLinkDelay @unit(us) = default(0.0us);
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
         int numTors = default(4);
-        double fabricLinkDelay @unit(us) = default(0.02us);
+        double fabricLinkDelay @unit(us) = default(0.0us);
         int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
                                                            // to nicLinkSpeed
 

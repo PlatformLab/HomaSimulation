@@ -25,6 +25,7 @@ Define_Module(WorkloadSynthesizer);
 
 simsignal_t WorkloadSynthesizer::sentMsgSignal = registerSignal("sentMsg");
 simsignal_t WorkloadSynthesizer::rcvdMsgSignal = registerSignal("rcvdMsg");
+simsignal_t WorkloadSynthesizer::msgLifeTimeSignal = registerSignal("msgLifeTime");
 
 WorkloadSynthesizer::WorkloadSynthesizer()
 {
@@ -71,7 +72,7 @@ WorkloadSynthesizer::initialize()
     
     // Set Interarrival Time Distributions type from what's specified
     // in omnetpp.ini file
-    if (strcmp(par("interArrivalDist").stringValue(), "exponential")) {
+    if (strcmp(par("interArrivalDist").stringValue(), "exponential") == 0) {
         interArrivalDist = InterArrivalDist::EXPONENTIAL;
     } else {
         throw cRuntimeError("'%s': Not a valid Interarrival Distribution",
@@ -157,6 +158,7 @@ WorkloadSynthesizer::sendMsg()
     appMessage->setByteLength(msgByteSize);
     appMessage->setDestAddr(destAddrs);
     appMessage->setSrcAddr(srcAddress);
+    appMessage->setMsgCreationTime(0);
     emit(sentMsgSignal, appMessage);
     send(appMessage, "transportOut");
     numSent++;
@@ -165,6 +167,29 @@ WorkloadSynthesizer::sendMsg()
 void
 WorkloadSynthesizer::processStart()
 {
+    // set srcAddress. The assumption here is that each host has only one
+    // non-loopback interface and the IP of that interface is srcAddress.
+    inet::InterfaceTable* ifaceTable = 
+            check_and_cast<inet::InterfaceTable*>(
+            getModuleByPath(par("interfaceTableModule").stringValue()));
+    inet::InterfaceEntry* srcIface = NULL;
+    inet::IPv4InterfaceData* srcIPv4Data = NULL;
+    for (int i=0; i < ifaceTable->getNumInterfaces(); i++) {
+        if ((srcIface = ifaceTable->getInterface(i)) &&
+                !srcIface->isLoopback() &&
+                (srcIPv4Data = srcIface->ipv4Data())) {
+            break;
+        }
+    }
+    if (!srcIface) {
+        throw cRuntimeError("Can't find a valid interface on the host");
+    } else if (!srcIPv4Data) {
+        throw cRuntimeError("Can't find an interface with IPv4 address");
+    }
+    srcAddress = inet::L3Address(srcIPv4Data->getIPAddress());
+
+    // destAddress will be populated with all possible destination hosts in the
+    // network
     const char *destAddrs = par("destAddresses");
     cStringTokenizer tokenizer(destAddrs);
     const char *token;
@@ -186,26 +211,6 @@ WorkloadSynthesizer::processStart()
         scheduleAt(stopTime, selfMsg);
     }
 
-    // set srcAddress. The assumption here is that each host has only one
-    // non-loopback interface and the IP of that interface is srcAddress.
-    inet::InterfaceTable* ifaceTable = 
-            check_and_cast<inet::InterfaceTable*>(
-            getModuleByPath(par("interfaceTableModule").stringValue()));
-    inet::InterfaceEntry* srcIface = NULL;
-    inet::IPv4InterfaceData* srcIPv4Data = NULL;
-    for (int id=0; id <= ifaceTable->getBiggestInterfaceId(); id++) {
-        if ( !(srcIface = ifaceTable->getInterfaceById(id)) &&
-                !srcIface->isLoopback() &&
-                !(srcIPv4Data = srcIface->ipv4Data())) {
-            break;
-        }
-    }
-    if (!srcIface) {
-        throw cRuntimeError("Can't find a valid interface on the host");
-    } else if (!srcIPv4Data) {
-        throw cRuntimeError("Can't find an interface with IPv4 address");
-    }
-    srcAddress = inet::L3Address(srcIPv4Data->getIPAddress());
 }
 
 void
@@ -229,9 +234,11 @@ WorkloadSynthesizer::processSend()
 double
 WorkloadSynthesizer::nextSendTime()
 {
+    double nextSxTime;
     switch (interArrivalDist) {
         case InterArrivalDist::EXPONENTIAL:
-            return (exponential(avgInterArrivalTime));
+             nextSxTime = exponential(avgInterArrivalTime);
+            return (nextSxTime);
         default:
             return 0;
     }
@@ -242,8 +249,9 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
 {
     AppMessage* rcvdMsg = check_and_cast<AppMessage*>(msg);
     emit(rcvdMsgSignal, rcvdMsg);
-    EV_INFO << "Received a message of length %d Bytes" <<
-            rcvdMsg->getByteLength() << endl;
+    emit(msgLifeTimeSignal, simTime() - rcvdMsg->getMsgCreationTime());
+    EV_INFO << "Received a message of length " << rcvdMsg->getByteLength() <<
+            "Bytes" << endl;
     delete rcvdMsg;
     numReceived++;
 }

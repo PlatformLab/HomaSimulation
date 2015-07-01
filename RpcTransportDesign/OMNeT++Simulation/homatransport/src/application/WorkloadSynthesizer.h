@@ -69,6 +69,7 @@ class WorkloadSynthesizer : public cSimpleModule
 
     static simsignal_t sentMsgSignal;
     static simsignal_t rcvdMsgSignal;
+    static simsignal_t msgLifeTimeSignal;
 
   protected:
     virtual void initialize();

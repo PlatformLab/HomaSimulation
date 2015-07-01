@@ -36,6 +36,18 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
     // distribution.
     getline(distFileStream, avgMsgSizeStr); 
     sscanf(avgMsgSizeStr.c_str(), "%lf", &avgMsgSize);
+    
+    // Set the distribution to be used
+    switch (distSelector) {
+        case DistributionChoice::DCTCP:
+            this->avgMsgSize *= maxDataBytesPerPkt;
+        case DistributionChoice::FACEBOOK_KEY_VALUE: 
+            this->distSelector = distSelector;
+            break;
+        default:
+            throw MsgSizeDistException(
+                    "Invalide Message Size Distribution Selected");
+    }
 
     // reads msgSize<->probabilty pairs from "distFileName" file
     while(!distFileStream.eof()) {
@@ -46,18 +58,6 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
                 &msgSize, &prob);
         msgSizeProbDistVector.push_back(std::make_pair(msgSize, prob));
     }
-
-    switch (distSelector) {
-        case DistributionChoice::DCTCP:
-        case DistributionChoice::FACEBOOK_KEY_VALUE: 
-            this->distSelector = distSelector;
-            break;
-        default:
-            throw MsgSizeDistException(
-                    "Invalide Message Size Distribution Selected");
-    }
-
-
 }
 
 int

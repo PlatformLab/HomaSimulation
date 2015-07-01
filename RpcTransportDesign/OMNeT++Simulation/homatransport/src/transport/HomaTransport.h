@@ -72,7 +72,7 @@ class HomaTransport : public cSimpleModule
         SendController(HomaTransport* transport);
         ~SendController();
         void processSendMsgFromApp(AppMessage* msg);
-        void processIncomingGrant(HomaPkt* rxPkt);
+        void processReceivedGrant(HomaPkt* rxPkt);
 
       protected:
         HomaTransport* transport;
@@ -97,6 +97,9 @@ class HomaTransport : public cSimpleModule
         uint32_t bytesToGrant;
         uint32_t bytesToReceive;
         uint32_t msgSize;
+
+        // Meta data for statistic collecting
+        simtime_t msgCreationTime;
         
         friend class CompareInboundMsg;
         friend class ReceiveScheduler;

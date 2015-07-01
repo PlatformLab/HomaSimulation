@@ -36,7 +36,7 @@ HomaTransport::initialize()
     int grantMinBytes = par("grantMinBytes");
     rxScheduler.setGrantMinBytes(grantMinBytes);
     linkSpeed = par("linkSpeed");
-    grantTimeInterval = 8.0 * grantMinBytes / (linkSpeed * 10e-9);
+    grantTimeInterval = 8.0 * grantMinBytes * 10e-9 / linkSpeed;
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);
     scheduleAt(simTime(), selfMsg);
@@ -84,7 +84,7 @@ HomaTransport::handleMessage(cMessage *msg)
                     break;
 
                 case PktType::GRANT:
-                    sxController.processIncomingGrant(rxPkt);
+                    sxController.processReceivedGrant(rxPkt);
                     break;
 
                 case PktType::DATA:
@@ -139,14 +139,19 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
 }
 
 void
-HomaTransport::SendController::processIncomingGrant(HomaPkt* rxPkt)
+HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
 {
+    EV_INFO << "Received a grant from " << rxPkt->getSrcAddr().str()
+            << " for  msgId " << rxPkt->getMsgId() << " for " 
+            << rxPkt->getGrantFields().grantBytes << "  Bytes." << endl;
+
     OutboundMessage* outboundMsg = &(outboundMsgMap.at(rxPkt->getMsgId()));
     ASSERT(rxPkt->getDestAddr() == outboundMsg->srcAddr &&
             rxPkt->getSrcAddr() == outboundMsg->destAddr);
 
     int outboundMsgByteLeft = 
         outboundMsg->sendBytes(rxPkt->getGrantFields().grantBytes);
+
     if (outboundMsgByteLeft == 0) {
         outboundMsgMap.erase(rxPkt->getMsgId());
     }
@@ -207,6 +212,7 @@ void
 HomaTransport::OutboundMessage::sendRequest(simtime_t msgCreationTime)
 {
     HomaPkt* reqPkt = new(HomaPkt);
+    reqPkt->setByteLength(0);
     reqPkt->setPktType(PktType::REQUEST);
     RequestFields reqFields;
     reqFields.msgByteLen = this->bytesLeft;
@@ -216,6 +222,8 @@ HomaTransport::OutboundMessage::sendRequest(simtime_t msgCreationTime)
     reqPkt->setSrcAddr(this->srcAddr);
     reqPkt->setMsgId(this->msgId);
     sxController->transport->sendPacket(reqPkt);
+    EV_INFO << "Send request with msgId " << this->msgId << " from " << this->srcAddr.str() << " to " << 
+            this->destAddr.str() << endl;
 }
 
 int
@@ -226,6 +234,7 @@ HomaTransport::OutboundMessage::sendBytes(uint32_t numBytes)
 
     // create a data pkt and send out
     HomaPkt* dataPkt = new(HomaPkt);
+    dataPkt->setByteLength(bytesToSend);
     dataPkt->setSrcAddr(this->srcAddr);
     dataPkt->setDestAddr(this->destAddr);
     dataPkt->setMsgId(this->msgId);
@@ -239,6 +248,10 @@ HomaTransport::OutboundMessage::sendBytes(uint32_t numBytes)
     // update outbound messgae
     this->bytesLeft -= bytesToSend;
     this->nextByteToSend = dataFields.lastByte + 1;
+
+    EV_INFO << "Sent " <<  bytesToSend << " bytes from msgId " << this->msgId 
+            << " to destination " << this->destAddr.str() << " ("
+            << this->bytesLeft << " bytes left.)" << endl;
     return this->bytesLeft;
 }
 
@@ -267,12 +280,16 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
 {
     // if request for zero bytes, message is complete and should be sent
     // to app (no to queue it) 
-    if (rxPkt->getByteLength() == 0) {
+    EV_INFO << "Received request with msgId " << rxPkt->getMsgId() << " from "
+            << rxPkt->getSrcAddr().str() << " to " << rxPkt->getDestAddr().str()
+            << " for " << rxPkt->getReqFields().msgByteLen << " bytes." << endl;
+    if (rxPkt->getReqFields().msgByteLen == 0) {
         AppMessage* rxMsg = new AppMessage();
         rxMsg->setDestAddr(rxPkt->getDestAddr());
         rxMsg->setSrcAddr(rxPkt->getSrcAddr());
+        rxMsg->setMsgCreationTime(rxPkt->getReqFields().msgCreationTime);
         rxMsg->setByteLength(0);
-        transport->send(rxMsg, "appOut");
+        transport->send(rxMsg, "appOut", 0);
         delete rxPkt;
         return;
     }
@@ -295,9 +312,13 @@ void HomaTransport::ReceiveScheduler::processReceivedData(HomaPkt* rxPkt)
                 rxPkt->getSrcAddr() == inboundMsg->srcAddr) {
             
             incompleteRxMsgs.erase(it);
-            inboundMsg->bytesToReceive -= (rxPkt->getDataFields().lastByte 
+            uint32_t bytesReceived = (rxPkt->getDataFields().lastByte 
                     - rxPkt->getDataFields().firstByte + 1);
-
+            inboundMsg->bytesToReceive -= bytesReceived;
+            EV_INFO << "Received " << bytesReceived << " bytes from "
+                    << inboundMsg->srcAddr.str() << " for msgId " 
+                    << rxPkt->getMsgId() << " (" << inboundMsg->bytesToReceive
+                    << " bytes left to receive)" << endl;
             // If bytesToReceive is zero, this message is complete and must be
             // sent to the application
             if (inboundMsg->bytesToReceive <= 0) {
@@ -306,12 +327,19 @@ void HomaTransport::ReceiveScheduler::processReceivedData(HomaPkt* rxPkt)
                 AppMessage* rxMsg = new AppMessage();
                 rxMsg->setDestAddr(inboundMsg->destAddr);
                 rxMsg->setSrcAddr(inboundMsg->srcAddr);
+                rxMsg->setMsgCreationTime(inboundMsg->msgCreationTime);
                 rxMsg->setByteLength(inboundMsg->msgSize);
-                transport->send(rxMsg, "appOut");
+                transport->send(rxMsg, "appOut", 0);
+                EV_INFO << "Finished receiving msgId " << rxPkt->getMsgId()
+                        << " with size " << inboundMsg->msgSize
+                        << " from source address " << inboundMsg->srcAddr
+                        << endl;
+
                 delete inboundMsg;
             } else {
                 incompleteRxMsgs.push_front(inboundMsg);
             }
+            delete rxPkt;
             return;
         }
     }
@@ -326,12 +354,21 @@ HomaTransport::ReceiveScheduler::sendGrant()
         InboundMessage* highPrioMsg = inboundMsgQueue.top();
         int grantSize = 
                 std::min(highPrioMsg->bytesToGrant, (uint32_t)grantMinBytes);
+//        if (inboundMsgQueue.size() > 1 ) {
+//            InboundMessage* msg;
+//            for (std::list<InboundMessage*>::iterator it = incompleteRxMsgs.begin()
+//                    ; it != incompleteRxMsgs.end(); ++it) {
+//                msg = *it;
+//            }
+//
+//        }
 
         // prepare a grant and send out
         HomaPkt* grantPkt = new(HomaPkt);
+        grantPkt->setByteLength(0);
         grantPkt->setPktType(PktType::GRANT);
         GrantFields grantFields;
-        grantFields.grantBytes = this->grantMinBytes;
+        grantFields.grantBytes = grantSize;
         grantPkt->setGrantFields(grantFields);
         grantPkt->setDestAddr(highPrioMsg->srcAddr);
         grantPkt->setSrcAddr(highPrioMsg->destAddr);
@@ -343,7 +380,16 @@ HomaTransport::ReceiveScheduler::sendGrant()
         if (highPrioMsg->bytesToGrant <= 0) {
             inboundMsgQueue.pop();
         }
+
+
+        EV_INFO << " Sent a grant, among " << inboundMsgQueue.size() 
+                << " possible choices, for msgId " <<  highPrioMsg->msgIdAtSender
+                << " at host " << highPrioMsg->srcAddr.str() << " for "
+                << grantSize << " Bytes." << "(" << highPrioMsg->bytesToGrant
+                << " Bytes left to grant.)" << endl;
     }
+    
+
 }
 
 /**
@@ -355,6 +401,8 @@ HomaTransport::InboundMessage::InboundMessage()
     , destAddr()
     , msgIdAtSender(0)
     , bytesToGrant(0)
+    , bytesToReceive(0)
+    , msgSize(0)
 {}
 
 HomaTransport::InboundMessage::~InboundMessage()
@@ -372,7 +420,9 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , destAddr(rxPkt->getDestAddr())
     , msgIdAtSender(rxPkt->getMsgId())
     , bytesToGrant(rxPkt->getReqFields().msgByteLen)
+    , bytesToReceive(rxPkt->getReqFields().msgByteLen)
     , msgSize(rxPkt->getReqFields().msgByteLen)
+    , msgCreationTime(rxPkt->getReqFields().msgCreationTime)
 {
     ASSERT(rxPkt->getPktType() == PktType::REQUEST);
 }
@@ -387,4 +437,5 @@ HomaTransport::InboundMessage::copy(const InboundMessage& other)
     this->bytesToGrant = other.bytesToGrant;
     this->bytesToReceive = other.bytesToReceive;
     this->msgSize = other.msgSize;
+    this->msgCreationTime = other.msgCreationTime;
 }

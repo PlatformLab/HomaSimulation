@@ -22,7 +22,7 @@ enum PktType
 {
     REQUEST = 0;
     GRANT = 1;
-    DATA = 3;
+    DATA = 2;
 };
 
 

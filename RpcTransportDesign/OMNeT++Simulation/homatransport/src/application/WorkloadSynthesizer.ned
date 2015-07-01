@@ -12,7 +12,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
-
 package homatransport.application;
 import homatransport.application.ITrafficGeneratorApp;
 
@@ -29,7 +28,7 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         double loadFactor = default(0.5);
 
         // workload types from this set: {"DCTCP", "FACEBOOK_KEY_VALUE"}
-        string workloadType = defualt("DCTCP");
+        string workloadType = default("DCTCP");
         string interArrivalDist = default("exponential");
         string destAddresses = default("");
         double startTime @unit(s) = default(0s);
@@ -37,18 +36,11 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @display("i=block/app");
         @signal[sentMsg](type=cPacket);
         @signal[rcvdMsg](type=cPacket);
+        @signal[msgLifeTime](type=simtime_t);
 
-        @statistic[sentMsg](title="messages sent"; source=sentMsg;
-                record=count,"sum(packetBytes)","vector(packetBytes)";
-                interpolationMode=none);
-
-        @statistic[rcvdMsg](title="received messages"; source=rcvdMsg;
-                record=count,"sum(packetBytes)","vector(packetBytes)";
-                interpolationMode=none);
-
-        @statistic[rcvdMsgLifeTime](title="received messages lifetime";
-                source="messageAge(rcvdMsg)"; unit=s;
-                record=stats,histogram,vector; interpolationmode=none);
+        @statistic[sentMsg](title="messages sent"; source=sentMsg; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
+        @statistic[rcvdMsg](title="received messages"; source=rcvdMsg; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
+        @statistic[rcvdMsgLifeTime](title="received messages lifetime"; source="msgLifeTime"; unit=s; record=stats,histogram,vector; interpolationmode=none);
     gates:
         input transportIn @label(AppMessage/up);
         output transportOut @labels(AppMessage/down);

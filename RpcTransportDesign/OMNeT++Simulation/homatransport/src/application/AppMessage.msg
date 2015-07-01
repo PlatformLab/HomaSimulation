@@ -25,4 +25,5 @@ class noncobject inet::L3Address;
 packet AppMessage {
      inet::L3Address destAddr;
      inet::L3Address srcAddr;
+     simtime_t msgCreationTime;
 }
