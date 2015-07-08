@@ -33,10 +33,10 @@ HomaTransport::initialize()
 {
     localPort = par("localPort");
     destPort = par("destPort");
-    int grantMinBytes = par("grantMinBytes");
-    rxScheduler.setGrantMinBytes(grantMinBytes);
     linkSpeed = par("linkSpeed");
-    grantTimeInterval = 8.0 * grantMinBytes * 10e-9 / linkSpeed;
+    int grantMaxBytes = par("grantMaxBytes");
+    rxScheduler.initialize(grantMaxBytes, linkSpeed, par("maxRtt"));
+    grantTimeInterval = 8.0 * grantMaxBytes * 10e-9 / linkSpeed;
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);
     scheduleAt(simTime(), selfMsg);
@@ -108,7 +108,9 @@ HomaTransport::sendPacket(HomaPkt* sxPkt)
 
 void
 HomaTransport::finish()
-{}
+{
+    cancelAndDelete(selfMsg);
+}
 
 
 /**
@@ -261,10 +263,21 @@ HomaTransport::OutboundMessage::sendBytes(uint32_t numBytes)
  */
 HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     : transport(transport) 
+    , byteBucket(NULL)
     , inboundMsgQueue()
     , incompleteRxMsgs()
-    , grantMinBytes(0)
-{}
+    , grantMaxBytes(0)
+{
+    byteBucket = (ByteBucket*) ::operator new (sizeof(ByteBucket));
+}
+
+void
+HomaTransport::ReceiveScheduler::initialize(int grantMaxBytes, 
+        uint32_t linkSpeed, uint32_t maxRtt)
+{
+    this->grantMaxBytes = grantMaxBytes;
+    this->byteBucket = new(this->byteBucket) ByteBucket(linkSpeed, maxRtt);
+}
 
 HomaTransport::ReceiveScheduler::~ReceiveScheduler()
 {
@@ -273,6 +286,8 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
         InboundMessage* msgToDelete = *it;
         delete msgToDelete;
     }
+
+    delete byteBucket;
 }
 
 void
@@ -319,6 +334,7 @@ void HomaTransport::ReceiveScheduler::processReceivedData(HomaPkt* rxPkt)
                     << inboundMsg->srcAddr.str() << " for msgId " 
                     << rxPkt->getMsgId() << " (" << inboundMsg->bytesToReceive
                     << " bytes left to receive)" << endl;
+
             // If bytesToReceive is zero, this message is complete and must be
             // sent to the application
             if (inboundMsg->bytesToReceive <= 0) {
@@ -350,10 +366,10 @@ void HomaTransport::ReceiveScheduler::processReceivedData(HomaPkt* rxPkt)
 void
 HomaTransport::ReceiveScheduler::sendGrant()
 {
-    if (!inboundMsgQueue.empty()) {
+    while (!inboundMsgQueue.empty()) {
         InboundMessage* highPrioMsg = inboundMsgQueue.top();
-        int grantSize = 
-                std::min(highPrioMsg->bytesToGrant, (uint32_t)grantMinBytes);
+        uint32_t grantReqSize = 
+                std::min(highPrioMsg->bytesToGrant, (uint32_t)grantMaxBytes);
 //        if (inboundMsgQueue.size() > 1 ) {
 //            InboundMessage* msg;
 //            for (std::list<InboundMessage*>::iterator it = incompleteRxMsgs.begin()
@@ -362,34 +378,43 @@ HomaTransport::ReceiveScheduler::sendGrant()
 //            }
 //
 //        }
+        
+        uint32_t grantSize = byteBucket->getGrantBytes(grantReqSize, simTime());
+        if (grantSize > 0) {
 
-        // prepare a grant and send out
-        HomaPkt* grantPkt = new(HomaPkt);
-        grantPkt->setByteLength(0);
-        grantPkt->setPktType(PktType::GRANT);
-        GrantFields grantFields;
-        grantFields.grantBytes = grantSize;
-        grantPkt->setGrantFields(grantFields);
-        grantPkt->setDestAddr(highPrioMsg->srcAddr);
-        grantPkt->setSrcAddr(highPrioMsg->destAddr);
-        grantPkt->setMsgId(highPrioMsg->msgIdAtSender);
-        transport->sendPacket(grantPkt);       
+            // prepare a grant and send out
+            HomaPkt* grantPkt = new(HomaPkt);
+            grantPkt->setByteLength(0);
+            grantPkt->setPktType(PktType::GRANT);
+            GrantFields grantFields;
+            grantFields.grantBytes = grantSize;
+            grantPkt->setGrantFields(grantFields);
+            grantPkt->setDestAddr(highPrioMsg->srcAddr);
+            grantPkt->setSrcAddr(highPrioMsg->destAddr);
+            grantPkt->setMsgId(highPrioMsg->msgIdAtSender);
+            transport->sendPacket(grantPkt);
 
-        // update highPrioMsg 
-        highPrioMsg->bytesToGrant -= grantSize;
-        if (highPrioMsg->bytesToGrant <= 0) {
-            inboundMsgQueue.pop();
+            // update highPrioMsg
+            highPrioMsg->bytesToGrant -= grantSize;
+            if (highPrioMsg->bytesToGrant <= 0) {
+                inboundMsgQueue.pop();
+            }
+
+
+            EV_INFO << " Sent a grant, among " << inboundMsgQueue.size()
+                    << " possible choices, for msgId "
+                    <<  highPrioMsg->msgIdAtSender
+                    << " at host " << highPrioMsg->srcAddr.str() << " for "
+                    << grantSize << " Bytes." << "("
+                    << highPrioMsg->bytesToGrant
+                    << " Bytes left to grant.)" << endl;
+
+        } else {
+
+            // No grant available, we should break and wait
+            break;
         }
-
-
-        EV_INFO << " Sent a grant, among " << inboundMsgQueue.size() 
-                << " possible choices, for msgId " <<  highPrioMsg->msgIdAtSender
-                << " at host " << highPrioMsg->srcAddr.str() << " for "
-                << grantSize << " Bytes." << "(" << highPrioMsg->bytesToGrant
-                << " Bytes left to grant.)" << endl;
     }
-    
-
 }
 
 /**

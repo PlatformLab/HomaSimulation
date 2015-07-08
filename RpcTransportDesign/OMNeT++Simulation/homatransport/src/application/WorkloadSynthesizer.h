@@ -52,6 +52,7 @@ class WorkloadSynthesizer : public cSimpleModule
     MsgSizeDistributions *msgSizeGenerator;
 
     // parameters
+    bool isSender;
     std::vector<inet::L3Address> destAddresses;
     simtime_t startTime;
     simtime_t stopTime;

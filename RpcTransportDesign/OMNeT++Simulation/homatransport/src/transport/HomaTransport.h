@@ -25,6 +25,7 @@
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt_m.h"
+#include "transport/ByteBucket.h"
 
 /**
  * Impelements a grant based, receiver side congection control transport
@@ -122,9 +123,9 @@ class HomaTransport : public cSimpleModule
 
     class ReceiveScheduler
     {
-      
+
       public:
-        typedef std::priority_queue<InboundMessage*, 
+        typedef std::priority_queue<InboundMessage*,
                 std::vector<InboundMessage*>, CompareInboundMsg> PriorityQueue;
 
         ReceiveScheduler(HomaTransport* transport);
@@ -132,16 +133,16 @@ class HomaTransport : public cSimpleModule
         void processReceivedRequest(HomaPkt* rxPkt);
         void processReceivedData(HomaPkt* rxPkt);
         void sendGrant();
-        void setGrantMinBytes(int grantMinBytes)
-        {
-            this->grantMinBytes = grantMinBytes;
-        }
+        void initialize(int grantMaxBytes,
+                uint32_t linkSpeed, uint32_t maxRtt);
         
       protected:
         HomaTransport* transport;
+        ByteBucket *byteBucket;
         PriorityQueue inboundMsgQueue; 
         std::list<InboundMessage*> incompleteRxMsgs;
-        int grantMinBytes;
+        int grantMaxBytes;
+        friend class HomaTransport;
         friend class InboundMessage;
         
     };

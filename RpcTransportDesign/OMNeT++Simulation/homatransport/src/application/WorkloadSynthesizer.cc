@@ -41,6 +41,7 @@ WorkloadSynthesizer::~WorkloadSynthesizer()
 void
 WorkloadSynthesizer::initialize()
 {
+    isSender = par("isSender").boolValue();
 
     // Initialize the msgSizeGenerator
     const char* workLoadType = par("workloadType").stringValue();
@@ -220,14 +221,16 @@ WorkloadSynthesizer::processStop() {
 void
 WorkloadSynthesizer::processSend()
 {
-    sendMsg();
-    simtime_t nextSend = simTime() + nextSendTime();
-    if (stopTime < SIMTIME_ZERO || nextSend < stopTime) {
-        selfMsg->setKind(SEND);
-        scheduleAt(nextSend, selfMsg);
-    } else {
-        selfMsg->setKind(STOP);
-        scheduleAt(stopTime, selfMsg);
+    if (isSender) {
+        sendMsg();
+        simtime_t nextSend = simTime() + nextSendTime();
+        if (stopTime < SIMTIME_ZERO || nextSend < stopTime) {
+            selfMsg->setKind(SEND);
+            scheduleAt(nextSend, selfMsg);
+        } else {
+            selfMsg->setKind(STOP);
+            scheduleAt(stopTime, selfMsg);
+        }
     }
 }
 
@@ -261,4 +264,5 @@ WorkloadSynthesizer::finish()
 {
     recordScalar("packets sent", numSent);
     recordScalar("packets received", numReceived);
+    cancelAndDelete(selfMsg);
 }

@@ -23,6 +23,7 @@ import homatransport.application.ITrafficGeneratorApp;
 simple WorkloadSynthesizer like ITrafficGeneratorApp 
 {
     parameters:
+        bool isSender = default(true);
         string interfaceTableModule;   // The path to the InterfaceTable module
         int linkSpeed @unit(Gbps) = default(10Gbps);
         double loadFactor = default(0.5);
