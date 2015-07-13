@@ -14,17 +14,18 @@
 class ByteBucket
 {
   public:
-    ByteBucket(uint32_t linkSpeed, uint32_t maxRtt);
+    ByteBucket(double linkSpeed);
     ~ByteBucket();
-    uint32_t getGrantBytes(uint32_t numRequestBytes, simtime_t currentTime);
+    inline simtime_t getGrantTime()
+    {
+        return nextGrantTime;
+    }
+    void getGrant(uint32_t grantSize, simtime_t currentTime);
     void subtractUnschedBytes(HomaPkt* reqMsg);
 
   private:
-    uint32_t linkSpeed;
-    uint32_t maxRtt;
-    uint32_t bucketMaxBytes;
-    int availableBytes;
-    simtime_t lastGrantTime;
+    double linkSpeed;
+    simtime_t nextGrantTime;
 };
 
 

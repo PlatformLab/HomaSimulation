@@ -34,6 +34,13 @@
 class HomaTransport : public cSimpleModule
 {
   public:
+    enum SelfMsgKind
+    {
+        START = 1,
+        GRANT = 2,
+        STOP  = 3
+    };
+
     HomaTransport();
     ~HomaTransport();
 
@@ -132,16 +139,16 @@ class HomaTransport : public cSimpleModule
         ~ReceiveScheduler();
         void processReceivedRequest(HomaPkt* rxPkt);
         void processReceivedData(HomaPkt* rxPkt);
-        void sendGrant();
-        void initialize(int grantMaxBytes,
-                uint32_t linkSpeed, uint32_t maxRtt);
+        void sendAndScheduleGrant();
+        void initialize(uint32_t grantMaxBytes, uint32_t linkSpeed, cMessage* grantTimer);
         
       protected:
         HomaTransport* transport;
-        ByteBucket *byteBucket;
+        cMessage* grantTimer;
+        ByteBucket* byteBucket;
         PriorityQueue inboundMsgQueue; 
         std::list<InboundMessage*> incompleteRxMsgs;
-        int grantMaxBytes;
+        uint32_t grantMaxBytes;
         friend class HomaTransport;
         friend class InboundMessage;
         
@@ -158,12 +165,6 @@ class HomaTransport : public cSimpleModule
     void processGrantTimer();
 
   protected:
-    enum SelfMsgKind
-    {
-        START = 1,
-        GRANT = 2,
-        STOP  = 3
-    };
 
     // contain the transport code in the send and receive paths.
     SendController sxController;
@@ -179,8 +180,7 @@ class HomaTransport : public cSimpleModule
     int linkSpeed;
     double grantTimeInterval;
 
-
-   
+    friend class ReceiveScheduler;
 };
 
 #endif

@@ -23,7 +23,7 @@ simple HomaTransport like ITransportScheme
 {
     parameters:
         int linkSpeed @unit(Gbps) = default(10Gbps);
-        int grantMaxBytes @unit(byte) = default(1400B);
+        int grantMaxBytes @unit(byte) = default(1472B);
         int maxRtt @unit(us) = default(15us);
         int localPort = default(-1);
         int destPort;

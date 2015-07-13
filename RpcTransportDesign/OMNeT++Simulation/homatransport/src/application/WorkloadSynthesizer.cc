@@ -81,7 +81,7 @@ WorkloadSynthesizer::initialize()
     }
 
     // Calculate average inter arrival time
-    avgInterArrivalTime = 10e-9 * msgSizeGenerator->getAvgMsgSize() * 8 /
+    avgInterArrivalTime = 1e-9 * msgSizeGenerator->getAvgMsgSize() * 8 /
             (par("loadFactor").doubleValue() * par("linkSpeed").longValue());
 
     // Send timer settings
