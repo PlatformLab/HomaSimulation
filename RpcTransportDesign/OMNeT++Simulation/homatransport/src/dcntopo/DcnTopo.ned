@@ -24,11 +24,12 @@ import homatransport.common.HostBase;
 network DcnTopo
 {
     parameters:
-        int numServersPerTor = default(8);
+        xml topologyConfig = xmldoc("config.xml");
+        int numServersPerTor;
         double edgeLinkDelay @unit(us) = default(0.0us);
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
-        int numTors = default(4);
+        int numTors;
         double fabricLinkDelay @unit(us) = default(0.0us);
         int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
                                                            // to nicLinkSpeed
@@ -73,8 +74,8 @@ network DcnTopo
         }
 
         host[numHosts]: HostBase {
-            parameters:
-                @display("i=device/server2");
+            @display("i=device/server2");
+            hostConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$MODULE_INDEX]");
         }
 
         configurator: IPv4NetworkConfigurator {

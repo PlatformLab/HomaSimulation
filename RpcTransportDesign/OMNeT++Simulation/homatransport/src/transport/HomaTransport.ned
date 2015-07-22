@@ -22,6 +22,7 @@ import homatransport.transport.ITransportScheme;
 simple HomaTransport like ITransportScheme
 {
     parameters:
+        xml transportConfig = default(xml("<param/>"));
         int linkSpeed @unit(Gbps) = default(10Gbps);
         int grantMaxBytes @unit(byte) = default(1472B);
         int maxRtt @unit(us) = default(15us);

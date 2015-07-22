@@ -13,6 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+#include <unordered_set>
 #include "WorkloadSynthesizer.h"
 #include "application/AppMessage_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
@@ -25,7 +26,25 @@ Define_Module(WorkloadSynthesizer);
 
 simsignal_t WorkloadSynthesizer::sentMsgSignal = registerSignal("sentMsg");
 simsignal_t WorkloadSynthesizer::rcvdMsgSignal = registerSignal("rcvdMsg");
-simsignal_t WorkloadSynthesizer::msgLifeTimeSignal = registerSignal("msgLifeTime");
+simsignal_t WorkloadSynthesizer::msgE2EDelaySignal =
+        registerSignal("msgE2EDelay");
+
+simsignal_t WorkloadSynthesizer::msg1PktE2EDelaySignal = 
+        registerSignal("msg1PktE2EDelay");
+simsignal_t WorkloadSynthesizer::msg3PktsE2EDelaySignal = 
+        registerSignal("msg3PktsE2EDelay");
+simsignal_t WorkloadSynthesizer::msg6PktsE2EDelaySignal = 
+        registerSignal("msg6PktsE2EDelay");
+simsignal_t WorkloadSynthesizer::msg13PktsE2EDelaySignal = 
+        registerSignal("msg13PktsE2EDelay");
+simsignal_t WorkloadSynthesizer::msg33PktsE2EDelaySignal = 
+        registerSignal("msg33PktsE2EDelay");
+simsignal_t WorkloadSynthesizer::msg133PktsE2EDelaySignal = 
+        registerSignal("msg133PktsE2EDelay");
+simsignal_t WorkloadSynthesizer::msg1333PktsE2EDelaySignal = 
+        registerSignal("msg1333PktsE2EDelay");
+simsignal_t WorkloadSynthesizer::msgHugeE2EDelaySignal = 
+        registerSignal("msgHugeE2EDelay");
 
 WorkloadSynthesizer::WorkloadSynthesizer()
 {
@@ -41,7 +60,6 @@ WorkloadSynthesizer::~WorkloadSynthesizer()
 void
 WorkloadSynthesizer::initialize()
 {
-    isSender = par("isSender").boolValue();
 
     // Initialize the msgSizeGenerator
     const char* workLoadType = par("workloadType").stringValue();
@@ -97,11 +115,74 @@ WorkloadSynthesizer::initialize()
         scheduleAt(start, selfMsg);
     }
 
+    // set xmlConfig 
+    xmlConfig = par("appConfig").xmlValue();
+
     // Initialize statistics
     numSent = 0;
     numReceived = 0;
     WATCH(numSent);
     WATCH(numReceived);
+}
+
+void
+WorkloadSynthesizer::parseAndProcessXMLConfig()
+{
+    // determine if this app is also a sender or only a receiver
+    bool isSender;
+    const char* isSenderParam = 
+            xmlConfig->getElementByPath("isSender")->getNodeValue();
+    if (strcmp(isSenderParam, "true") == 0) {
+        isSender = true;
+    } else if (strcmp(isSenderParam, "false") == 0) {
+        isSender = false;
+    } else {
+        throw cRuntimeError("'%s': Not a valid xml parameter for appConfig.",
+                isSenderParam);
+    }
+
+    if (!isSender) {
+        selfMsg->setKind(STOP);
+        scheduleAt(stopTime, selfMsg);
+        return;
+    }
+
+    // destAddress will be populated with the destination hosts in the xml
+    // config file. If no destination is specified in the xml config file, then
+    // dest host be chosen randomly among all the possible dest hosts.
+    std::string destIdsStr =
+            std::string(xmlConfig->getElementByPath("destIds")->getNodeValue());
+    std::stringstream destIdsStream(destIdsStr); 
+    int id;
+    std::unordered_set<int> destHostIds;
+    while (destIdsStream >> id) {
+        destHostIds.insert(id);
+    }
+
+    const char *destAddrs = par("destAddresses");
+    cStringTokenizer tokenizer(destAddrs);
+    const char *token;
+    while((token = tokenizer.nextToken()) != NULL) {
+        cModule* mod = simulation.getModuleByPath(token);
+        if (!destHostIds.empty() && destHostIds.count(mod->getIndex()) == 0) {
+                continue;
+        }
+        inet::L3Address result;
+        inet::L3AddressResolver().tryResolve(token, result);
+        if (result.isUnspecified()) {
+            EV_ERROR << "cannot resolve destination address: "
+                    << token << endl;
+        }
+        destAddresses.push_back(result);
+    }
+
+    if (destAddresses.empty()) {
+        selfMsg->setKind(STOP);
+        scheduleAt(stopTime, selfMsg);
+    } else {
+        selfMsg->setKind(SEND);
+        processSend();
+    }
 }
 
 void
@@ -150,7 +231,6 @@ WorkloadSynthesizer::chooseDestAddr()
 void
 WorkloadSynthesizer::sendMsg()
 {
-
     inet::L3Address destAddrs = chooseDestAddr();
     int msgByteSize = msgSizeGenerator->sizeGeneratorWrapper();
     char msgName[100];
@@ -189,29 +269,8 @@ WorkloadSynthesizer::processStart()
     }
     srcAddress = inet::L3Address(srcIPv4Data->getIPAddress());
 
-    // destAddress will be populated with all possible destination hosts in the
-    // network
-    const char *destAddrs = par("destAddresses");
-    cStringTokenizer tokenizer(destAddrs);
-    const char *token;
-    while((token = tokenizer.nextToken()) != NULL) {
-        inet::L3Address result;
-        inet::L3AddressResolver().tryResolve(token, result);
-        if (result.isUnspecified())
-            EV_ERROR << "cannot resolve destination address: "
-                    << token << endl;
-        else
-            destAddresses.push_back(result);
-    }
-
-    if (!destAddresses.empty()) {
-        selfMsg->setKind(SEND);
-        processSend();
-    } else {
-        selfMsg->setKind(STOP);
-        scheduleAt(stopTime, selfMsg);
-    }
-
+    // call parseXml to complete intialization based on the config.xml file
+    parseAndProcessXMLConfig();
 }
 
 void
@@ -221,16 +280,14 @@ WorkloadSynthesizer::processStop() {
 void
 WorkloadSynthesizer::processSend()
 {
-    if (isSender) {
-        sendMsg();
-        simtime_t nextSend = simTime() + nextSendTime();
-        if (stopTime < SIMTIME_ZERO || nextSend < stopTime) {
-            selfMsg->setKind(SEND);
-            scheduleAt(nextSend, selfMsg);
-        } else {
-            selfMsg->setKind(STOP);
-            scheduleAt(stopTime, selfMsg);
-        }
+    sendMsg();
+    simtime_t nextSend = simTime() + nextSendTime();
+    if (stopTime < SIMTIME_ZERO || nextSend < stopTime) {
+        selfMsg->setKind(SEND);
+        scheduleAt(nextSend, selfMsg);
+    } else {
+        selfMsg->setKind(STOP);
+        scheduleAt(stopTime, selfMsg);
     }
 }
 
@@ -252,9 +309,36 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
 {
     AppMessage* rcvdMsg = check_and_cast<AppMessage*>(msg);
     emit(rcvdMsgSignal, rcvdMsg);
-    emit(msgLifeTimeSignal, simTime() - rcvdMsg->getMsgCreationTime());
-    EV_INFO << "Received a message of length " << rcvdMsg->getByteLength() <<
-            "Bytes" << endl;
+    simtime_t completionTime = simTime() - rcvdMsg->getMsgCreationTime();
+    emit(msgE2EDelaySignal, completionTime);
+    EV_INFO << "Received a message of length " << rcvdMsg->getByteLength()
+            << "Bytes" << endl;
+
+    if (rcvdMsg->getByteLength() <= maxDataBytesPerPkt) {
+        emit(msg1PktE2EDelaySignal, completionTime);
+
+    } else if (rcvdMsg->getByteLength() <= 3 * maxDataBytesPerPkt) {
+        emit(msg3PktsE2EDelaySignal, completionTime);
+
+    } else if (rcvdMsg->getByteLength() <= 6 * maxDataBytesPerPkt) {
+        emit(msg6PktsE2EDelaySignal, completionTime);
+
+    } else if (rcvdMsg->getByteLength() <= 13 * maxDataBytesPerPkt) {
+        emit(msg13PktsE2EDelaySignal, completionTime);
+
+    } else if (rcvdMsg->getByteLength() <= 33 * maxDataBytesPerPkt) {
+        emit(msg33PktsE2EDelaySignal, completionTime);
+
+    } else if (rcvdMsg->getByteLength() <= 133 * maxDataBytesPerPkt) {
+        emit(msg133PktsE2EDelaySignal, completionTime);
+
+    } else if (rcvdMsg->getByteLength() <= 1333 * maxDataBytesPerPkt) {
+        emit(msg1333PktsE2EDelaySignal, completionTime);
+
+    } else {
+        emit(msgHugeE2EDelaySignal, completionTime);
+    }
+
     delete rcvdMsg;
     numReceived++;
 }

@@ -23,7 +23,7 @@ import homatransport.application.ITrafficGeneratorApp;
 simple WorkloadSynthesizer like ITrafficGeneratorApp 
 {
     parameters:
-        bool isSender = default(true);
+        xml appConfig = default(xml("<isSender/><destIds/>")); 
         string interfaceTableModule;   // The path to the InterfaceTable module
         int linkSpeed @unit(Gbps) = default(10Gbps);
         double loadFactor = default(0.5);
@@ -37,11 +37,29 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @display("i=block/app");
         @signal[sentMsg](type=cPacket);
         @signal[rcvdMsg](type=cPacket);
-        @signal[msgLifeTime](type=simtime_t);
+        @signal[msgE2EDelay](type=simtime_t);
+
+        @signal[msg1PktE2EDelay](type=simtime_t);
+        @signal[msg3PktsE2EDelay](type=simtime_t);
+        @signal[msg6PktsE2EDelay](type=simtime_t);
+        @signal[msg13PktsE2EDelay](type=simtime_t);
+        @signal[msg33PktsE2EDelay](type=simtime_t);
+        @signal[msg133PktsE2EDelay](type=simtime_t);
+        @signal[msg1333PktsE2EDelay](type=simtime_t);
+        @signal[msgHugeE2EDelay](type=simtime_t);
 
         @statistic[sentMsg](title="messages sent"; source=sentMsg; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
         @statistic[rcvdMsg](title="received messages"; source=rcvdMsg; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
-        @statistic[rcvdMsgLifeTime](title="received messages lifetime"; source="msgLifeTime"; unit=s; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[msgE2EDelay](title="Message lifetime (end to end latency)"; source="msgE2EDelay"; unit=s; record=stats,histogram,vector; interpolationmode=none);
+
+        @statistic[msg1PktE2EDelay](title="1 pkt size msg lifetime"; source="msg1PktE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msg3PktsE2EDelay](title="2 to 3 pkts msg lifetime"; source="msg3PktsE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msg6PktsE2EDelay](title="4 to 6 pkts msg lifetime"; source="msg6PktsE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msg13PktsE2EDelay](title="7 to 13 pkts msg lifetime"; source="msg13PktsE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msg33PktsE2EDelay](title="14 to 33 pkts msg lifetime"; source="msg33PktsE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msg133PktsE2EDelay](title="34 to 133 pkts msg lifetime"; source="msg133PktsE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msg1333PktsE2EDelay](title="134 to 1333 pkts msg lifetime"; source="msg1333PktsE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
+        @statistic[msgHugeE2EDelay](title="more than 1334 pkts msg lifetime"; source="msgHugeE2EDelay"; unit=s; record=stats,histogram; interpolationmode=none);
     gates:
         input transportIn @label(AppMessage/up);
         output transportOut @labels(AppMessage/down);

@@ -32,8 +32,8 @@ module HostBase extends NodeBase
 {
     parameters:
         @display("i=device/pc2");
+        xml hostConfig;
         int numTrafficGeneratorApp = default(0);
-
         // no of TCP apps. Specify the app types in INI file with
         // tcpApp[0..1].typename="TCPEchoApp" syntax
         int numTcpApps = default(0);  
@@ -58,11 +58,13 @@ module HostBase extends NodeBase
         trafficGeneratorApp[numTrafficGeneratorApp]: <> like ITrafficGeneratorApp {
             parameters:
                 @display("p=490,38");
+                appConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$PARENTMODULE_INDEX]/appConfig");
         }
 
         transportScheme: <transportSchemeType> like ITransportScheme if hasTransportScheme {
             parameters:
                 @display("p=445,112");
+                transportConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$PARENTMODULE_INDEX]/transportConfig");
         }
 
         udpApp[numUdpApps]: <> like IUDPApp {

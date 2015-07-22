@@ -23,7 +23,7 @@ moduleinterface ITransportScheme
 {
     parameters:
         @display("i=block/transport");
-    
+        xml transportConfig;
     gates:
         input appIn[] @labels(AppMessage/down);
         input udpIn @labels(UDPControlInfo/up);
@@ -36,7 +36,7 @@ simple TransportSchemeNone like ITransportScheme
     parameters:
         @display("i=old/x_noentry");
         @class("UnimplementedModule");
-    
+        xml transportConfig;
     gates:
         input appIn[] @labels(AppMessage/down);
         input udpIn @labels(UDPControlInfo/up);

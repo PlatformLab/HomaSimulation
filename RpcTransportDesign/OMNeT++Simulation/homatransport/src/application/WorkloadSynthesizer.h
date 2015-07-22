@@ -19,6 +19,7 @@
 #include <omnetpp.h>
 #include <vector>
 #include <string>
+#include <sstream>
 #include "application/MsgSizeDistributions.h"
 #include "inet/networklayer/common/L3Address.h"
 
@@ -52,13 +53,13 @@ class WorkloadSynthesizer : public cSimpleModule
     MsgSizeDistributions *msgSizeGenerator;
 
     // parameters
-    bool isSender;
     std::vector<inet::L3Address> destAddresses;
     simtime_t startTime;
     simtime_t stopTime;
     InterArrivalDist interArrivalDist;
     double avgInterArrivalTime;
     int maxDataBytesPerPkt;
+    cXMLElement* xmlConfig;
 
     // states
     cMessage* selfMsg;
@@ -70,7 +71,16 @@ class WorkloadSynthesizer : public cSimpleModule
 
     static simsignal_t sentMsgSignal;
     static simsignal_t rcvdMsgSignal;
-    static simsignal_t msgLifeTimeSignal;
+    static simsignal_t msgE2EDelaySignal;
+
+    static simsignal_t msg1PktE2EDelaySignal;
+    static simsignal_t msg3PktsE2EDelaySignal;
+    static simsignal_t msg6PktsE2EDelaySignal;
+    static simsignal_t msg13PktsE2EDelaySignal;
+    static simsignal_t msg33PktsE2EDelaySignal;
+    static simsignal_t msg133PktsE2EDelaySignal;
+    static simsignal_t msg1333PktsE2EDelaySignal;
+    static simsignal_t msgHugeE2EDelaySignal;
 
   protected:
     virtual void initialize();
@@ -84,7 +94,7 @@ class WorkloadSynthesizer : public cSimpleModule
     void processRcvdMsg(cPacket* msg);
     void sendMsg();
     double nextSendTime();
-
+    void parseAndProcessXMLConfig();
 };
 
 #endif //__HOMATRANSPORT_WORKLOADSYNTHESIZER_H_

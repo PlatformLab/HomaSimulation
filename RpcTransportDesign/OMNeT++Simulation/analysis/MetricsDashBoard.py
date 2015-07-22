@@ -117,58 +117,6 @@ def parse(f):
             else:
                 warnings.warn('Entry type not known to parser: {0}'.format(entryType), RuntimeWarning) 
     return hosts, tors, aggrs, cores
-#    for line in f:
-#        match = re.match('(\S+)\s+{0}\.(([a-zA-Z]+).+\.\S+)\s+(".+"|\S+)\s*(\S*)'.format(net), line)
-#        if match:
-#            topLevelModule = match.group(3)
-#            if topLevelModule == 'tor':
-#                currDict = tors
-#            elif topLevelModule == 'host':
-#                currDict = hosts
-#            elif topLevelModule == 'aggRouter':
-#                currDict = aggrs
-#            elif topLevelModule == 'core':
-#                currDict = cores
-#            else:
-#                raise Exception, 'no such module defined for parser: {0}'.format(topLevelModule)
-#            entryType = match.group(1)
-#            var = re.sub([[\]""], '', match.group(2))
-#            var = re.sub([^\w\.], '_', var)
-#            subVar = re.sub([""], '', match.group(4))
-#            subVar = re.sub([^\w\.], '_', subVar)
-#            if entryType == 'statistic':
-#                var = var+'.'+subVar
-#                currDict.assign(var+'.bins', [])
-#            elif entryType == 'scalar':
-#                var = var+'.'+subVar
-#                subVar = var + '.value' 
-#                value = float(match.group(5))
-#                currDict.assign(subVar, value)
-#            else:
-#                raise Exception, '{0}: not defined for this parser'.format(match.group(1))
-#            continue
-#        match = re.match('(\S+)\s+(".+"|\S+)\s+(".+"|\S+)', line)        
-#        if not match:
-#            warnings.warn('Parser cant find a match for line: {0}'.format(line), RuntimeWarning) 
-#        if currDict:
-#            entryType = match.group(1)
-#            if entryType == 'bin':
-#                subVar = var + '.bins'
-#                valuePair = (float(match.group(2), float(match.group(3))))
-#                currDict.access(subVar).append(valuePair)
-#            subVar = re.sub([""], '', match.group(2))
-#            subVar = re.sub([^\w\.], '_', subVar)
-#            subVar = var + '.' + subVar 
-#            value = match.group(3) 
-#            if entryType == 'field':
-#                currDict.assign(subVar, float(value))
-#            elif entryType == 'attr':
-#                currDict.assign(subVar, value)
-#            
-#            else:
-#                warnings.warn('Entry type not known to parser: {0}'.format(entryType), RuntimeWarning) 
-#    return hosts, tors, aggrs, cores
-
 
 def copyExclude(source, dest, exclude):
     selectKeys = (key for key in source if key not in exclude)
@@ -194,6 +142,8 @@ def main():
     coresNotHistogram = AttrDict()
     exclude = ['bins', 'interpolationmode', 'interpolationMode', '"simulated time"']
     copyExclude(hosts, hostsNoHistogram, exclude)
+    copyExclude(tors, torsNoHistogram, exclude)
+    copyExclude(aggrs, aggrsNoHistogram, exclude)
     pprint(hostsNoHistogram)
     
 if __name__ == '__main__':

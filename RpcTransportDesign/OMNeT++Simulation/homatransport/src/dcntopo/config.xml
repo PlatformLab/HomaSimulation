@@ -1,0 +1,156 @@
+<!--XML config file for perhost configuration of simulation. Define per host
+     configuration under hostConfig/param tag if you want. The hosts are
+     distinguished by "id" attribute of hostConfig tag. The
+     hostConfig/transportConfig tag is defined for transport config params of
+     the host and hostConfig/appConfig tag is to set WorkloadSynthesizer
+     parameters.-->
+<topologyConfig>
+    <!--id attribute is the index of this host in the topology's hosts vector-->
+    <hostConfig id="0"> 
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <!--if true, this host app will send messages as well-->
+            <isSender>false</isSender> 
+            <!--the space separated ids of the hosts that this app will send
+                 messages to. If empty, it means the sender will send randomly
+                 to every other host in the topology. -->
+            <destIds></destIds> 
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="1">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="2">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="3">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="4">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="5">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="6">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="7">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="8">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="9">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="10">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="11">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="12">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="13">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="14">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="15">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+</topologyConfig>

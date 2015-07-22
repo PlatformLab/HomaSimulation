@@ -21,6 +21,7 @@ moduleinterface ITrafficGeneratorApp
 {
     parameters:
         @display("i=block/app");
+        xml appConfig; 
     gates:
         input transportIn @label(AppMessage/up);
         output transportOut @labels(AppMessage/down);
