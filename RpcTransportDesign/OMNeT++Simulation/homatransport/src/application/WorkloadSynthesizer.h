@@ -21,6 +21,7 @@
 #include <string>
 #include <sstream>
 #include "application/MsgSizeDistributions.h"
+#include "application/AppMessage_m.h"
 #include "inet/networklayer/common/L3Address.h"
 
 
@@ -39,6 +40,10 @@ class WorkloadSynthesizer : public cSimpleModule
     static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
     static const uint32_t IP_HEADER_SIZE = 20;
     static const uint32_t UDP_HEADER_SIZE = 8;
+    static const uint32_t ETHERNET_PREAMBLE_SIZE = 8;
+    static const uint32_t ETHERNET_HDR_SIZE = 14; 
+    static const uint32_t ETHERNET_CRC_SIZE = 4;
+    static const uint32_t MIN_ETHERNET_FRAME_SIZE = 64; 
 
   protected:
     enum SelfMsgKinds { START = 1, SEND, STOP };
@@ -71,8 +76,13 @@ class WorkloadSynthesizer : public cSimpleModule
 
     static simsignal_t sentMsgSignal;
     static simsignal_t rcvdMsgSignal;
-    static simsignal_t msgE2EDelaySignal;
 
+    // Signal for end to end to delay every received messages
+    static simsignal_t msgE2EDelaySignal; 
+
+    // Signals for end to end delay of message ranges. In the signal name 
+    // msgXPktE2EDelaySignal, X stands for messages sizes that are smaller or
+    // equal to X and larger than previously defined signal.
     static simsignal_t msg1PktE2EDelaySignal;
     static simsignal_t msg3PktsE2EDelaySignal;
     static simsignal_t msg6PktsE2EDelaySignal;
@@ -95,6 +105,8 @@ class WorkloadSynthesizer : public cSimpleModule
     void sendMsg();
     double nextSendTime();
     void parseAndProcessXMLConfig();
+    double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
+    
 };
 
 #endif //__HOMATRANSPORT_WORKLOADSYNTHESIZER_H_

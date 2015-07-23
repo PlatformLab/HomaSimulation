@@ -15,7 +15,6 @@
 
 #include <unordered_set>
 #include "WorkloadSynthesizer.h"
-#include "application/AppMessage_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "inet/networklayer/common/InterfaceTable.h"
@@ -311,28 +310,29 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
     emit(rcvdMsgSignal, rcvdMsg);
     simtime_t completionTime = simTime() - rcvdMsg->getMsgCreationTime();
     emit(msgE2EDelaySignal, completionTime);
-    EV_INFO << "Received a message of length " << rcvdMsg->getByteLength()
+    int msgByteLen = rcvdMsg->getByteLength();
+    EV_INFO << "Received a message of length " << msgByteLen
             << "Bytes" << endl;
 
-    if (rcvdMsg->getByteLength() <= maxDataBytesPerPkt) {
+    if (msgByteLen <= maxDataBytesPerPkt) {
         emit(msg1PktE2EDelaySignal, completionTime);
 
-    } else if (rcvdMsg->getByteLength() <= 3 * maxDataBytesPerPkt) {
+    } else if (msgByteLen <= 3 * maxDataBytesPerPkt) {
         emit(msg3PktsE2EDelaySignal, completionTime);
 
-    } else if (rcvdMsg->getByteLength() <= 6 * maxDataBytesPerPkt) {
+    } else if (msgByteLen <= 6 * maxDataBytesPerPkt) {
         emit(msg6PktsE2EDelaySignal, completionTime);
 
-    } else if (rcvdMsg->getByteLength() <= 13 * maxDataBytesPerPkt) {
+    } else if (msgByteLen <= 13 * maxDataBytesPerPkt) {
         emit(msg13PktsE2EDelaySignal, completionTime);
 
-    } else if (rcvdMsg->getByteLength() <= 33 * maxDataBytesPerPkt) {
+    } else if (msgByteLen <= 33 * maxDataBytesPerPkt) {
         emit(msg33PktsE2EDelaySignal, completionTime);
 
-    } else if (rcvdMsg->getByteLength() <= 133 * maxDataBytesPerPkt) {
+    } else if (msgByteLen <= 133 * maxDataBytesPerPkt) {
         emit(msg133PktsE2EDelaySignal, completionTime);
 
-    } else if (rcvdMsg->getByteLength() <= 1333 * maxDataBytesPerPkt) {
+    } else if (msgByteLen <= 1333 * maxDataBytesPerPkt) {
         emit(msg1333PktsE2EDelaySignal, completionTime);
 
     } else {
@@ -341,6 +341,55 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
 
     delete rcvdMsg;
     numReceived++;
+}
+
+double
+WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
+{
+
+    // calculate the total transmitted bytes in the the network for this
+    // rcvdMsg. These bytes include all headers and ethernet overhead bytes per
+    // frame.
+    int totalBytesTranmitted = 0;
+    int lastPartialFrameLen = 0;
+    int numFullEthFrame = rcvdMsg->getByteLength() / maxDataBytesPerPkt;
+    int lastPartialFrameData = rcvdMsg->getByteLength() % maxDataBytesPerPkt;
+
+
+    totalBytesTranmitted = numFullEthFrame *
+            (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+            ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE);
+
+    if (lastPartialFrameData == 0) {
+        if (numFullEthFrame == 0) {
+            totalBytesTranmitted = MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE;
+        }
+    } else {
+        int minEthernetPayloadSize = 
+            MIN_ETHERNET_FRAME_SIZE - ETHERNET_HDR_SIZE - ETHERNET_CRC_SIZE;
+        if (lastPartialFrameData < 
+                (minEthernetPayloadSize - IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
+
+            lastPartialFrameLen =
+                    MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE;
+        } else {
+            lastPartialFrameLen = lastPartialFrameData + IP_HEADER_SIZE
+                    + UDP_HEADER_SIZE + ETHERNET_HDR_SIZE + ETHERNET_CRC_SIZE
+                    + ETHERNET_PREAMBLE_SIZE; 
+        }
+
+        totalBytesTranmitted += lastPartialFrameLen; 
+    }
+
+    double msgSerializationDelay = 
+            (1e-9 * (totalBytesTranmitted << 3)) / par("linkSpeed").longValue();
+
+    // The switch models in omnet++ are store and forward therefor the first
+    // packet of each message will experience an extra serialialization delay at
+    // each switch. There for need to figure out how many switched a packet will
+    // pass through.
+
+    
 }
 
 void
