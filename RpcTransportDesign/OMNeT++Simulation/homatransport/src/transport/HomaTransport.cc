@@ -33,12 +33,12 @@ HomaTransport::initialize()
 {
     localPort = par("localPort");
     destPort = par("destPort");
-    linkSpeed = par("linkSpeed");
+    nicLinkSpeed = par("nicLinkSpeed");
     uint32_t grantMaxBytes = (uint32_t) par("grantMaxBytes");
-    //maxGrantTimeInterval = 8.0 * grantMaxBytes * 10e-9 / linkSpeed;
+    //maxGrantTimeInterval = 8.0 * grantMaxBytes * 10e-9 / nicLinkSpeed;
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);
-    rxScheduler.initialize(grantMaxBytes, linkSpeed, selfMsg);
+    rxScheduler.initialize(grantMaxBytes, nicLinkSpeed, selfMsg);
     scheduleAt(simTime(), selfMsg);
 }
 
@@ -272,10 +272,10 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
 
 void
 HomaTransport::ReceiveScheduler::initialize(uint32_t grantMaxBytes,
-        uint32_t linkSpeed, cMessage* grantTimer)
+        uint32_t nicLinkSpeed, cMessage* grantTimer)
 {
     this->grantMaxBytes = grantMaxBytes;
-    this->byteBucket = new(this->byteBucket) ByteBucket(linkSpeed);
+    this->byteBucket = new(this->byteBucket) ByteBucket(nicLinkSpeed);
     this->grantTimer = grantTimer;
 }
 

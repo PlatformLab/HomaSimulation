@@ -140,7 +140,7 @@ class HomaTransport : public cSimpleModule
         void processReceivedRequest(HomaPkt* rxPkt);
         void processReceivedData(HomaPkt* rxPkt);
         void sendAndScheduleGrant();
-        void initialize(uint32_t grantMaxBytes, uint32_t linkSpeed, cMessage* grantTimer);
+        void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed, cMessage* grantTimer);
         
       protected:
         HomaTransport* transport;
@@ -177,7 +177,7 @@ class HomaTransport : public cSimpleModule
     // parameters
     int localPort;
     int destPort;
-    int linkSpeed;
+    int nicLinkSpeed;
     double grantTimeInterval;
 
     friend class ReceiveScheduler;

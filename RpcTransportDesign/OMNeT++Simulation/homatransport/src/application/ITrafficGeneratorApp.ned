@@ -22,6 +22,8 @@ moduleinterface ITrafficGeneratorApp
     parameters:
         @display("i=block/app");
         xml appConfig; 
+        int nicLinkSpeed @unit(Gbps);
+        int fabricLinkSpeed @unit(Gbps);
     gates:
         input transportIn @label(AppMessage/up);
         output transportOut @labels(AppMessage/down);

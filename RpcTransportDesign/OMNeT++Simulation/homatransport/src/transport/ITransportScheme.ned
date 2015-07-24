@@ -24,6 +24,7 @@ moduleinterface ITransportScheme
     parameters:
         @display("i=block/transport");
         xml transportConfig;
+        int nicLinkSpeed @unit(Gbps);
     gates:
         input appIn[] @labels(AppMessage/down);
         input udpIn @labels(UDPControlInfo/up);
@@ -37,6 +38,7 @@ simple TransportSchemeNone like ITransportScheme
         @display("i=old/x_noentry");
         @class("UnimplementedModule");
         xml transportConfig;
+        int nicLinkSpeed @unit(Gbps);
     gates:
         input appIn[] @labels(AppMessage/down);
         input udpIn @labels(UDPControlInfo/up);

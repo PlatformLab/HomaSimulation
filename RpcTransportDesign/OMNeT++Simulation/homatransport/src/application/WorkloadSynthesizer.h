@@ -65,6 +65,8 @@ class WorkloadSynthesizer : public cSimpleModule
     double avgInterArrivalTime;
     int maxDataBytesPerPkt;
     cXMLElement* xmlConfig;
+    uint32_t nicLinkSpeed; // in Gb/s
+    uint32_t fabricLinkSpeed;
 
     // states
     cMessage* selfMsg;
@@ -91,6 +93,21 @@ class WorkloadSynthesizer : public cSimpleModule
     static simsignal_t msg133PktsE2EDelaySignal;
     static simsignal_t msg1333PktsE2EDelaySignal;
     static simsignal_t msgHugeE2EDelaySignal;
+
+    // Signals for end to end stretch factor of message different ranges.
+    // Stretch is defined as the overhead factor end to end completion time of a
+    // mesage comparing to ideal condition.  In the signal name
+    // msgXPktE2EStretchSignal, X stands for messages sizes that are smaller
+    // or equal to X and larger than previously defined signal.
+    static simsignal_t msg1PktE2EStretchSignal;
+    static simsignal_t msg3PktsE2EStretchSignal;
+    static simsignal_t msg6PktsE2EStretchSignal;
+    static simsignal_t msg13PktsE2EStretchSignal;
+    static simsignal_t msg33PktsE2EStretchSignal;
+    static simsignal_t msg133PktsE2EStretchSignal;
+    static simsignal_t msg1333PktsE2EStretchSignal;
+    static simsignal_t msgHugeE2EStretchSignal;
+
 
   protected:
     virtual void initialize();

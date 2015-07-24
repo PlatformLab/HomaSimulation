@@ -5,6 +5,20 @@
      the host and hostConfig/appConfig tag is to set WorkloadSynthesizer
      parameters.-->
 <topologyConfig>
+    <IPv4Configurator>
+        <config>
+            <interface hosts='**.host[0..4]' address='10.x.0.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[4..7]' address='10.x.1.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[8..11]' address='10.x.2.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[12..15]' address='10.x.3.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[16..19]' address='10.x.4.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[20..23]' address='10.x.5.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[24..27]' address='10.x.6.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[28..31]' address='10.x.7.x' netmask='255.x.x.x'/>
+            <interface hosts='**' address='10.x.x.x' netmask='255.x.x.x'/>
+        </config>
+    </IPv4Configurator>
+
     <!--id attribute is the index of this host in the topology's hosts vector-->
     <hostConfig id="0"> 
         <transportConfig>
@@ -146,6 +160,150 @@
     </hostConfig>
 
     <hostConfig id="15">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="16">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="17">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="18">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="19">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="20">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="21">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="22">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="23">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="24">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="25">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="26">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="27">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="28">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="29">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="30">
+        <transportConfig>
+        </transportConfig>
+        <appConfig>
+            <isSender>true</isSender>
+            <destIds>0</destIds>
+        </appConfig>
+    </hostConfig>
+
+    <hostConfig id="31">
         <transportConfig>
         </transportConfig>
         <appConfig>

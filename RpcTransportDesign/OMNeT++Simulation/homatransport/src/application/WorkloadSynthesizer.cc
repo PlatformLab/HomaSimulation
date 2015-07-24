@@ -45,6 +45,23 @@ simsignal_t WorkloadSynthesizer::msg1333PktsE2EDelaySignal =
 simsignal_t WorkloadSynthesizer::msgHugeE2EDelaySignal = 
         registerSignal("msgHugeE2EDelay");
 
+simsignal_t WorkloadSynthesizer::msg1PktE2EStretchSignal = 
+        registerSignal("msg1PktE2EStretch");
+simsignal_t WorkloadSynthesizer::msg3PktsE2EStretchSignal = 
+        registerSignal("msg3PktsE2EStretch");
+simsignal_t WorkloadSynthesizer::msg6PktsE2EStretchSignal = 
+        registerSignal("msg6PktsE2EStretch");
+simsignal_t WorkloadSynthesizer::msg13PktsE2EStretchSignal = 
+        registerSignal("msg13PktsE2EStretch");
+simsignal_t WorkloadSynthesizer::msg33PktsE2EStretchSignal = 
+        registerSignal("msg33PktsE2EStretch");
+simsignal_t WorkloadSynthesizer::msg133PktsE2EStretchSignal = 
+        registerSignal("msg133PktsE2EStretch");
+simsignal_t WorkloadSynthesizer::msg1333PktsE2EStretchSignal = 
+        registerSignal("msg1333PktsE2EStretch");
+simsignal_t WorkloadSynthesizer::msgHugeE2EStretchSignal = 
+        registerSignal("msgHugeE2EStretch");
+
 WorkloadSynthesizer::WorkloadSynthesizer()
 {
     msgSizeGenerator = NULL;
@@ -59,6 +76,9 @@ WorkloadSynthesizer::~WorkloadSynthesizer()
 void
 WorkloadSynthesizer::initialize()
 {
+
+    nicLinkSpeed = par("nicLinkSpeed").longValue();
+    fabricLinkSpeed = par("fabricLinkSpeed").longValue(); 
 
     // Initialize the msgSizeGenerator
     const char* workLoadType = par("workloadType").stringValue();
@@ -99,7 +119,7 @@ WorkloadSynthesizer::initialize()
 
     // Calculate average inter arrival time
     avgInterArrivalTime = 1e-9 * msgSizeGenerator->getAvgMsgSize() * 8 /
-            (par("loadFactor").doubleValue() * par("linkSpeed").longValue());
+            (par("loadFactor").doubleValue() * nicLinkSpeed);
 
     // Send timer settings
     startTime = par("startTime").doubleValue();
@@ -314,29 +334,41 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
     EV_INFO << "Received a message of length " << msgByteLen
             << "Bytes" << endl;
 
+    double idealDelay = idealMsgEndToEndDelay(rcvdMsg);
+    double stretchFactor = 
+            (idealDelay == 0.0 ? 1.0 : completionTime.dbl()/idealDelay);
+
     if (msgByteLen <= maxDataBytesPerPkt) {
         emit(msg1PktE2EDelaySignal, completionTime);
+        emit(msg1PktE2EStretchSignal, stretchFactor);
 
     } else if (msgByteLen <= 3 * maxDataBytesPerPkt) {
         emit(msg3PktsE2EDelaySignal, completionTime);
+        emit(msg3PktsE2EStretchSignal, stretchFactor);
 
     } else if (msgByteLen <= 6 * maxDataBytesPerPkt) {
         emit(msg6PktsE2EDelaySignal, completionTime);
+        emit(msg6PktsE2EStretchSignal, stretchFactor);
 
     } else if (msgByteLen <= 13 * maxDataBytesPerPkt) {
         emit(msg13PktsE2EDelaySignal, completionTime);
+        emit(msg13PktsE2EStretchSignal, stretchFactor);
 
     } else if (msgByteLen <= 33 * maxDataBytesPerPkt) {
         emit(msg33PktsE2EDelaySignal, completionTime);
+        emit(msg33PktsE2EStretchSignal, stretchFactor);
 
     } else if (msgByteLen <= 133 * maxDataBytesPerPkt) {
         emit(msg133PktsE2EDelaySignal, completionTime);
+        emit(msg133PktsE2EStretchSignal, stretchFactor);
 
     } else if (msgByteLen <= 1333 * maxDataBytesPerPkt) {
         emit(msg1333PktsE2EDelaySignal, completionTime);
+        emit(msg1333PktsE2EStretchSignal, stretchFactor);
 
     } else {
         emit(msgHugeE2EDelaySignal, completionTime);
+        emit(msgHugeE2EStretchSignal, stretchFactor);
     }
 
     delete rcvdMsg;
@@ -346,14 +378,24 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
 double
 WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
 {
+    int totalBytesTranmitted = 0;
+    inet::L3Address srcAddr = rcvdMsg->getSrcAddr();
+    ASSERT(srcAddr.getType() == inet::L3Address::AddressType::IPv4);
+    inet::L3Address destAddr = rcvdMsg->getDestAddr();
+    ASSERT(destAddr.getType() == inet::L3Address::AddressType::IPv4);
+    
+    if (destAddr == srcAddr) {
+        // no switching delay
+        return totalBytesTranmitted;
+    }
+
 
     // calculate the total transmitted bytes in the the network for this
     // rcvdMsg. These bytes include all headers and ethernet overhead bytes per
     // frame.
-    int totalBytesTranmitted = 0;
     int lastPartialFrameLen = 0;
     int numFullEthFrame = rcvdMsg->getByteLength() / maxDataBytesPerPkt;
-    int lastPartialFrameData = rcvdMsg->getByteLength() % maxDataBytesPerPkt;
+    uint32_t lastPartialFrameData = rcvdMsg->getByteLength() % maxDataBytesPerPkt;
 
 
     totalBytesTranmitted = numFullEthFrame *
@@ -363,10 +405,12 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     if (lastPartialFrameData == 0) {
         if (numFullEthFrame == 0) {
             totalBytesTranmitted = MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE;
+            lastPartialFrameLen = totalBytesTranmitted;
         }
+
     } else {
-        int minEthernetPayloadSize = 
-            MIN_ETHERNET_FRAME_SIZE - ETHERNET_HDR_SIZE - ETHERNET_CRC_SIZE;
+        uint32_t minEthernetPayloadSize = 
+                MIN_ETHERNET_FRAME_SIZE - ETHERNET_HDR_SIZE - ETHERNET_CRC_SIZE;
         if (lastPartialFrameData < 
                 (minEthernetPayloadSize - IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
 
@@ -382,14 +426,43 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     }
 
     double msgSerializationDelay = 
-            (1e-9 * (totalBytesTranmitted << 3)) / par("linkSpeed").longValue();
+            (1e-9 * (totalBytesTranmitted << 3)) / nicLinkSpeed;
 
     // The switch models in omnet++ are store and forward therefor the first
     // packet of each message will experience an extra serialialization delay at
     // each switch. There for need to figure out how many switched a packet will
-    // pass through.
+    // pass through. The proper working of this part of the code depends on the
+    // correct ip assignments.
+    double totalSwitchDelay = 0;
+    double edgeSwitchingDelay = 0; 
+    double fabricSwitchinDelay = 0;
 
-    
+    if (numFullEthFrame == 0) {
+        edgeSwitchingDelay = (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE) *
+                1e-9 * 8 / nicLinkSpeed; 
+
+        fabricSwitchinDelay = (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE) *
+                1e-9 * 8 / fabricLinkSpeed;
+    } else {
+        edgeSwitchingDelay = lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
+        fabricSwitchinDelay = lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
+    }
+
+    if (destAddr.toIPv4().getDByte(2) == srcAddr.toIPv4().getDByte(2)) {
+        // src and dest in the same rack
+        totalSwitchDelay = edgeSwitchingDelay;
+
+    } else if (destAddr.toIPv4().getDByte(1) == srcAddr.toIPv4().getDByte(1)) {
+        // src and dest in the same pod 
+        totalSwitchDelay = edgeSwitchingDelay + 2 * fabricSwitchinDelay;
+
+    } else {
+        totalSwitchDelay = edgeSwitchingDelay + 4 * fabricSwitchinDelay;
+    }
+
+    return msgSerializationDelay + totalSwitchDelay;
 }
 
 void

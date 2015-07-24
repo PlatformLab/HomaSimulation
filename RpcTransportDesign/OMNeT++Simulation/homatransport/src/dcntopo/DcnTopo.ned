@@ -76,10 +76,13 @@ network DcnTopo
         host[numHosts]: HostBase {
             @display("i=device/server2");
             hostConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$MODULE_INDEX]");
+            nicLinkSpeed = nicLinkSpeed;
+            fabricLinkSpeed = fabricLinkSpeed;
         }
 
         configurator: IPv4NetworkConfigurator {
             parameters:
+                config = xmldoc("config.xml", "/topologyConfig/IPv4Configurator/config");
                 @display("p=26,25");
         }
 
