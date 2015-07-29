@@ -188,8 +188,7 @@ def hostQueueWaitTimes(hosts, xmlParsedDic):
     sendersQueuingTimeDigest = AttrDict() 
     sendersQueuingTimeDigest = digestModulesStats(sendersQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest["Queue Waiting Time in Senders NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( sendersQueuingTimeDigest.count, sendersQueuingTimeDigest.min * 1e6, sendersQueuingTimeDigest.mean * 1e6, sendersQueuingTimeDigest.stddev * 1e6, sendersQueuingTimeDigest.median * 1e6, sendersQueuingTimeDigest.threeQuartile * 1e6, sendersQueuingTimeDigest.ninety9Percentile * 1e6, sendersQueuingTimeDigest.max * 1e6)
-
+    reportDigest.assign("Queue Waiting Time in Senders NICs", sendersQueuingTimeDigest)
     return reportDigest
 
 def torsQueueWaitTime(tors, xmlParsedDic):
@@ -217,8 +216,7 @@ def torsQueueWaitTime(tors, xmlParsedDic):
     torsUpwardQueuingTimeDigest = AttrDict()
     torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest["Queue Waiting Time in TOR upward NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( torsUpwardQueuingTimeDigest.count, torsUpwardQueuingTimeDigest.min * 1e6, torsUpwardQueuingTimeDigest.mean * 1e6, torsUpwardQueuingTimeDigest.stddev * 1e6, torsUpwardQueuingTimeDigest.median * 1e6, torsUpwardQueuingTimeDigest.threeQuartile * 1e6, torsUpwardQueuingTimeDigest.ninety9Percentile * 1e6, torsUpwardQueuingTimeDigest.max * 1e6)
-    
+    reportDigest.assign("Queue Waiting Time in TOR upward NICs", torsUpwardQueuingTimeDigest)
     # Find the queue waiting times for the downward NIC of the receiver tors
     # For that we fist need to find the torIds for all the tors that are 
     # connected to the receiver hosts
@@ -234,7 +232,7 @@ def torsQueueWaitTime(tors, xmlParsedDic):
  
     torsDownwardQueuingTimeDigest = AttrDict()
     torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
-    reportDigest["Queue Waiting Time in TOR downward NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( torsDownwardQueuingTimeDigest.count, torsDownwardQueuingTimeDigest.min * 1e6, torsDownwardQueuingTimeDigest.mean * 1e6, torsDownwardQueuingTimeDigest.stddev * 1e6, torsDownwardQueuingTimeDigest.median * 1e6, torsDownwardQueuingTimeDigest.threeQuartile * 1e6, torsDownwardQueuingTimeDigest.ninety9Percentile * 1e6, torsDownwardQueuingTimeDigest.max * 1e6)
+    reportDigest.assign("Queue Waiting Time in TOR downward NICs", torsDownwardQueuingTimeDigest)
     return reportDigest
 
 def aggrsQueueWaitTime(aggrs, xmlParsedDic):
@@ -250,7 +248,7 @@ def aggrsQueueWaitTime(aggrs, xmlParsedDic):
     aggrsQueuingTimeDigest = AttrDict() 
     aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest["Queue Waiting Time in Senders NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( aggrsQueuingTimeDigest.count, aggrsQueuingTimeDigest.min * 1e6, aggrsQueuingTimeDigest.mean * 1e6, aggrsQueuingTimeDigest.stddev * 1e6, aggrsQueuingTimeDigest.median * 1e6, aggrsQueuingTimeDigest.threeQuartile * 1e6, aggrsQueuingTimeDigest.ninety9Percentile * 1e6, aggrsQueuingTimeDigest.max * 1e6)
+    reportDigest.assign("Queue Waiting Time in Senders NICs", aggrsQueuingTimeDigest)
     return reportDigest
 
 def parseXmlFile(xmlConfigFile):
@@ -287,11 +285,26 @@ def parseXmlFile(xmlConfigFile):
     xmlParsedDic.receiverIds = [elem for elem in set(receiverIds)]
     return xmlParsedDic
 
-def textifyStats(allStatsList):
-    statTopicLen = 0
+def printStats(allStatsList, unit):
+    if unit == 'us':
+        scaleFac = 1e6 
+
+    statMaxTopicLen = 0
     for statDics in allStatsList:
         for key in statDics:
-            statTopicLen = max(key, statTopicLen)
+            statMaxTopicLen = max(len(key), statMaxTopicLen)
+
+    for statDics in allStatsList:
+        for key in statDics:
+            print key + ':'.rjust(statMaxTopicLen)
+            print ''.rjust(statMaxTopicLen) + 'num sample points = ' + str(statDics[key].count)
+            print ''.rjust(statMaxTopicLen) + 'minimum({0}) = '.format(unit) + str(statDics[key].min)
+            print ''.rjust(statMaxTopicLen) + 'mean({0}) = '.format(unit) + str(statDics[key].mean)
+            print ''.rjust(statMaxTopicLen) + 'stddev({0}) = '.format(unit) + str(statDics[key].stddev)
+            print ''.rjust(statMaxTopicLen) + 'median({0}) = '.format(unit) + str(statDics[key].median)
+            print ''.rjust(statMaxTopicLen) + '75percentile({0}) = '.format(unit) + str(statDics[key].threeQuartile)
+            print ''.rjust(statMaxTopicLen) + '99percentile({0}) = '.format(unit) + str(statDics[key].ninety9Percentile)
+            print ''.rjust(statMaxTopicLen) + 'max({0}) = '.format(unit) + str(statDics[key].max)
 
 def main():
     parser = OptionParser()
@@ -314,16 +327,18 @@ def main():
     #copyExclude(hosts, hostsNoHistogram, exclude)
     #copyExclude(tors, torsNoHistogram, exclude)
     #copyExclude(aggrs, aggrsNoHistogram, exclude)
+    allStatsList = list()
     hostQueueWaitingDigest = AttrDict()
     hostQueueWaitingDigest = hostQueueWaitTimes(hosts, xmlParsedDic)
+    allStatsList.append(hostQueueWaitingDigest)
     torQueueWaitingDigest = AttrDict()
     torQueueWaitingDigest = torsQueueWaitTime(tors, xmlParsedDic)
+    allStatsList.append(torQueueWaitingDigest)
     aggrQueueWaitingDigest = AttrDict()
     aggrQueueWaitingDigest = aggrsQueueWaitTime(aggrs, xmlParsedDic)
-    pprint(hostQueueWaitingDigest)
-    pprint(torQueueWaitingDigest)
-    pprint(aggrQueueWaitingDigest)
-
+    allStatsList.append(aggrQueueWaitingDigest)
+    print("====================Packet Wait Times In The Queues====================")
+    printStats(allStatsList, 'us')
 
 if __name__ == '__main__':
     sys.exit(main());
