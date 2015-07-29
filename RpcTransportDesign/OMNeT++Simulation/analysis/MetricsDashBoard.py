@@ -4,16 +4,20 @@ This program scans the scaler result file (.sca) and printouts some of the
 statistics on the screen.
 """
 
+from numpy import *
 from glob import glob
 from optparse import OptionParser
 from pprint import pprint
 from functools import partial
+from xml.dom import minidom
 import math
 import os
 import random
 import re
 import sys
 import warnings
+
+__all__ = ['parse', 'copyExclude']
 
 class AttrDict(dict):
     """A mapping with string keys that aliases x.y syntax to x['y'] syntax.
@@ -100,7 +104,7 @@ def parse(f):
                 raise Exception, '{0}: not defined for this parser'.format(match.group(1))
             continue
         match = re.match('(\S+)\s+(".+"|\S+)\s+(".+"|\S+)', line)        
-        if not match:
+        if not match and not line.isspace():
             warnings.warn('Parser cant find a match for line: {0}'.format(line), RuntimeWarning) 
         if currDict:
             entryType = match.group(1)
@@ -127,6 +131,168 @@ def copyExclude(source, dest, exclude):
         else:
             dest[key] = source[key]
 
+
+def getStatsFromHist(bins, cumProb, idx):
+    if idx == 0 and bins[idx] == -inf:
+        return bins[idx + 1]
+    if idx == len(bins)-1:
+        return bins[idx]
+    return (bins[idx] + bins[idx + 1])/2
+
+def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
+    histogram = moduleDic.access(histogramKey)
+    stats = moduleDic.access(statsKey)
+    bins = [tuple[0] for tuple in histogram]
+    cumProb = cumsum([tuple[1]/stats.count for tuple in histogram])
+    moduleStats = AttrDict()
+    moduleStats.count = stats.count
+    moduleStats.min = stats.min
+    moduleStats.mean = stats.mean
+    moduleStats.stddev = stats.stddev
+    moduleStats.max = stats.max
+    medianIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.5)
+    moduleStats.median = getStatsFromHist(bins, cumProb, medianIdx)
+    threeQuartileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.75)
+    moduleStats.threeQuartile = getStatsFromHist(bins, cumProb, threeQuartileIdx)
+    ninety9PercentileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.99)
+    moduleStats.ninety9Percentile = getStatsFromHist(bins, cumProb, ninety9PercentileIdx)
+    return moduleStats
+
+def digestModulesStats(modulesStatsList):
+    statsDigest = AttrDict()
+    statsDigest = statsDigest.fromkeys(modulesStatsList[0].keys(), 0.0) 
+    for targetStat in modulesStatsList:
+        statsDigest.count += targetStat.count 
+        statsDigest.min += targetStat.min / len(modulesStatsList) 
+        statsDigest.max = max(targetStat.max, statsDigest.max)
+        statsDigest.mean += targetStat.mean / len(modulesStatsList) 
+        statsDigest.stddev += targetStat.stddev / len(modulesStatsList) 
+        statsDigest.median += targetStat.median / len(modulesStatsList) 
+        statsDigest.threeQuartile += targetStat.threeQuartile / len(modulesStatsList) 
+        statsDigest.ninety9Percentile += targetStat.ninety9Percentile / len(modulesStatsList) 
+    return statsDigest
+
+
+def hostQueueWaitTimes(hosts, xmlParsedDic):
+    senderIds = xmlParsedDic.senderIds
+    sendersQueuingTimeStats = list()
+    for host in hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        if hostId in senderIds:
+            queuingTimeHistogramKey = 'host[{0}].eth[0].queue.dataQueue.queueingTime:histogram.bins'.format(hostId)
+            queuingTimeStatsKey = 'host[{0}].eth[0].queue.dataQueue.queueingTime:stats'.format(hostId)
+            senderStats = AttrDict()
+            senderStats = getInterestingModuleStats(hosts, queuingTimeStatsKey, queuingTimeHistogramKey)
+            sendersQueuingTimeStats.append(senderStats)
+    
+    sendersQueuingTimeDigest = AttrDict() 
+    sendersQueuingTimeDigest = digestModulesStats(sendersQueuingTimeStats)
+    reportDigest = AttrDict()
+    reportDigest["Queue Waiting Time in Senders NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( sendersQueuingTimeDigest.count, sendersQueuingTimeDigest.min * 1e6, sendersQueuingTimeDigest.mean * 1e6, sendersQueuingTimeDigest.stddev * 1e6, sendersQueuingTimeDigest.median * 1e6, sendersQueuingTimeDigest.threeQuartile * 1e6, sendersQueuingTimeDigest.ninety9Percentile * 1e6, sendersQueuingTimeDigest.max * 1e6)
+
+    return reportDigest
+
+def torsQueueWaitTime(tors, xmlParsedDic):
+    # Find the queue waiting times for the upward NICs of sender tors.
+    # For that we first need to find torIds for all the tors
+    # connected to the sender hosts
+    senderHostIds = xmlParsedDic.senderIds
+    senderTorIds = [elem for elem in set([int(id / xmlParsedDic.numServersPerTor) for id in senderHostIds])]
+    numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
+    numServersPerTor = xmlParsedDic.numServersPerTor
+
+    torsUpwardQueuingTimeStats = list()
+    for torKey in tors.keys():
+        torId = int(re.match('tor\[([0-9]+)]', torKey).group(1))
+        if torId in senderTorIds:
+            tor = tors[torKey]
+            # Find the queuewait time only for the upward tor NICs
+            for ifaceId in range(numServersPerTor, numServersPerTor + numTorUplinkNics):
+                queuingTimeHistogramKey = 'eth[{0}].queue.dataQueue.queueingTime:histogram.bins'.format(ifaceId)
+                queuingTimeStatsKey = 'eth[{0}].queue.dataQueue.queueingTime:stats'.format(ifaceId)            
+                torUpwardStat = AttrDict()
+                torUpwardStat = getInterestingModuleStats(tor, queuingTimeStatsKey, queuingTimeHistogramKey)
+                torsUpwardQueuingTimeStats.append(torUpwardStat)
+   
+    torsUpwardQueuingTimeDigest = AttrDict()
+    torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
+    reportDigest = AttrDict()
+    reportDigest["Queue Waiting Time in TOR upward NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( torsUpwardQueuingTimeDigest.count, torsUpwardQueuingTimeDigest.min * 1e6, torsUpwardQueuingTimeDigest.mean * 1e6, torsUpwardQueuingTimeDigest.stddev * 1e6, torsUpwardQueuingTimeDigest.median * 1e6, torsUpwardQueuingTimeDigest.threeQuartile * 1e6, torsUpwardQueuingTimeDigest.ninety9Percentile * 1e6, torsUpwardQueuingTimeDigest.max * 1e6)
+    
+    # Find the queue waiting times for the downward NIC of the receiver tors
+    # For that we fist need to find the torIds for all the tors that are 
+    # connected to the receiver hosts
+    receiverHostIds = xmlParsedDic.receiverIds
+    receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
+    torsDownwardQueuingTimeStats = list()
+    for torId, ifaceId in receiverTorIdsIfaces:
+        queuingTimeHistogramKey = 'tor[{0}].eth[{1}].queue.dataQueue.queueingTime:histogram.bins'.format(torId, ifaceId)
+        queuingTimeStatsKey = 'tor[{0}].eth[{1}].queue.dataQueue.queueingTime:stats'.format(torId, ifaceId)            
+        torDownwardStat = AttrDict() 
+        torDownwardStat = getInterestingModuleStats(tors, queuingTimeStatsKey, queuingTimeHistogramKey)
+        torsDownwardQueuingTimeStats.append(torDownwardStat)
+ 
+    torsDownwardQueuingTimeDigest = AttrDict()
+    torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
+    reportDigest["Queue Waiting Time in TOR downward NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( torsDownwardQueuingTimeDigest.count, torsDownwardQueuingTimeDigest.min * 1e6, torsDownwardQueuingTimeDigest.mean * 1e6, torsDownwardQueuingTimeDigest.stddev * 1e6, torsDownwardQueuingTimeDigest.median * 1e6, torsDownwardQueuingTimeDigest.threeQuartile * 1e6, torsDownwardQueuingTimeDigest.ninety9Percentile * 1e6, torsDownwardQueuingTimeDigest.max * 1e6)
+    return reportDigest
+
+def aggrsQueueWaitTime(aggrs, xmlParsedDic):
+    # Find the queue waiting for aggrs switches NICs
+    aggrsQueuingTimeStats = list()
+    for aggr in aggrs.keys():
+        queuingTimeHistogramKey = '{0}.eth[0].queue.dataQueue.queueingTime:histogram.bins'.format(aggr)
+        queuingTimeStatsKey = '{0}.eth[0].queue.dataQueue.queueingTime:stats'.format(aggr)
+        aggrsStats = AttrDict()
+        aggrsStats = getInterestingModuleStats(aggrs, queuingTimeStatsKey, queuingTimeHistogramKey)
+        aggrsQueuingTimeStats.append(aggrsStats)
+    
+    aggrsQueuingTimeDigest = AttrDict() 
+    aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
+    reportDigest = AttrDict()
+    reportDigest["Queue Waiting Time in Senders NICs"] = 'sample count:{0} / min: {1}us / mean: {2}us / stddev: {3}us / median: {4}us / 75percentile: {5}us / 99percentile: {6}us/ max: {7}us'.format( aggrsQueuingTimeDigest.count, aggrsQueuingTimeDigest.min * 1e6, aggrsQueuingTimeDigest.mean * 1e6, aggrsQueuingTimeDigest.stddev * 1e6, aggrsQueuingTimeDigest.median * 1e6, aggrsQueuingTimeDigest.threeQuartile * 1e6, aggrsQueuingTimeDigest.ninety9Percentile * 1e6, aggrsQueuingTimeDigest.max * 1e6)
+    return reportDigest
+
+def parseXmlFile(xmlConfigFile):
+    xmlConfig = minidom.parse(xmlConfigFile)
+    xmlParsedDic = AttrDict()
+    numServersPerTor = int(xmlConfig.getElementsByTagName('numServersPerTor')[0].firstChild.data)
+    numTors = int(xmlConfig.getElementsByTagName('numTors')[0].firstChild.data)
+    fabricLinkSpeed = int(xmlConfig.getElementsByTagName('fabricLinkSpeed')[0].firstChild.data)
+    nicLinkSpeed = int(xmlConfig.getElementsByTagName('nicLinkSpeed')[0].firstChild.data)
+    numTors = int(xmlConfig.getElementsByTagName('numTors')[0].firstChild.data)
+    xmlParsedDic.numServersPerTor = numServersPerTor
+    xmlParsedDic.numTors = numTors 
+    xmlParsedDic.fabricLinkSpeed = fabricLinkSpeed 
+    xmlParsedDic.nicLinkSpeed = nicLinkSpeed 
+    senderIds = list()
+    receiverIds = list()
+    allHostsReceive = False
+    for hostConfig in xmlConfig.getElementsByTagName('hostConfig'):
+        isSender = hostConfig.getElementsByTagName('isSender')[0]
+        if isSender.childNodes[0].data == 'true':
+            senderIds.append(int(hostConfig.getAttribute('id'))) 
+            if allHostsReceive is False:
+                destIdsNode = hostConfig.getElementsByTagName('destIds')[0]
+                destIds = list()
+                if destIdsNode.firstChild != None:
+                    destIds = [int(destId) for destId in destIdsNode.firstChild.data.split()]
+                if destIds == []:
+                    allHostsReceive = True     
+                else:
+                    receiverIds += destIds
+    xmlParsedDic.senderIds = senderIds
+    if allHostsReceive is True: 
+        receiverIds = range(0, numTors*numServersPerTor)
+    xmlParsedDic.receiverIds = [elem for elem in set(receiverIds)]
+    return xmlParsedDic
+
+def textifyStats(allStatsList):
+    statTopicLen = 0
+    for statDics in allStatsList:
+        for key in statDics:
+            statTopicLen = max(key, statTopicLen)
+
 def main():
     parser = OptionParser()
     options, args = parser.parse_args()
@@ -135,16 +301,29 @@ def main():
     else:
         scalarResultFile = 'homatransport/src/dcntopo/results/RecordAllStats-0.sca'
 
-    hosts, tors, aggrs, cores  = parse(open(scalarResultFile))
-    hostsNoHistogram = AttrDict()
-    torsNoHistogram = AttrDict()
-    aggrsNoHistogram = AttrDict()
-    coresNotHistogram = AttrDict()
-    exclude = ['bins', 'interpolationmode', 'interpolationMode', '"simulated time"']
-    copyExclude(hosts, hostsNoHistogram, exclude)
-    copyExclude(tors, torsNoHistogram, exclude)
-    copyExclude(aggrs, aggrsNoHistogram, exclude)
-    pprint(hostsNoHistogram)
+    xmlConfigFile = 'homatransport/src/dcntopo/config.xml' 
+    xmlParsedDic = AttrDict()
+    xmlParsedDic = parseXmlFile(xmlConfigFile)
     
+    hosts, tors, aggrs, cores  = parse(open(scalarResultFile))
+    #hostsNoHistogram = AttrDict()
+    #torsNoHistogram = AttrDict()
+    #aggrsNoHistogram = AttrDict()
+    #coresNotHistogram = AttrDict()
+    #exclude = ['bins', 'interpolationmode', 'interpolationMode', '"simulated time"']
+    #copyExclude(hosts, hostsNoHistogram, exclude)
+    #copyExclude(tors, torsNoHistogram, exclude)
+    #copyExclude(aggrs, aggrsNoHistogram, exclude)
+    hostQueueWaitingDigest = AttrDict()
+    hostQueueWaitingDigest = hostQueueWaitTimes(hosts, xmlParsedDic)
+    torQueueWaitingDigest = AttrDict()
+    torQueueWaitingDigest = torsQueueWaitTime(tors, xmlParsedDic)
+    aggrQueueWaitingDigest = AttrDict()
+    aggrQueueWaitingDigest = aggrsQueueWaitTime(aggrs, xmlParsedDic)
+    pprint(hostQueueWaitingDigest)
+    pprint(torQueueWaitingDigest)
+    pprint(aggrQueueWaitingDigest)
+
+
 if __name__ == '__main__':
     sys.exit(main());

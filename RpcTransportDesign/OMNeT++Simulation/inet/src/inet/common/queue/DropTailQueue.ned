@@ -36,8 +36,8 @@ simple DropTailQueue like IOutputQueue
         @signal[queueLength](type=long);
         @statistic[rcvdPk](title="received packets"; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[dropPk](title="dropped packets"; source=dropPkByQueue; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-        @statistic[queueingTime](title="queueing time"; record=histogram,vector; interpolationmode=none);
-        @statistic[queueLength](title="queue length"; record=max,timeavg,vector; interpolationmode=sample-hold);
+        @statistic[queueingTime](title="queueing time"; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[queueLength](title="queue length"; record=stats,histogram,timeavg,vector; interpolationmode=sample-hold);
     gates:
         input in;
         output out;

@@ -5,6 +5,12 @@
      the host and hostConfig/appConfig tag is to set WorkloadSynthesizer
      parameters.-->
 <topologyConfig>
+    <param>
+        <numServersPerTor>4</numServersPerTor>
+        <numTors>8</numTors>
+        <fabricLinkSpeed>40</fabricLinkSpeed> <!--In Gb/s-->
+        <nicLinkSpeed>10</nicLinkSpeed> <!--In Gb/s-->
+    </param>
     <IPv4Configurator>
         <config>
             <interface hosts='**.host[0..4]' address='10.x.0.x' netmask='255.x.x.x'/>

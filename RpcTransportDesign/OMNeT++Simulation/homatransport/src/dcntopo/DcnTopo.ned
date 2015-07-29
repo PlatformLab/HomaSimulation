@@ -27,12 +27,12 @@ network DcnTopo
         xml topologyConfig = xmldoc("config.xml");
         int numServersPerTor;
         double edgeLinkDelay @unit(us) = default(0.0us);
-        int nicLinkSpeed @unit(Gbps) = default(10Gbps);
+        int nicLinkSpeed @unit(Gbps);
 
         int numTors;
         double fabricLinkDelay @unit(us) = default(0.0us);
-        int fabricLinkSpeed @unit(Gbps) = default(40Gbps); // greater and equal
-                                                           // to nicLinkSpeed
+        int fabricLinkSpeed @unit(Gbps); // greater and equal
+                                         // to nicLinkSpeed
 
         double overSubFactor = default(1.0); // must be larger than 1.0
                                              // 1.0 means full bisection bw
