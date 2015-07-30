@@ -58,8 +58,6 @@ class AttrDict(dict):
             container = container[name]
         return container[names[-1]]
 
-
-
 def parse(f):
     """
     Scan a result file containing scalar statistics for omnetsimulation, and
@@ -131,7 +129,6 @@ def copyExclude(source, dest, exclude):
         else:
             dest[key] = source[key]
 
-
 def getStatsFromHist(bins, cumProb, idx):
     if idx == 0 and bins[idx] == -inf:
         return bins[idx + 1]
@@ -140,22 +137,24 @@ def getStatsFromHist(bins, cumProb, idx):
     return (bins[idx] + bins[idx + 1])/2
 
 def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
+    moduleStats = AttrDict()
+    moduleStats = moduleStats.fromkeys(['count','min','mean','stddev','max','median','threeQuartile','ninety9Percentile'], 0.0)
     histogram = moduleDic.access(histogramKey)
     stats = moduleDic.access(statsKey)
     bins = [tuple[0] for tuple in histogram]
-    cumProb = cumsum([tuple[1]/stats.count for tuple in histogram])
-    moduleStats = AttrDict()
-    moduleStats.count = stats.count
-    moduleStats.min = stats.min
-    moduleStats.mean = stats.mean
-    moduleStats.stddev = stats.stddev
-    moduleStats.max = stats.max
-    medianIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.5)
-    moduleStats.median = getStatsFromHist(bins, cumProb, medianIdx)
-    threeQuartileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.75)
-    moduleStats.threeQuartile = getStatsFromHist(bins, cumProb, threeQuartileIdx)
-    ninety9PercentileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.99)
-    moduleStats.ninety9Percentile = getStatsFromHist(bins, cumProb, ninety9PercentileIdx)
+    if stats.count != 0:
+        cumProb = cumsum([tuple[1]/stats.count for tuple in histogram])
+        moduleStats.count = stats.count
+        moduleStats.min = stats.min
+        moduleStats.mean = stats.mean
+        moduleStats.stddev = stats.stddev
+        moduleStats.max = stats.max
+        medianIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.5)
+        moduleStats.median = getStatsFromHist(bins, cumProb, medianIdx)
+        threeQuartileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.75)
+        moduleStats.threeQuartile = getStatsFromHist(bins, cumProb, threeQuartileIdx)
+        ninety9PercentileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.99)
+        moduleStats.ninety9Percentile = getStatsFromHist(bins, cumProb, ninety9PercentileIdx)
     return moduleStats
 
 def digestModulesStats(modulesStatsList):
@@ -217,6 +216,7 @@ def torsQueueWaitTime(tors, xmlParsedDic):
     torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
     reportDigest = AttrDict()
     reportDigest.assign("Queue Waiting Time in TOR upward NICs", torsUpwardQueuingTimeDigest)
+
     # Find the queue waiting times for the downward NIC of the receiver tors
     # For that we fist need to find the torIds for all the tors that are 
     # connected to the receiver hosts
@@ -248,7 +248,7 @@ def aggrsQueueWaitTime(aggrs, xmlParsedDic):
     aggrsQueuingTimeDigest = AttrDict() 
     aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest.assign("Queue Waiting Time in Senders NICs", aggrsQueuingTimeDigest)
+    reportDigest.assign("Queue Waiting Time in Aggregate Switch NICs", aggrsQueuingTimeDigest)
     return reportDigest
 
 def parseXmlFile(xmlConfigFile):
@@ -288,23 +288,56 @@ def parseXmlFile(xmlConfigFile):
 def printStats(allStatsList, unit):
     if unit == 'us':
         scaleFac = 1e6 
+    elif unit == '':
+        scaleFac = 1
 
     statMaxTopicLen = 0
     for statDics in allStatsList:
         for key in statDics:
             statMaxTopicLen = max(len(key), statMaxTopicLen)
-
+    statMaxTopicLen += 4
     for statDics in allStatsList:
         for key in statDics:
-            print key + ':'.rjust(statMaxTopicLen)
+            print '\n'
+            print (key + ':').ljust(statMaxTopicLen)
             print ''.rjust(statMaxTopicLen) + 'num sample points = ' + str(statDics[key].count)
-            print ''.rjust(statMaxTopicLen) + 'minimum({0}) = '.format(unit) + str(statDics[key].min)
-            print ''.rjust(statMaxTopicLen) + 'mean({0}) = '.format(unit) + str(statDics[key].mean)
-            print ''.rjust(statMaxTopicLen) + 'stddev({0}) = '.format(unit) + str(statDics[key].stddev)
-            print ''.rjust(statMaxTopicLen) + 'median({0}) = '.format(unit) + str(statDics[key].median)
-            print ''.rjust(statMaxTopicLen) + '75percentile({0}) = '.format(unit) + str(statDics[key].threeQuartile)
-            print ''.rjust(statMaxTopicLen) + '99percentile({0}) = '.format(unit) + str(statDics[key].ninety9Percentile)
-            print ''.rjust(statMaxTopicLen) + 'max({0}) = '.format(unit) + str(statDics[key].max)
+            print ''.rjust(statMaxTopicLen) + 'minimum = ' + str(statDics[key].min) + unit
+            print ''.rjust(statMaxTopicLen) + 'mean = ' + str(statDics[key].mean) + unit
+            print ''.rjust(statMaxTopicLen) + 'stddev = ' + str(statDics[key].stddev) + unit
+            print ''.rjust(statMaxTopicLen) + 'median = ' + str(statDics[key].median) + unit
+            print ''.rjust(statMaxTopicLen) + '75percentile = ' + str(statDics[key].threeQuartile) + unit
+            print ''.rjust(statMaxTopicLen) + '99percentile = ' + str(statDics[key].ninety9Percentile) + unit
+            print ''.rjust(statMaxTopicLen) + 'max = '.format(unit) + str(statDics[key].max) + unit
+
+def e2eStretchAndDelay(hosts, xmlParsedDic):
+    # For the hosts that are receivers, find the stretch and endToend stats and
+    # return them. 
+    receiverHostIds = xmlParsedDic.receiverIds 
+    sizes = ['1Pkt', '3Pkts', '6Pkts', '13Pkts', '33Pkts', '133Pkts', '1333Pkts', 'Huge']
+    e2eDelayReportDigest = AttrDict()
+    e2eStretchReportDigest = AttrDict()
+    for size in sizes:
+        e2eDelayList = list()
+        e2eStretchList = list()
+        for id in receiverHostIds:
+            e2eDelayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EDelay:histogram.bins'.format(id, size)
+            e2eDelayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EDelay:stats'.format(id, size)
+            e2eStretchHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EStretch:histogram.bins'.format(id, size)
+            e2eStretchStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EStretch:stats'.format(id, size)
+            e2eDelayForSize = AttrDict()
+            e2eStretchForSize = AttrDict()
+            e2eDelayForSize = getInterestingModuleStats(hosts, e2eDelayStatsKey, e2eDelayHistogramKey)
+            e2eStretchForSize = getInterestingModuleStats(hosts, e2eStretchStatsKey, e2eStretchHistogramKey)
+            e2eDelayList.append(e2eDelayForSize)
+            e2eStretchList.append(e2eStretchForSize)
+
+        e2eDelayDigest = AttrDict()
+        e2eStretchDigest = AttrDict()
+        e2eDelayDigest = digestModulesStats(e2eDelayList)
+        e2eStretchDigest = digestModulesStats(e2eStretchList)
+        e2eDelayReportDigest.assign('End to End Delay for less than {0} messages'.format(size), e2eDelayDigest)
+        e2eStretchReportDigest.assign('End to End Stretch for less than {0} messages'.format(size), e2eStretchDigest)
+    return e2eDelayReportDigest, e2eStretchReportDigest
 
 def main():
     parser = OptionParser()
@@ -327,6 +360,7 @@ def main():
     #copyExclude(hosts, hostsNoHistogram, exclude)
     #copyExclude(tors, torsNoHistogram, exclude)
     #copyExclude(aggrs, aggrsNoHistogram, exclude)
+    #pprint(hosts)
     allStatsList = list()
     hostQueueWaitingDigest = AttrDict()
     hostQueueWaitingDigest = hostQueueWaitTimes(hosts, xmlParsedDic)
@@ -339,6 +373,14 @@ def main():
     allStatsList.append(aggrQueueWaitingDigest)
     print("====================Packet Wait Times In The Queues====================")
     printStats(allStatsList, 'us')
+
+    e2eDelayDigest = AttrDict()
+    e2eStretchDigest = AttrDict()
+    e2eDelayDigest, e2eStretchDigest = e2eStretchAndDelay(hosts, xmlParsedDic)
+    print("====================End To End Delay====================")
+    printStats([e2eDelayDigest], 'us')
+    print("====================End To End Stretch====================")
+    printStats([e2eStretchDigest], '')
 
 if __name__ == '__main__':
     sys.exit(main());
