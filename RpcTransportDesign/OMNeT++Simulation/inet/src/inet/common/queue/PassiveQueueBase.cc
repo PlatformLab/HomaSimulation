@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "inet/common/queue/PassiveQueueBase.h"
+#include "../../homatransport/src/transport/HomaPkt_m.h"
 
 namespace inet {
 
@@ -26,6 +27,11 @@ simsignal_t PassiveQueueBase::enqueuePkSignal = registerSignal("enqueuePk");
 simsignal_t PassiveQueueBase::dequeuePkSignal = registerSignal("dequeuePk");
 simsignal_t PassiveQueueBase::dropPkByQueueSignal = registerSignal("dropPkByQueue");
 simsignal_t PassiveQueueBase::queueingTimeSignal = registerSignal("queueingTime");
+
+
+simsignal_t PassiveQueueBase::requestQueueingTimeSignal = registerSignal("requestQueueingTime");
+simsignal_t PassiveQueueBase::grantQueueingTimeSignal = registerSignal("grantQueueingTime");
+simsignal_t PassiveQueueBase::dataQueueingTimeSignal = registerSignal("dataQueueingTime");
 
 void PassiveQueueBase::initialize()
 {
@@ -51,6 +57,23 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
         emit(enqueuePkSignal, msg);
         emit(dequeuePkSignal, msg);
         emit(queueingTimeSignal, SIMTIME_ZERO);
+        cPacket* pkt = searchEncapHomaPkt(msg);
+        if (pkt) {
+            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(pkt);
+            switch (homaPkt->getPktType()) {
+                case PktType::REQUEST:
+                    emit(requestQueueingTimeSignal, SIMTIME_ZERO);
+                    break;
+                case PktType::GRANT:
+                    emit(grantQueueingTimeSignal, SIMTIME_ZERO);
+                    break;
+                case PktType::DATA:
+                    emit(grantQueueingTimeSignal, SIMTIME_ZERO);
+                    break;
+                default:
+                    throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
+            }
+        }
         sendOut(msg);
     }
     else {
@@ -86,6 +109,23 @@ void PassiveQueueBase::requestPacket()
     else {
         emit(dequeuePkSignal, msg);
         emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
+        cPacket* pkt = searchEncapHomaPkt(msg);
+        if (pkt) {
+            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(pkt);
+            switch (homaPkt->getPktType()) {
+                case PktType::REQUEST:
+                    emit(requestQueueingTimeSignal, simTime() - msg->getArrivalTime());
+                    break;
+                case PktType::GRANT:
+                    emit(grantQueueingTimeSignal, simTime() - msg->getArrivalTime());
+                    break;
+                case PktType::DATA:
+                    emit(grantQueueingTimeSignal, simTime() - msg->getArrivalTime());
+                    break;
+                default:
+                    throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
+            }
+        }
         sendOut(msg);
     }
 }
@@ -127,6 +167,24 @@ void PassiveQueueBase::notifyListeners()
 {
     for (std::list<IPassiveQueueListener *>::iterator it = listeners.begin(); it != listeners.end(); ++it)
         (*it)->packetEnqueued(this);
+}
+
+cPacket*
+PassiveQueueBase::searchEncapHomaPkt(cMessage* msg)
+{
+    cPacket* pkt = dynamic_cast<cPacket*>(msg);
+    while (pkt) {
+        if (dynamic_cast<HomaPkt*>(pkt)) {
+            return pkt;
+        }
+
+        if (pkt->hasEncapsulatedPacket()) {
+            pkt = dynamic_cast<cPacket*>(pkt->getEncapsulatedPacket());
+        } else {
+            break;
+        }
+    }
+    return NULL;
 }
 
 } // namespace inet

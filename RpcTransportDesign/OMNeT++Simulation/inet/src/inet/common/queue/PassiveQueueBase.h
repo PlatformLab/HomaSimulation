@@ -54,6 +54,11 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     static simsignal_t dropPkByQueueSignal;
     /** Signal with value of delaying time when sent out a packet. */
     static simsignal_t queueingTimeSignal;
+    /** Queuing time for different HomaPkt packet types **/
+    static simsignal_t requestQueueingTimeSignal;
+    static simsignal_t grantQueueingTimeSignal;
+    static simsignal_t dataQueueingTimeSignal;
+
 
   protected:
     virtual void initialize();
@@ -77,6 +82,12 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
      * Should be redefined to send out the packet; e.g. <tt>send(msg,"out")</tt>.
      */
     virtual void sendOut(cMessage *msg) = 0;
+
+    /**
+     * This function checks if there is a HomaPkt packet encapsulated in the messages
+     * and fires the proper signal for that.
+     */
+    virtual cPacket* searchEncapHomaPkt(cMessage* msg);
 
   public:
     /**
