@@ -187,7 +187,8 @@ def hostQueueWaitTimes(hosts, xmlParsedDic):
     sendersQueuingTimeDigest = AttrDict() 
     sendersQueuingTimeDigest = digestModulesStats(sendersQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest.assign("Queue Waiting Time in Senders NICs", sendersQueuingTimeDigest)
+    if sendersQueuingTimeDigest.count != 0:
+        reportDigest.assign("Queue Waiting Time in Senders NICs", sendersQueuingTimeDigest)
     return reportDigest
 
 def torsQueueWaitTime(tors, xmlParsedDic):
@@ -215,7 +216,8 @@ def torsQueueWaitTime(tors, xmlParsedDic):
     torsUpwardQueuingTimeDigest = AttrDict()
     torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest.assign("Queue Waiting Time in TOR upward NICs", torsUpwardQueuingTimeDigest)
+    if torsUpwardQueuingTimeDigest.count != 0:
+        reportDigest.assign("Queue Waiting Time in TOR upward NICs", torsUpwardQueuingTimeDigest)
 
     # Find the queue waiting times for the downward NIC of the receiver tors
     # For that we fist need to find the torIds for all the tors that are 
@@ -232,7 +234,8 @@ def torsQueueWaitTime(tors, xmlParsedDic):
  
     torsDownwardQueuingTimeDigest = AttrDict()
     torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
-    reportDigest.assign("Queue Waiting Time in TOR downward NICs", torsDownwardQueuingTimeDigest)
+    if torsDownwardQueuingTimeDigest.count != 0:
+        reportDigest.assign("Queue Waiting Time in TOR downward NICs", torsDownwardQueuingTimeDigest)
     return reportDigest
 
 def aggrsQueueWaitTime(aggrs, xmlParsedDic):
@@ -248,7 +251,8 @@ def aggrsQueueWaitTime(aggrs, xmlParsedDic):
     aggrsQueuingTimeDigest = AttrDict() 
     aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
     reportDigest = AttrDict()
-    reportDigest.assign("Queue Waiting Time in Aggregate Switch NICs", aggrsQueuingTimeDigest)
+    if aggrsQueuingTimeDigest.count != 0: 
+        reportDigest.assign("Queue Waiting Time in Aggregate Switch NICs", aggrsQueuingTimeDigest)
     return reportDigest
 
 def parseXmlFile(xmlConfigFile):
@@ -301,13 +305,13 @@ def printStats(allStatsList, unit):
             print '\n'
             print (key + ':').ljust(statMaxTopicLen)
             print ''.rjust(statMaxTopicLen) + 'num sample points = ' + str(statDics[key].count)
-            print ''.rjust(statMaxTopicLen) + 'minimum = ' + str(statDics[key].min) + unit
-            print ''.rjust(statMaxTopicLen) + 'mean = ' + str(statDics[key].mean) + unit
-            print ''.rjust(statMaxTopicLen) + 'stddev = ' + str(statDics[key].stddev) + unit
-            print ''.rjust(statMaxTopicLen) + 'median = ' + str(statDics[key].median) + unit
-            print ''.rjust(statMaxTopicLen) + '75percentile = ' + str(statDics[key].threeQuartile) + unit
-            print ''.rjust(statMaxTopicLen) + '99percentile = ' + str(statDics[key].ninety9Percentile) + unit
-            print ''.rjust(statMaxTopicLen) + 'max = '.format(unit) + str(statDics[key].max) + unit
+            print ''.rjust(statMaxTopicLen) + 'minimum = ' + str(statDics[key].min) + ' ' +  unit
+            print ''.rjust(statMaxTopicLen) + 'mean = ' + str(statDics[key].mean) + ' ' + unit
+            print ''.rjust(statMaxTopicLen) + 'stddev = ' + str(statDics[key].stddev) + ' ' + unit
+            print ''.rjust(statMaxTopicLen) + 'median = ' + str(statDics[key].median) + ' ' + unit
+            print ''.rjust(statMaxTopicLen) + '75percentile = ' + str(statDics[key].threeQuartile) + ' ' + unit
+            print ''.rjust(statMaxTopicLen) + '99percentile = ' + str(statDics[key].ninety9Percentile) + ' ' + unit
+            print ''.rjust(statMaxTopicLen) + 'max = '.format(unit) + str(statDics[key].max) + ' ' + unit
 
 def e2eStretchAndDelay(hosts, xmlParsedDic):
     # For the hosts that are receivers, find the stretch and endToend stats and
@@ -335,8 +339,10 @@ def e2eStretchAndDelay(hosts, xmlParsedDic):
         e2eStretchDigest = AttrDict()
         e2eDelayDigest = digestModulesStats(e2eDelayList)
         e2eStretchDigest = digestModulesStats(e2eStretchList)
-        e2eDelayReportDigest.assign('End to End Delay for less than {0} messages'.format(size), e2eDelayDigest)
-        e2eStretchReportDigest.assign('End to End Stretch for less than {0} messages'.format(size), e2eStretchDigest)
+        if e2eDelayDigest.count != 0:
+            e2eDelayReportDigest.assign('End to End Delay for less than {0} messages'.format(size), e2eDelayDigest)
+        if e2eStretchDigest.count != 0: 
+            e2eStretchReportDigest.assign('End to End Stretch for less than {0} messages'.format(size), e2eStretchDigest)
     return e2eDelayReportDigest, e2eStretchReportDigest
 
 def main():
