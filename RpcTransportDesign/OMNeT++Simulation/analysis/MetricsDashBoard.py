@@ -174,85 +174,98 @@ def digestModulesStats(modulesStatsList):
 
 def hostQueueWaitTimes(hosts, xmlParsedDic):
     senderIds = xmlParsedDic.senderIds
-    sendersQueuingTimeStats = list()
-    for host in hosts.keys():
-        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
-        if hostId in senderIds:
-            queuingTimeHistogramKey = 'host[{0}].eth[0].queue.dataQueue.queueingTime:histogram.bins'.format(hostId)
-            queuingTimeStatsKey = 'host[{0}].eth[0].queue.dataQueue.queueingTime:stats'.format(hostId)
-            senderStats = AttrDict()
-            senderStats = getInterestingModuleStats(hosts, queuingTimeStatsKey, queuingTimeHistogramKey)
-            sendersQueuingTimeStats.append(senderStats)
-    
-    sendersQueuingTimeDigest = AttrDict() 
-    sendersQueuingTimeDigest = digestModulesStats(sendersQueuingTimeStats)
     reportDigest = AttrDict()
-    if sendersQueuingTimeDigest.count != 0:
-        reportDigest.assign("Queue Waiting Time in Senders NICs", sendersQueuingTimeDigest)
+    # find the queueWaitTimes for different types of packets. Current types
+    # considered are request, grant and data packets. Also queueingTimes in the
+    # senders NIC.
+    keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
+    for keyString in keyStrings:
+        queuingTimeStats = list()
+        for host in hosts.keys():
+            hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+            queuingTimeHistogramKey = 'host[{0}].eth[0].queue.dataQueue.{1}:histogram.bins'.format(hostId, keyString)
+            queuingTimeStatsKey = 'host[{0}].eth[0].queue.dataQueue.{1}:stats'.format(hostId,keyString)
+            hostStats = AttrDict()
+            if keyString != 'queueingTime' or (keyString == 'queueingTime' and hostId in senderIds):
+                hostStats = getInterestingModuleStats(hosts, queuingTimeStatsKey, queuingTimeHistogramKey)
+                queuingTimeStats.append(hostStats)
+
+        queuingTimeDigest = AttrDict()
+        queuingTimeDigest = digestModulesStats(queuingTimeStats)
+        if queuingTimeDigest.count != 0:
+            reportDigest.assign('Queue Waiting Time in Host NICs({0})'.format(keyString), queuingTimeDigest)
     return reportDigest
 
 def torsQueueWaitTime(tors, xmlParsedDic):
-    # Find the queue waiting times for the upward NICs of sender tors.
-    # For that we first need to find torIds for all the tors
-    # connected to the sender hosts
     senderHostIds = xmlParsedDic.senderIds
     senderTorIds = [elem for elem in set([int(id / xmlParsedDic.numServersPerTor) for id in senderHostIds])]
     numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
     numServersPerTor = xmlParsedDic.numServersPerTor
-
-    torsUpwardQueuingTimeStats = list()
-    for torKey in tors.keys():
-        torId = int(re.match('tor\[([0-9]+)]', torKey).group(1))
-        if torId in senderTorIds:
-            tor = tors[torKey]
-            # Find the queuewait time only for the upward tor NICs
-            for ifaceId in range(numServersPerTor, numServersPerTor + numTorUplinkNics):
-                queuingTimeHistogramKey = 'eth[{0}].queue.dataQueue.queueingTime:histogram.bins'.format(ifaceId)
-                queuingTimeStatsKey = 'eth[{0}].queue.dataQueue.queueingTime:stats'.format(ifaceId)            
-                torUpwardStat = AttrDict()
-                torUpwardStat = getInterestingModuleStats(tor, queuingTimeStatsKey, queuingTimeHistogramKey)
-                torsUpwardQueuingTimeStats.append(torUpwardStat)
-   
-    torsUpwardQueuingTimeDigest = AttrDict()
-    torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
-    reportDigest = AttrDict()
-    if torsUpwardQueuingTimeDigest.count != 0:
-        reportDigest.assign("Queue Waiting Time in TOR upward NICs", torsUpwardQueuingTimeDigest)
-
-    # Find the queue waiting times for the downward NIC of the receiver tors
-    # For that we fist need to find the torIds for all the tors that are 
-    # connected to the receiver hosts
     receiverHostIds = xmlParsedDic.receiverIds
     receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
-    torsDownwardQueuingTimeStats = list()
-    for torId, ifaceId in receiverTorIdsIfaces:
-        queuingTimeHistogramKey = 'tor[{0}].eth[{1}].queue.dataQueue.queueingTime:histogram.bins'.format(torId, ifaceId)
-        queuingTimeStatsKey = 'tor[{0}].eth[{1}].queue.dataQueue.queueingTime:stats'.format(torId, ifaceId)            
-        torDownwardStat = AttrDict() 
-        torDownwardStat = getInterestingModuleStats(tors, queuingTimeStatsKey, queuingTimeHistogramKey)
-        torsDownwardQueuingTimeStats.append(torDownwardStat)
- 
-    torsDownwardQueuingTimeDigest = AttrDict()
-    torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
-    if torsDownwardQueuingTimeDigest.count != 0:
-        reportDigest.assign("Queue Waiting Time in TOR downward NICs", torsDownwardQueuingTimeDigest)
+    reportDigest = AttrDict()
+    keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
+    for keyString in keyStrings:
+        torsUpwardQueuingTimeStats = list()
+        torsDownwardQueuingTimeStats = list()
+        for torKey in tors.keys():
+            torId = int(re.match('tor\[([0-9]+)]', torKey).group(1))
+            tor = tors[torKey]
+            # Find the queue waiting times for the upward NICs of sender tors
+            # as well as the queue waiting times for various packet types.
+            # For the first one we have to find torIds for all the tors
+            # connected to the sender hosts
+            for ifaceId in range(numServersPerTor, numServersPerTor + numTorUplinkNics):
+                # Find the queuewait time only for the upward tor NICs
+                queuingTimeHistogramKey = 'eth[{0}].queue.dataQueue.{1}:histogram.bins'.format(ifaceId, keyString)
+                queuingTimeStatsKey = 'eth[{0}].queue.dataQueue.{1}:stats'.format(ifaceId, keyString)
+                if keyString != 'queueingTime' or (keyString == 'queueingTime' and torId in senderTorIds):
+                    torUpwardStat = AttrDict()
+                    torUpwardStat = getInterestingModuleStats(tor, queuingTimeStatsKey, queuingTimeHistogramKey)
+                    torsUpwardQueuingTimeStats.append(torUpwardStat)
+
+            # Find the queue waiting times for the downward NICs of receiver tors
+            # as well as the queue waiting times for various packet types.
+            # For the first one we have to find torIds for all the tors
+            # connected to the receiver hosts
+            for ifaceId in range(0, numServersPerTor):
+                # Find the queuewait time only for the downward tor NICs
+                queuingTimeHistogramKey = 'eth[{0}].queue.dataQueue.{1}:histogram.bins'.format(ifaceId, keyString)
+                queuingTimeStatsKey = 'eth[{0}].queue.dataQueue.{1}:stats'.format(ifaceId, keyString)
+                if keyString != 'queueingTime' or (keyString == 'queueingTime' and (torId, ifaceId) in receiverTorIdsIfaces):
+                    torDownwardStat = AttrDict() 
+                    torDownwardStat = getInterestingModuleStats(tor, queuingTimeStatsKey, queuingTimeHistogramKey)
+                    torsDownwardQueuingTimeStats.append(torDownwardStat)
+       
+        torsUpwardQueuingTimeDigest = AttrDict()
+        torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
+        if torsUpwardQueuingTimeDigest.count != 0:
+            reportDigest.assign('Queue Waiting Time in TOR upward NICs({0})'.format(keyString), torsUpwardQueuingTimeDigest)
+
+        torsDownwardQueuingTimeDigest = AttrDict()
+        torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
+        if torsDownwardQueuingTimeDigest.count != 0:
+            reportDigest.assign('Queue Waiting Time in TOR downward NICs({0})'.format(keyString), torsDownwardQueuingTimeDigest)
+
     return reportDigest
 
 def aggrsQueueWaitTime(aggrs, xmlParsedDic):
     # Find the queue waiting for aggrs switches NICs
-    aggrsQueuingTimeStats = list()
-    for aggr in aggrs.keys():
-        queuingTimeHistogramKey = '{0}.eth[0].queue.dataQueue.queueingTime:histogram.bins'.format(aggr)
-        queuingTimeStatsKey = '{0}.eth[0].queue.dataQueue.queueingTime:stats'.format(aggr)
-        aggrsStats = AttrDict()
-        aggrsStats = getInterestingModuleStats(aggrs, queuingTimeStatsKey, queuingTimeHistogramKey)
-        aggrsQueuingTimeStats.append(aggrsStats)
-    
-    aggrsQueuingTimeDigest = AttrDict() 
-    aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
+    keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
     reportDigest = AttrDict()
-    if aggrsQueuingTimeDigest.count != 0: 
-        reportDigest.assign("Queue Waiting Time in Aggregate Switch NICs", aggrsQueuingTimeDigest)
+    for keyString in keyStrings:
+        aggrsQueuingTimeStats = list()
+        for aggr in aggrs.keys():
+            queuingTimeHistogramKey = '{0}.eth[0].queue.dataQueue.{1}:histogram.bins'.format(aggr, keyString)
+            queuingTimeStatsKey = '{0}.eth[0].queue.dataQueue.{1}:stats'.format(aggr, keyString)
+            aggrsStats = AttrDict()
+            aggrsStats = getInterestingModuleStats(aggrs, queuingTimeStatsKey, queuingTimeHistogramKey)
+            aggrsQueuingTimeStats.append(aggrsStats)
+        
+        aggrsQueuingTimeDigest = AttrDict() 
+        aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
+        if aggrsQueuingTimeDigest.count != 0: 
+            reportDigest.assign('Queue Waiting Time in Aggregate Switch NICs({0})'.format(keyString), aggrsQueuingTimeDigest)
     return reportDigest
 
 def parseXmlFile(xmlConfigFile):

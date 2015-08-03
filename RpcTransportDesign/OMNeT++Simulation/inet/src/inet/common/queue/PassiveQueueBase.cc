@@ -68,7 +68,7 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
                     emit(grantQueueingTimeSignal, SIMTIME_ZERO);
                     break;
                 case PktType::DATA:
-                    emit(grantQueueingTimeSignal, SIMTIME_ZERO);
+                    emit(dataQueueingTimeSignal, SIMTIME_ZERO);
                     break;
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
@@ -120,7 +120,7 @@ void PassiveQueueBase::requestPacket()
                     emit(grantQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
                 case PktType::DATA:
-                    emit(grantQueueingTimeSignal, simTime() - msg->getArrivalTime());
+                    emit(dataQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");

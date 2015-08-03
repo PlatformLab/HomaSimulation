@@ -36,8 +36,8 @@ simple DropTailQueue like IOutputQueue
         @signal[queueLength](type=long);
 
         // Queuing time for different pkt types
-        @signal[grantQueueingTime](type=simtime_t; unit=s);
         @signal[requestQueueingTime](type=simtime_t; unit=s);
+        @signal[grantQueueingTime](type=simtime_t; unit=s);
         @signal[dataQueueingTime](type=simtime_t; unit=s);
 
 
@@ -47,9 +47,9 @@ simple DropTailQueue like IOutputQueue
         @statistic[queueingTime](title="queueing time"; record=stats,histogram,vector; interpolationmode=none);
 
         // Queuing time for different pkt types
-        @statistic[requestQueueingTime](title="request pkts queueing time"; record=stats,histogram,vector; interpolationmode=none);
-        @statistic[grantQueueingTime](title="grant pkts queueing time"; record=stats,histogram,vector; interpolationmode=none);
-        @statistic[dataQueueingTime](title="data pkts queueing time"; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[requestQueueingTime](title="request pkts queueing time";source=requestQueueingTime; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[grantQueueingTime](title="grant pkts queueing time";source=grantQueueingTime; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[dataQueueingTime](title="data pkts queueing time";source=dataQueueingTime; record=stats,histogram,vector; interpolationmode=none);
 
     gates:
         input in;
