@@ -172,9 +172,8 @@ def digestModulesStats(modulesStatsList):
     return statsDigest
 
 
-def hostQueueWaitTimes(hosts, xmlParsedDic):
+def hostQueueWaitTimes(hosts, xmlParsedDic, reportDigest):
     senderIds = xmlParsedDic.senderIds
-    reportDigest = AttrDict()
     # find the queueWaitTimes for different types of packets. Current types
     # considered are request, grant and data packets. Also queueingTimes in the
     # senders NIC.
@@ -193,17 +192,15 @@ def hostQueueWaitTimes(hosts, xmlParsedDic):
         queuingTimeDigest = AttrDict()
         queuingTimeDigest = digestModulesStats(queuingTimeStats)
         if queuingTimeDigest.count != 0:
-            reportDigest.assign('Queue Waiting Time in Host NICs({0})'.format(keyString), queuingTimeDigest)
-    return reportDigest
+            reportDigest.assign('queueWaitTime.hosts.{0}'.format(keyString), queuingTimeDigest)
 
-def torsQueueWaitTime(tors, xmlParsedDic):
+def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
     senderHostIds = xmlParsedDic.senderIds
     senderTorIds = [elem for elem in set([int(id / xmlParsedDic.numServersPerTor) for id in senderHostIds])]
     numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
     numServersPerTor = xmlParsedDic.numServersPerTor
     receiverHostIds = xmlParsedDic.receiverIds
     receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
-    reportDigest = AttrDict()
     keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
     for keyString in keyStrings:
         torsUpwardQueuingTimeStats = list()
@@ -240,33 +237,30 @@ def torsQueueWaitTime(tors, xmlParsedDic):
         torsUpwardQueuingTimeDigest = AttrDict()
         torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
         if torsUpwardQueuingTimeDigest.count != 0:
-            reportDigest.assign('Queue Waiting Time in TOR upward NICs({0})'.format(keyString), torsUpwardQueuingTimeDigest)
+            reportDigest.assign('queueWaitTime.tors.upward.{0}'.format(keyString), torsUpwardQueuingTimeDigest)
 
         torsDownwardQueuingTimeDigest = AttrDict()
         torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
         if torsDownwardQueuingTimeDigest.count != 0:
-            reportDigest.assign('Queue Waiting Time in TOR downward NICs({0})'.format(keyString), torsDownwardQueuingTimeDigest)
+            reportDigest.assign('queueWaitTime.tors.downward.{0}'.format(keyString), torsDownwardQueuingTimeDigest)
 
-    return reportDigest
-
-def aggrsQueueWaitTime(aggrs, xmlParsedDic):
+def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
     # Find the queue waiting for aggrs switches NICs
     keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
-    reportDigest = AttrDict()
     for keyString in keyStrings:
         aggrsQueuingTimeStats = list()
         for aggr in aggrs.keys():
-            queuingTimeHistogramKey = '{0}.eth[0].queue.dataQueue.{1}:histogram.bins'.format(aggr, keyString)
-            queuingTimeStatsKey = '{0}.eth[0].queue.dataQueue.{1}:stats'.format(aggr, keyString)
-            aggrsStats = AttrDict()
-            aggrsStats = getInterestingModuleStats(aggrs, queuingTimeStatsKey, queuingTimeHistogramKey)
-            aggrsQueuingTimeStats.append(aggrsStats)
+            for ifaceId in range(0, xmlParsedDic.numTors):
+                queuingTimeHistogramKey = '{0}.eth[{1}].queue.dataQueue.{2}:histogram.bins'.format(aggr, ifaceId,  keyString)
+                queuingTimeStatsKey = '{0}.eth[{1}].queue.dataQueue.{2}:stats'.format(aggr, ifaceId, keyString)
+                aggrsStats = AttrDict()
+                aggrsStats = getInterestingModuleStats(aggrs, queuingTimeStatsKey, queuingTimeHistogramKey)
+                aggrsQueuingTimeStats.append(aggrsStats)
         
         aggrsQueuingTimeDigest = AttrDict() 
         aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
         if aggrsQueuingTimeDigest.count != 0: 
-            reportDigest.assign('Queue Waiting Time in Aggregate Switch NICs({0})'.format(keyString), aggrsQueuingTimeDigest)
-    return reportDigest
+            reportDigest.assign('queueWaitTime.aggrs.{0}'.format(keyString), aggrsQueuingTimeDigest)
 
 def parseXmlFile(xmlConfigFile):
     xmlConfig = minidom.parse(xmlConfigFile)
@@ -302,37 +296,109 @@ def parseXmlFile(xmlConfigFile):
     xmlParsedDic.receiverIds = [elem for elem in set(receiverIds)]
     return xmlParsedDic
 
-def printStats(allStatsList, unit):
+def printStatsLine(statsDic, rowTitle, tw, fw, unit):
     if unit == 'us':
         scaleFac = 1e6 
     elif unit == '':
         scaleFac = 1
 
-    statMaxTopicLen = 0
-    for statDics in allStatsList:
-        for key in statDics:
-            statMaxTopicLen = max(len(key), statMaxTopicLen)
-    statMaxTopicLen += 4
-    for statDics in allStatsList:
-        for key in statDics:
-            print '\n'
-            print (key + ':').ljust(statMaxTopicLen)
-            print ''.rjust(statMaxTopicLen) + 'num sample points = ' + str(statDics[key].count)
-            print ''.rjust(statMaxTopicLen) + 'minimum = ' + str(statDics[key].min) + ' ' +  unit
-            print ''.rjust(statMaxTopicLen) + 'mean = ' + str(statDics[key].mean) + ' ' + unit
-            print ''.rjust(statMaxTopicLen) + 'stddev = ' + str(statDics[key].stddev) + ' ' + unit
-            print ''.rjust(statMaxTopicLen) + 'median = ' + str(statDics[key].median) + ' ' + unit
-            print ''.rjust(statMaxTopicLen) + '75percentile = ' + str(statDics[key].threeQuartile) + ' ' + unit
-            print ''.rjust(statMaxTopicLen) + '99percentile = ' + str(statDics[key].ninety9Percentile) + ' ' + unit
-            print ''.rjust(statMaxTopicLen) + 'max = '.format(unit) + str(statDics[key].max) + ' ' + unit
+    print(rowTitle.ljust(tw)  + '{0}'.format(int(statsDic.count)).center(fw)+ '{0:.2f}{1}'.format(statsDic.min * scaleFac, unit).center(fw) + 
+            '{0:.2f}{1}'.format(statsDic.mean * scaleFac, unit).center(fw) + '{0:.2f}{1}'.format(statsDic.stddev * scaleFac, unit).center(fw) +
+            '{0:.2f}{1}'.format(statsDic.median * scaleFac, unit).center(fw) + '{0:.2f}{1}'.format(statsDic.threeQuartile * scaleFac, unit).center(fw) +
+            '{0:.2f}{1}'.format(statsDic.ninety9Percentile * scaleFac, unit).center(fw) + '{0:.2f}{1}'.format(statsDic.max * scaleFac, unit).center(fw))
 
-def e2eStretchAndDelay(hosts, xmlParsedDic):
+def printQueueTimeStats(queueWaitTimeDigest, unit):
+
+    tw = 50
+    fw = 14
+    lineMax = 160
+    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'Queue Wait Time Stats'.center(lineMax,'*') + '\n' + ''.center(lineMax,'*'))
+    print('\n\n' + "="*lineMax)
+    print("Request Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("_"*lineMax)
+    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.requestQueueingTime
+    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.requestQueueingTime
+    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.requestQueueingTime
+    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.requestQueueingTime
+    printStatsLine(hostStats, 'At Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'At TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'At TORs downward NICs:', tw, fw, unit)
+
+    print('\n\n' + "="*lineMax)
+    print("Grant Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("_"*lineMax)
+    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.grantQueueingTime
+    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.grantQueueingTime
+    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.grantQueueingTime
+    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.grantQueueingTime
+    printStatsLine(hostStats, 'At Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'At TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'At TORs downward NICs:', tw, fw, unit)
+
+    print('\n\n' + "="*lineMax)
+    print("Data Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("_"*lineMax)
+    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.dataQueueingTime
+    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.dataQueueingTime
+    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.dataQueueingTime
+    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.dataQueueingTime
+    printStatsLine(hostStats, 'At Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'At TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'At TORs downward NICs:', tw, fw, unit)
+
+    print('\n\n' + "="*lineMax)
+    print("Total Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("_"*lineMax)
+    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.queueingTime
+    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.queueingTime
+    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.queueingTime
+    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.queueingTime
+    printStatsLine(hostStats, 'At Sender Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'At Sender TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'At Receiver TORs downward NICs:', tw, fw, unit)
+
+
+def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
+    tw = 50
+    fw = 14
+    lineMax = 160
+    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Delays For Different Ranges of Message Sizes'.center(lineMax, '*') + '\n' + ''.center(lineMax,'*'))
+    print('\n\n' + "="*lineMax)
+    print("End to End Delay Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("_"*lineMax)
+    
+    end2EndDelayDigest = e2eStretchAndDelayDigest.delay
+    for e2eSizedDelay in end2EndDelayDigest:
+        printStatsLine(e2eSizedDelay, e2eSizedDelay.sizeUpBound, tw, fw, 'us')
+
+    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Stretch For Different Ranges of Message Sizes'.center(lineMax,'*') + '\n' + ''.center(lineMax,'*'))
+    print('\n\n' + "="*lineMax)
+    print("End to End Stretch Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("_"*lineMax)
+    
+    end2EndStretchDigest = e2eStretchAndDelayDigest.stretch
+    for e2eSizedStretch in end2EndStretchDigest:
+        printStatsLine(e2eSizedStretch, e2eSizedStretch.sizeUpBound, tw, fw, '')
+
+
+
+def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
     # For the hosts that are receivers, find the stretch and endToend stats and
     # return them. 
     receiverHostIds = xmlParsedDic.receiverIds 
     sizes = ['1Pkt', '3Pkts', '6Pkts', '13Pkts', '33Pkts', '133Pkts', '1333Pkts', 'Huge']
-    e2eDelayReportDigest = AttrDict()
-    e2eStretchReportDigest = AttrDict()
+    e2eStretchAndDelayDigest.delay = []
+    e2eStretchAndDelayDigest.stretch = []
     for size in sizes:
         e2eDelayList = list()
         e2eStretchList = list()
@@ -353,10 +419,12 @@ def e2eStretchAndDelay(hosts, xmlParsedDic):
         e2eDelayDigest = digestModulesStats(e2eDelayList)
         e2eStretchDigest = digestModulesStats(e2eStretchList)
         if e2eDelayDigest.count != 0:
-            e2eDelayReportDigest.assign('End to End Delay for less than {0} messages'.format(size), e2eDelayDigest)
+            e2eDelayDigest.sizeUpBound = 'Msg Size (Less than){0}'.format(size)
+            e2eStretchAndDelayDigest.delay.append(e2eDelayDigest)
         if e2eStretchDigest.count != 0: 
-            e2eStretchReportDigest.assign('End to End Stretch for less than {0} messages'.format(size), e2eStretchDigest)
-    return e2eDelayReportDigest, e2eStretchReportDigest
+            e2eStretchDigest.sizeUpBound = 'Msg Size (Less than){0}'.format(size)
+            e2eStretchAndDelayDigest.stretch.append(e2eStretchDigest)
+    return e2eStretchAndDelayDigest
 
 def main():
     parser = OptionParser()
@@ -371,35 +439,15 @@ def main():
     xmlParsedDic = parseXmlFile(xmlConfigFile)
     
     hosts, tors, aggrs, cores  = parse(open(scalarResultFile))
-    #hostsNoHistogram = AttrDict()
-    #torsNoHistogram = AttrDict()
-    #aggrsNoHistogram = AttrDict()
-    #coresNotHistogram = AttrDict()
-    #exclude = ['bins', 'interpolationmode', 'interpolationMode', '"simulated time"']
-    #copyExclude(hosts, hostsNoHistogram, exclude)
-    #copyExclude(tors, torsNoHistogram, exclude)
-    #copyExclude(aggrs, aggrsNoHistogram, exclude)
-    #pprint(hosts)
-    allStatsList = list()
-    hostQueueWaitingDigest = AttrDict()
-    hostQueueWaitingDigest = hostQueueWaitTimes(hosts, xmlParsedDic)
-    allStatsList.append(hostQueueWaitingDigest)
-    torQueueWaitingDigest = AttrDict()
-    torQueueWaitingDigest = torsQueueWaitTime(tors, xmlParsedDic)
-    allStatsList.append(torQueueWaitingDigest)
-    aggrQueueWaitingDigest = AttrDict()
-    aggrQueueWaitingDigest = aggrsQueueWaitTime(aggrs, xmlParsedDic)
-    allStatsList.append(aggrQueueWaitingDigest)
-    print("====================Packet Wait Times In The Queues====================")
-    printStats(allStatsList, 'us')
+    queueWaitTimeDigest = AttrDict()
+    hostQueueWaitTimes(hosts, xmlParsedDic, queueWaitTimeDigest)
+    torsQueueWaitTime(tors, xmlParsedDic, queueWaitTimeDigest)
+    aggrsQueueWaitTime(aggrs, xmlParsedDic, queueWaitTimeDigest)
+    printQueueTimeStats(queueWaitTimeDigest, 'us')
 
-    e2eDelayDigest = AttrDict()
-    e2eStretchDigest = AttrDict()
-    e2eDelayDigest, e2eStretchDigest = e2eStretchAndDelay(hosts, xmlParsedDic)
-    print("====================End To End Delay====================")
-    printStats([e2eDelayDigest], 'us')
-    print("====================End To End Stretch====================")
-    printStats([e2eStretchDigest], '')
+    e2eStretchAndDelayDigest = AttrDict()
+    e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest)
+    printE2EStretchAndDelay(e2eStretchAndDelayDigest, 'us')
 
 if __name__ == '__main__':
     sys.exit(main());
