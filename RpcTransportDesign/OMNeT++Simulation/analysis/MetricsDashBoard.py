@@ -302,93 +302,130 @@ def printStatsLine(statsDic, rowTitle, tw, fw, unit):
     elif unit == '':
         scaleFac = 1
 
-    print(rowTitle.ljust(tw)  + '{0}'.format(int(statsDic.count)).center(fw)+ '{0:.2f}{1}'.format(statsDic.min * scaleFac, unit).center(fw) + 
-            '{0:.2f}{1}'.format(statsDic.mean * scaleFac, unit).center(fw) + '{0:.2f}{1}'.format(statsDic.stddev * scaleFac, unit).center(fw) +
-            '{0:.2f}{1}'.format(statsDic.median * scaleFac, unit).center(fw) + '{0:.2f}{1}'.format(statsDic.threeQuartile * scaleFac, unit).center(fw) +
-            '{0:.2f}{1}'.format(statsDic.ninety9Percentile * scaleFac, unit).center(fw) + '{0:.2f}{1}'.format(statsDic.max * scaleFac, unit).center(fw))
+    keys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
+    printStr = rowTitle.ljust(tw)
+    for key in keys:
+        if key in statsDic.keys():
+            if key == 'count':
+                printStr += '{0}'.format(int(statsDic.access('count'))).center(fw)
+            elif key == 'meanFrac':
+                printStr += '{0:.1f}'.format(statsDic.access(key)).center(fw)
+            else:
+                printStr += '{0:.2f}'.format(statsDic.access(key) * scaleFac).center(fw)
+    print(printStr)
 
 def printQueueTimeStats(queueWaitTimeDigest, unit):
 
-    tw = 50
-    fw = 14
-    lineMax = 160
+    tw = 20
+    fw = 12
+    lineMax = 125
     print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'Queue Wait Time Stats'.center(lineMax,'*') + '\n' + ''.center(lineMax,'*'))
-    print('\n\n' + "="*lineMax)
-    print("Request Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print('\n\n' + "Packet Type: Requst".center(lineMax,' ') + '\n' + "="*lineMax)
+    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
+            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
+            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.requestQueueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.requestQueueingTime
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.requestQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.requestQueueingTime
-    printStatsLine(hostStats, 'At Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'At TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'At TORs downward NICs:', tw, fw, unit)
+    meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
+        moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
-    print('\n\n' + "="*lineMax)
-    print("Grant Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit)
+    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+
+    print('\n\n' + "Packet Type: Grant".center(lineMax,' ') + '\n' + "="*lineMax)
+    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
+            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
+            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.grantQueueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.grantQueueingTime
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.grantQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.grantQueueingTime
-    printStatsLine(hostStats, 'At Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'At TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'At TORs downward NICs:', tw, fw, unit)
+    meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
+        moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
-    print('\n\n' + "="*lineMax)
-    print("Data Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit)
+    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+
+    print('\n\n' + "Packet Type: Data".center(lineMax,' ') + '\n'  + "="*lineMax)
+    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
+            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
+            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.dataQueueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.dataQueueingTime
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.dataQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.dataQueueingTime
-    printStatsLine(hostStats, 'At Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'At TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'At TORs downward NICs:', tw, fw, unit)
+    meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
+        moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
-    print('\n\n' + "="*lineMax)
-    print("Total Pkts Queue Wait Time Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit)
+    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+
+    print('\n\n' + "packet Type: All Pkts".center(lineMax,' ') + '\n' + "="*lineMax)
+    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
+            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
+            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.queueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.queueingTime
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.queueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.queueingTime
-    printStatsLine(hostStats, 'At Sender Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'At Sender TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'At Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'At Receiver TORs downward NICs:', tw, fw, unit)
+    meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
+        moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+
+    printStatsLine(hostStats, 'SX Host NICs:', tw, fw, unit)
+    printStatsLine(torsUpStats, 'SX TORs UP NICs:', tw, fw, unit)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
+    printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit)
+    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
 
 
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
-    tw = 50
-    fw = 14
-    lineMax = 160
-    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Delays For Different Ranges of Message Sizes'.center(lineMax, '*') + '\n' + ''.center(lineMax,'*'))
+    tw = 20
+    fw = 12
+    lineMax = 125
+    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Delays For Different Ranges of Message Sizes'.center(lineMax, '*') +
+            '\n' + ''.center(lineMax,'*'))
     print('\n\n' + "="*lineMax)
-    print("End to End Delay Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("Msg Size Range".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'stddev({0})'.format(unit).center(fw) + 'min({0})'.format(unit).center(fw) +
+            'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) + '99%ile({0})'.format(unit).center(fw) +
+            'max({0})'.format(unit).center(fw) + 'count'.center(fw))
     print("_"*lineMax)
     
     end2EndDelayDigest = e2eStretchAndDelayDigest.delay
-    for e2eSizedDelay in end2EndDelayDigest:
-        printStatsLine(e2eSizedDelay, e2eSizedDelay.sizeUpBound, tw, fw, 'us')
+    sizeLowBound = ['0'] + [e2eSizedDelay.sizeUpBound for e2eSizedDelay in end2EndDelayDigest[0:len(end2EndDelayDigest)-1]]
+    for i, e2eSizedDelay in enumerate(end2EndDelayDigest):
+        printStatsLine(e2eSizedDelay, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedDelay.sizeUpBound), tw, fw, 'us')
 
-    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Stretch For Different Ranges of Message Sizes'.center(lineMax,'*') + '\n' + ''.center(lineMax,'*'))
+    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Stretch For Different Ranges of Message Sizes'.center(lineMax,'*') +
+            '\n' + ''.center(lineMax,'*'))
     print('\n\n' + "="*lineMax)
-    print("End to End Stretch Stats:".ljust(tw) + 'count'.center(fw) + 'min'.center(fw) + 'mean'.center(fw) + 'stddev'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw))
+    print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw) + 'count'.center(fw))
     print("_"*lineMax)
     
     end2EndStretchDigest = e2eStretchAndDelayDigest.stretch
-    for e2eSizedStretch in end2EndStretchDigest:
-        printStatsLine(e2eSizedStretch, e2eSizedStretch.sizeUpBound, tw, fw, '')
+    sizeLowBound = ['0'] + [e2eSizedStretch.sizeUpBound for e2eSizedStretch in end2EndStretchDigest[0:len(end2EndStretchDigest)-1]]
+    for i, e2eSizedStretch in enumerate(end2EndStretchDigest):
+        printStatsLine(e2eSizedStretch, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedStretch.sizeUpBound), tw, fw, '')
 
 
 
@@ -418,12 +455,11 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
         e2eStretchDigest = AttrDict()
         e2eDelayDigest = digestModulesStats(e2eDelayList)
         e2eStretchDigest = digestModulesStats(e2eStretchList)
-        if e2eDelayDigest.count != 0:
-            e2eDelayDigest.sizeUpBound = 'Msg Size (Less than){0}'.format(size)
-            e2eStretchAndDelayDigest.delay.append(e2eDelayDigest)
-        if e2eStretchDigest.count != 0: 
-            e2eStretchDigest.sizeUpBound = 'Msg Size (Less than){0}'.format(size)
-            e2eStretchAndDelayDigest.stretch.append(e2eStretchDigest)
+
+        e2eDelayDigest.sizeUpBound = '{0}'.format(size)
+        e2eStretchAndDelayDigest.delay.append(e2eDelayDigest)
+        e2eStretchDigest.sizeUpBound = '{0}'.format(size)
+        e2eStretchAndDelayDigest.stretch.append(e2eStretchDigest)
     return e2eStretchAndDelayDigest
 
 def main():
