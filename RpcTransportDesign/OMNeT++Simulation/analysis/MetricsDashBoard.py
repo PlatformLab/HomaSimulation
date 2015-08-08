@@ -332,14 +332,16 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.requestQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.requestQueueingTime
     meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    meanFracSum = 0.0
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+        meanFracSum += moduleStats.meanFrac
 
     printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
     printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
-    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+    print('_'*2*tw + '\n' + 'Total:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
     print('\n\n' + "Packet Type: Grant".center(lineMax,' ') + '\n' + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
@@ -351,15 +353,17 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.grantQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.grantQueueingTime
     meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    meanFracSum = 0.0
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+        meanFracSum += moduleStats.meanFrac
 
 
     printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
     printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
-    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+    print('_'*2*tw + '\n' + 'Total:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
     print('\n\n' + "Packet Type: Data".center(lineMax,' ') + '\n'  + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
@@ -371,14 +375,16 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.dataQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.dataQueueingTime
     meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    meanFracSum = 0.0
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+        meanFracSum += moduleStats.meanFrac
 
     printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
     printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
-    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+    print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
     print('\n\n' + "packet Type: All Pkts".center(lineMax,' ') + '\n' + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
@@ -390,14 +396,16 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.queueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.queueingTime
     meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    meanFracSum = 0.0
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+        meanFracSum += moduleStats.meanFrac
 
     printStatsLine(hostStats, 'SX Host NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsUpStats, 'SX TORs UP NICs:', tw, fw, unit, printKeys)
     printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
     printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit, printKeys)
-    print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
+    print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
 
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
@@ -476,8 +484,8 @@ def printGenralInfo(xmlParsedDic):
     title = 'General Simulation Information'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
-    print('Num Servers Per TOR:'.ljust(tw) + '{0}'.format(xmlParsedDic.numServersPerTor).center(fw))
-    print('Num TORs:'.ljust(tw) + '{0}'.format(xmlParsedDic.numTors).center(fw))
+    print('Num Servers Per TOR:'.ljust(tw) + '{0}'.format(xmlParsedDic.numServersPerTor).center(fw) + 'Num Sender Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.senderIds)).center(fw))
+    print('Num TORs:'.ljust(tw) + '{0}'.format(xmlParsedDic.numTors).center(fw) + 'Num Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw))
     print('Server Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.nicLinkSpeed).center(fw))
     print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw))
 
@@ -485,7 +493,7 @@ def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
     trafficDigest.title = title 
     if 'bytes' in trafficBytesAndRateDic.keys():
-        trafficDigest.cumBytes = sum(trafficBytesAndRateDic.bytes)
+        trafficDigest.cumBytes = sum(trafficBytesAndRateDic.bytes)/1e6
     if 'rates' in trafficBytesAndRateDic.keys():
         trafficDigest.cumRate = sum(trafficBytesAndRateDic.rates)
         trafficDigest.avgRate = trafficDigest.cumRate/float(len(trafficBytesAndRateDic.rates)) 
@@ -501,66 +509,93 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     tw = 20
     fw = 15
     lineMax = 140
-    title = 'Generated Bytes and Rates'
+    title = 'Traffic Characteristic (Rates, Bytes, and DutyCycle)'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
     trafficDic = AttrDict()
-    trafficDic.hostsTraffic.tx.apps.bytes = []
-    trafficDic.hostsTraffic.tx.apps.rates = []
-    trafficDic.hostsTraffic.rx.apps.bytes = []
-    trafficDic.hostsTraffic.rx.apps.rates = []
-    trafficDic.hostsTraffic.tx.nics.bytes = []
-    trafficDic.hostsTraffic.tx.nics.rates = []
-    trafficDic.hostsTraffic.tx.nics.dutyCycles = []
-    trafficDic.hostsTraffic.rx.nics.bytes = []
-    trafficDic.hostsTraffic.rx.nics.rates = []
-    trafficDic.hostsTraffic.rx.nics.dutyCycles = []
+    trafficDic.sxHostsTraffic.apps.sx.bytes = []
+    trafficDic.sxHostsTraffic.apps.sx.rates = []
+    trafficDic.rxHostsTraffic.apps.rx.bytes = []
+    trafficDic.rxHostsTraffic.apps.rx.rates = []
+    trafficDic.sxHostsTraffic.nics.sx.bytes = []
+    trafficDic.sxHostsTraffic.nics.sx.rates = []
+    trafficDic.sxHostsTraffic.nics.sx.dutyCycles = []
+    trafficDic.rxHostsTraffic.nics.rx.bytes = []
+    trafficDic.rxHostsTraffic.nics.rx.rates = []
+    trafficDic.rxHostsTraffic.nics.rx.dutyCycles = []
+
+    trafficDic.hostsTraffic.nics.sx.bytes = []
+    trafficDic.hostsTraffic.nics.sx.rates = []
+    trafficDic.hostsTraffic.nics.sx.dutyCycles = []
+    trafficDic.hostsTraffic.nics.rx.bytes = []
+    trafficDic.hostsTraffic.nics.rx.rates = []
+    trafficDic.hostsTraffic.nics.rx.dutyCycles = []
+
 
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        hostStats = parsedStats.hosts[host]
+        nicSendBytes = hostStats.access('eth[0].mac.txPk:sum(packetBytes).value')
+        nicSendRate = hostStats.access('eth[0].mac.\"bits/sec sent\".value')/1e9
+        nicSendDutyCycle = hostStats.access('eth[0].mac.\"tx channel utilization (%)\".value')
+        nicRcvBytes = hostStats.access('eth[0].mac.rxPkOk:sum(packetBytes).value')
+        nicRcvRate = hostStats.access('eth[0].mac.\"bits/sec rcvd\".value')/1e9
+        nicRcvDutyCycle = hostStats.access('eth[0].mac.\"rx channel utilization (%)\".value')
+        nicTxBytes = trafficDic.hostsTraffic.nics.sx.bytes
+        nicTxBytes.append(nicSendBytes)
+        nicTxRates = trafficDic.hostsTraffic.nics.sx.rates
+        nicTxRates.append(nicSendRate)
+        nicTxDutyCycles = trafficDic.hostsTraffic.nics.sx.dutyCycles
+        nicTxDutyCycles.append(nicSendDutyCycle)
+        nicRxBytes = trafficDic.hostsTraffic.nics.rx.bytes
+        nicRxBytes.append(nicRcvBytes)
+        nicRxRates = trafficDic.hostsTraffic.nics.rx.rates
+        nicRxRates.append(nicRcvRate)
+        nicRxDutyCycles = trafficDic.hostsTraffic.nics.rx.dutyCycles
+        nicRxDutyCycles.append(nicRcvDutyCycle)
+
         if hostId in xmlParsedDic.senderIds:
-            senderStats = parsedStats.hosts[host]
-            txAppsBytes = trafficDic.hostsTraffic.tx.apps.bytes 
-            txAppsRates = trafficDic.hostsTraffic.tx.apps.rates
-            txAppsBytes.append(senderStats.access('trafficGeneratorApp[0].sentMsg:sum(packetBytes).value'))
-            txAppsRates.append(senderStats.access('trafficGeneratorApp[0].sentMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
-            txNicsBytes = trafficDic.hostsTraffic.tx.nics.bytes 
-            txNicsRates = trafficDic.hostsTraffic.tx.nics.rates
-            txNicsDutyCycles = trafficDic.hostsTraffic.tx.nics.dutyCycles
-            txNicsBytes.append(senderStats.access('eth[0].mac.txPk:sum(packetBytes).value'))
-            txNicsRates.append(senderStats.access('eth[0].mac.\"bits/sec sent\".value')/1e9)
-            txNicsDutyCycles.append(senderStats.access('eth[0].mac.\"tx channel utilization (%)\".value'))
+            txAppsBytes = trafficDic.sxHostsTraffic.apps.sx.bytes 
+            txAppsRates = trafficDic.sxHostsTraffic.apps.sx.rates
+            txAppsBytes.append(hostStats.access('trafficGeneratorApp[0].sentMsg:sum(packetBytes).value'))
+            txAppsRates.append(hostStats.access('trafficGeneratorApp[0].sentMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
+            txNicsBytes = trafficDic.sxHostsTraffic.nics.sx.bytes 
+            txNicsRates = trafficDic.sxHostsTraffic.nics.sx.rates
+            txNicsDutyCycles = trafficDic.sxHostsTraffic.nics.sx.dutyCycles
+            txNicsBytes.append(nicSendBytes)
+            txNicsRates.append(nicSendRate)
+            txNicsDutyCycles.append(nicSendDutyCycle)
         if hostId in xmlParsedDic.receiverIds:
-            receiverStats = parsedStats.hosts[host] 
-            rxAppsBytes = trafficDic.hostsTraffic.rx.apps.bytes 
-            rxAppsRates = trafficDic.hostsTraffic.rx.apps.rates
-            rxAppsBytes.append(receiverStats.access('trafficGeneratorApp[0].rcvdMsg:sum(packetBytes).value'))
-            rxAppsRates.append(receiverStats.access('trafficGeneratorApp[0].rcvdMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
-            rxNicsBytes = trafficDic.hostsTraffic.rx.nics.bytes 
-            rxNicsRates = trafficDic.hostsTraffic.rx.nics.rates
-            rxNicsDutyCycles = trafficDic.hostsTraffic.rx.nics.dutyCycles
-            rxNicsBytes.append(receiverStats.access('eth[0].mac.rxPkOk:sum(packetBytes).value'))
-            rxNicsRates.append(receiverStats.access('eth[0].mac.\"bits/sec rcvd\".value')/1e9)
-            rxNicsDutyCycles.append(receiverStats.access('eth[0].mac.\"rx channel utilization (%)\".value'))
-
-
-
+            rxAppsBytes = trafficDic.rxHostsTraffic.apps.rx.bytes 
+            rxAppsRates = trafficDic.rxHostsTraffic.apps.rx.rates
+            rxAppsBytes.append(hostStats.access('trafficGeneratorApp[0].rcvdMsg:sum(packetBytes).value'))
+            rxAppsRates.append(hostStats.access('trafficGeneratorApp[0].rcvdMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
+            rxNicsBytes = trafficDic.rxHostsTraffic.nics.rx.bytes 
+            rxNicsRates = trafficDic.rxHostsTraffic.nics.rx.rates
+            rxNicsDutyCycles = trafficDic.rxHostsTraffic.nics.rx.dutyCycles
+            rxNicsBytes.append(nicRcvBytes)
+            rxNicsRates.append(nicRcvRate)
+            rxNicsDutyCycles.append(nicRcvDutyCycle)
 
 
     print("="*lineMax)
     print("Measurement Point".ljust(tw) + 'AvgRate(Gb/s)'.center(fw) + 'CumRate(Gb/s)'.center(fw) + 'MinRate(Gb/s)'.center(fw) + 'MaxRate(Gb/s)'.center(fw) +
-             'CumBytes'.center(fw) + '%AvgDutyCycle'.center(fw) + '%MinDutyCycle'.center(fw) + '%MaxDutyCycle'.center(fw))
+             'CumBytes(MB)'.center(fw) + '%AvgDutyCycle'.center(fw) + '%MinDutyCycle'.center(fw) + '%MaxDutyCycle'.center(fw))
     print("_"*lineMax)
-    digestTrafficInfo(trafficDic.hostsTraffic.tx.apps, 'TX Host Apps:')
-    printStatsLine(trafficDic.hostsTraffic.tx.apps.trafficDigest, trafficDic.hostsTraffic.tx.apps.trafficDigest.title, tw, fw, '', printKeys)
-    digestTrafficInfo(trafficDic.hostsTraffic.tx.nics, 'TX Host NICs:')
-    printStatsLine(trafficDic.hostsTraffic.tx.nics.trafficDigest, trafficDic.hostsTraffic.tx.nics.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.sxHostsTraffic.apps.sx, 'SX Apps Send:')
+    printStatsLine(trafficDic.sxHostsTraffic.apps.sx.trafficDigest, trafficDic.sxHostsTraffic.apps.sx.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.sxHostsTraffic.nics.sx, 'SX NICs Send:')
+    printStatsLine(trafficDic.sxHostsTraffic.nics.sx.trafficDigest, trafficDic.sxHostsTraffic.nics.sx.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.hostsTraffic.nics.sx, 'All NICs Send:')
+    printStatsLine(trafficDic.hostsTraffic.nics.sx.trafficDigest, trafficDic.hostsTraffic.nics.sx.trafficDigest.title, tw, fw, '', printKeys)
 
 
-    digestTrafficInfo(trafficDic.hostsTraffic.rx.nics, 'RX Host NICs:')
-    printStatsLine(trafficDic.hostsTraffic.rx.nics.trafficDigest, trafficDic.hostsTraffic.rx.nics.trafficDigest.title, tw, fw, '', printKeys)
-    digestTrafficInfo(trafficDic.hostsTraffic.rx.apps, 'RX Host Apps:')
-    printStatsLine(trafficDic.hostsTraffic.rx.apps.trafficDigest, trafficDic.hostsTraffic.rx.apps.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.hostsTraffic.nics.rx, 'ALL NICs Recv:')
+    printStatsLine(trafficDic.hostsTraffic.nics.rx.trafficDigest, trafficDic.hostsTraffic.nics.rx.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.rxHostsTraffic.nics.rx, 'RX NICs Recv:')
+    printStatsLine(trafficDic.rxHostsTraffic.nics.rx.trafficDigest, trafficDic.rxHostsTraffic.nics.rx.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.rxHostsTraffic.apps.rx, 'RX Apps Recv:')
+    printStatsLine(trafficDic.rxHostsTraffic.apps.rx.trafficDigest, trafficDic.rxHostsTraffic.apps.rx.trafficDigest.title, tw, fw, '', printKeys)
 
    
 def main():
