@@ -132,9 +132,7 @@ def copyExclude(source, dest, exclude):
 def getStatsFromHist(bins, cumProb, idx):
     if idx == 0 and bins[idx] == -inf:
         return bins[idx + 1]
-    if idx == len(bins)-1:
-        return bins[idx]
-    return (bins[idx] + bins[idx + 1])/2
+    return bins[idx]
 
 def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
     moduleStats = AttrDict()
@@ -296,31 +294,35 @@ def parseXmlFile(xmlConfigFile):
     xmlParsedDic.receiverIds = [elem for elem in set(receiverIds)]
     return xmlParsedDic
 
-def printStatsLine(statsDic, rowTitle, tw, fw, unit):
+def printStatsLine(statsDic, rowTitle, tw, fw, unit, printKeys):
     if unit == 'us':
         scaleFac = 1e6 
     elif unit == '':
         scaleFac = 1
 
-    keys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
     printStr = rowTitle.ljust(tw)
-    for key in keys:
+    for key in printKeys:
         if key in statsDic.keys():
             if key == 'count':
                 printStr += '{0}'.format(int(statsDic.access('count'))).center(fw)
             elif key == 'meanFrac':
-                printStr += '{0:.1f}'.format(statsDic.access(key)).center(fw)
+                printStr += '{0:.2f}'.format(statsDic.access(key)).center(fw)
             else:
                 printStr += '{0:.2f}'.format(statsDic.access(key) * scaleFac).center(fw)
     print(printStr)
 
+
 def printQueueTimeStats(queueWaitTimeDigest, unit):
 
+    printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
     tw = 20
     fw = 12
-    lineMax = 125
-    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'Queue Wait Time Stats'.center(lineMax,'*') + '\n' + ''.center(lineMax,'*'))
-    print('\n\n' + "Packet Type: Requst".center(lineMax,' ') + '\n' + "="*lineMax)
+    lineMax = 140
+    title = 'Queue Wait Time Stats'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+
+    print('\n' + "Packet Type: Requst".center(lineMax,' ') + '\n' + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
             'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
             '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
@@ -333,10 +335,10 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
-    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit)
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
 
     print('\n\n' + "Packet Type: Grant".center(lineMax,' ') + '\n' + "="*lineMax)
@@ -353,10 +355,10 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
 
-    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit)
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
 
     print('\n\n' + "Packet Type: Data".center(lineMax,' ') + '\n'  + "="*lineMax)
@@ -372,10 +374,10 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
-    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit)
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
 
     print('\n\n' + "packet Type: All Pkts".center(lineMax,' ') + '\n' + "="*lineMax)
@@ -391,20 +393,23 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
         moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
 
-    printStatsLine(hostStats, 'SX Host NICs:', tw, fw, unit)
-    printStatsLine(torsUpStats, 'SX TORs UP NICs:', tw, fw, unit)
-    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit)
-    printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit)
+    printStatsLine(hostStats, 'SX Host NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsUpStats, 'SX TORs UP NICs:', tw, fw, unit, printKeys)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Sum:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw))
 
 
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
+    printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
     tw = 20
     fw = 12
-    lineMax = 125
-    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Delays For Different Ranges of Message Sizes'.center(lineMax, '*') +
-            '\n' + ''.center(lineMax,'*'))
-    print('\n\n' + "="*lineMax)
+    lineMax = 140
+    title = 'End To End Message Delays For Different Ranges of Message Sizes'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+
+    print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'stddev({0})'.format(unit).center(fw) + 'min({0})'.format(unit).center(fw) +
             'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) + '99%ile({0})'.format(unit).center(fw) +
             'max({0})'.format(unit).center(fw) + 'count'.center(fw))
@@ -413,11 +418,13 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     end2EndDelayDigest = e2eStretchAndDelayDigest.delay
     sizeLowBound = ['0'] + [e2eSizedDelay.sizeUpBound for e2eSizedDelay in end2EndDelayDigest[0:len(end2EndDelayDigest)-1]]
     for i, e2eSizedDelay in enumerate(end2EndDelayDigest):
-        printStatsLine(e2eSizedDelay, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedDelay.sizeUpBound), tw, fw, 'us')
+        printStatsLine(e2eSizedDelay, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedDelay.sizeUpBound), tw, fw, 'us', printKeys)
 
-    print('\n'*2 + ''.center(lineMax,'*') + '\n' + 'End To End Message Stretch For Different Ranges of Message Sizes'.center(lineMax,'*') +
-            '\n' + ''.center(lineMax,'*'))
-    print('\n\n' + "="*lineMax)
+    title = 'End To End Message Stretch For Different Ranges of Message Sizes'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+
+    print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
             'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw) + 'count'.center(fw))
     print("_"*lineMax)
@@ -425,7 +432,7 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     end2EndStretchDigest = e2eStretchAndDelayDigest.stretch
     sizeLowBound = ['0'] + [e2eSizedStretch.sizeUpBound for e2eSizedStretch in end2EndStretchDigest[0:len(end2EndStretchDigest)-1]]
     for i, e2eSizedStretch in enumerate(end2EndStretchDigest):
-        printStatsLine(e2eSizedStretch, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedStretch.sizeUpBound), tw, fw, '')
+        printStatsLine(e2eSizedStretch, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedStretch.sizeUpBound), tw, fw, '', printKeys)
 
 
 
@@ -462,6 +469,100 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
         e2eStretchAndDelayDigest.stretch.append(e2eStretchDigest)
     return e2eStretchAndDelayDigest
 
+def printGenralInfo(xmlParsedDic):
+    tw = 20
+    fw = 12
+    lineMax = 140
+    title = 'General Simulation Information'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+    print('Num Servers Per TOR:'.ljust(tw) + '{0}'.format(xmlParsedDic.numServersPerTor).center(fw))
+    print('Num TORs:'.ljust(tw) + '{0}'.format(xmlParsedDic.numTors).center(fw))
+    print('Server Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.nicLinkSpeed).center(fw))
+    print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw))
+
+def digestTrafficInfo(trafficBytesAndRateDic, title):
+    trafficDigest = trafficBytesAndRateDic.trafficDigest
+    trafficDigest.title = title 
+    if 'bytes' in trafficBytesAndRateDic.keys():
+        trafficDigest.cumBytes = sum(trafficBytesAndRateDic.bytes)
+    if 'rates' in trafficBytesAndRateDic.keys():
+        trafficDigest.cumRate = sum(trafficBytesAndRateDic.rates)
+        trafficDigest.avgRate = trafficDigest.cumRate/float(len(trafficBytesAndRateDic.rates)) 
+        trafficDigest.minRate = min(trafficBytesAndRateDic.rates)
+        trafficDigest.maxRate = max(trafficBytesAndRateDic.rates)
+    if 'dutyCycles' in trafficBytesAndRateDic.keys():
+        trafficDigest.avgDutyCycle = sum(trafficBytesAndRateDic.dutyCycles)/float(len(trafficBytesAndRateDic.dutyCycles)) 
+        trafficDigest.minDutyCycle = min(trafficBytesAndRateDic.dutyCycles)
+        trafficDigest.maxDutyCycle = max(trafficBytesAndRateDic.dutyCycles)
+
+def printBytesAndRates(parsedStats, xmlParsedDic):
+    printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate', 'cumBytes', 'avgDutyCycle', 'minDutyCycle', 'maxDutyCycle']
+    tw = 20
+    fw = 15
+    lineMax = 140
+    title = 'Generated Bytes and Rates'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+    trafficDic = AttrDict()
+    trafficDic.hostsTraffic.tx.apps.bytes = []
+    trafficDic.hostsTraffic.tx.apps.rates = []
+    trafficDic.hostsTraffic.rx.apps.bytes = []
+    trafficDic.hostsTraffic.rx.apps.rates = []
+    trafficDic.hostsTraffic.tx.nics.bytes = []
+    trafficDic.hostsTraffic.tx.nics.rates = []
+    trafficDic.hostsTraffic.tx.nics.dutyCycles = []
+    trafficDic.hostsTraffic.rx.nics.bytes = []
+    trafficDic.hostsTraffic.rx.nics.rates = []
+    trafficDic.hostsTraffic.rx.nics.dutyCycles = []
+
+    for host in parsedStats.hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        if hostId in xmlParsedDic.senderIds:
+            senderStats = parsedStats.hosts[host]
+            txAppsBytes = trafficDic.hostsTraffic.tx.apps.bytes 
+            txAppsRates = trafficDic.hostsTraffic.tx.apps.rates
+            txAppsBytes.append(senderStats.access('trafficGeneratorApp[0].sentMsg:sum(packetBytes).value'))
+            txAppsRates.append(senderStats.access('trafficGeneratorApp[0].sentMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
+            txNicsBytes = trafficDic.hostsTraffic.tx.nics.bytes 
+            txNicsRates = trafficDic.hostsTraffic.tx.nics.rates
+            txNicsDutyCycles = trafficDic.hostsTraffic.tx.nics.dutyCycles
+            txNicsBytes.append(senderStats.access('eth[0].mac.txPk:sum(packetBytes).value'))
+            txNicsRates.append(senderStats.access('eth[0].mac.\"bits/sec sent\".value')/1e9)
+            txNicsDutyCycles.append(senderStats.access('eth[0].mac.\"tx channel utilization (%)\".value'))
+        if hostId in xmlParsedDic.receiverIds:
+            receiverStats = parsedStats.hosts[host] 
+            rxAppsBytes = trafficDic.hostsTraffic.rx.apps.bytes 
+            rxAppsRates = trafficDic.hostsTraffic.rx.apps.rates
+            rxAppsBytes.append(receiverStats.access('trafficGeneratorApp[0].rcvdMsg:sum(packetBytes).value'))
+            rxAppsRates.append(receiverStats.access('trafficGeneratorApp[0].rcvdMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
+            rxNicsBytes = trafficDic.hostsTraffic.rx.nics.bytes 
+            rxNicsRates = trafficDic.hostsTraffic.rx.nics.rates
+            rxNicsDutyCycles = trafficDic.hostsTraffic.rx.nics.dutyCycles
+            rxNicsBytes.append(receiverStats.access('eth[0].mac.rxPkOk:sum(packetBytes).value'))
+            rxNicsRates.append(receiverStats.access('eth[0].mac.\"bits/sec rcvd\".value')/1e9)
+            rxNicsDutyCycles.append(receiverStats.access('eth[0].mac.\"rx channel utilization (%)\".value'))
+
+
+
+
+
+    print("="*lineMax)
+    print("Measurement Point".ljust(tw) + 'AvgRate(Gb/s)'.center(fw) + 'CumRate(Gb/s)'.center(fw) + 'MinRate(Gb/s)'.center(fw) + 'MaxRate(Gb/s)'.center(fw) +
+             'CumBytes'.center(fw) + '%AvgDutyCycle'.center(fw) + '%MinDutyCycle'.center(fw) + '%MaxDutyCycle'.center(fw))
+    print("_"*lineMax)
+    digestTrafficInfo(trafficDic.hostsTraffic.tx.apps, 'TX Host Apps:')
+    printStatsLine(trafficDic.hostsTraffic.tx.apps.trafficDigest, trafficDic.hostsTraffic.tx.apps.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.hostsTraffic.tx.nics, 'TX Host NICs:')
+    printStatsLine(trafficDic.hostsTraffic.tx.nics.trafficDigest, trafficDic.hostsTraffic.tx.nics.trafficDigest.title, tw, fw, '', printKeys)
+
+
+    digestTrafficInfo(trafficDic.hostsTraffic.rx.nics, 'RX Host NICs:')
+    printStatsLine(trafficDic.hostsTraffic.rx.nics.trafficDigest, trafficDic.hostsTraffic.rx.nics.trafficDigest.title, tw, fw, '', printKeys)
+    digestTrafficInfo(trafficDic.hostsTraffic.rx.apps, 'RX Host Apps:')
+    printStatsLine(trafficDic.hostsTraffic.rx.apps.trafficDigest, trafficDic.hostsTraffic.rx.apps.trafficDigest.title, tw, fw, '', printKeys)
+
+   
 def main():
     parser = OptionParser()
     options, args = parser.parse_args()
@@ -473,16 +574,18 @@ def main():
     xmlConfigFile = 'homatransport/src/dcntopo/config.xml' 
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile)
-    
-    hosts, tors, aggrs, cores  = parse(open(scalarResultFile))
+    parsedStats = AttrDict() 
+    parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores  = parse(open(scalarResultFile))
+    #pprint(parsedStats)
     queueWaitTimeDigest = AttrDict()
-    hostQueueWaitTimes(hosts, xmlParsedDic, queueWaitTimeDigest)
-    torsQueueWaitTime(tors, xmlParsedDic, queueWaitTimeDigest)
-    aggrsQueueWaitTime(aggrs, xmlParsedDic, queueWaitTimeDigest)
+    hostQueueWaitTimes(parsedStats.hosts, xmlParsedDic, queueWaitTimeDigest)
+    torsQueueWaitTime(parsedStats.tors, xmlParsedDic, queueWaitTimeDigest)
+    aggrsQueueWaitTime(parsedStats.aggrs, xmlParsedDic, queueWaitTimeDigest)
+    printGenralInfo(xmlParsedDic)
+    printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
-
     e2eStretchAndDelayDigest = AttrDict()
-    e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest)
+    e2eStretchAndDelay(parsedStats.hosts, xmlParsedDic, e2eStretchAndDelayDigest)
     printE2EStretchAndDelay(e2eStretchAndDelayDigest, 'us')
 
 if __name__ == '__main__':

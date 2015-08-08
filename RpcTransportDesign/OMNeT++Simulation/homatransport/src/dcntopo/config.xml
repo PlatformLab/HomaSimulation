@@ -13,7 +13,7 @@
     </param>
     <IPv4Configurator>
         <config>
-            <interface hosts='**.host[0..4]' address='10.x.0.x' netmask='255.x.x.x'/>
+            <interface hosts='**.host[0..3]' address='10.x.0.x' netmask='255.x.x.x'/>
             <interface hosts='**.host[4..7]' address='10.x.1.x' netmask='255.x.x.x'/>
             <interface hosts='**.host[8..11]' address='10.x.2.x' netmask='255.x.x.x'/>
             <interface hosts='**.host[12..15]' address='10.x.3.x' netmask='255.x.x.x'/>

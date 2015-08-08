@@ -43,7 +43,7 @@ simple DropTailQueue like IOutputQueue
 
         @statistic[rcvdPk](title="received packets"; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[dropPk](title="dropped packets"; source=dropPkByQueue; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-        @statistic[queueLength](title="queue length"; record=stats,histogram,timeavg,vector; interpolationmode=sample-hold);
+        @statistic[queueLength](title="queue length"; record=stats,timeavg,vector; interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time"; record=stats,histogram,vector; interpolationmode=none);
 
         // Queuing time for different pkt types

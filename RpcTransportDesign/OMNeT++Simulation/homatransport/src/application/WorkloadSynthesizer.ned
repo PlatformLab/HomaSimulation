@@ -59,8 +59,8 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @signal[msg1333PktsE2EStretch](type=double);
         @signal[msgHugeE2EStretch](type=double);
 
-        @statistic[sentMsg](title="messages sent"; source=sentMsg; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
-        @statistic[rcvdMsg](title="received messages"; source=rcvdMsg; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
+        @statistic[sentMsg](title="messages sent"; source=sentMsg; record=count,"last(sumPerDuration(packetBytes))","sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
+        @statistic[rcvdMsg](title="received messages"; source=rcvdMsg; record=count,"last(sumPerDuration(packetBytes))","sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
         @statistic[msgE2EDelay](title="Message lifetime (end to end latency)"; source="msgE2EDelay"; unit=s; record=count,stats,histogram,vector; interpolationmode=none);
 
         @statistic[msg1PktE2EDelay](title="1 pkt size msg lifetime"; source="msg1PktE2EDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);

@@ -53,6 +53,7 @@ void EtherMACFullDuplex::initializeStatistics()
 
     // initialize statistics
     totalSuccessfulRxTime = 0.0;
+    totalSuccessfulRxTime = 0.0;
 }
 
 void EtherMACFullDuplex::initializeFlags()
@@ -121,6 +122,8 @@ void EtherMACFullDuplex::startFrameTransmission()
     send(frame, physOutGate);
 
     scheduleAt(transmissionChannel->getTransmissionFinishTime(), endTxMsg);
+    totalSuccessfulTxTime += 
+            transmissionChannel->getTransmissionFinishTime()-simTime();
     transmitState = TRANSMITTING_STATE;
 }
 
@@ -295,8 +298,12 @@ void EtherMACFullDuplex::finish()
 
     simtime_t t = simTime();
     simtime_t totalRxChannelIdleTime = t - totalSuccessfulRxTime;
+    simtime_t totalTxChannelIdleTime = t - totalSuccessfulTxTime;
     recordScalar("rx channel idle (%)", 100 * (totalRxChannelIdleTime / t));
     recordScalar("rx channel utilization (%)", 100 * (totalSuccessfulRxTime / t));
+    recordScalar("tx channel idle (%)", 100 * (totalTxChannelIdleTime / t));
+    recordScalar("tx channel utilization (%)", 100 * (totalSuccessfulTxTime / t));
+
 }
 
 void EtherMACFullDuplex::handleEndPausePeriod()
