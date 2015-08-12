@@ -18,6 +18,11 @@
 
 Define_Module(HomaTransport);
 
+simsignal_t HomaTransport::msgsLeftToSendSignal = 
+        registerSignal("msgsLeftToSend");
+simsignal_t HomaTransport::bytesLeftToSendSignal = 
+        registerSignal("bytesLeftToSend");
+
 HomaTransport::HomaTransport()
     : sxController(this)
     , rxScheduler(this)
@@ -116,6 +121,7 @@ HomaTransport::finish()
  */
 HomaTransport::SendController::SendController(HomaTransport* transport)
     : transport(transport) 
+    , bytesLeftToSend(0)
     , msgId(0)
     , outboundMsgMap()
 {}
@@ -126,14 +132,14 @@ HomaTransport::SendController::~SendController()
 void
 HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
 {
-//    outboundMsgMap.emplace(
-//            std::make_pair(msgId, 
-//            HomaTransport::OutboundMessage(sendMsg, this, msgId)));
-//
+
+    transport->emit(msgsLeftToSendSignal, outboundMsgMap.size());
+    transport->emit(bytesLeftToSendSignal, bytesLeftToSend);
     outboundMsgMap.emplace(std::piecewise_construct, 
             std::forward_as_tuple(msgId), 
             std::forward_as_tuple(sendMsg, this, msgId));
     outboundMsgMap.at(msgId).sendRequest(sendMsg->getCreationTime()); 
+    bytesLeftToSend += sendMsg->getByteLength();
     msgId++;
     delete sendMsg;
 }
@@ -149,10 +155,14 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
     ASSERT(rxPkt->getDestAddr() == outboundMsg->srcAddr &&
             rxPkt->getSrcAddr() == outboundMsg->destAddr);
 
-    int outboundMsgByteLeft = 
+    int bytesLeftOld = outboundMsg->bytesLeft;
+    int bytesLeftNew = 
         outboundMsg->sendBytes(rxPkt->getGrantFields().grantBytes);
+    int bytesSent = bytesLeftOld - bytesLeftNew;
+    bytesLeftToSend -= bytesSent;
+    ASSERT(bytesSent > 0 && bytesLeftToSend >= 0);
 
-    if (outboundMsgByteLeft == 0) {
+    if (bytesLeftNew <= 0) {
         outboundMsgMap.erase(rxPkt->getMsgId());
     }
     delete rxPkt;   
