@@ -24,6 +24,7 @@ namespace inet {
 Define_Module(DropTailQueue);
 
 simsignal_t DropTailQueue::queueLengthSignal = registerSignal("queueLength");
+simsignal_t DropTailQueue::queueByteLengthSignal = registerSignal("queueByteLength");
 
 void DropTailQueue::initialize()
 {
@@ -47,8 +48,18 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
         return msg;
     }
     else {
-        queue.insert(msg);
+        // The timeavg of queueLength queueByteLength will not be accurate if
+        // the queue(Byte)LengthSignal is emitted before a packet is stored at
+        // the queue (similar to the following line) however the average of
+        // queueLength at the packet arrival time at the queue will be accurate.
+        // If you want the timeavg of queueLength instead, comment out the
+        // following line and decomment the other emit invokations of
+        // queueLengthSignal in this file.
         emit(queueLengthSignal, queue.length());
+        emit(queueByteLengthSignal, queue.getByteLength());
+        queue.insert(check_and_cast<cPacket*>(msg));
+        //emit(queueLengthSignal, queue.length());
+        //emit(queueByteLengthSignal, queue.getByteLength());
         return NULL;
     }
 }
@@ -61,7 +72,8 @@ cMessage *DropTailQueue::dequeue()
     cMessage *msg = (cMessage *)queue.pop();
 
     // statistics
-    emit(queueLengthSignal, queue.length());
+    //emit(queueLengthSignal, queue.length());
+    //emit(queueByteLengthSignal, queue.getByteLength());
 
     return msg;
 }

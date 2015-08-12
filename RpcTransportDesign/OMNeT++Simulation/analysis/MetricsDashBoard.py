@@ -316,16 +316,20 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
 
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
     tw = 20
-    fw = 12
-    lineMax = 140
+    fw = 9 
+    lineMax = 100
     title = 'Queue Wait Time Stats'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
 
     print('\n' + "Packet Type: Requst".center(lineMax,' ') + '\n' + "="*lineMax)
-    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
-            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
-            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
+            'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
+            '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + '({0})'.format(unit).center(fw) + '(%)'.center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
+
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.requestQueueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.requestQueueingTime
@@ -344,9 +348,12 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     print('_'*2*tw + '\n' + 'Total:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
     print('\n\n' + "Packet Type: Grant".center(lineMax,' ') + '\n' + "="*lineMax)
-    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
-            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
-            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
+            'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
+            '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + '({0})'.format(unit).center(fw) + '(%)'.center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.grantQueueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.grantQueueingTime
@@ -366,9 +373,12 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     print('_'*2*tw + '\n' + 'Total:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
     print('\n\n' + "Packet Type: Data".center(lineMax,' ') + '\n'  + "="*lineMax)
-    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
-            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
-            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
+            'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
+            '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + '({0})'.format(unit).center(fw) + '(%)'.center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.dataQueueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.dataQueueingTime
@@ -387,9 +397,12 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
     print('\n\n' + "packet Type: All Pkts".center(lineMax,' ') + '\n' + "="*lineMax)
-    print("Queue Location".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'mean%'.center(fw) + 'stddev({0})'.format(unit).center(fw) +
-            'min({0})'.format(unit).center(fw) + 'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) +
-            '99%ile({0})'.format(unit).center(fw) + 'max({0})'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
+            'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
+            '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Queue Location".ljust(tw) + '({0})'.format(unit).center(fw) + '(%)'.center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
     print("_"*lineMax)
     hostStats = queueWaitTimeDigest.queueWaitTime.hosts.queueingTime
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.queueingTime
@@ -411,16 +424,20 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
     tw = 20
-    fw = 12
-    lineMax = 140
+    fw = 9 
+    lineMax = 90
     title = 'End To End Message Delays For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
 
     print("="*lineMax)
-    print("Msg Size Range".ljust(tw) + 'mean({0})'.format(unit).center(fw) + 'stddev({0})'.format(unit).center(fw) + 'min({0})'.format(unit).center(fw) +
-            'median({0})'.format(unit).center(fw) + '75%ile({0})'.format(unit).center(fw) + '99%ile({0})'.format(unit).center(fw) +
-            'max({0})'.format(unit).center(fw) + 'count'.center(fw))
+    print("Msg Size Range".ljust(tw) + 'mean'.format(unit).center(fw) + 'stddev'.format(unit).center(fw) + 'min'.format(unit).center(fw) +
+            'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) + '99%ile'.format(unit).center(fw) +
+            'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Msg Size Range".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + 'count'.center(fw))
+
     print("_"*lineMax)
     
     end2EndDelayDigest = e2eStretchAndDelayDigest.delay
@@ -507,29 +524,29 @@ def digestTrafficInfo(trafficBytesAndRateDic, title):
 def printBytesAndRates(parsedStats, xmlParsedDic):
     printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate', 'cumBytes', 'avgDutyCycle', 'minDutyCycle', 'maxDutyCycle']
     tw = 20
-    fw = 15
-    lineMax = 140
+    fw = 10
+    lineMax = 100
     title = 'Traffic Characteristic (Rates, Bytes, and DutyCycle)'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
     trafficDic = AttrDict()
-    trafficDic.sxHostsTraffic.apps.sx.bytes = []
-    trafficDic.sxHostsTraffic.apps.sx.rates = []
-    trafficDic.rxHostsTraffic.apps.rx.bytes = []
-    trafficDic.rxHostsTraffic.apps.rx.rates = []
-    trafficDic.sxHostsTraffic.nics.sx.bytes = []
-    trafficDic.sxHostsTraffic.nics.sx.rates = []
-    trafficDic.sxHostsTraffic.nics.sx.dutyCycles = []
-    trafficDic.rxHostsTraffic.nics.rx.bytes = []
-    trafficDic.rxHostsTraffic.nics.rx.rates = []
-    trafficDic.rxHostsTraffic.nics.rx.dutyCycles = []
+    txAppsBytes = trafficDic.sxHostsTraffic.apps.sx.bytes = []
+    txAppsRates = trafficDic.sxHostsTraffic.apps.sx.rates = []
+    rxAppsBytes = trafficDic.rxHostsTraffic.apps.rx.bytes = []
+    rxAppsRates = trafficDic.rxHostsTraffic.apps.rx.rates = []
+    txNicsBytes = trafficDic.sxHostsTraffic.nics.sx.bytes = []
+    txNicsRates = trafficDic.sxHostsTraffic.nics.sx.rates = []
+    txNicsDutyCycles = trafficDic.sxHostsTraffic.nics.sx.dutyCycles = []
+    rxNicsBytes = trafficDic.rxHostsTraffic.nics.rx.bytes = []
+    rxNicsRates = trafficDic.rxHostsTraffic.nics.rx.rates = []
+    rxNicsDutyCycles = trafficDic.rxHostsTraffic.nics.rx.dutyCycles = []
 
-    trafficDic.hostsTraffic.nics.sx.bytes = []
-    trafficDic.hostsTraffic.nics.sx.rates = []
-    trafficDic.hostsTraffic.nics.sx.dutyCycles = []
-    trafficDic.hostsTraffic.nics.rx.bytes = []
-    trafficDic.hostsTraffic.nics.rx.rates = []
-    trafficDic.hostsTraffic.nics.rx.dutyCycles = []
+    nicTxBytes = trafficDic.hostsTraffic.nics.sx.bytes = []
+    nicTxRates = trafficDic.hostsTraffic.nics.sx.rates = []
+    nicTxDutyCycles = trafficDic.hostsTraffic.nics.sx.dutyCycles = []
+    nicRxBytes = trafficDic.hostsTraffic.nics.rx.bytes = []
+    nicRxRates = trafficDic.hostsTraffic.nics.rx.rates = []
+    nicRxDutyCycles = trafficDic.hostsTraffic.nics.rx.dutyCycles = []
 
 
     for host in parsedStats.hosts.keys():
@@ -541,46 +558,72 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
         nicRcvBytes = hostStats.access('eth[0].mac.rxPkOk:sum(packetBytes).value')
         nicRcvRate = hostStats.access('eth[0].mac.\"bits/sec rcvd\".value')/1e9
         nicRcvDutyCycle = hostStats.access('eth[0].mac.\"rx channel utilization (%)\".value')
-        nicTxBytes = trafficDic.hostsTraffic.nics.sx.bytes
         nicTxBytes.append(nicSendBytes)
-        nicTxRates = trafficDic.hostsTraffic.nics.sx.rates
         nicTxRates.append(nicSendRate)
-        nicTxDutyCycles = trafficDic.hostsTraffic.nics.sx.dutyCycles
         nicTxDutyCycles.append(nicSendDutyCycle)
-        nicRxBytes = trafficDic.hostsTraffic.nics.rx.bytes
         nicRxBytes.append(nicRcvBytes)
-        nicRxRates = trafficDic.hostsTraffic.nics.rx.rates
         nicRxRates.append(nicRcvRate)
-        nicRxDutyCycles = trafficDic.hostsTraffic.nics.rx.dutyCycles
         nicRxDutyCycles.append(nicRcvDutyCycle)
 
         if hostId in xmlParsedDic.senderIds:
-            txAppsBytes = trafficDic.sxHostsTraffic.apps.sx.bytes 
-            txAppsRates = trafficDic.sxHostsTraffic.apps.sx.rates
             txAppsBytes.append(hostStats.access('trafficGeneratorApp[0].sentMsg:sum(packetBytes).value'))
             txAppsRates.append(hostStats.access('trafficGeneratorApp[0].sentMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
-            txNicsBytes = trafficDic.sxHostsTraffic.nics.sx.bytes 
-            txNicsRates = trafficDic.sxHostsTraffic.nics.sx.rates
-            txNicsDutyCycles = trafficDic.sxHostsTraffic.nics.sx.dutyCycles
             txNicsBytes.append(nicSendBytes)
             txNicsRates.append(nicSendRate)
             txNicsDutyCycles.append(nicSendDutyCycle)
         if hostId in xmlParsedDic.receiverIds:
-            rxAppsBytes = trafficDic.rxHostsTraffic.apps.rx.bytes 
-            rxAppsRates = trafficDic.rxHostsTraffic.apps.rx.rates
             rxAppsBytes.append(hostStats.access('trafficGeneratorApp[0].rcvdMsg:sum(packetBytes).value'))
             rxAppsRates.append(hostStats.access('trafficGeneratorApp[0].rcvdMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
-            rxNicsBytes = trafficDic.rxHostsTraffic.nics.rx.bytes 
-            rxNicsRates = trafficDic.rxHostsTraffic.nics.rx.rates
-            rxNicsDutyCycles = trafficDic.rxHostsTraffic.nics.rx.dutyCycles
             rxNicsBytes.append(nicRcvBytes)
             rxNicsRates.append(nicRcvRate)
             rxNicsDutyCycles.append(nicRcvDutyCycle)
 
+    upNicsTxBytes = trafficDic.torsTraffic.upNics.sx.bytes = []
+    upNicsTxRates = trafficDic.torsTraffic.upNics.sx.rates = []
+    upNicsTxDutyCycle = trafficDic.torsTraffic.upNics.sx.dutyCycles = []
+    upNicsRxBytes = trafficDic.torsTraffic.upNics.rx.bytes = []
+    upNicsRxRates = trafficDic.torsTraffic.upNics.rx.rates = []
+    upNicsRxDutyCycle = trafficDic.torsTraffic.upNics.rx.dutyCycles = []
+    downNicsTxBytes =  trafficDic.torsTraffic.downNics.sx.bytes = []
+    downNicsTxRates =  trafficDic.torsTraffic.downNics.sx.rates = []
+    downNicsTxDutyCycle = trafficDic.torsTraffic.downNics.sx.dutyCycles = []
+    downNicsRxBytes = trafficDic.torsTraffic.downNics.rx.bytes = []
+    downNicsRxRates = trafficDic.torsTraffic.downNics.rx.rates = []
+    downNicsRxDutyCycle = trafficDic.torsTraffic.downNics.rx.dutyCycles = []
+
+    numServersPerTor = xmlParsedDic.numServersPerTor
+    numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
+    for torKey in parsedStats.tors.keys():
+        tor = parsedStats.tors[torKey]
+        for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
+            nicRecvBytes = tor.access('eth[{0}].mac.rxPkOk:sum(packetBytes).value'.format(ifaceId)) 
+            nicRecvRates = tor.access('eth[{0}].mac.\"bits/sec rcvd\".value'.format(ifaceId))/1e9
+            nicRecvDutyCycle = tor.access('eth[{0}].mac.\"rx channel utilization (%)\".value'.format(ifaceId)) 
+            nicSendBytes = tor.access('eth[{0}].mac.txPk:sum(packetBytes).value'.format(ifaceId))
+            nicSendRates = tor.access('eth[{0}].mac.\"bits/sec sent\".value'.format(ifaceId))/1e9
+            nicSendDutyCycle = tor.access('eth[{0}].mac.\"tx channel utilization (%)\".value'.format(ifaceId))
+            if ifaceId < numServersPerTor:
+                downNicsRxBytes.append(nicRecvBytes)
+                downNicsRxRates.append(nicRecvRates)
+                downNicsRxDutyCycle.append(nicRecvDutyCycle)
+                downNicsTxBytes.append(nicSendBytes)
+                downNicsTxRates.append(nicSendRates)
+                downNicsTxDutyCycle.append(nicSendDutyCycle)
+            else :
+                upNicsRxBytes.append(nicRecvBytes)
+                upNicsRxRates.append(nicRecvRates)
+                upNicsRxDutyCycle.append(nicRecvDutyCycle)
+                upNicsTxBytes.append(nicSendBytes)
+                upNicsTxRates.append(nicSendRates)
+                upNicsTxDutyCycle.append(nicSendDutyCycle)
+
 
     print("="*lineMax)
-    print("Measurement Point".ljust(tw) + 'AvgRate(Gb/s)'.center(fw) + 'CumRate(Gb/s)'.center(fw) + 'MinRate(Gb/s)'.center(fw) + 'MaxRate(Gb/s)'.center(fw) +
-             'CumBytes(MB)'.center(fw) + '%AvgDutyCycle'.center(fw) + '%MinDutyCycle'.center(fw) + '%MaxDutyCycle'.center(fw))
+    print("Measurement Point".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw) +
+             'CumBytes'.center(fw) + 'Avg Duty'.center(fw) + 'Min Duty'.center(fw) + 'Max Duty'.center(fw))
+    print("".ljust(tw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) +
+            '(MB)'.center(fw) + 'Cycle(%)'.center(fw) + 'Cycle(%)'.center(fw) + 'Cycle(%)'.center(fw))
+   
     print("_"*lineMax)
     digestTrafficInfo(trafficDic.sxHostsTraffic.apps.sx, 'SX Apps Send:')
     printStatsLine(trafficDic.sxHostsTraffic.apps.sx.trafficDigest, trafficDic.sxHostsTraffic.apps.sx.trafficDigest.title, tw, fw, '', printKeys)
@@ -590,12 +633,183 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     printStatsLine(trafficDic.hostsTraffic.nics.sx.trafficDigest, trafficDic.hostsTraffic.nics.sx.trafficDigest.title, tw, fw, '', printKeys)
 
 
+    digestTrafficInfo(trafficDic.torsTraffic.downNics.rx, 'TORs Down Recv:')
+    printStatsLine(trafficDic.torsTraffic.downNics.rx.trafficDigest, trafficDic.torsTraffic.downNics.rx.trafficDigest.title, tw, fw, '', printKeys)   
+    digestTrafficInfo(trafficDic.torsTraffic.upNics.sx, 'TORs Up Send:')
+    printStatsLine(trafficDic.torsTraffic.upNics.sx.trafficDigest, trafficDic.torsTraffic.upNics.sx.trafficDigest.title, tw, fw, '', printKeys)   
+    digestTrafficInfo(trafficDic.torsTraffic.upNics.rx, 'TORs Up Recv:')
+    printStatsLine(trafficDic.torsTraffic.upNics.rx.trafficDigest, trafficDic.torsTraffic.upNics.rx.trafficDigest.title, tw, fw, '', printKeys)   
+    digestTrafficInfo(trafficDic.torsTraffic.downNics.sx, 'TORs Down Send:')
+    printStatsLine(trafficDic.torsTraffic.downNics.sx.trafficDigest, trafficDic.torsTraffic.downNics.sx.trafficDigest.title, tw, fw, '', printKeys)   
+
+
     digestTrafficInfo(trafficDic.hostsTraffic.nics.rx, 'ALL NICs Recv:')
     printStatsLine(trafficDic.hostsTraffic.nics.rx.trafficDigest, trafficDic.hostsTraffic.nics.rx.trafficDigest.title, tw, fw, '', printKeys)
     digestTrafficInfo(trafficDic.rxHostsTraffic.nics.rx, 'RX NICs Recv:')
     printStatsLine(trafficDic.rxHostsTraffic.nics.rx.trafficDigest, trafficDic.rxHostsTraffic.nics.rx.trafficDigest.title, tw, fw, '', printKeys)
     digestTrafficInfo(trafficDic.rxHostsTraffic.apps.rx, 'RX Apps Recv:')
     printStatsLine(trafficDic.rxHostsTraffic.apps.rx.trafficDigest, trafficDic.rxHostsTraffic.apps.rx.trafficDigest.title, tw, fw, '', printKeys)
+
+def digestQueueLenInfo(queueLenDic, title):
+    queueLenDigest = queueLenDic.queueLenDigest
+    queueLenDigest.title = title 
+    queueLenDigest.meanCnt = sum(queueLenDic.meanCnt)/float(len(queueLenDic.meanCnt))
+    queueLenDigest.minCnt = min(queueLenDic.minCnt)
+    queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
+    queueLenDigest.stddevCnt = sum(queueLenDic.stddevCnt)/float(len(queueLenDic.stddevCnt))
+    queueLenDigest.meanBytes = sum(queueLenDic.meanBytes)/float(len(queueLenDic.meanBytes))
+    queueLenDigest.minBytes = min(queueLenDic.minBytes)
+    queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
+    queueLenDigest.stddevBytes = sum(queueLenDic.stddevBytes)/float(len(queueLenDic.stddevBytes))
+
+def printQueueLength(parsedStats, xmlParsedDic):
+    printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
+    tw = 15 
+    fw = 9 
+    lineMax = 88 
+    title = 'Queue Length In Number of Packets and Bytes (Stats Collected At Pkt Arrivals)'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+    print("="*lineMax)
+    print("Queue Location".ljust(tw) + 'Mean'.center(fw) + 'StdDev'.center(fw) + 'Mean'.center(fw) + 'StdDev'.center(fw) +
+             'Min'.center(fw) + 'Min'.center(fw) + 'Max'.center(fw) + 'Max'.center(fw))
+    print("".ljust(tw) + '(Pkts)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(KB)'.center(fw) +
+             '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw))
+    print("_"*lineMax)
+    
+    queueLen = AttrDict()
+    for key in printKeys:
+        queueLen.sxHosts.transport[key] = []
+        queueLen.sxHosts.nic[key] = []
+        queueLen.hosts.nic[key] = []
+        queueLen.tors.up.nic[key] = []
+        queueLen.sxTors.up.nic[key] = []
+        queueLen.tors.down.nic[key] = []
+        queueLen.rxTors.down.nic[key] = []
+    
+    for host in parsedStats.hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        hostStats = parsedStats.hosts[host]
+        transQueueLenMin = hostStats.access('transportScheme.msgsLeftToSend:stats.min')
+        transQueueLenMax = hostStats.access('transportScheme.msgsLeftToSend:stats.max')
+        transQueueLenMean = hostStats.access('transportScheme.msgsLeftToSend:stats.mean')
+        transQueueLenStddev = hostStats.access('transportScheme.msgsLeftToSend:stats.stddev')
+        transQueueBytesMin = hostStats.access('transportScheme.bytesLeftToSend:stats.min')/1e3
+        transQueueBytesMax = hostStats.access('transportScheme.bytesLeftToSend:stats.max')/1e3
+        transQueueBytesMean = hostStats.access('transportScheme.bytesLeftToSend:stats.mean')/1e3
+        transQueueBytesStddev = hostStats.access('transportScheme.bytesLeftToSend:stats.stddev')/1e3
+        
+        nicQueueLenMin = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.min')
+        nicQueueLenMax = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.max')
+        nicQueueLenMean = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.mean')
+        nicQueueLenStddev = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.stddev')
+        nicQueueBytesMin = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.min')/1e3
+        nicQueueBytesMax = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.max')/1e3
+        nicQueueBytesMean = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.mean')/1e3
+        nicQueueBytesStddev = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.stddev')/1e3
+        queueLen.hosts.nic.minCnt.append(nicQueueLenMin)
+        queueLen.hosts.nic.maxCnt.append(nicQueueLenMax)
+        queueLen.hosts.nic.meanCnt.append(nicQueueLenMean)
+        queueLen.hosts.nic.stddevCnt.append(nicQueueLenStddev)
+        queueLen.hosts.nic.minBytes.append(nicQueueBytesMin)
+        queueLen.hosts.nic.maxBytes.append(nicQueueBytesMax)
+        queueLen.hosts.nic.meanBytes.append(nicQueueBytesMean)
+        queueLen.hosts.nic.stddevBytes.append(nicQueueBytesStddev)
+
+        if hostId in xmlParsedDic.senderIds:
+            queueLen.sxHosts.transport.minCnt.append(transQueueLenMin)
+            queueLen.sxHosts.transport.maxCnt.append(transQueueLenMax)
+            queueLen.sxHosts.transport.meanCnt.append(transQueueLenMean)
+            queueLen.sxHosts.transport.stddevCnt.append(transQueueLenStddev)
+            queueLen.sxHosts.transport.minBytes.append(transQueueBytesMin)
+            queueLen.sxHosts.transport.maxBytes.append(transQueueBytesMax)
+            queueLen.sxHosts.transport.meanBytes.append(transQueueBytesMean)
+            queueLen.sxHosts.transport.stddevBytes.append(transQueueBytesStddev)
+            
+            queueLen.sxHosts.nic.minCnt.append(nicQueueLenMin)
+            queueLen.sxHosts.nic.maxCnt.append(nicQueueLenMax)
+            queueLen.sxHosts.nic.meanCnt.append(nicQueueLenMean)
+            queueLen.sxHosts.nic.stddevCnt.append(nicQueueLenStddev)
+            queueLen.sxHosts.nic.minBytes.append(nicQueueBytesMin)
+            queueLen.sxHosts.nic.maxBytes.append(nicQueueBytesMax)
+            queueLen.sxHosts.nic.meanBytes.append(nicQueueBytesMean)
+            queueLen.sxHosts.nic.stddevBytes.append(nicQueueBytesStddev)
+
+    numServersPerTor = xmlParsedDic.numServersPerTor
+    numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
+    senderHostIds = xmlParsedDic.senderIds
+    senderTorIds = [elem for elem in set([int(id / xmlParsedDic.numServersPerTor) for id in senderHostIds])]
+    receiverHostIds = xmlParsedDic.receiverIds
+    receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
+
+    for torKey in parsedStats.tors.keys():
+        tor = parsedStats.tors[torKey]
+        torId = int(re.match('tor\[([0-9]+)]', torKey).group(1))
+        for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
+            nicQueueLenMin = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.min'.format(ifaceId))
+            nicQueueLenMax = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.max'.format(ifaceId))
+            nicQueueLenMean = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.mean'.format(ifaceId))
+            nicQueueLenStddev = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.stddev'.format(ifaceId))
+            nicQueueBytesMin = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.min'.format(ifaceId))/1e3
+            nicQueueBytesMax = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.max'.format(ifaceId))/1e3
+            nicQueueBytesMean = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.mean'.format(ifaceId))/1e3
+            nicQueueBytesStddev = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.stddev'.format(ifaceId))/1e3
+
+            if ifaceId < numServersPerTor:
+                queueLen.tors.down.nic.minCnt.append(nicQueueLenMin)
+                queueLen.tors.down.nic.maxCnt.append(nicQueueLenMax)
+                queueLen.tors.down.nic.meanCnt.append(nicQueueLenMean)
+                queueLen.tors.down.nic.stddevCnt.append(nicQueueLenStddev)
+                queueLen.tors.down.nic.minBytes.append(nicQueueBytesMin)
+                queueLen.tors.down.nic.maxBytes.append(nicQueueBytesMax)
+                queueLen.tors.down.nic.meanBytes.append(nicQueueBytesMean)
+                queueLen.tors.down.nic.stddevBytes.append(nicQueueBytesStddev)
+
+                if (torId, ifaceId) in receiverTorIdsIfaces:
+                    queueLen.rxTors.down.nic.minCnt.append(nicQueueLenMin)
+                    queueLen.rxTors.down.nic.maxCnt.append(nicQueueLenMax)
+                    queueLen.rxTors.down.nic.meanCnt.append(nicQueueLenMean)
+                    queueLen.rxTors.down.nic.stddevCnt.append(nicQueueLenStddev)
+                    queueLen.rxTors.down.nic.minBytes.append(nicQueueBytesMin)
+                    queueLen.rxTors.down.nic.maxBytes.append(nicQueueBytesMax)
+                    queueLen.rxTors.down.nic.meanBytes.append(nicQueueBytesMean)
+                    queueLen.rxTors.down.nic.stddevBytes.append(nicQueueBytesStddev)
+
+            else:
+                queueLen.tors.up.nic.minCnt.append(nicQueueLenMin)
+                queueLen.tors.up.nic.maxCnt.append(nicQueueLenMax)
+                queueLen.tors.up.nic.meanCnt.append(nicQueueLenMean)
+                queueLen.tors.up.nic.stddevCnt.append(nicQueueLenStddev)
+                queueLen.tors.up.nic.minBytes.append(nicQueueBytesMin)
+                queueLen.tors.up.nic.maxBytes.append(nicQueueBytesMax)
+                queueLen.tors.up.nic.meanBytes.append(nicQueueBytesMean)
+                queueLen.tors.up.nic.stddevBytes.append(nicQueueBytesStddev)
+
+                if torId in senderTorIds:
+                    queueLen.sxTors.up.nic.minCnt.append(nicQueueLenMin)
+                    queueLen.sxTors.up.nic.maxCnt.append(nicQueueLenMax)
+                    queueLen.sxTors.up.nic.meanCnt.append(nicQueueLenMean)
+                    queueLen.sxTors.up.nic.stddevCnt.append(nicQueueLenStddev)
+                    queueLen.sxTors.up.nic.minBytes.append(nicQueueBytesMin)
+                    queueLen.sxTors.up.nic.maxBytes.append(nicQueueBytesMax)
+                    queueLen.sxTors.up.nic.meanBytes.append(nicQueueBytesMean)
+                    queueLen.sxTors.up.nic.stddevBytes.append(nicQueueBytesStddev)
+
+
+    digestQueueLenInfo(queueLen.sxHosts.transport, 'SX Transports')
+    printStatsLine(queueLen.sxHosts.transport.queueLenDigest, queueLen.sxHosts.transport.queueLenDigest.title, tw, fw, '', printKeys)
+    digestQueueLenInfo(queueLen.sxHosts.nic, 'SX NICs')
+    printStatsLine(queueLen.sxHosts.nic.queueLenDigest, queueLen.sxHosts.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    digestQueueLenInfo(queueLen.hosts.nic, 'All NICs')
+    printStatsLine(queueLen.hosts.nic.queueLenDigest, queueLen.hosts.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    digestQueueLenInfo(queueLen.sxTors.up.nic, 'SX TORs Up')
+    printStatsLine(queueLen.sxTors.up.nic.queueLenDigest, queueLen.sxTors.up.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    digestQueueLenInfo(queueLen.tors.up.nic, 'All TORs Up')
+    printStatsLine(queueLen.tors.up.nic.queueLenDigest, queueLen.tors.up.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    digestQueueLenInfo(queueLen.rxTors.down.nic, 'RX TORs Down')
+    printStatsLine(queueLen.rxTors.down.nic.queueLenDigest, queueLen.rxTors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    digestQueueLenInfo(queueLen.tors.down.nic, 'All TORs Down')
+    printStatsLine(queueLen.tors.down.nic.queueLenDigest, queueLen.tors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
 
    
 def main():
@@ -618,6 +832,7 @@ def main():
     aggrsQueueWaitTime(parsedStats.aggrs, xmlParsedDic, queueWaitTimeDigest)
     printGenralInfo(xmlParsedDic)
     printBytesAndRates(parsedStats, xmlParsedDic)
+    printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     e2eStretchAndDelayDigest = AttrDict()
     e2eStretchAndDelay(parsedStats.hosts, xmlParsedDic, e2eStretchAndDelayDigest)

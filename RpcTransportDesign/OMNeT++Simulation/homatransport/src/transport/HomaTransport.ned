@@ -29,10 +29,10 @@ simple HomaTransport like ITransportScheme
         int localPort = default(-1);
         int destPort;
 
-        @signal[sentPkt](type=cPacket);
-        @signal[rcvdPkt](type=cPacket);
-        @statistic[rcvdPkt](title="packets received"; source=rcvdPkt; record=count, "sum(packetBytes)", "vector(packetBytes)"; interpolationmode=none);
-        @statistic[sentPkt](title="packets sent"; source=sentPkt; record=count, "sum(packetBytes)", "vector(packetBytes)"; interpolationmode=none);
+        @signal[msgsLeftToSend](type=long);
+        @signal[bytesLeftToSend](type=long);
+        @statistic[msgsLeftToSend](title="num msgs left to send"; source=msgsLeftToSend; record=stats, histogram; interpolationmode=none);
+        @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);
 
     gates:
         input appIn[] @labels(AppMessage/down);

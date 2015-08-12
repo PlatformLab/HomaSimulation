@@ -44,11 +44,16 @@ class HomaTransport : public cSimpleModule
     HomaTransport();
     ~HomaTransport();
 
+    // Signals
+    static simsignal_t msgsLeftToSendSignal;
+    static simsignal_t bytesLeftToSendSignal;
+ 
+
     class SendController;
     class ReceiveScheduler;
     class CompareInboundMsg;
 
- 
+
     class OutboundMessage
     {
       public:
@@ -81,9 +86,9 @@ class HomaTransport : public cSimpleModule
         ~SendController();
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
-
       protected:
         HomaTransport* transport;
+        uint64_t bytesLeftToSend; //statistics
         uint64_t msgId;
         std::unordered_map<uint64_t, OutboundMessage> outboundMsgMap;
         friend class OutboundMessage;
@@ -165,7 +170,6 @@ class HomaTransport : public cSimpleModule
     void processGrantTimer();
 
   protected:
-
     // contain the transport code in the send and receive paths.
     SendController sxController;
     ReceiveScheduler rxScheduler;
@@ -179,7 +183,6 @@ class HomaTransport : public cSimpleModule
     int destPort;
     int nicLinkSpeed;
     double grantTimeInterval;
-
     friend class ReceiveScheduler;
 };
 

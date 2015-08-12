@@ -34,6 +34,7 @@ simple DropTailQueue like IOutputQueue
         @signal[dropPkByQueue](type=cPacket);
         @signal[queueingTime](type=simtime_t; unit=s);
         @signal[queueLength](type=long);
+        @signal[queueByteLength](type=long);
 
         // Queuing time for different pkt types
         @signal[requestQueueingTime](type=simtime_t; unit=s);
@@ -44,6 +45,7 @@ simple DropTailQueue like IOutputQueue
         @statistic[rcvdPk](title="received packets"; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[dropPk](title="dropped packets"; source=dropPkByQueue; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[queueLength](title="queue length"; record=stats,timeavg,vector; interpolationmode=sample-hold);
+        @statistic[queueByteLength](title="queue byte length"; record=stats,timeavg,histogram; interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time"; record=stats,histogram,vector; interpolationmode=none);
 
         // Queuing time for different pkt types
