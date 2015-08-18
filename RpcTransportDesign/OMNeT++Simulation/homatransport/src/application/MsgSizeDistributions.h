@@ -10,26 +10,42 @@
 
 #include <string>
 #include <vector>
+#include <queue>
 #include <utility>
 #include <random>
 #include <exception>
+#include <omnetpp.h>
 
 class MsgSizeDistributions {
 
   public:
     enum DistributionChoice {
+        SIZE_IN_FILE = 0,
         DCTCP,
-        FACEBOOK_KEY_VALUE
+        FACEBOOK_KEY_VALUE,
+        NO_SIZE_DIST_SPECIFIED //Should always remain the last 
+
     };
 
-    MsgSizeDistributions(const char* distFileName,
-            DistributionChoice distSelector, int maxDataBytesPerPkt);
+    enum InterArrivalDist {
+        INTERARRIVAL_IN_FILE = 0,
+        EXPONENTIAL,
+        GAUSSIAN,
+        FACEBOOK_KEY_VALU,
+        CONSTANT,
+        NO_INTERARRIAVAL_DIST_SPECIFIED //Should always remain the last
+    };
+
+
+    MsgSizeDistributions(const char* distFileName, int maxDataBytesPerPkt,
+            InterArrivalDist interArrivalDist, DistributionChoice sizeDistSelector,
+            double avgRate = 5.0, int callerHostId = -1);
     ~MsgSizeDistributions() {};
-    int sizeGeneratorWrapper();
-    double getAvgMsgSize();
+    void getSizeAndInterarrival(int &nextMsgSize, double &nextInterarrivalTime);
    
   private:
     std::vector<std::pair<int, double>> msgSizeProbDistVector;
+    std::queue<std::pair<int, uint64_t>> msgSizeInterarrivalQueue;
 
     // Random number generator classes and datastructs
     std::random_device rdDevice;
@@ -38,17 +54,22 @@ class MsgSizeDistributions {
  
     // The value of this variable will determine which distribution should be
     // used for generating new messages in the sizeGenratorWrapper()
-    DistributionChoice distSelector;
+    DistributionChoice sizeDistSelector;
+    InterArrivalDist interArrivalDist;
 
     // Average message size from the constructed distribution. This value is
     // read from the first line of the file 'distFileName'. 
     double avgMsgSize;
+    double avgInterArrivalTime; 
 
     // Max number of data bytes that one packet can carry.
     int maxDataBytesPerPkt;
-
-    int generateSizeFromDctcpDist();
-    int generateFacebookMsgSize();
+    
+  private:
+    void getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
+    void getDctcpSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
+    void getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
+    double getInterarrivalTime();
 };
 
 struct MsgSizeDistException : std::exception {
@@ -57,7 +78,7 @@ struct MsgSizeDistException : std::exception {
         : msg(msg)
     {
     }
-    
+ 
     const char* what() const noexcept
     {
         return msg.c_str(); 

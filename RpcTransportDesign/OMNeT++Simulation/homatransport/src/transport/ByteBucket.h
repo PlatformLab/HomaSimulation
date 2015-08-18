@@ -14,8 +14,10 @@
 class ByteBucket
 {
   public:
-    ByteBucket(double linkSpeed);
+    ByteBucket(double nominalLinkSpeed);
     ~ByteBucket();
+    static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 0.95;
+
     inline simtime_t getGrantTime()
     {
         return nextGrantTime;
@@ -24,7 +26,7 @@ class ByteBucket
     void subtractUnschedBytes(HomaPkt* reqMsg);
 
   private:
-    double linkSpeed;
+    double actualLinkSpeed;
     simtime_t nextGrantTime;
 };
 

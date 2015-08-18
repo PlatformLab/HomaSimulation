@@ -66,6 +66,8 @@ WorkloadSynthesizer::WorkloadSynthesizer()
 {
     msgSizeGenerator = NULL;
     selfMsg = NULL;
+    isSender = false;
+    sendMsgSize = -1;
 }
 
 WorkloadSynthesizer::~WorkloadSynthesizer()
@@ -75,10 +77,14 @@ WorkloadSynthesizer::~WorkloadSynthesizer()
 
 void
 WorkloadSynthesizer::initialize()
-{
-
+{   
+    // read in module parameters
+    int parentHostIdx = -1;
     nicLinkSpeed = par("nicLinkSpeed").longValue();
     fabricLinkSpeed = par("fabricLinkSpeed").longValue(); 
+    startTime = par("startTime").doubleValue();
+    stopTime = par("stopTime").doubleValue();
+    xmlConfig = par("appConfig").xmlValue();
 
     // Initialize the msgSizeGenerator
     const char* workLoadType = par("workloadType").stringValue();
@@ -88,42 +94,45 @@ WorkloadSynthesizer::initialize()
         distSelector = MsgSizeDistributions::DistributionChoice::DCTCP;
         distFileName = std::string(
                 "../../sizeDistributions/DCTCP_MsgSizeDist.txt");
-    } else if (strcmp(workLoadType, "FACEBOOK_KEy_VALUE")) {
+    } else if (strcmp(workLoadType, "FACEBOOK_KEY_VALUE") == 0) {
         distSelector = 
                 MsgSizeDistributions::DistributionChoice::FACEBOOK_KEY_VALUE;
         distFileName = std::string(
                 "../../sizeDistributions/FacebookKeyValueMsgSizeDist.txt");
+    } else if (strcmp(workLoadType, "PRESET_IN_FILE") == 0){
+        distSelector = 
+                MsgSizeDistributions::DistributionChoice::SIZE_IN_FILE;
+        distFileName = std::string(
+                "../../sizeDistributions/HostidSizeInterarrival.txt");
+        cModule* parentHost = this->getParentModule();
+        if (strcmp(parentHost->getName(), "HostBase") != 0) {
+            throw cRuntimeError("'%s': Not a valid parent module type. Expected "
+                    "\"HostBase\" for parent module type.", parentHost->getName());
+        }
+        parentHostIdx = parentHost->getIndex();
     } else {
         throw cRuntimeError("'%s': Not a valie workload type.",workLoadType);
     }
     
     maxDataBytesPerPkt = 
             MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE; 
-    try {
-        msgSizeGenerator = 
-                new MsgSizeDistributions(distFileName.c_str(), distSelector,
-                maxDataBytesPerPkt);
 
-    } catch(MsgSizeDistException& e) {
-        throw cRuntimeError("'%s': Not a valid workload type.",workLoadType);
-    }
-    
-    // Set Interarrival Time Distributions type from what's specified
-    // in omnetpp.ini file
+    MsgSizeDistributions::InterArrivalDist interArrivalDist;
     if (strcmp(par("interArrivalDist").stringValue(), "exponential") == 0) {
-        interArrivalDist = InterArrivalDist::EXPONENTIAL;
+        interArrivalDist = MsgSizeDistributions::InterArrivalDist::EXPONENTIAL;
+    } else if (strcmp(par("interArrivalDist").stringValue(), "preset_in_file") == 0) {
+        interArrivalDist = MsgSizeDistributions::InterArrivalDist::INTERARRIVAL_IN_FILE;
     } else {
         throw cRuntimeError("'%s': Not a valid Interarrival Distribution",
                 par("interArrivalDist").stringValue());
     }
 
-    // Calculate average inter arrival time
-    avgInterArrivalTime = 1e-9 * msgSizeGenerator->getAvgMsgSize() * 8 /
-            (par("loadFactor").doubleValue() * nicLinkSpeed);
+    double avgRate = par("loadFactor").doubleValue() * nicLinkSpeed;
+    msgSizeGenerator = new MsgSizeDistributions(distFileName.c_str(),
+            maxDataBytesPerPkt, interArrivalDist, distSelector, avgRate,
+            parentHostIdx);
 
     // Send timer settings
-    startTime = par("startTime").doubleValue();
-    stopTime = par("stopTime").doubleValue();
     if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
         throw cRuntimeError("Invalid startTime/stopTime parameters");
 
@@ -134,10 +143,11 @@ WorkloadSynthesizer::initialize()
         scheduleAt(start, selfMsg);
     }
 
-    // set xmlConfig 
-    xmlConfig = par("appConfig").xmlValue();
+    if (stopTime < SIMTIME_ZERO) {
+        stopTime = MAXTIME;
+    }
 
-    // Initialize statistics
+    // Initialize statistic tracker variables
     numSent = 0;
     numReceived = 0;
     WATCH(numSent);
@@ -148,23 +158,18 @@ void
 WorkloadSynthesizer::parseAndProcessXMLConfig()
 {
     // determine if this app is also a sender or only a receiver
-    bool isSender;
     const char* isSenderParam = 
             xmlConfig->getElementByPath("isSender")->getNodeValue();
-    if (strcmp(isSenderParam, "true") == 0) {
-        isSender = true;
-    } else if (strcmp(isSenderParam, "false") == 0) {
+    if (strcmp(isSenderParam, "false") == 0) {
         isSender = false;
+        return;
+    } else if (strcmp(isSenderParam, "true") == 0) {
+        isSender = true;
     } else {
         throw cRuntimeError("'%s': Not a valid xml parameter for appConfig.",
                 isSenderParam);
     }
 
-    if (!isSender) {
-        selfMsg->setKind(STOP);
-        scheduleAt(stopTime, selfMsg);
-        return;
-    }
 
     // destAddress will be populated with the destination hosts in the xml
     // config file. If no destination is specified in the xml config file, then
@@ -195,13 +200,6 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
         destAddresses.push_back(result);
     }
 
-    if (destAddresses.empty()) {
-        selfMsg->setKind(STOP);
-        scheduleAt(stopTime, selfMsg);
-    } else {
-        selfMsg->setKind(SEND);
-        processSend();
-    }
 }
 
 void
@@ -251,11 +249,10 @@ void
 WorkloadSynthesizer::sendMsg()
 {
     inet::L3Address destAddrs = chooseDestAddr();
-    int msgByteSize = msgSizeGenerator->sizeGeneratorWrapper();
     char msgName[100];
     sprintf(msgName, "WorkloadSynthesizerMsg-%d", numSent);
     AppMessage *appMessage = new AppMessage(msgName);
-    appMessage->setByteLength(msgByteSize);
+    appMessage->setByteLength(sendMsgSize);
     appMessage->setDestAddr(destAddrs);
     appMessage->setSrcAddr(srcAddress);
     appMessage->setMsgCreationTime(0);
@@ -290,6 +287,19 @@ WorkloadSynthesizer::processStart()
 
     // call parseXml to complete intialization based on the config.xml file
     parseAndProcessXMLConfig();
+
+    // Start the Sender application based on the parsed xmlConfig results
+    // If this app is not sender or is a sender but no receiver is available for
+    // this sender, then just set the sendTimer to the stopTime and only wait
+    // for message arrivals.
+    if (!isSender || destAddresses.empty()) {
+        selfMsg->setKind(STOP);
+        scheduleAt(stopTime, selfMsg);
+        return;
+    }
+
+    selfMsg->setKind(SEND);
+    setupNextSend();
 }
 
 void
@@ -300,27 +310,22 @@ void
 WorkloadSynthesizer::processSend()
 {
     sendMsg();
-    simtime_t nextSend = simTime() + nextSendTime();
-    if (stopTime < SIMTIME_ZERO || nextSend < stopTime) {
-        selfMsg->setKind(SEND);
-        scheduleAt(nextSend, selfMsg);
-    } else {
-        selfMsg->setKind(STOP);
-        scheduleAt(stopTime, selfMsg);
-    }
+    setupNextSend();
 }
 
-double
-WorkloadSynthesizer::nextSendTime()
+void
+WorkloadSynthesizer::setupNextSend()
 {
-    double nextSxTime;
-    switch (interArrivalDist) {
-        case InterArrivalDist::EXPONENTIAL:
-             nextSxTime = exponential(avgInterArrivalTime);
-            return (nextSxTime);
-        default:
-            return 0;
+    double nextSendInterval;
+    msgSizeGenerator->getSizeAndInterarrival(sendMsgSize, nextSendInterval);
+    simtime_t nextSendTime = nextSendInterval + simTime();
+    if (sendMsgSize < 0 || nextSendTime > stopTime) {
+        selfMsg->setKind(STOP);
+        scheduleAt(stopTime, selfMsg);
+        return;
     }
+    ASSERT(selfMsg->getKind() == SelfMsgKinds::SEND);
+    scheduleAt(nextSendTime, selfMsg);
 }
 
 void

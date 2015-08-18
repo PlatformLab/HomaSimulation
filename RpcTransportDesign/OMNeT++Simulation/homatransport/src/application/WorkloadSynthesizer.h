@@ -47,12 +47,6 @@ class WorkloadSynthesizer : public cSimpleModule
 
   protected:
     enum SelfMsgKinds { START = 1, SEND, STOP };
-    enum InterArrivalDist {
-        EXPONENTIAL = 1,
-        GAUSSIAN,
-        FACEBOOK_KEY_VALU,
-        CONSTANT
-    };
 
     // generates samples from the a given random distribution 
     MsgSizeDistributions *msgSizeGenerator;
@@ -61,8 +55,7 @@ class WorkloadSynthesizer : public cSimpleModule
     std::vector<inet::L3Address> destAddresses;
     simtime_t startTime;
     simtime_t stopTime;
-    InterArrivalDist interArrivalDist;
-    double avgInterArrivalTime;
+    bool isSender;
     int maxDataBytesPerPkt;
     cXMLElement* xmlConfig;
     uint32_t nicLinkSpeed; // in Gb/s
@@ -71,6 +64,7 @@ class WorkloadSynthesizer : public cSimpleModule
     // states
     cMessage* selfMsg;
     inet::L3Address srcAddress;
+    int sendMsgSize; // In bytes
 
     // statistics
     int numSent;
@@ -120,7 +114,7 @@ class WorkloadSynthesizer : public cSimpleModule
     void processStop();
     void processRcvdMsg(cPacket* msg);
     void sendMsg();
-    double nextSendTime();
+    void setupNextSend();
     void parseAndProcessXMLConfig();
     double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
     

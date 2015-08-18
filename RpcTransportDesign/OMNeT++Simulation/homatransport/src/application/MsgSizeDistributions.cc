@@ -11,20 +11,25 @@
 #include <stdio.h>
 #include "MsgSizeDistributions.h"
 
+/**
+ * avgRate must be in Gb/s defined as loadFactor*nicLinkSpeed
+ */
 
 MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
-        DistributionChoice distSelector, int maxDataBytesPerPkt)
+        int maxDataBytesPerPkt, InterArrivalDist interArrivalDist,
+        DistributionChoice sizeDistSelector, double avgRate, int callerHostId)
     : msgSizeProbDistVector()
+    , msgSizeInterarrivalQueue()
     , rdDevice()
     , randGen(rdDevice())
     , dist(0, 1)
-    , distSelector(distSelector)
-    , avgMsgSize(0)
+    , sizeDistSelector(sizeDistSelector)
+    , interArrivalDist(interArrivalDist)
+    , avgMsgSize(0.0)
+    , avgInterArrivalTime(0.0)
     , maxDataBytesPerPkt(maxDataBytesPerPkt)
 {
     std::ifstream distFileStream;
-    std::string avgMsgSizeStr;
-    std::string sizeProbStr;
     distFileStream.open(distFileName);
     if (distFileStream.fail()) {
         char buf[100]; 
@@ -32,69 +37,124 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         throw MsgSizeDistException(buf);
     }
 
-    // The first line of distFileName is the average message size of the
-    // distribution.
-    getline(distFileStream, avgMsgSizeStr); 
-    sscanf(avgMsgSizeStr.c_str(), "%lf", &avgMsgSize);
+    if (sizeDistSelector >= DistributionChoice::NO_SIZE_DIST_SPECIFIED || 
+            sizeDistSelector < 0) {
+        throw MsgSizeDistException("Invalide MsgSize Distribution Selected.");
+
+    }
     
-    // Set the distribution to be used
-    switch (distSelector) {
-        case DistributionChoice::DCTCP:
-            this->avgMsgSize *= maxDataBytesPerPkt;
-        case DistributionChoice::FACEBOOK_KEY_VALUE: 
-            this->distSelector = distSelector;
-            break;
-        default:
-            throw MsgSizeDistException(
-                    "Invalide Message Size Distribution Selected");
+    if (interArrivalDist >= InterArrivalDist::NO_INTERARRIAVAL_DIST_SPECIFIED ||
+            interArrivalDist < 0) {
+        throw MsgSizeDistException("Invalid MsgArrival Distribution Selected.");
     }
 
-    // reads msgSize<->probabilty pairs from "distFileName" file
-    while(!distFileStream.eof()) {
+    if (sizeDistSelector == DistributionChoice::SIZE_IN_FILE){
+        ASSERT(interArrivalDist == InterArrivalDist::INTERARRIVAL_IN_FILE);
+        double dt = 0.0;
+        std::string hostIdSizeInterarrivalLine; 
+        int hostId;
         int msgSize;
-        double prob;
-        getline(distFileStream, sizeProbStr);
-        sscanf(sizeProbStr.c_str(), "%d %lf", 
-                &msgSize, &prob);
-        msgSizeProbDistVector.push_back(std::make_pair(msgSize, prob));
+        double deltaTime;
+        while (!distFileStream.eof()) {
+            getline(distFileStream, hostIdSizeInterarrivalLine);
+            sscanf(hostIdSizeInterarrivalLine.c_str(), "%d %d %lf",
+                    &hostId, &msgSize, &deltaTime);
+            dt += deltaTime;
+            if (hostId == callerHostId) {
+                msgSizeInterarrivalQueue.push(std::make_pair(msgSize, dt));  
+                dt = 0.0;
+            }
+        } 
+         
+    } else {
+        ASSERT(interArrivalDist != InterArrivalDist::INTERARRIVAL_IN_FILE);
+        std::string avgMsgSizeStr;
+        std::string sizeProbStr;
+
+        // The first line of distFileName is the average message size of the
+        // distribution.
+        getline(distFileStream, avgMsgSizeStr); 
+        sscanf(avgMsgSizeStr.c_str(), "%lf", &avgMsgSize);
+        if (sizeDistSelector == DistributionChoice::DCTCP) {
+            avgMsgSize *= maxDataBytesPerPkt; // AvgSize in terms of bytes
+        }
+        
+        avgInterArrivalTime = 1e-9 * avgMsgSize * 8  / avgRate;
+
+        // reads msgSize<->probabilty pairs from "distFileName" file
+        while(!distFileStream.eof()) {
+            int msgSize;
+            double prob;
+            getline(distFileStream, sizeProbStr);
+            sscanf(sizeProbStr.c_str(), "%d %lf", 
+                    &msgSize, &prob);
+            msgSizeProbDistVector.push_back(std::make_pair(msgSize, prob));
+        }
     }
 }
 
-int
-MsgSizeDistributions::sizeGeneratorWrapper()
+void
+MsgSizeDistributions::getSizeAndInterarrival(int &msgSize, double &nextInterarrivalTime)
 {
-    switch(distSelector) {
+    std::pair<int, double> sizeInterarrivalPair;
+    switch(sizeDistSelector) {
         case DistributionChoice::DCTCP:
-            return generateSizeFromDctcpDist();
+            getDctcpSizeInterarrival(msgSize, nextInterarrivalTime);
+            return;
         case DistributionChoice::FACEBOOK_KEY_VALUE: 
-            return generateFacebookMsgSize();
+            getFacebookSizeInterarrival(msgSize, nextInterarrivalTime);
+            return;
+        case DistributionChoice::SIZE_IN_FILE:
+            getInfileSizeInterarrival(msgSize, nextInterarrivalTime);
+            return;
         default:
-            return 0;
+            msgSize = -1;
+            nextInterarrivalTime = 0.0;
+            return;
     }
+
 }
 
-double
-MsgSizeDistributions::getAvgMsgSize()
+void
+MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime)
 {
-    return avgMsgSize;
+    ASSERT(interArrivalDist == InterArrivalDist::INTERARRIVAL_IN_FILE);
+    if (msgSizeInterarrivalQueue.empty()) {
+        msgSize = -1;
+        nextInterarrivalTime = 0.0;
+        return;
+    }
+
+    msgSizeInterarrivalQueue.front();
+    msgSize = msgSizeInterarrivalQueue.front().first;
+    nextInterarrivalTime = msgSizeInterarrivalQueue.front().second;
+    msgSizeInterarrivalQueue.pop();
+    return;
 }
 
-int
-MsgSizeDistributions::generateSizeFromDctcpDist()
+void
+MsgSizeDistributions::getDctcpSizeInterarrival(int &msgSize, double &nextInterarrivalTime)
 {
     
     double prob = dist(randGen);
+    int size = 0;
     for (size_t i = 0; i < msgSizeProbDistVector.size(); ++i)
     {
-        if (msgSizeProbDistVector[i].second >= prob)
-            return (msgSizeProbDistVector[i].first) * maxDataBytesPerPkt;
+        if (msgSizeProbDistVector[i].second >= prob){
+            size = (msgSizeProbDistVector[i].first) * maxDataBytesPerPkt;
+            break;
+        }
     }
+    msgSize = size;
 
-    return 0;
+    //generate the interarrival time
+    nextInterarrivalTime = getInterarrivalTime();
+    return;
+
 }
 
-int
-MsgSizeDistributions::generateFacebookMsgSize()
+void
+MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime)
 {
     // Facebook workload constants
     int sizeOffset = msgSizeProbDistVector.back().first; 
@@ -108,6 +168,7 @@ MsgSizeDistributions::generateFacebookMsgSize()
     const int maxSize = 0x40000000;
 
     double prob = dist(randGen);
+    int size;
     
     if (prob <= msgSizeProbDistVector.back().second) {
         int first = 0;
@@ -121,13 +182,28 @@ MsgSizeDistributions::generateFacebookMsgSize()
                 first = mid + 1;
             }
         }
-        return msgSizeProbDistVector[first].first;
+        size = msgSizeProbDistVector[first].first;
 
     } else {
         double msgSize = 
             round( sizeOffset + 
             (pow((1-probOffset)/(1-prob), k) - 1) * sigma / k );
 
-        return msgSize > maxSize ? maxSize : (int)(msgSize); 
+        size =  msgSize > maxSize ? maxSize : (int)(msgSize); 
+    }
+    msgSize = size;
+
+    //generate the interarrival time
+    nextInterarrivalTime = getInterarrivalTime();
+    return;
+}
+
+double
+MsgSizeDistributions::getInterarrivalTime()
+{
+    if (interArrivalDist == InterArrivalDist::EXPONENTIAL) {
+        return exponential(avgInterArrivalTime);     
+    } else {
+        throw MsgSizeDistException("InterArrival generator not defined.");
     }
 }
