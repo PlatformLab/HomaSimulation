@@ -34,6 +34,8 @@ module EthernetInterface like IWiredNic
 {
     parameters:
         string interfaceTableModule;
+        double nicThinkTime @unit(us) = default(0.0us); // <Behnam> if non zero, the frames will be sent to upper layer after nicThinkTime. This models the 
+                                      // turn over delay that software has utnil it receives a notification from NIC.
         bool csmacdSupport = default(false);  // by default CSMA/CD is turned off, so only point-to-point duplex links are supported.
         string macType = default(csmacdSupport ? "EtherMAC" : "EtherMACFullDuplex"); // ~EtherMAC or ~EtherMACFullDuplex
         string queueType = default(""); // ~DropTailQueue, or a Diffserv queue; set to "" for use of an internal queue
@@ -88,17 +90,17 @@ module EthernetInterface like IWiredNic
         encap.lowerLayerOut --> mac.upperLayerIn if queueType == "";
 
         // no input hooks, no ingressTC
-        encap.upperLayerOut --> { @display("m=n"); } --> upperLayerOut if numInputHooks == 0 && ingressTCType == "";
+        encap.upperLayerOut --> ned.DelayChannel{ @display("m=n"); delay=nicThinkTime; } --> upperLayerOut if numInputHooks == 0 && ingressTCType == "";
 
         // no input hooks, there is ingressTC
         if numInputHooks == 0 && ingressTCType != "" {
             encap.upperLayerOut --> ingressTC.in;
-            ingressTC.out --> { @display("m=n"); } --> upperLayerOut;
+            ingressTC.out --> ned.DelayChannel{ @display("m=n"); delay=nicThinkTime; } --> upperLayerOut;
         }
 
         // there are input hooks
         if numInputHooks > 0 {
-            inputHook[numInputHooks-1].out --> { @display("m=n"); } --> upperLayerOut;
+            inputHook[numInputHooks-1].out --> ned.DelayChannel{ @display("m=n"); delay=nicThinkTime; } --> upperLayerOut;
         }
         for i=0..numInputHooks-2 {
             inputHook[i].out --> inputHook[i+1].in;

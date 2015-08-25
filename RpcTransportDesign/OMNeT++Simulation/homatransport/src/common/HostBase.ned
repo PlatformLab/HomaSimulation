@@ -57,6 +57,11 @@ module HostBase extends NodeBase
         forwarding = default(false);  // disable routing by default
         networkLayer.proxyARP = default(false);
 
+        double edgeLinkDelay @unit(us);
+        double fabricLinkDelay @unit(us);
+        double nicThinkTime @unit(us);
+        eth[*].nicThinkTime = nicThinkTime;
+
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <> like ITrafficGeneratorApp {
             parameters:
@@ -64,6 +69,9 @@ module HostBase extends NodeBase
                 appConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$PARENTMODULE_INDEX]/appConfig");
                 nicLinkSpeed = nicLinkSpeed;
                 fabricLinkSpeed = fabricLinkSpeed;
+                edgeLinkDelay = edgeLinkDelay;
+                fabricLinkDelay = fabricLinkDelay;  
+                nicThinkTime = nicThinkTime;
         }
 
         transportScheme: <transportSchemeType> like ITransportScheme if hasTransportScheme {

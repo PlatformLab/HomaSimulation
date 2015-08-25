@@ -26,14 +26,20 @@ network DcnTopo
     parameters:
         xml topologyConfig = xmldoc("config.xml");
         int numServersPerTor;
-        double edgeLinkDelay @unit(us) = default(0.0us);
+        double edgeLinkDelay @unit(us) = default(0.0us); // This models NIC
+                                                         // intrinsic delay
         int nicLinkSpeed @unit(Gbps);
 
         int numTors;
+        
+        // models the fabrciLinkDealy plus the intrinsic switching delay
         double fabricLinkDelay @unit(us) = default(0.0us);
-        int fabricLinkSpeed @unit(Gbps); // greater and equal
+        int fabricLinkSpeed @unit(Gbps); // NOTE: always greater and equal
                                          // to nicLinkSpeed
 
+        // models the software trun over time in the hosts between the time
+        // ethFrame is received until the notification is received in software
+        double hostNicThinkTime @unit(us);
         double overSubFactor = default(1.0); // must be larger than 1.0
                                              // 1.0 means full bisection bw
 
@@ -78,6 +84,9 @@ network DcnTopo
             hostConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$MODULE_INDEX]");
             nicLinkSpeed = nicLinkSpeed;
             fabricLinkSpeed = fabricLinkSpeed;
+            edgeLinkDelay = edgeLinkDelay;
+            fabricLinkDelay = fabricLinkDelay;  
+            nicThinkTime = hostNicThinkTime;
         }
 
         configurator: IPv4NetworkConfigurator {

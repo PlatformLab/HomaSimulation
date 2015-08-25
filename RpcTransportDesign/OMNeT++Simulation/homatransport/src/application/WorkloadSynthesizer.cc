@@ -100,6 +100,9 @@ WorkloadSynthesizer::initialize()
     int parentHostIdx = -1;
     nicLinkSpeed = par("nicLinkSpeed").longValue();
     fabricLinkSpeed = par("fabricLinkSpeed").longValue(); 
+    edgeLinkDelay = 1e-6 * par("edgeLinkDelay").doubleValue();
+    fabricLinkDelay = 1e-6 * par("fabricLinkDelay").doubleValue();
+    nicThinkTime = 1e-6 * par("nicThinkTime").doubleValue(); 
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
     xmlConfig = par("appConfig").xmlValue();
@@ -462,10 +465,14 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
 
     // The switch models in omnet++ are store and forward therefor the first
     // packet of each message will experience an extra serialialization delay at
-    // each switch. There for need to figure out how many switched a packet will
+    // each switch. Therefore need to figure out how many switched a packet will
     // pass through. The proper working of this part of the code depends on the
     // correct ip assignments.
     double totalSwitchDelay = 0;
+
+    // There's always one nicThinkTime involved ideal latency for software
+    // overhead.
+    totalSwitchDelay += nicThinkTime;                                
     double edgeSwitchingDelay = 0; 
     double fabricSwitchinDelay = 0;
 
@@ -486,12 +493,23 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         // src and dest in the same rack
         totalSwitchDelay = edgeSwitchingDelay;
 
+        // Add 2 edge link delays
+        totalSwitchDelay += (2 * edgeLinkDelay);
+
     } else if (destAddr.toIPv4().getDByte(1) == srcAddr.toIPv4().getDByte(1)) {
         // src and dest in the same pod 
         totalSwitchDelay = edgeSwitchingDelay + 2 * fabricSwitchinDelay;
 
+        // Add 2 edge link delays and two fabric link delays
+        totalSwitchDelay += (2 * edgeLinkDelay + 2 * fabricLinkDelay);
+
     } else {
         totalSwitchDelay = edgeSwitchingDelay + 4 * fabricSwitchinDelay;
+
+        // Add 2 edge link delays and 4 fabric link delays
+        totalSwitchDelay += (2 * edgeLinkDelay + 4 * fabricLinkDelay);
+
+
     }
 
     return msgSerializationDelay + totalSwitchDelay;

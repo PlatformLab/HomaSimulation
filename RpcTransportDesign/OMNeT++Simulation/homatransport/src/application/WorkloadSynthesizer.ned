@@ -27,6 +27,9 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         string interfaceTableModule;   // The path to the InterfaceTable module
         int nicLinkSpeed @unit(Gbps);
         int fabricLinkSpeed @unit(Gbps);
+        double fabricLinkDelay @unit(us);
+        double edgeLinkDelay @unit(us);
+        double nicThinkTime @unit(us);
         double loadFactor = default(0.5);
 
         // workload types from this set: {"DCTCP", "FACEBOOK_KEY_VALUE"}
