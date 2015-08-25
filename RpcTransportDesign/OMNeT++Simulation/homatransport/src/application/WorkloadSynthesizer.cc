@@ -62,6 +62,24 @@ simsignal_t WorkloadSynthesizer::msg1333PktsE2EStretchSignal =
 simsignal_t WorkloadSynthesizer::msgHugeE2EStretchSignal = 
         registerSignal("msgHugeE2EStretch");
 
+simsignal_t WorkloadSynthesizer::msg1PktQueuingDelaySignal = 
+        registerSignal("msg1PktQueuingDelay");
+simsignal_t WorkloadSynthesizer::msg3PktsQueuingDelaySignal = 
+        registerSignal("msg3PktsQueuingDelay");
+simsignal_t WorkloadSynthesizer::msg6PktsQueuingDelaySignal = 
+        registerSignal("msg6PktsQueuingDelay");
+simsignal_t WorkloadSynthesizer::msg13PktsQueuingDelaySignal = 
+        registerSignal("msg13PktsQueuingDelay");
+simsignal_t WorkloadSynthesizer::msg33PktsQueuingDelaySignal = 
+        registerSignal("msg33PktsQueuingDelay");
+simsignal_t WorkloadSynthesizer::msg133PktsQueuingDelaySignal = 
+        registerSignal("msg133PktsQueuingDelay");
+simsignal_t WorkloadSynthesizer::msg1333PktsQueuingDelaySignal = 
+        registerSignal("msg1333PktsQueuingDelay");
+simsignal_t WorkloadSynthesizer::msgHugeQueuingDelaySignal = 
+        registerSignal("msgHugeQueuingDelay");
+
+
 WorkloadSynthesizer::WorkloadSynthesizer()
 {
     msgSizeGenerator = NULL;
@@ -340,40 +358,49 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
             << "Bytes" << endl;
 
     double idealDelay = idealMsgEndToEndDelay(rcvdMsg);
+    double queuingDelay =  completionTime.dbl() - idealDelay;
     double stretchFactor = 
             (idealDelay == 0.0 ? 1.0 : completionTime.dbl()/idealDelay);
 
     if (msgByteLen <= maxDataBytesPerPkt) {
         emit(msg1PktE2EDelaySignal, completionTime);
         emit(msg1PktE2EStretchSignal, stretchFactor);
+        emit(msg1PktQueuingDelaySignal, queuingDelay);
 
     } else if (msgByteLen <= 3 * maxDataBytesPerPkt) {
         emit(msg3PktsE2EDelaySignal, completionTime);
         emit(msg3PktsE2EStretchSignal, stretchFactor);
+        emit(msg3PktsQueuingDelaySignal, queuingDelay);
 
     } else if (msgByteLen <= 6 * maxDataBytesPerPkt) {
         emit(msg6PktsE2EDelaySignal, completionTime);
         emit(msg6PktsE2EStretchSignal, stretchFactor);
+        emit(msg6PktsQueuingDelaySignal, queuingDelay);
 
     } else if (msgByteLen <= 13 * maxDataBytesPerPkt) {
         emit(msg13PktsE2EDelaySignal, completionTime);
         emit(msg13PktsE2EStretchSignal, stretchFactor);
+        emit(msg13PktsQueuingDelaySignal, queuingDelay);
 
     } else if (msgByteLen <= 33 * maxDataBytesPerPkt) {
         emit(msg33PktsE2EDelaySignal, completionTime);
         emit(msg33PktsE2EStretchSignal, stretchFactor);
+        emit(msg33PktsQueuingDelaySignal, queuingDelay);
 
     } else if (msgByteLen <= 133 * maxDataBytesPerPkt) {
         emit(msg133PktsE2EDelaySignal, completionTime);
         emit(msg133PktsE2EStretchSignal, stretchFactor);
+        emit(msg133PktsQueuingDelaySignal, queuingDelay);
 
     } else if (msgByteLen <= 1333 * maxDataBytesPerPkt) {
         emit(msg1333PktsE2EDelaySignal, completionTime);
         emit(msg1333PktsE2EStretchSignal, stretchFactor);
+        emit(msg1333PktsQueuingDelaySignal, queuingDelay);
 
     } else {
         emit(msgHugeE2EDelaySignal, completionTime);
         emit(msgHugeE2EStretchSignal, stretchFactor);
+        emit(msgHugeQueuingDelaySignal, queuingDelay);
     }
 
     delete rcvdMsg;
@@ -431,7 +458,7 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     }
 
     double msgSerializationDelay = 
-            (1e-9 * (totalBytesTranmitted << 3)) / nicLinkSpeed;
+            1e-9 * ((totalBytesTranmitted << 3) * 1.0 / nicLinkSpeed);
 
     // The switch models in omnet++ are store and forward therefor the first
     // packet of each message will experience an extra serialialization delay at

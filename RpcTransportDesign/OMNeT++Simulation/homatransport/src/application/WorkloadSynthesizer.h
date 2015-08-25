@@ -102,6 +102,19 @@ class WorkloadSynthesizer : public cSimpleModule
     static simsignal_t msg1333PktsE2EStretchSignal;
     static simsignal_t msgHugeE2EStretchSignal;
 
+    // Signals for network queuing delay overhead for different msg size ranges.
+    // In the signal name msgXPktQueuingDelaySignal, X stands for messages sizes
+    // that are smaller or equal to X and larger than previously defined signal.
+    static simsignal_t msg1PktQueuingDelaySignal;
+    static simsignal_t msg3PktsQueuingDelaySignal;
+    static simsignal_t msg6PktsQueuingDelaySignal;
+    static simsignal_t msg13PktsQueuingDelaySignal;
+    static simsignal_t msg33PktsQueuingDelaySignal;
+    static simsignal_t msg133PktsQueuingDelaySignal;
+    static simsignal_t msg1333PktsQueuingDelaySignal;
+    static simsignal_t msgHugeQueuingDelaySignal;
+
+
 
   protected:
     virtual void initialize();

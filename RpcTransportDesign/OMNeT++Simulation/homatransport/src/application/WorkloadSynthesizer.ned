@@ -59,6 +59,15 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @signal[msg1333PktsE2EStretch](type=double);
         @signal[msgHugeE2EStretch](type=double);
 
+        @signal[msg1PktQueuingDelay](type=simtime_t);
+        @signal[msg3PktsQueuingDelay](type=simtime_t);
+        @signal[msg6PktsQueuingDelay](type=simtime_t);
+        @signal[msg13PktsQueuingDelay](type=simtime_t);
+        @signal[msg33PktsQueuingDelay](type=simtime_t);
+        @signal[msg133PktsQueuingDelay](type=simtime_t);
+        @signal[msg1333PktsQueuingDelay](type=simtime_t);
+        @signal[msgHugeQueuingDelay](type=simtime_t);
+
         @statistic[sentMsg](title="messages sent"; source=sentMsg; record=count,"last(sumPerDuration(packetBytes))","sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
         @statistic[rcvdMsg](title="received messages"; source=rcvdMsg; record=count,"last(sumPerDuration(packetBytes))","sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
         @statistic[msgE2EDelay](title="Message lifetime (end to end latency)"; source="msgE2EDelay"; unit=s; record=count,stats,histogram,vector; interpolationmode=none);
@@ -80,6 +89,17 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @statistic[msg133PktsE2EStretch](title="34 to 133 pkts msg stretch"; source="msg133PktsE2EStretch"; record=count,stats,histogram; interpolationmode=none);
         @statistic[msg1333PktsE2EStretch](title="134 to 1333 pkts msg stretch"; source="msg1333PktsE2EStretch"; record=count,stats,histogram; interpolationmode=none);
         @statistic[msgHugeE2EStretch](title="more than 1334 pkts msg stretch"; source="msgHugeE2EStretch"; record=count,stats,histogram; interpolationmode=none);
+
+        @statistic[msg1PktQueuingDelay](title="1 pkt size msg queuing delay"; source="msg1PktQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msg3PktsQueuingDelay](title="2 to 3 pkts msg queuing delay"; source="msg3PktsQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msg6PktsQueuingDelay](title="4 to 6 pkts msg queuing delay"; source="msg6PktsQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msg13PktsQueuingDelay](title="7 to 13 pkts msg queuing delay"; source="msg13PktsQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msg33PktsQueuingDelay](title="14 to 33 pkts msg queuing delay"; source="msg33PktsQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msg133PktsQueuingDelay](title="34 to 133 pkts msg queuing delay"; source="msg133PktsQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msg1333PktsQueuingDelay](title="134 to 1333 pkts msg queuing delay"; source="msg1333PktsQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statistic[msgHugeQueuingDelay](title="more than 1334 pkts msg queuing delay"; source="msgHugeQueuingDelay"; unit=s; record=count,stats,histogram; interpolationmode=none);
+
+
     gates:
         input transportIn @label(AppMessage/up);
         output transportOut @labels(AppMessage/down);

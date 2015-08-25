@@ -23,9 +23,6 @@ namespace inet {
 
 Define_Module(DropTailQueue);
 
-simsignal_t DropTailQueue::queueLengthSignal = registerSignal("queueLength");
-simsignal_t DropTailQueue::queueByteLengthSignal = registerSignal("queueByteLength");
-
 void DropTailQueue::initialize()
 {
     PassiveQueueBase::initialize();
@@ -34,6 +31,7 @@ void DropTailQueue::initialize()
 
     //statistics
     emit(queueLengthSignal, queue.length());
+    emit(queueByteLengthSignal, queue.getByteLength());
 
     outGate = gate("out");
 
@@ -43,10 +41,31 @@ void DropTailQueue::initialize()
 
 cMessage *DropTailQueue::enqueue(cMessage *msg)
 {
+    // update stats for queueLenOne if queue is empty. The fact that we are
+    // queuing a packet, means a packet is already on the transmission so queue
+    // len is in practice one in such cases even though queue.length() is zero.
+    int pktOnWire = pktOnWireByteSize == 0 ? 0 : 1; 
+    switch (queue.length()) {
+        case 0:
+            if (pktOnWire == 0) {
+                queueEmpty++;
+            } else if (pktOnWire == 1) {
+                queueLenOne++;
+            }
+            break;
+        case 1:
+            if (pktOnWire == 0) {
+                queueLenOne++;
+            }
+        default:
+            break;
+    }
+
     if (frameCapacity && queue.length() >= frameCapacity) {
         EV << "Queue full, dropping packet.\n";
         return msg;
     }
+
     else {
         // The timeavg of queueLength queueByteLength will not be accurate if
         // the queue(Byte)LengthSignal is emitted before a packet is stored at
@@ -55,8 +74,8 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
         // If you want the timeavg of queueLength instead, comment out the
         // following line and decomment the other emit invokations of
         // queueLengthSignal in this file.
-        emit(queueLengthSignal, queue.length());
-        emit(queueByteLengthSignal, queue.getByteLength());
+        emit(queueLengthSignal, queue.length() + pktOnWire);
+        emit(queueByteLengthSignal, queue.getByteLength() + pktOnWireByteSize);
         queue.insert(check_and_cast<cPacket*>(msg));
         //emit(queueLengthSignal, queue.length());
         //emit(queueByteLengthSignal, queue.getByteLength());

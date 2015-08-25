@@ -43,6 +43,9 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     // statistics
     int numQueueReceived;
     int numQueueDropped;
+    int queueEmpty;
+    int queueLenOne;
+    int pktOnWireByteSize;
 
     /** Signal with packet when received it */
     static simsignal_t rcvdPkSignal;
@@ -58,6 +61,10 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     static simsignal_t requestQueueingTimeSignal;
     static simsignal_t grantQueueingTimeSignal;
     static simsignal_t dataQueueingTimeSignal;
+
+    /** Statistics for length of the queue in terms of packets and bytes **/
+    static simsignal_t queueLengthSignal;
+    static simsignal_t queueByteLengthSignal;
 
 
   protected:
@@ -87,7 +94,7 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
      * This function checks if there is a HomaPkt packet encapsulated in the messages
      * and fires the proper signal for that.
      */
-    virtual cPacket* searchEncapHomaPkt(cMessage* msg);
+    virtual cPacket* searchEncapHomaPkt(cPacket* msg);
 
   public:
     /**

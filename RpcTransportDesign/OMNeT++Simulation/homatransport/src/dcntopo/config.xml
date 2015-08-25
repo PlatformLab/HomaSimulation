@@ -10,6 +10,12 @@
         <numTors>8</numTors>
         <fabricLinkSpeed>40</fabricLinkSpeed> <!--In Gb/s-->
         <nicLinkSpeed>10</nicLinkSpeed> <!--In Gb/s-->
+        <workloadType>DCTCP</workloadType>
+        <interArrivalDist>exponential</interArrivalDist>
+        <loadFactor>0.0161290</loadFactor>
+        <startTime>0s</startTime>
+        <stopTime>9.5s</stopTime>
+        <warmup-period>0ms</warmup-period>
     </param>
     <IPv4Configurator>
         <config>

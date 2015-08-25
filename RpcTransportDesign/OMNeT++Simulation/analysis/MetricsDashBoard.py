@@ -158,15 +158,24 @@ def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
 def digestModulesStats(modulesStatsList):
     statsDigest = AttrDict()
     statsDigest = statsDigest.fromkeys(modulesStatsList[0].keys(), 0.0) 
+    statsDigest.min = inf
     for targetStat in modulesStatsList:
         statsDigest.count += targetStat.count 
-        statsDigest.min += targetStat.min / len(modulesStatsList) 
+        statsDigest.min = min(targetStat.min, statsDigest.min)
         statsDigest.max = max(targetStat.max, statsDigest.max)
-        statsDigest.mean += targetStat.mean / len(modulesStatsList) 
-        statsDigest.stddev += targetStat.stddev / len(modulesStatsList) 
-        statsDigest.median += targetStat.median / len(modulesStatsList) 
-        statsDigest.threeQuartile += targetStat.threeQuartile / len(modulesStatsList) 
-        statsDigest.ninety9Percentile += targetStat.ninety9Percentile / len(modulesStatsList) 
+        statsDigest.mean += targetStat.mean * targetStat.count 
+        statsDigest.stddev += targetStat.stddev * targetStat.count 
+        statsDigest.median += targetStat.median * targetStat.count
+        statsDigest.threeQuartile += targetStat.threeQuartile  * targetStat.count 
+        statsDigest.ninety9Percentile += targetStat.ninety9Percentile  * targetStat.count 
+    
+    divideNoneZero = lambda stats, count: stats * 1.0/count if count !=0 else 0.0  
+    statsDigest.mean = divideNoneZero(statsDigest.mean, statsDigest.count)
+    statsDigest.stddev = divideNoneZero(statsDigest.stddev, statsDigest.count) 
+    statsDigest.median = divideNoneZero(statsDigest.median, statsDigest.count) 
+    statsDigest.threeQuartile = divideNoneZero(statsDigest.threeQuartile, statsDigest.count) 
+    statsDigest.ninety9Percentile = divideNoneZero(statsDigest.ninety9Percentile, statsDigest.count) 
+
     return statsDigest
 
 
@@ -268,10 +277,23 @@ def parseXmlFile(xmlConfigFile):
     fabricLinkSpeed = int(xmlConfig.getElementsByTagName('fabricLinkSpeed')[0].firstChild.data)
     nicLinkSpeed = int(xmlConfig.getElementsByTagName('nicLinkSpeed')[0].firstChild.data)
     numTors = int(xmlConfig.getElementsByTagName('numTors')[0].firstChild.data)
+    workloadType = xmlConfig.getElementsByTagName('workloadType')[0].firstChild.data
+    interArrivalDist = xmlConfig.getElementsByTagName('interArrivalDist')[0].firstChild.data
+    loadFactor = xmlConfig.getElementsByTagName('loadFactor')[0].firstChild.data
+    startTime = xmlConfig.getElementsByTagName('startTime')[0].firstChild.data
+    stopTime = xmlConfig.getElementsByTagName('stopTime')[0].firstChild.data
+    warmupPeriod = xmlConfig.getElementsByTagName('warmup-period')[0].firstChild.data
     xmlParsedDic.numServersPerTor = numServersPerTor
     xmlParsedDic.numTors = numTors 
     xmlParsedDic.fabricLinkSpeed = fabricLinkSpeed 
     xmlParsedDic.nicLinkSpeed = nicLinkSpeed 
+    xmlParsedDic.numTors = numTors 
+    xmlParsedDic.workloadType = workloadType 
+    xmlParsedDic.interArrivalDist = interArrivalDist 
+    xmlParsedDic.loadFactor = '%' + str(double(loadFactor) * 100)
+    xmlParsedDic.startTime = startTime
+    xmlParsedDic.stopTime = stopTime
+    xmlParsedDic.warmupPeriod = warmupPeriod 
     senderIds = list()
     receiverIds = list()
     allHostsReceive = False
@@ -426,7 +448,7 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     tw = 20
     fw = 10 
     lineMax = 100 
-    title = 'End To End Message Delays For Different Ranges of Message Sizes'
+    title = 'End To End Message Latency For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
 
@@ -434,16 +456,35 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     print("Msg Size Range".ljust(tw) + 'mean'.format(unit).center(fw) + 'stddev'.format(unit).center(fw) + 'min'.format(unit).center(fw) +
             'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) + '99%ile'.format(unit).center(fw) +
             'max'.format(unit).center(fw) + 'count'.center(fw))
-    print("Msg Size Range".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
             '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
-            '({0})'.format(unit).center(fw) + 'count'.center(fw))
+            '({0})'.format(unit).center(fw) + ''.center(fw))
 
     print("_"*lineMax)
     
-    end2EndDelayDigest = e2eStretchAndDelayDigest.delay
+    end2EndDelayDigest = e2eStretchAndDelayDigest.latency
     sizeLowBound = ['0'] + [e2eSizedDelay.sizeUpBound for e2eSizedDelay in end2EndDelayDigest[0:len(end2EndDelayDigest)-1]]
     for i, e2eSizedDelay in enumerate(end2EndDelayDigest):
         printStatsLine(e2eSizedDelay, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedDelay.sizeUpBound), tw, fw, 'us', printKeys)
+
+    title = 'Total Queue Delay (ie. real_e2e_latency - ideal_e2e_latency) For Different Ranges of Message Sizes'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+
+    print("="*lineMax)
+    print("Msg Size Range".ljust(tw) + 'mean'.format(unit).center(fw) + 'stddev'.format(unit).center(fw) + 'min'.format(unit).center(fw) +
+            'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) + '99%ile'.format(unit).center(fw) +
+            'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + ''.center(fw))
+
+    print("_"*lineMax)
+    
+    queuingDelayDigest = e2eStretchAndDelayDigest.delay
+    sizeLowBound = ['0'] + [queuingSizedDelay.sizeUpBound for queuingSizedDelay in queuingDelayDigest[0:len(queuingDelayDigest)-1]]
+    for i, queuingSizedDelay in enumerate(queuingDelayDigest):
+        printStatsLine(queuingSizedDelay, '({0}, {1}]'.format(sizeLowBound[i], queuingSizedDelay.sizeUpBound), tw, fw, 'us', printKeys)
 
     title = 'End To End Message Stretch For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
@@ -465,29 +506,40 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
     receiverHostIds = xmlParsedDic.receiverIds 
     sizes = ['1Pkt', '3Pkts', '6Pkts', '13Pkts', '33Pkts', '133Pkts', '1333Pkts', 'Huge']
     e2eStretchAndDelayDigest.delay = []
+    e2eStretchAndDelayDigest.latency = []
     e2eStretchAndDelayDigest.stretch = []
     for size in sizes:
         e2eDelayList = list()
+        queuingDelayList = list()
         e2eStretchList = list()
         for id in receiverHostIds:
             e2eDelayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EDelay:histogram.bins'.format(id, size)
             e2eDelayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EDelay:stats'.format(id, size)
+            queuingDelayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}QueuingDelay:histogram.bins'.format(id, size)
+            queuingDelayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}QueuingDelay:stats'.format(id, size)
             e2eStretchHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EStretch:histogram.bins'.format(id, size)
             e2eStretchStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EStretch:stats'.format(id, size)
             e2eDelayForSize = AttrDict()
+            queuingDelayForSize = AttrDict()
             e2eStretchForSize = AttrDict()
             e2eDelayForSize = getInterestingModuleStats(hosts, e2eDelayStatsKey, e2eDelayHistogramKey)
+            queuingDelayForSize = getInterestingModuleStats(hosts, queuingDelayStatsKey, queuingDelayHistogramKey)
             e2eStretchForSize = getInterestingModuleStats(hosts, e2eStretchStatsKey, e2eStretchHistogramKey)
             e2eDelayList.append(e2eDelayForSize)
+            queuingDelayList.append(queuingDelayForSize)
             e2eStretchList.append(e2eStretchForSize)
 
         e2eDelayDigest = AttrDict()
+        queuingDelayDigest = AttrDict()
         e2eStretchDigest = AttrDict()
         e2eDelayDigest = digestModulesStats(e2eDelayList)
+        queuingDelayDigest = digestModulesStats(queuingDelayList)
         e2eStretchDigest = digestModulesStats(e2eStretchList)
 
         e2eDelayDigest.sizeUpBound = '{0}'.format(size)
-        e2eStretchAndDelayDigest.delay.append(e2eDelayDigest)
+        e2eStretchAndDelayDigest.latency.append(e2eDelayDigest)
+        queuingDelayDigest.sizeUpBound = '{0}'.format(size)
+        e2eStretchAndDelayDigest.delay.append(queuingDelayDigest)
         e2eStretchDigest.sizeUpBound = '{0}'.format(size)
         e2eStretchAndDelayDigest.stretch.append(e2eStretchDigest)
     return e2eStretchAndDelayDigest
@@ -495,14 +547,18 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
 def printGenralInfo(xmlParsedDic):
     tw = 20
     fw = 12
-    lineMax = 140
+    lineMax = 100
     title = 'General Simulation Information'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
-    print('Num Servers Per TOR:'.ljust(tw) + '{0}'.format(xmlParsedDic.numServersPerTor).center(fw) + 'Num Sender Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.senderIds)).center(fw))
-    print('Num TORs:'.ljust(tw) + '{0}'.format(xmlParsedDic.numTors).center(fw) + 'Num Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw))
-    print('Server Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.nicLinkSpeed).center(fw))
-    print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw))
+    print('Num Servers Per TOR:'.ljust(tw) + '{0}'.format(xmlParsedDic.numServersPerTor).center(fw) + 'Num Sender Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.senderIds)).center(fw)
+        + 'Load Factor:'.ljust(tw) + '{0}'.format(xmlParsedDic.loadFactor).center(fw))
+    print('Num TORs:'.ljust(tw) + '{0}'.format(xmlParsedDic.numTors).center(fw) + 'Num Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw)
+        + 'Start Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.startTime).center(fw))
+    print('Server Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.nicLinkSpeed).center(fw) + 'Workload Type:'.ljust(tw) + '{0}'.format(xmlParsedDic.workloadType).center(fw)
+        + 'Stop Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.stopTime).center(fw))
+    print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(xmlParsedDic.interArrivalDist).center(fw)
+        + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
@@ -650,33 +706,49 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
 
 def digestQueueLenInfo(queueLenDic, title):
     queueLenDigest = queueLenDic.queueLenDigest
+    totalCount = sum(queueLenDic.count) * 1.0
+    keyList = ['meanCnt', 'empty', 'onePkt', 'stddevCnt', 'meanBytes', 'stddevBytes']
+    for key in queueLenDic.keys():
+        if len(queueLenDic[key]) > 0 and key in keyList:
+            queueLenDigest[key] = 0
+
+    if totalCount != 0:
+        for i,cnt in enumerate(queueLenDic.count): 
+            for key in queueLenDigest.keys():
+                queueLenDigest[key] += queueLenDic.access(key)[i] * cnt
+
+        for key in queueLenDigest.keys():
+                queueLenDigest[key] /= totalCount 
+
+    for key in queueLenDic.keys():
+        if len(queueLenDic[key]) == 0 and key in keyList:
+            queueLenDigest[key] = nan 
+
     queueLenDigest.title = title 
-    queueLenDigest.meanCnt = sum(queueLenDic.meanCnt)/float(len(queueLenDic.meanCnt))
     queueLenDigest.minCnt = min(queueLenDic.minCnt)
     queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
-    queueLenDigest.stddevCnt = sum(queueLenDic.stddevCnt)/float(len(queueLenDic.stddevCnt))
-    queueLenDigest.meanBytes = sum(queueLenDic.meanBytes)/float(len(queueLenDic.meanBytes))
     queueLenDigest.minBytes = min(queueLenDic.minBytes)
     queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
-    queueLenDigest.stddevBytes = sum(queueLenDic.stddevBytes)/float(len(queueLenDic.stddevBytes))
 
 def printQueueLength(parsedStats, xmlParsedDic):
-    printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
+    printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
     tw = 15 
     fw = 9 
-    lineMax = 88 
-    title = 'Queue Length In Number of Packets and Bytes (Stats Collected At Pkt Arrivals)'
+    lineMax = 105 
+    title = 'Queue Length (Stats Collected At Pkt Arrivals)'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
     print("="*lineMax)
     print("Queue Location".ljust(tw) + 'Mean'.center(fw) + 'StdDev'.center(fw) + 'Mean'.center(fw) + 'StdDev'.center(fw) +
-             'Min'.center(fw) + 'Min'.center(fw) + 'Max'.center(fw) + 'Max'.center(fw))
+             'Empty'.center(fw) + 'OnePkt'.center(fw) + 'Min'.center(fw) + 'Min'.center(fw) + 'Max'.center(fw) + 'Max'.center(fw))
     print("".ljust(tw) + '(Pkts)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(KB)'.center(fw) +
-             '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw))
+             '%'.center(fw) + '%'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw))
     print("_"*lineMax)
     
     queueLen = AttrDict()
-    for key in printKeys:
+    keysAll = printKeys[:]
+    keysAll.append('count')
+    for key in keysAll:
         queueLen.sxHosts.transport[key] = []
         queueLen.sxHosts.nic[key] = []
         queueLen.hosts.nic[key] = []
@@ -688,6 +760,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
+        transQueueLenCnt = hostStats.access('transportScheme.msgsLeftToSend:stats.count')
         transQueueLenMin = hostStats.access('transportScheme.msgsLeftToSend:stats.min')
         transQueueLenMax = hostStats.access('transportScheme.msgsLeftToSend:stats.max')
         transQueueLenMean = hostStats.access('transportScheme.msgsLeftToSend:stats.mean')
@@ -697,7 +770,10 @@ def printQueueLength(parsedStats, xmlParsedDic):
         transQueueBytesMean = hostStats.access('transportScheme.bytesLeftToSend:stats.mean')/1e3
         transQueueBytesStddev = hostStats.access('transportScheme.bytesLeftToSend:stats.stddev')/1e3
         
+        nicQueueLenCnt = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.count')
         nicQueueLenMin = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.min')
+        nicQueueLenEmpty = hostStats.access('eth[0].queue.dataQueue.\"queue empty (%)\".value')
+        nicQueueLenOnePkt = hostStats.access('eth[0].queue.dataQueue.\"queue length one (%)\".value')
         nicQueueLenMax = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.max')
         nicQueueLenMean = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.mean')
         nicQueueLenStddev = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.stddev')
@@ -705,6 +781,9 @@ def printQueueLength(parsedStats, xmlParsedDic):
         nicQueueBytesMax = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.max')/1e3
         nicQueueBytesMean = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.mean')/1e3
         nicQueueBytesStddev = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.stddev')/1e3
+        queueLen.hosts.nic.empty.append(nicQueueLenEmpty)
+        queueLen.hosts.nic.onePkt.append(nicQueueLenOnePkt)
+        queueLen.hosts.nic.count.append(nicQueueLenCnt)
         queueLen.hosts.nic.minCnt.append(nicQueueLenMin)
         queueLen.hosts.nic.maxCnt.append(nicQueueLenMax)
         queueLen.hosts.nic.meanCnt.append(nicQueueLenMean)
@@ -716,6 +795,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
 
         if hostId in xmlParsedDic.senderIds:
             queueLen.sxHosts.transport.minCnt.append(transQueueLenMin)
+            queueLen.sxHosts.transport.count.append(transQueueLenCnt)
             queueLen.sxHosts.transport.maxCnt.append(transQueueLenMax)
             queueLen.sxHosts.transport.meanCnt.append(transQueueLenMean)
             queueLen.sxHosts.transport.stddevCnt.append(transQueueLenStddev)
@@ -725,6 +805,9 @@ def printQueueLength(parsedStats, xmlParsedDic):
             queueLen.sxHosts.transport.stddevBytes.append(transQueueBytesStddev)
             
             queueLen.sxHosts.nic.minCnt.append(nicQueueLenMin)
+            queueLen.sxHosts.nic.count.append(nicQueueLenCnt)
+            queueLen.sxHosts.nic.empty.append(nicQueueLenEmpty)
+            queueLen.sxHosts.nic.onePkt.append(nicQueueLenOnePkt)
             queueLen.sxHosts.nic.maxCnt.append(nicQueueLenMax)
             queueLen.sxHosts.nic.meanCnt.append(nicQueueLenMean)
             queueLen.sxHosts.nic.stddevCnt.append(nicQueueLenStddev)
@@ -744,7 +827,10 @@ def printQueueLength(parsedStats, xmlParsedDic):
         tor = parsedStats.tors[torKey]
         torId = int(re.match('tor\[([0-9]+)]', torKey).group(1))
         for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
+            nicQueueLenEmpty = tor.access('eth[{0}].queue.dataQueue.\"queue empty (%)\".value'.format(ifaceId))
+            nicQueueLenOnePkt = tor.access('eth[{0}].queue.dataQueue.\"queue length one (%)\".value'.format(ifaceId))
             nicQueueLenMin = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.min'.format(ifaceId))
+            nicQueueLenCnt = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.count'.format(ifaceId))
             nicQueueLenMax = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.max'.format(ifaceId))
             nicQueueLenMean = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.mean'.format(ifaceId))
             nicQueueLenStddev = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.stddev'.format(ifaceId))
@@ -755,6 +841,9 @@ def printQueueLength(parsedStats, xmlParsedDic):
 
             if ifaceId < numServersPerTor:
                 queueLen.tors.down.nic.minCnt.append(nicQueueLenMin)
+                queueLen.tors.down.nic.count.append(nicQueueLenCnt)
+                queueLen.tors.down.nic.empty.append(nicQueueLenEmpty)
+                queueLen.tors.down.nic.onePkt.append(nicQueueLenOnePkt)
                 queueLen.tors.down.nic.maxCnt.append(nicQueueLenMax)
                 queueLen.tors.down.nic.meanCnt.append(nicQueueLenMean)
                 queueLen.tors.down.nic.stddevCnt.append(nicQueueLenStddev)
@@ -765,6 +854,9 @@ def printQueueLength(parsedStats, xmlParsedDic):
 
                 if (torId, ifaceId) in receiverTorIdsIfaces:
                     queueLen.rxTors.down.nic.minCnt.append(nicQueueLenMin)
+                    queueLen.rxTors.down.nic.count.append(nicQueueLenCnt)
+                    queueLen.rxTors.down.nic.empty.append(nicQueueLenEmpty)
+                    queueLen.rxTors.down.nic.onePkt.append(nicQueueLenOnePkt)
                     queueLen.rxTors.down.nic.maxCnt.append(nicQueueLenMax)
                     queueLen.rxTors.down.nic.meanCnt.append(nicQueueLenMean)
                     queueLen.rxTors.down.nic.stddevCnt.append(nicQueueLenStddev)
@@ -775,6 +867,9 @@ def printQueueLength(parsedStats, xmlParsedDic):
 
             else:
                 queueLen.tors.up.nic.minCnt.append(nicQueueLenMin)
+                queueLen.tors.up.nic.count.append(nicQueueLenCnt)
+                queueLen.tors.up.nic.empty.append(nicQueueLenEmpty)
+                queueLen.tors.up.nic.onePkt.append(nicQueueLenOnePkt)
                 queueLen.tors.up.nic.maxCnt.append(nicQueueLenMax)
                 queueLen.tors.up.nic.meanCnt.append(nicQueueLenMean)
                 queueLen.tors.up.nic.stddevCnt.append(nicQueueLenStddev)
@@ -785,6 +880,9 @@ def printQueueLength(parsedStats, xmlParsedDic):
 
                 if torId in senderTorIds:
                     queueLen.sxTors.up.nic.minCnt.append(nicQueueLenMin)
+                    queueLen.sxTors.up.nic.count.append(nicQueueLenCnt)
+                    queueLen.sxTors.up.nic.empty.append(nicQueueLenEmpty)
+                    queueLen.sxTors.up.nic.onePkt.append(nicQueueLenOnePkt)
                     queueLen.sxTors.up.nic.maxCnt.append(nicQueueLenMax)
                     queueLen.sxTors.up.nic.meanCnt.append(nicQueueLenMean)
                     queueLen.sxTors.up.nic.stddevCnt.append(nicQueueLenStddev)
