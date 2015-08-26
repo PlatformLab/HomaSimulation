@@ -326,7 +326,9 @@ def printStatsLine(statsDic, rowTitle, tw, fw, unit, printKeys):
     for key in printKeys:
         if key in statsDic.keys():
             if key == 'count':
-                printStr += '{0}'.format(int(statsDic.access('count'))).center(fw)
+                printStr += '{0}'.format(int(statsDic.access(key))).center(fw)
+            elif key == 'cntPercent':
+                printStr += '{0:.2f}'.format(statsDic.access(key)).center(fw)
             elif key == 'meanFrac':
                 printStr += '{0:.2f}'.format(statsDic.access(key)).center(fw)
             else:
@@ -444,21 +446,21 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
 
 
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
-    printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
+    printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
     tw = 20
-    fw = 10 
+    fw = 9 
     lineMax = 100 
     title = 'End To End Message Latency For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
 
     print("="*lineMax)
-    print("Msg Size Range".ljust(tw) + 'mean'.format(unit).center(fw) + 'stddev'.format(unit).center(fw) + 'min'.format(unit).center(fw) +
-            'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) + '99%ile'.format(unit).center(fw) +
-            'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) +
+            'max'.center(fw) + 'count'.center(fw) + 'count'.center(fw))
     print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
             '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
-            '({0})'.format(unit).center(fw) + ''.center(fw))
+            '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
 
     print("_"*lineMax)
     
@@ -472,12 +474,12 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
 
     print("="*lineMax)
-    print("Msg Size Range".ljust(tw) + 'mean'.format(unit).center(fw) + 'stddev'.format(unit).center(fw) + 'min'.format(unit).center(fw) +
-            'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) + '99%ile'.format(unit).center(fw) +
-            'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) +
+            'max'.center(fw) + 'count'.center(fw) + 'count'.center(fw))
     print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
             '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
-            '({0})'.format(unit).center(fw) + ''.center(fw))
+            '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
 
     print("_"*lineMax)
     
@@ -492,7 +494,7 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
 
     print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw) + 'count'.center(fw))
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw) + 'count'.center(fw) + 'count%'.center(fw))
     print("_"*lineMax)
     
     end2EndStretchDigest = e2eStretchAndDelayDigest.stretch
@@ -542,6 +544,15 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
         e2eStretchAndDelayDigest.delay.append(queuingDelayDigest)
         e2eStretchDigest.sizeUpBound = '{0}'.format(size)
         e2eStretchAndDelayDigest.stretch.append(e2eStretchDigest)
+
+    totalDelayCnt = sum([delay.count for delay in e2eStretchAndDelayDigest.delay])
+    totalStretchCnt = sum([stretch.count for stretch in e2eStretchAndDelayDigest.stretch])
+    totalLatencyCnt = sum([latency.count for latency in e2eStretchAndDelayDigest.latency])
+    for sizedDelay, sizedStretch, sizedLatency in zip(e2eStretchAndDelayDigest.delay, e2eStretchAndDelayDigest.stretch, e2eStretchAndDelayDigest.latency):
+        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt 
+        sizedStretch.cntPercent = sizedStretch.count * 100.0 / totalStretchCnt 
+        sizedLatency.cntPercent = sizedLatency.count * 100.0 / totalLatencyCnt 
+
     return e2eStretchAndDelayDigest
 
 def printGenralInfo(xmlParsedDic):
