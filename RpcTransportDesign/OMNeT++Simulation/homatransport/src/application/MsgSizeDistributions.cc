@@ -99,7 +99,8 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize, double &nextInterarri
     std::pair<int, double> sizeInterarrivalPair;
     switch(sizeDistSelector) {
         case DistributionChoice::DCTCP:
-            getDctcpSizeInterarrival(msgSize, nextInterarrivalTime);
+        case DistributionChoice::TEST_DIST:
+            getInterarrivalSizeFromVec(msgSize, nextInterarrivalTime);
             return;
         case DistributionChoice::FACEBOOK_KEY_VALUE: 
             getFacebookSizeInterarrival(msgSize, nextInterarrivalTime);
@@ -132,8 +133,11 @@ MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize, double &nextIntera
     return;
 }
 
+/*
+ * Internal api for DCTCP or TestDist
+ */
 void
-MsgSizeDistributions::getDctcpSizeInterarrival(int &msgSize, double &nextInterarrivalTime)
+MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize, double &nextInterarrivalTime)
 {
     
     double prob = dist(randGen);
@@ -141,17 +145,22 @@ MsgSizeDistributions::getDctcpSizeInterarrival(int &msgSize, double &nextInterar
     for (size_t i = 0; i < msgSizeProbDistVector.size(); ++i)
     {
         if (msgSizeProbDistVector[i].second >= prob){
-            size = (msgSizeProbDistVector[i].first) * maxDataBytesPerPkt;
+            size = msgSizeProbDistVector[i].first;
             break;
         }
     }
     msgSize = size;
+    
+    if (sizeDistSelector == DistributionChoice::DCTCP){
+        msgSize *= maxDataBytesPerPkt;
+    }
 
     //generate the interarrival time
     nextInterarrivalTime = getInterarrivalTime();
     return;
 
 }
+
 
 void
 MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime)

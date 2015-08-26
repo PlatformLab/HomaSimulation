@@ -23,6 +23,7 @@ class MsgSizeDistributions {
         SIZE_IN_FILE = 0,
         DCTCP,
         FACEBOOK_KEY_VALUE,
+        TEST_DIST,
         NO_SIZE_DIST_SPECIFIED //Should always remain the last 
 
     };
@@ -67,8 +68,8 @@ class MsgSizeDistributions {
     
   private:
     void getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
-    void getDctcpSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
     void getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
+    void getInterarrivalSizeFromVec(int &msgSize, double &nextInterarrivalTime);
     double getInterarrivalTime();
 };
 

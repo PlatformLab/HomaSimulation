@@ -115,6 +115,10 @@ WorkloadSynthesizer::initialize()
         distSelector = MsgSizeDistributions::DistributionChoice::DCTCP;
         distFileName = std::string(
                 "../../sizeDistributions/DCTCP_MsgSizeDist.txt");
+    } else if (strcmp(workLoadType, "TEST_DIST") == 0) {
+        distSelector = MsgSizeDistributions::DistributionChoice::TEST_DIST;
+        distFileName = std::string(
+                "../../sizeDistributions/TestDistribution.txt");
     } else if (strcmp(workLoadType, "FACEBOOK_KEY_VALUE") == 0) {
         distSelector = 
                 MsgSizeDistributions::DistributionChoice::FACEBOOK_KEY_VALUE;
