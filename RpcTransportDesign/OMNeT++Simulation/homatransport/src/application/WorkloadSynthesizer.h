@@ -63,7 +63,7 @@ class WorkloadSynthesizer : public cSimpleModule
     double fabricLinkDelay;
     double edgeLinkDelay;
     double nicThinkTime;
-    const char* msgSizeRanges;
+    
 
     // states
     cMessage* selfMsg;
@@ -80,45 +80,9 @@ class WorkloadSynthesizer : public cSimpleModule
     // Signal for end to end to delay every received messages
     static simsignal_t msgE2EDelaySignal; 
     
-    /*
-    // Signals for end to end delay of message ranges. In the signal name 
-    // msgXPktE2EDelaySignal, X stands for messages sizes that are smaller or
-    // equal to X and larger than previously defined signal.
-    static simsignal_t msg1PktE2EDelaySignal;
-    static simsignal_t msg3PktsE2EDelaySignal;
-    static simsignal_t msg6PktsE2EDelaySignal;
-    static simsignal_t msg13PktsE2EDelaySignal;
-    static simsignal_t msg33PktsE2EDelaySignal;
-    static simsignal_t msg133PktsE2EDelaySignal;
-    static simsignal_t msg1333PktsE2EDelaySignal;
-    static simsignal_t msgHugeE2EDelaySignal;
-
-    // Signals for end to end stretch factor of message different ranges.
-    // Stretch is defined as the overhead factor end to end completion time of a
-    // mesage comparing to ideal condition.  In the signal name
-    // msgXPktE2EStretchSignal, X stands for messages sizes that are smaller
-    // or equal to X and larger than previously defined signal.
-    static simsignal_t msg1PktE2EStretchSignal;
-    static simsignal_t msg3PktsE2EStretchSignal;
-    static simsignal_t msg6PktsE2EStretchSignal;
-    static simsignal_t msg13PktsE2EStretchSignal;
-    static simsignal_t msg33PktsE2EStretchSignal;
-    static simsignal_t msg133PktsE2EStretchSignal;
-    static simsignal_t msg1333PktsE2EStretchSignal;
-    static simsignal_t msgHugeE2EStretchSignal;
-
-    // Signals for network queuing delay overhead for different msg size ranges.
-    // In the signal name msgXPktQueuingDelaySignal, X stands for messages sizes
-    // that are smaller or equal to X and larger than previously defined signal.
-    static simsignal_t msg1PktQueuingDelaySignal;
-    static simsignal_t msg3PktsQueuingDelaySignal;
-    static simsignal_t msg6PktsQueuingDelaySignal;
-    static simsignal_t msg13PktsQueuingDelaySignal;
-    static simsignal_t msg33PktsQueuingDelaySignal;
-    static simsignal_t msg133PktsQueuingDelaySignal;
-    static simsignal_t msg1333PktsQueuingDelaySignal;
-    static simsignal_t msgHugeQueuingDelaySignal;
-    */
+    // keep pairs of upper bound message size range and its corresponding
+    // signal id.
+    std::vector<uint64_t> msgSizeRangeUpperBounds;
     std::vector<simsignal_t> msgE2ELatencySignalVec;
     std::vector<simsignal_t> msgE2EStretchSignalVec;
     std::vector<simsignal_t> msgQueueDelaySignalVec;
@@ -137,7 +101,7 @@ class WorkloadSynthesizer : public cSimpleModule
     void sendMsg();
     void setupNextSend();
     void parseAndProcessXMLConfig();
-    void registerTemplatedStats();
+    void registerTemplatedStats(const char* msgSizeRanges);
     double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
     
 };

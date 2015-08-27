@@ -25,8 +25,12 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
     parameters:
         xml appConfig = default(xml("<isSender/>true<destIds/><destIds></destIds>")); 
         string interfaceTableModule;   // The path to the InterfaceTable module
+        
         // a space sperated list of msg sizes in bytes in a string like "100 1000 10000 100000"
+        // that creates bins of msg size renges. each number in this string is an upper bound in the range;
+        // Any msgeSize that doesn't fit in any bins sepcified in the string, will be placed in an additional distinct bin.
         string msgSizeRanges;
+
         int nicLinkSpeed @unit(Gbps);
         int fabricLinkSpeed @unit(Gbps);
         double fabricLinkDelay @unit(us);

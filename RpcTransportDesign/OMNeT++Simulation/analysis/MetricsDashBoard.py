@@ -283,6 +283,8 @@ def parseXmlFile(xmlConfigFile):
     startTime = xmlConfig.getElementsByTagName('startTime')[0].firstChild.data
     stopTime = xmlConfig.getElementsByTagName('stopTime')[0].firstChild.data
     warmupPeriod = xmlConfig.getElementsByTagName('warmup-period')[0].firstChild.data
+    msgSizeRanges = xmlConfig.getElementsByTagName('msgSizeRanges')[0].firstChild.data
+    xmlParsedDic.msgSizeRanges = msgSizeRanges.split()
     xmlParsedDic.numServersPerTor = numServersPerTor
     xmlParsedDic.numTors = numTors 
     xmlParsedDic.fabricLinkSpeed = fabricLinkSpeed 
@@ -506,7 +508,9 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
     # For the hosts that are receivers, find the stretch and endToend stats and
     # return them. 
     receiverHostIds = xmlParsedDic.receiverIds 
-    sizes = ['1Pkt', '3Pkts', '6Pkts', '13Pkts', '33Pkts', '133Pkts', '1333Pkts', 'Huge']
+    sizes = xmlParsedDic.msgSizeRanges[:]
+    sizes.append('Huge')
+
     e2eStretchAndDelayDigest.delay = []
     e2eStretchAndDelayDigest.latency = []
     e2eStretchAndDelayDigest.stretch = []
