@@ -63,6 +63,7 @@ class WorkloadSynthesizer : public cSimpleModule
     double fabricLinkDelay;
     double edgeLinkDelay;
     double nicThinkTime;
+    const char* msgSizeRanges;
 
     // states
     cMessage* selfMsg;
@@ -78,7 +79,8 @@ class WorkloadSynthesizer : public cSimpleModule
 
     // Signal for end to end to delay every received messages
     static simsignal_t msgE2EDelaySignal; 
-
+    
+    /*
     // Signals for end to end delay of message ranges. In the signal name 
     // msgXPktE2EDelaySignal, X stands for messages sizes that are smaller or
     // equal to X and larger than previously defined signal.
@@ -116,7 +118,10 @@ class WorkloadSynthesizer : public cSimpleModule
     static simsignal_t msg133PktsQueuingDelaySignal;
     static simsignal_t msg1333PktsQueuingDelaySignal;
     static simsignal_t msgHugeQueuingDelaySignal;
-
+    */
+    std::vector<simsignal_t> msgE2ELatencySignalVec;
+    std::vector<simsignal_t> msgE2EStretchSignalVec;
+    std::vector<simsignal_t> msgQueueDelaySignalVec;
 
 
   protected:
@@ -132,6 +137,7 @@ class WorkloadSynthesizer : public cSimpleModule
     void sendMsg();
     void setupNextSend();
     void parseAndProcessXMLConfig();
+    void registerTemplatedStats();
     double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
     
 };

@@ -14,20 +14,20 @@
 // 
 
 #include <unordered_set>
+#include<iterator>
+#include<iostream>
 #include "WorkloadSynthesizer.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "inet/networklayer/common/InterfaceTable.h"
 #include "inet/networklayer/ipv4/IPv4InterfaceData.h"
-
-
 Define_Module(WorkloadSynthesizer);
 
 simsignal_t WorkloadSynthesizer::sentMsgSignal = registerSignal("sentMsg");
 simsignal_t WorkloadSynthesizer::rcvdMsgSignal = registerSignal("rcvdMsg");
 simsignal_t WorkloadSynthesizer::msgE2EDelaySignal =
         registerSignal("msgE2EDelay");
-
+/*
 simsignal_t WorkloadSynthesizer::msg1PktE2EDelaySignal = 
         registerSignal("msg1PktE2EDelay");
 simsignal_t WorkloadSynthesizer::msg3PktsE2EDelaySignal = 
@@ -78,6 +78,7 @@ simsignal_t WorkloadSynthesizer::msg1333PktsQueuingDelaySignal =
         registerSignal("msg1333PktsQueuingDelay");
 simsignal_t WorkloadSynthesizer::msgHugeQueuingDelaySignal = 
         registerSignal("msgHugeQueuingDelay");
+*/
 
 
 WorkloadSynthesizer::WorkloadSynthesizer()
@@ -86,11 +87,56 @@ WorkloadSynthesizer::WorkloadSynthesizer()
     selfMsg = NULL;
     isSender = false;
     sendMsgSize = -1;
+    msgSizeRanges = NULL;
 }
 
 WorkloadSynthesizer::~WorkloadSynthesizer()
 {
     delete msgSizeGenerator;
+}
+
+void
+WorkloadSynthesizer::registerTemplatedStats()
+{
+    msgSizeRanges = "1Pkt 3Pkts 6Pkts 13Pkts 33Pkts 133Pkts 1333Pkts Huge";
+    std::stringstream sstream(msgSizeRanges);
+    std::istream_iterator<std::string> begin(sstream);
+    std::istream_iterator<std::string> end;
+    std::vector<std::string> sizeRangeVec(begin, end);
+    for (std::vector<std::string>::iterator it = sizeRangeVec.begin();
+            it != sizeRangeVec.end(); ++it) {
+        char latencySignalName[50];
+        sprintf(latencySignalName, "msg%sE2EDelay", (*it).c_str());
+        simsignal_t latencySignal = registerSignal(latencySignalName);
+        msgE2ELatencySignalVec.push_back(latencySignal); 
+        char latencyStatsName[50];
+        sprintf(latencyStatsName, "msg%sE2EDelay", (*it).c_str());
+        cProperty *statisticTemplate = 
+                getProperties()->get("statisticTemplate", "msgRangesE2EDelay");
+        ev.addResultRecorders(this, latencySignal, latencyStatsName, statisticTemplate);
+
+        char queueDelaySignalName[50];
+        sprintf(queueDelaySignalName, "msg%sQueuingDelay", (*it).c_str());
+        simsignal_t queueDelaySignal = registerSignal(queueDelaySignalName);
+        msgQueueDelaySignalVec.push_back(queueDelaySignal); 
+        char queueDelayStatsName[50];
+        sprintf(queueDelayStatsName, "msg%sQueuingDelay", (*it).c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+                "msgRangesQueuingDelay");
+        ev.addResultRecorders(this, queueDelaySignal, queueDelayStatsName, statisticTemplate);
+
+
+        char stretchSignalName[50];
+        sprintf(stretchSignalName, "msg%sE2EStretch", (*it).c_str());
+        simsignal_t stretchSignal = registerSignal(stretchSignalName);
+        msgE2EStretchSignalVec.push_back(stretchSignal); 
+        char stretchStatsName[50];
+        sprintf(stretchStatsName, "msg%sE2EStretch", (*it).c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+                "msgRangesE2EStretch");
+        ev.addResultRecorders(this, stretchSignal, stretchStatsName, statisticTemplate);
+       
+    }
 }
 
 void
@@ -177,6 +223,8 @@ WorkloadSynthesizer::initialize()
     numReceived = 0;
     WATCH(numSent);
     WATCH(numReceived);
+
+    registerTemplatedStats();
 }
 
 void
@@ -224,7 +272,6 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
         }
         destAddresses.push_back(result);
     }
-
 }
 
 void
@@ -370,44 +417,44 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
             (idealDelay == 0.0 ? 1.0 : completionTime.dbl()/idealDelay);
 
     if (msgByteLen <= maxDataBytesPerPkt) {
-        emit(msg1PktE2EDelaySignal, completionTime);
-        emit(msg1PktE2EStretchSignal, stretchFactor);
-        emit(msg1PktQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[0], completionTime);
+        emit(msgE2EStretchSignalVec[0], stretchFactor);
+        emit(msgQueueDelaySignalVec[0], queuingDelay);
 
     } else if (msgByteLen <= 3 * maxDataBytesPerPkt) {
-        emit(msg3PktsE2EDelaySignal, completionTime);
-        emit(msg3PktsE2EStretchSignal, stretchFactor);
-        emit(msg3PktsQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[1], completionTime);
+        emit(msgE2EStretchSignalVec[1], stretchFactor);
+        emit(msgQueueDelaySignalVec[1], queuingDelay);
 
     } else if (msgByteLen <= 6 * maxDataBytesPerPkt) {
-        emit(msg6PktsE2EDelaySignal, completionTime);
-        emit(msg6PktsE2EStretchSignal, stretchFactor);
-        emit(msg6PktsQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[2], completionTime);
+        emit(msgE2EStretchSignalVec[2], stretchFactor);
+        emit(msgQueueDelaySignalVec[2], queuingDelay);
 
     } else if (msgByteLen <= 13 * maxDataBytesPerPkt) {
-        emit(msg13PktsE2EDelaySignal, completionTime);
-        emit(msg13PktsE2EStretchSignal, stretchFactor);
-        emit(msg13PktsQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[3], completionTime);
+        emit(msgE2EStretchSignalVec[3], stretchFactor);
+        emit(msgQueueDelaySignalVec[3], queuingDelay);
 
     } else if (msgByteLen <= 33 * maxDataBytesPerPkt) {
-        emit(msg33PktsE2EDelaySignal, completionTime);
-        emit(msg33PktsE2EStretchSignal, stretchFactor);
-        emit(msg33PktsQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[4], completionTime);
+        emit(msgE2EStretchSignalVec[4], stretchFactor);
+        emit(msgQueueDelaySignalVec[4], queuingDelay);
 
     } else if (msgByteLen <= 133 * maxDataBytesPerPkt) {
-        emit(msg133PktsE2EDelaySignal, completionTime);
-        emit(msg133PktsE2EStretchSignal, stretchFactor);
-        emit(msg133PktsQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[5], completionTime);
+        emit(msgE2EStretchSignalVec[5], stretchFactor);
+        emit(msgQueueDelaySignalVec[5], queuingDelay);
 
     } else if (msgByteLen <= 1333 * maxDataBytesPerPkt) {
-        emit(msg1333PktsE2EDelaySignal, completionTime);
-        emit(msg1333PktsE2EStretchSignal, stretchFactor);
-        emit(msg1333PktsQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[6], completionTime);
+        emit(msgE2EStretchSignalVec[6], stretchFactor);
+        emit(msgQueueDelaySignalVec[6], queuingDelay);
 
     } else {
-        emit(msgHugeE2EDelaySignal, completionTime);
-        emit(msgHugeE2EStretchSignal, stretchFactor);
-        emit(msgHugeQueuingDelaySignal, queuingDelay);
+        emit(msgE2ELatencySignalVec[7], completionTime);
+        emit(msgE2EStretchSignalVec[7], stretchFactor);
+        emit(msgQueueDelaySignalVec[7], queuingDelay);
     }
 
     delete rcvdMsg;
