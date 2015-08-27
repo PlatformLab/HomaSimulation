@@ -40,6 +40,11 @@ HomaTransport::initialize()
     destPort = par("destPort");
     nicLinkSpeed = par("nicLinkSpeed");
     uint32_t grantMaxBytes = (uint32_t) par("grantMaxBytes");
+    uint32_t maxDataBytes = MAX_ETHERNET_PAYLOAD_BYTES - 
+            IP_HEADER_SIZE - UDP_HEADER_SIZE;
+    if (grantMaxBytes > maxDataBytes) {
+        grantMaxBytes = maxDataBytes;
+    }
     //maxGrantTimeInterval = 8.0 * grantMaxBytes * 10e-9 / nicLinkSpeed;
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);
@@ -379,6 +384,7 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
 { 
     ASSERT(grantTimer->getKind() == HomaTransport::SelfMsgKind::GRANT);
     uint32_t grantSize;
+    uint32_t grantSizeOnWire; //This include data and all other overheads
     simtime_t currentTime = simTime();
     while (true) {
         if (inboundMsgQueue.empty()) {
@@ -403,8 +409,20 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
 //
 //        }
 
+        // Find what the real number of bytes that will go on the wire for a
+        // ethernet frame that has grantSize number of data bytes in it. The
+        // ByteBucket must include this overhead bytes in it's grant mechanism.
+        if (grantSize < 
+                MIN_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE) {
 
-        byteBucket->getGrant(grantSize, currentTime);
+            grantSizeOnWire = ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
+                    MIN_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE + INTER_PKT_GAP;
+        } else {
+            grantSizeOnWire = ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
+                    grantSize + IP_HEADER_SIZE + UDP_HEADER_SIZE +
+                    ETHERNET_CRC_SIZE + INTER_PKT_GAP;
+        }
+        byteBucket->getGrant(grantSizeOnWire, currentTime);
 
         // prepare a grant and send out
         HomaPkt* grantPkt = new(HomaPkt);
