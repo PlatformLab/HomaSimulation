@@ -148,11 +148,11 @@ def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
         moduleStats.stddev = stats.stddev
         moduleStats.max = stats.max
         medianIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.5)
-        moduleStats.median = getStatsFromHist(bins, cumProb, medianIdx)
+        moduleStats.median = max(getStatsFromHist(bins, cumProb, medianIdx), stats.min)
         threeQuartileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.75)
-        moduleStats.threeQuartile = getStatsFromHist(bins, cumProb, threeQuartileIdx)
+        moduleStats.threeQuartile = max(getStatsFromHist(bins, cumProb, threeQuartileIdx), stats.min)
         ninety9PercentileIdx = next(idx for idx,value in enumerate(cumProb) if value >= 0.99)
-        moduleStats.ninety9Percentile = getStatsFromHist(bins, cumProb, ninety9PercentileIdx)
+        moduleStats.ninety9Percentile = max(getStatsFromHist(bins, cumProb, ninety9PercentileIdx), stats.min)
     return moduleStats
 
 def digestModulesStats(modulesStatsList):
@@ -284,6 +284,10 @@ def parseXmlFile(xmlConfigFile):
     stopTime = xmlConfig.getElementsByTagName('stopTime')[0].firstChild.data
     warmupPeriod = xmlConfig.getElementsByTagName('warmup-period')[0].firstChild.data
     msgSizeRanges = xmlConfig.getElementsByTagName('msgSizeRanges')[0].firstChild.data
+    edgeLinkDelay = xmlConfig.getElementsByTagName('edgeLinkDelay')[0].firstChild.data
+    fabricLinkDelay = xmlConfig.getElementsByTagName('fabricLinkDelay')[0].firstChild.data
+    hostNicThinkTime = xmlConfig.getElementsByTagName('hostNicThinkTime')[0].firstChild.data
+
     xmlParsedDic.msgSizeRanges = msgSizeRanges.split()
     xmlParsedDic.numServersPerTor = numServersPerTor
     xmlParsedDic.numTors = numTors 
@@ -296,6 +300,10 @@ def parseXmlFile(xmlConfigFile):
     xmlParsedDic.startTime = startTime
     xmlParsedDic.stopTime = stopTime
     xmlParsedDic.warmupPeriod = warmupPeriod 
+    xmlParsedDic.edgeLinkDelay = edgeLinkDelay 
+    xmlParsedDic.fabricLinkDelay = fabricLinkDelay 
+    xmlParsedDic.hostNicThinkTime = hostNicThinkTime 
+
     senderIds = list()
     receiverIds = list()
     allHostsReceive = False
@@ -574,6 +582,8 @@ def printGenralInfo(xmlParsedDic):
         + 'Stop Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.stopTime).center(fw))
     print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(xmlParsedDic.interArrivalDist).center(fw)
         + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
+    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'hostNicThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicThinkTime).center(fw))
+    print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
@@ -728,9 +738,10 @@ def digestQueueLenInfo(queueLenDic, title):
             queueLenDigest[key] = 0
 
     if totalCount != 0:
-        for i,cnt in enumerate(queueLenDic.count): 
+        for i,cnt in enumerate(queueLenDic.count):
             for key in queueLenDigest.keys():
-                queueLenDigest[key] += queueLenDic.access(key)[i] * cnt
+                if not math.isnan(queueLenDic.access(key)[i]):
+                    queueLenDigest[key] += queueLenDic.access(key)[i] * cnt
 
         for key in queueLenDigest.keys():
                 queueLenDigest[key] /= totalCount 
