@@ -457,7 +457,7 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     double edgeSwitchingDelay = 0; 
     double fabricSwitchinDelay = 0;
 
-    if (numFullEthFrame == 0) {
+    if (numFullEthFrame != 0) {
         edgeSwitchingDelay = (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
                 ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE) *
                 1e-9 * 8 / nicLinkSpeed; 

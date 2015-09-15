@@ -18,6 +18,8 @@
 #include "inet/common/INETDefs.h"
 
 #include "inet/common/queue/DropTailQueue.h"
+#include "inet/linklayer/ethernet/EtherMACBase.h"
+#include "inet/linklayer/ethernet/Ethernet.h"
 
 namespace inet {
 
@@ -41,46 +43,35 @@ void DropTailQueue::initialize()
 
 cMessage *DropTailQueue::enqueue(cMessage *msg)
 {
-    // update stats for queueLenOne if queue is empty. The fact that we are
-    // queuing a packet, means a packet is already on the transmission so queue
-    // len is in practice one in such cases even though queue.length() is zero.
-    int pktOnWire = pktOnWireByteSize == 0 ? 0 : 1; 
-    switch (queue.length()) {
-        case 0:
-            if (pktOnWire == 0) {
-                queueEmpty++;
-            } else if (pktOnWire == 1) {
-                queueLenOne++;
-            }
-            break;
-        case 1:
-            if (pktOnWire == 0) {
-                queueLenOne++;
-            }
-        default:
-            break;
-    }
-
     if (frameCapacity && queue.length() >= frameCapacity) {
         EV << "Queue full, dropping packet.\n";
         return msg;
     }
 
-    else {
-        // The timeavg of queueLength queueByteLength will not be accurate if
-        // the queue(Byte)LengthSignal is emitted before a packet is stored at
-        // the queue (similar to the following line) however the average of
-        // queueLength at the packet arrival time at the queue will be accurate.
-        // If you want the timeavg of queueLength instead, comment out the
-        // following line and decomment the other emit invokations of
-        // queueLengthSignal in this file.
-        emit(queueLengthSignal, queue.length() + pktOnWire);
-        emit(queueByteLengthSignal, queue.getByteLength() + pktOnWireByteSize);
-        queue.insert(check_and_cast<cPacket*>(msg));
-        //emit(queueLengthSignal, queue.length());
-        //emit(queueByteLengthSignal, queue.getByteLength());
-        return NULL;
+    // update stats for queueLenOne if queue is empty. The fact that we are
+    // queuing a packet, means a packet is already on the transmission so in
+    // practice  queue len is one in such cases even though queue.length() is
+    // zero.
+    if (queue.length() == 0) {
+        queueLenOne++;
     }
+
+    // The timeavg of queueLength queueByteLength will not be accurate if
+    // the queue(Byte)LengthSignal is emitted before a packet is stored at
+    // the queue (similar to the following line) however the average of
+    // queueLength at the packet arrival time at the queue will be accurate.
+    // If you want the timeavg of queueLength instead, comment out the
+    // following line and decomment the other emit invokations of
+    // queueLengthSignal in this file.
+    emit(queueLengthSignal, queue.length() + 1);
+    emit(queueByteLengthSignal, queue.getByteLength() + lastTxPktBytes);
+    cPacket* pkt = check_and_cast<cPacket*>(msg);
+    queue.insert(pkt);
+    txPktSizeAtArrival[pkt] = lastTxPktBytes;
+
+    //emit(queueLengthSignal, queue.length());
+    //emit(queueByteLengthSignal, queue.getByteLength());
+    return NULL;
 }
 
 cMessage *DropTailQueue::dequeue()
@@ -88,13 +79,13 @@ cMessage *DropTailQueue::dequeue()
     if (queue.empty())
         return NULL;
 
-    cMessage *msg = (cMessage *)queue.pop();
+    cPacket* pkt = queue.pop();
 
     // statistics
     //emit(queueLengthSignal, queue.length());
     //emit(queueByteLengthSignal, queue.getByteLength());
 
-    return msg;
+    return (cMessage *)pkt;
 }
 
 void DropTailQueue::sendOut(cMessage *msg)
@@ -105,6 +96,30 @@ void DropTailQueue::sendOut(cMessage *msg)
 bool DropTailQueue::isEmpty()
 {
     return queue.empty();
+}
+
+simtime_t
+DropTailQueue::txPktDurationAtArrival(cPacket* pktToSend)
+{
+
+    double lastTxBits = 0.0;
+    lastTxBits = txPktSizeAtArrival.at(pktToSend) * 8.0 + INTERFRAME_GAP_BITS;
+    txPktSizeAtArrival.erase(pktToSend);
+
+    cModule* parentModule = getParentModule(); 
+    if (!parentModule->hasGate("out")) {
+        return SIMTIME_ZERO;
+    }
+
+    cGate* parentOutGate = parentModule->gate("out");
+    cGate* destGate = parentOutGate->getNextGate();
+    cModule* nextModule = destGate->getOwnerModule();
+
+    if (strcmp(nextModule->getName(), "mac") != 0) {
+        return SIMTIME_ZERO;
+    }
+
+    return lastTxBits / dynamic_cast<EtherMACBase*>(nextModule)->getTxRate();
 }
 
 } // namespace inet

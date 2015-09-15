@@ -18,6 +18,7 @@
 #ifndef __INET_DROPTAILQUEUE_H
 #define __INET_DROPTAILQUEUE_H
 
+#include <unordered_map>
 #include "inet/common/INETDefs.h"
 
 #include "inet/common/queue/PassiveQueueBase.h"
@@ -36,6 +37,7 @@ class INET_API DropTailQueue : public PassiveQueueBase
     // state
     cPacketQueue queue;
     cGate *outGate;
+    std::unordered_map<cPacket*, int> txPktSizeAtArrival;
 
   protected:
     virtual void initialize();
@@ -59,6 +61,14 @@ class INET_API DropTailQueue : public PassiveQueueBase
      * Redefined from IPassiveQueue.
      */
     virtual bool isEmpty();
+
+  protected:
+    /**
+     * Redefined from IPassiveQueue.
+     * Throws an exceptions when called for a packet not already queued or if
+     * called more than once for the same pktToSend.
+     */
+    virtual simtime_t txPktDurationAtArrival(cPacket* pktToSend);
 };
 
 } // namespace inet

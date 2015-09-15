@@ -44,8 +44,11 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     int numQueueReceived;
     int numQueueDropped;
     int queueEmpty;
+    int zeroWaitTime;
     int queueLenOne;
-    int pktOnWireByteSize;
+    int onePktWaitTime;
+    int lastTxPktBytes;
+
 
     /** Signal with packet when received it */
     static simsignal_t rcvdPkSignal;
@@ -90,11 +93,22 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
      */
     virtual void sendOut(cMessage *msg) = 0;
 
+  protected:
     /**
      * This function checks if there is a HomaPkt packet encapsulated in the messages
-     * and fires the proper signal for that.
+     * and returns it. Returns null if no HomaPkt in encapsulated.
      */
     virtual cPacket* searchEncapHomaPkt(cPacket* msg);
+
+    /**
+     * Takes in the current pkt and returns the serialization time of that
+     * packet last transmitted pkt if the parrent module of this queue is an
+     * Ethernet queue that is connected to etherenet mac at its output gate.
+     */
+    virtual simtime_t txPktDurationAtArrival(cPacket* pktToSend)
+    {
+        return 0.0;
+    }
 
   public:
     /**

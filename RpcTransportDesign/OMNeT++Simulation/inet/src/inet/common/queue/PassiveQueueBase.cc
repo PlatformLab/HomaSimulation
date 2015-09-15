@@ -47,8 +47,10 @@ void PassiveQueueBase::initialize()
     numQueueReceived = 0;
     numQueueDropped = 0;
     queueEmpty = 0;
+    zeroWaitTime = 0;
     queueLenOne = 0;
-    pktOnWireByteSize = 0;
+    onePktWaitTime = 0;
+    lastTxPktBytes = 0;
     WATCH(numQueueReceived);
     WATCH(numQueueDropped);
 }
@@ -60,14 +62,15 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
     emit(rcvdPkSignal, msg);
 
     if (packetRequested > 0) {
+
         // If we're here, means queue is empty so update queueEmpty stats
         queueEmpty++;
+        zeroWaitTime++;
         packetRequested--;
         emit(enqueuePkSignal, msg);
         emit(dequeuePkSignal, msg);
         emit(queueingTimeSignal, SIMTIME_ZERO);
 
-        pktOnWireByteSize = pkt ? pkt->getByteLength() : 0;
         emit(queueLengthSignal, 0);
         emit(queueByteLengthSignal, 0);
 
@@ -89,6 +92,7 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
             }
         }
         sendOut(msg);
+        lastTxPktBytes = pkt->getByteLength();
     }
     else {
         msg->setArrivalTime(simTime());
@@ -119,18 +123,22 @@ void PassiveQueueBase::requestPacket()
     cMessage *msg = dequeue();
     if (msg == NULL) {
         packetRequested++;
-        pktOnWireByteSize = 0;
+        lastTxPktBytes = 0;
     }
     else {
-        emit(dequeuePkSignal, msg);
-        emit(queueingTimeSignal, simTime() - msg->getArrivalTime());
         cPacket* pkt = dynamic_cast<cPacket*>(msg);
-        pktOnWireByteSize = pkt ? pkt->getByteLength() : 0;
+        emit(dequeuePkSignal, msg);
+        simtime_t pktWaitTime =  simTime() - msg->getArrivalTime();
+        emit(queueingTimeSignal, pktWaitTime);
+        if (pktWaitTime == SIMTIME_ZERO) {
+            zeroWaitTime++;
+        } else if (pktWaitTime <= txPktDurationAtArrival(pkt)) {
+            onePktWaitTime++;
+        }
 
-        pkt = searchEncapHomaPkt(pkt);
-        if (pkt) {
-            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(pkt);
-            switch (homaPkt->getPktType()) {
+        cPacket* encapedHomaPkt = searchEncapHomaPkt(pkt);
+        if (encapedHomaPkt) {
+            switch (check_and_cast<HomaPkt*>(encapedHomaPkt)->getPktType()) {
                 case PktType::REQUEST:
                     emit(requestQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
@@ -145,6 +153,7 @@ void PassiveQueueBase::requestPacket()
             }
         }
         sendOut(msg);
+        lastTxPktBytes = pkt->getByteLength();
     }
 }
 
@@ -167,7 +176,8 @@ void PassiveQueueBase::finish()
 {
     recordScalar("queue empty (%)", (queueEmpty * 100.0) / numQueueReceived);
     recordScalar("queue length one (%)", (queueLenOne * 100.0) / numQueueReceived);
-
+    recordScalar("zero wait time (%)", (zeroWaitTime * 100.0) / numQueueReceived);
+    recordScalar("one pkt wait time (%)", (onePktWaitTime * 100.0) / numQueueReceived);
 }
 
 void PassiveQueueBase::addListener(IPassiveQueueListener *listener)

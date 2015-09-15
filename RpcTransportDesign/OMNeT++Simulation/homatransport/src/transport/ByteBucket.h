@@ -16,7 +16,7 @@ class ByteBucket
   public:
     ByteBucket(double nominalLinkSpeed);
     ~ByteBucket();
-    static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1;
+    static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1.0;
 
     inline simtime_t getGrantTime()
     {

@@ -798,8 +798,8 @@ def printQueueLength(parsedStats, xmlParsedDic):
         
         nicQueueLenCnt = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.count')
         nicQueueLenMin = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.min')
-        nicQueueLenEmpty = hostStats.access('eth[0].queue.dataQueue.\"queue empty (%)\".value')
-        nicQueueLenOnePkt = hostStats.access('eth[0].queue.dataQueue.\"queue length one (%)\".value')
+        nicQueueLenEmpty = hostStats.access('eth[0].queue.dataQueue.\"zero wait time (%)\".value')
+        nicQueueLenOnePkt = hostStats.access('eth[0].queue.dataQueue.\"one pkt wait time (%)\".value')
         nicQueueLenMax = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.max')
         nicQueueLenMean = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.mean')
         nicQueueLenStddev = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.stddev')
@@ -853,8 +853,8 @@ def printQueueLength(parsedStats, xmlParsedDic):
         tor = parsedStats.tors[torKey]
         torId = int(re.match('tor\[([0-9]+)]', torKey).group(1))
         for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
-            nicQueueLenEmpty = tor.access('eth[{0}].queue.dataQueue.\"queue empty (%)\".value'.format(ifaceId))
-            nicQueueLenOnePkt = tor.access('eth[{0}].queue.dataQueue.\"queue length one (%)\".value'.format(ifaceId))
+            nicQueueLenEmpty = tor.access('eth[{0}].queue.dataQueue.\"zero wait time (%)\".value'.format(ifaceId))
+            nicQueueLenOnePkt = tor.access('eth[{0}].queue.dataQueue.\"one pkt wait time (%)\".value'.format(ifaceId))
             nicQueueLenMin = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.min'.format(ifaceId))
             nicQueueLenCnt = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.count'.format(ifaceId))
             nicQueueLenMax = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.max'.format(ifaceId))
