@@ -19,6 +19,7 @@
 #define __INET_PASSIVEQUEUEBASE_H
 
 #include <map>
+#include <utility>
 
 #include "inet/common/INETDefs.h"
 
@@ -40,14 +41,21 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     // state
     int packetRequested;
 
+    // keep the total byte size of the last packet sent out from this queue
+    // (byteSize + INTERFRAME_GAP_BITS) and the time at which we expect the
+    // serialization of this packet on to the wire will be compeleted by the MAC
+    // layer.
+    std::pair<int, simtime_t> lastTxPktDuration;
+    
+    // in bits per second
+    double txRate;
+
+
     // statistics
     int numQueueReceived;
     int numQueueDropped;
     int queueEmpty;
-    int zeroWaitTime;
     int queueLenOne;
-    int onePktWaitTime;
-    int lastTxPktBytes;
 
 
     /** Signal with packet when received it */
@@ -101,11 +109,20 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     virtual cPacket* searchEncapHomaPkt(cPacket* msg);
 
     /**
-     * Takes in the current pkt and returns the serialization time of that
-     * packet last transmitted pkt if the parrent module of this queue is an
-     * Ethernet queue that is connected to etherenet mac at its output gate.
+     * Takes in the current transmitting pkt byte size and updates the
+     * lastTxPktDuration pair for this transmitting packet.
      */
-    virtual simtime_t txPktDurationAtArrival(cPacket* pktToSend)
+    virtual void setTxPktDuration(int txPktBytes)
+    {
+        return;
+    }
+
+    /**
+     * When this queue module is a part of a network interface where the next
+     * module is a MAC layer, this module will be implemented such that it
+     * reads the txRate of the MAC layer. 
+     */
+    virtual double getMacTxRate()
     {
         return 0.0;
     }

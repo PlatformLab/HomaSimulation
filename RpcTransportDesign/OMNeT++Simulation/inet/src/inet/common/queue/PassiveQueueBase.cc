@@ -47,10 +47,9 @@ void PassiveQueueBase::initialize()
     numQueueReceived = 0;
     numQueueDropped = 0;
     queueEmpty = 0;
-    zeroWaitTime = 0;
     queueLenOne = 0;
-    onePktWaitTime = 0;
-    lastTxPktBytes = 0;
+    lastTxPktDuration = std::make_pair(0, SIMTIME_ZERO);
+    txRate = getMacTxRate();
     WATCH(numQueueReceived);
     WATCH(numQueueDropped);
 }
@@ -65,7 +64,6 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
 
         // If we're here, means queue is empty so update queueEmpty stats
         queueEmpty++;
-        zeroWaitTime++;
         packetRequested--;
         emit(enqueuePkSignal, msg);
         emit(dequeuePkSignal, msg);
@@ -91,8 +89,8 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
             }
         }
+        setTxPktDuration(pkt->getByteLength());
         sendOut(msg);
-        lastTxPktBytes = pkt->getByteLength();
     }
     else {
         msg->setArrivalTime(simTime());
@@ -123,18 +121,13 @@ void PassiveQueueBase::requestPacket()
     cMessage *msg = dequeue();
     if (msg == NULL) {
         packetRequested++;
-        lastTxPktBytes = 0;
+        setTxPktDuration(0);
     }
     else {
         cPacket* pkt = dynamic_cast<cPacket*>(msg);
         emit(dequeuePkSignal, msg);
         simtime_t pktWaitTime =  simTime() - msg->getArrivalTime();
         emit(queueingTimeSignal, pktWaitTime);
-        if (pktWaitTime == SIMTIME_ZERO) {
-            zeroWaitTime++;
-        } else if (pktWaitTime <= txPktDurationAtArrival(pkt)) {
-            onePktWaitTime++;
-        }
 
         cPacket* encapedHomaPkt = searchEncapHomaPkt(pkt);
         if (encapedHomaPkt) {
@@ -152,8 +145,8 @@ void PassiveQueueBase::requestPacket()
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
             }
         }
+        setTxPktDuration(pkt->getByteLength());
         sendOut(msg);
-        lastTxPktBytes = pkt->getByteLength();
     }
 }
 
@@ -176,8 +169,6 @@ void PassiveQueueBase::finish()
 {
     recordScalar("queue empty (%)", (queueEmpty * 100.0) / numQueueReceived);
     recordScalar("queue length one (%)", (queueLenOne * 100.0) / numQueueReceived);
-    recordScalar("zero wait time (%)", (zeroWaitTime * 100.0) / numQueueReceived);
-    recordScalar("one pkt wait time (%)", (onePktWaitTime * 100.0) / numQueueReceived);
 }
 
 void PassiveQueueBase::addListener(IPassiveQueueListener *listener)

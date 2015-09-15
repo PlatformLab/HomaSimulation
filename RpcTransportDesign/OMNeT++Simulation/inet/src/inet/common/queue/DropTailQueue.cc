@@ -28,6 +28,7 @@ Define_Module(DropTailQueue);
 void DropTailQueue::initialize()
 {
     PassiveQueueBase::initialize();
+    txRate = getMacTxRate();
 
     queue.setName(par("queueName"));
 
@@ -48,11 +49,21 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
         return msg;
     }
 
-    // update stats for queueLenOne if queue is empty. The fact that we are
-    // queuing a packet, means a packet is already on the transmission so in
-    // practice  queue len is one in such cases even though queue.length() is
-    // zero.
-    if (queue.length() == 0) {
+    // at the queueing time, we check how much of the previous transmitting
+    // packet is remained to be serialized and trigger queueLength signals
+    // with current queue length and the remainder of that packet.
+    int pktOnWire = 0;
+    int txPktBitsRemained = 0; 
+
+    if (lastTxPktDuration.second > simTime()) {
+        txPktBitsRemained =  (int)((lastTxPktDuration.second - simTime()).dbl() * txRate);
+        pktOnWire = 1;
+    }
+
+    if (queue.length() == 0 && pktOnWire == 0) {
+            queueEmpty++;
+    } else if ((queue.length() == 0 && pktOnWire == 1) 
+            || (queue.length() == 1 && pktOnWire == 0)) {
         queueLenOne++;
     }
 
@@ -63,11 +74,10 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
     // If you want the timeavg of queueLength instead, comment out the
     // following line and decomment the other emit invokations of
     // queueLengthSignal in this file.
-    emit(queueLengthSignal, queue.length() + 1);
-    emit(queueByteLengthSignal, queue.getByteLength() + lastTxPktBytes);
+    emit(queueLengthSignal, queue.length() + pktOnWire);
+    emit(queueByteLengthSignal, queue.getByteLength() + (txPktBitsRemained >> 3));
     cPacket* pkt = check_and_cast<cPacket*>(msg);
     queue.insert(pkt);
-    txPktSizeAtArrival[pkt] = lastTxPktBytes;
 
     //emit(queueLengthSignal, queue.length());
     //emit(queueByteLengthSignal, queue.getByteLength());
@@ -98,17 +108,35 @@ bool DropTailQueue::isEmpty()
     return queue.empty();
 }
 
-simtime_t
-DropTailQueue::txPktDurationAtArrival(cPacket* pktToSend)
+void
+DropTailQueue::setTxPktDuration(int txPktBytes)
 {
 
+    if (txPktBytes == 0) {
+        lastTxPktDuration.first = 0;
+        lastTxPktDuration.second = simTime();
+        return;
+    }
+    
+    lastTxPktDuration.first = txPktBytes + (INTERFRAME_GAP_BITS >> 3);
     double lastTxBits = 0.0;
-    lastTxBits = txPktSizeAtArrival.at(pktToSend) * 8.0 + INTERFRAME_GAP_BITS;
-    txPktSizeAtArrival.erase(pktToSend);
+    lastTxBits = txPktBytes * 8.0 + INTERFRAME_GAP_BITS;
 
+    if (txRate <= 0.0) {
+        lastTxPktDuration.second = simTime();
+        return;
+    }
+
+    lastTxPktDuration.second = simTime() + lastTxBits / txRate;
+    return;
+}
+
+double
+DropTailQueue::getMacTxRate()
+{
     cModule* parentModule = getParentModule(); 
     if (!parentModule->hasGate("out")) {
-        return SIMTIME_ZERO;
+        return 0.0;
     }
 
     cGate* parentOutGate = parentModule->gate("out");
@@ -116,10 +144,12 @@ DropTailQueue::txPktDurationAtArrival(cPacket* pktToSend)
     cModule* nextModule = destGate->getOwnerModule();
 
     if (strcmp(nextModule->getName(), "mac") != 0) {
-        return SIMTIME_ZERO;
+        return 0.0;
     }
 
-    return lastTxBits / dynamic_cast<EtherMACBase*>(nextModule)->getTxRate();
+    return dynamic_cast<EtherMACBase*>(nextModule)->getTxRate();
+
+
 }
 
 } // namespace inet
