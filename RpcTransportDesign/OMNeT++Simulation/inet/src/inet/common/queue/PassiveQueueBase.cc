@@ -31,7 +31,8 @@ simsignal_t PassiveQueueBase::queueingTimeSignal = registerSignal("queueingTime"
 
 simsignal_t PassiveQueueBase::requestQueueingTimeSignal = registerSignal("requestQueueingTime");
 simsignal_t PassiveQueueBase::grantQueueingTimeSignal = registerSignal("grantQueueingTime");
-simsignal_t PassiveQueueBase::dataQueueingTimeSignal = registerSignal("dataQueueingTime");
+simsignal_t PassiveQueueBase::schedDataQueueingTimeSignal = registerSignal("schedDataQueueingTime");
+simsignal_t PassiveQueueBase::unschedDataQueueingTimeSignal = registerSignal("unschedDataQueueingTime");
 
 simsignal_t PassiveQueueBase::queueLengthSignal = registerSignal("queueLength");
 simsignal_t PassiveQueueBase::queueByteLengthSignal = registerSignal("queueByteLength");
@@ -83,7 +84,10 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
                     emit(grantQueueingTimeSignal, SIMTIME_ZERO);
                     break;
                 case PktType::SCHED_DATA:
-                    emit(dataQueueingTimeSignal, SIMTIME_ZERO);
+                    emit(schedDataQueueingTimeSignal, SIMTIME_ZERO);
+                    break;
+                case PktType::UNSCHED_DATA:
+                    emit(unschedDataQueueingTimeSignal, SIMTIME_ZERO);
                     break;
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
@@ -139,7 +143,10 @@ void PassiveQueueBase::requestPacket()
                     emit(grantQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
                 case PktType::SCHED_DATA:
-                    emit(dataQueueingTimeSignal, simTime() - msg->getArrivalTime());
+                    emit(schedDataQueueingTimeSignal, simTime() - msg->getArrivalTime());
+                    break;
+                case PktType::UNSCHED_DATA:
+                    emit(unschedDataQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");

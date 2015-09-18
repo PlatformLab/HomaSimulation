@@ -47,6 +47,7 @@ HomaTransport::initialize()
     if (grantMaxBytes > maxDataBytes) {
         grantMaxBytes = maxDataBytes;
     }
+
     //maxGrantTimeInterval = 8.0 * grantMaxBytes * 10e-9 / nicLinkSpeed;
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);

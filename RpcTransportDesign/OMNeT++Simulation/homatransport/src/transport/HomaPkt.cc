@@ -6,7 +6,7 @@
  */
 
 
-#include "transport/HomaPkt.h"
+#include "HomaPkt.h"
 
 Register_Class(HomaPkt);
 

@@ -39,7 +39,8 @@ simple DropTailQueue like IOutputQueue
         // Queuing time for different pkt types
         @signal[requestQueueingTime](type=simtime_t; unit=s);
         @signal[grantQueueingTime](type=simtime_t; unit=s);
-        @signal[dataQueueingTime](type=simtime_t; unit=s);
+        @signal[schedDataQueueingTime](type=simtime_t; unit=s);
+        @signal[unschedDataQueueingTime](type=simtime_t; unit=s);
 
 
         @statistic[rcvdPk](title="received packets"; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
@@ -51,7 +52,8 @@ simple DropTailQueue like IOutputQueue
         // Queuing time for different pkt types
         @statistic[requestQueueingTime](title="request pkts queueing time";source=requestQueueingTime; record=stats,histogram,vector; interpolationmode=none);
         @statistic[grantQueueingTime](title="grant pkts queueing time";source=grantQueueingTime; record=stats,histogram,vector; interpolationmode=none);
-        @statistic[dataQueueingTime](title="data pkts queueing time";source=dataQueueingTime; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[schedDataQueueingTime](title="sched. data pkts queueing time";source=schedDataQueueingTime; record=stats,histogram,vector; interpolationmode=none);
+        @statistic[unschedDataQueueingTime](title="unsched. data pkts queueing time";source=unschedDataQueueingTime; record=stats,histogram,vector; interpolationmode=none);
 
     gates:
         input in;

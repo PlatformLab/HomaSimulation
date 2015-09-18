@@ -184,7 +184,7 @@ def hostQueueWaitTimes(hosts, xmlParsedDic, reportDigest):
     # find the queueWaitTimes for different types of packets. Current types
     # considered are request, grant and data packets. Also queueingTimes in the
     # senders NIC.
-    keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
+    keyStrings = ['queueingTime','unschedDataQueueingTime','schedDataQueueingTime','grantQueueingTime','requestQueueingTime']
     for keyString in keyStrings:
         queuingTimeStats = list()
         for host in hosts.keys():
@@ -208,7 +208,7 @@ def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
     numServersPerTor = xmlParsedDic.numServersPerTor
     receiverHostIds = xmlParsedDic.receiverIds
     receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
-    keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
+    keyStrings = ['queueingTime','unschedDataQueueingTime','schedDataQueueingTime','grantQueueingTime','requestQueueingTime']
     for keyString in keyStrings:
         torsUpwardQueuingTimeStats = list()
         torsDownwardQueuingTimeStats = list()
@@ -253,7 +253,7 @@ def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
 
 def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
     # Find the queue waiting for aggrs switches NICs
-    keyStrings = ['queueingTime','dataQueueingTime','grantQueueingTime','requestQueueingTime']
+    keyStrings = ['queueingTime','unschedDataQueueingTime','schedDataQueueingTime','grantQueueingTime','requestQueueingTime']
     for keyString in keyStrings:
         aggrsQueuingTimeStats = list()
         for aggr in aggrs.keys():
@@ -381,6 +381,31 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Total:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
+    print('\n\n' + "Packet Type: Unsched. Data".center(lineMax,' ') + '\n'  + "="*lineMax)
+    print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
+            'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
+            '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
+    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '(%)'.center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
+    print("_"*lineMax)
+    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.unschedDataQueueingTime
+    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.unschedDataQueueingTime
+    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.unschedDataQueueingTime
+    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.unschedDataQueueingTime
+    meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+    meanFracSum = 0.0
+    for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
+        moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+        meanFracSum += moduleStats.meanFrac
+
+    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
+    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
+    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
+    print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
+
+
     print('\n\n' + "Packet Type: Grant".center(lineMax,' ') + '\n' + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
             'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
@@ -406,7 +431,7 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Total:'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
-    print('\n\n' + "Packet Type: Data".center(lineMax,' ') + '\n'  + "="*lineMax)
+    print('\n\n' + "Packet Type: Sched. Data".center(lineMax,' ') + '\n'  + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
             'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
             '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
@@ -414,10 +439,10 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
             '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
             '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
     print("_"*lineMax)
-    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.dataQueueingTime
-    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.dataQueueingTime
-    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.dataQueueingTime
-    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.dataQueueingTime
+    hostStats = queueWaitTimeDigest.queueWaitTime.hosts.schedDataQueueingTime
+    torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.schedDataQueueingTime
+    torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.schedDataQueueingTime
+    aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.schedDataQueueingTime
     meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
     meanFracSum = 0.0
     for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:

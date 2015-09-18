@@ -71,7 +71,8 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     /** Queuing time for different HomaPkt packet types **/
     static simsignal_t requestQueueingTimeSignal;
     static simsignal_t grantQueueingTimeSignal;
-    static simsignal_t dataQueueingTimeSignal;
+    static simsignal_t schedDataQueueingTimeSignal;
+    static simsignal_t unschedDataQueueingTimeSignal;
 
     /** Statistics for length of the queue in terms of packets and bytes **/
     static simsignal_t queueLengthSignal;
