@@ -24,7 +24,7 @@
 
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
-#include "transport/HomaPkt_m.h"
+#include "transport/HomaPkt.h"
 #include "transport/ByteBucket.h"
 
 /**
@@ -74,18 +74,23 @@ class HomaTransport : public cSimpleModule
         ~OutboundMessage();
         OutboundMessage& operator=(const OutboundMessage& other);
         int sendBytes(uint32_t numBytes);
-        void sendRequest(simtime_t msgCreationTime);
+        void sendRequestAndUnsched();
 
       protected:
         SendController* sxController;
+        uint64_t msgId; 
         uint32_t bytesLeft;
         uint32_t nextByteToSend;
+
+        uint32_t dataBytesInReq; // number of data bytes the req. pkt will carry.
+        uint32_t unschedDataBytes; // number of unsched bytes sent after the req.
         inet::L3Address destAddr;
         inet::L3Address srcAddr;
-        uint64_t msgId; 
+        simtime_t msgCreationTime;
 
       private:
-        void copy(const OutboundMessage &other);  
+        void copy(const OutboundMessage &other);
+        void sendUnsched();
         friend class SendController;
     };
 
@@ -96,6 +101,8 @@ class HomaTransport : public cSimpleModule
         ~SendController();
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
+        uint32_t getReqDataBytes(AppMessage* sxMsg);
+        uint32_t getUnschedBytes(AppMessage* sxMsg);
       protected:
         HomaTransport* transport;
         uint64_t bytesLeftToSend; //statistics
@@ -116,10 +123,15 @@ class HomaTransport : public cSimpleModule
         inet::L3Address srcAddr;
         inet::L3Address destAddr;
         uint64_t msgIdAtSender;
-
+        
+        // variables that track the message completion
         uint32_t bytesToGrant;
         uint32_t bytesToReceive;
+
+        // states that keeps the general infor about the message
         uint32_t msgSize;
+        uint16_t bytesInReq;
+        uint16_t totalUnschedBytes;
 
         // Meta data for statistic collecting
         simtime_t msgCreationTime;
@@ -129,6 +141,11 @@ class HomaTransport : public cSimpleModule
 
       protected:
         void copy(const InboundMessage& other);
+
+        /**
+         * add received bytes to the inboundMsg 
+         */
+        void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd);
     };
  
     class CompareInboundMsg
@@ -149,11 +166,14 @@ class HomaTransport : public cSimpleModule
       public:
         typedef std::priority_queue<InboundMessage*,
                 std::vector<InboundMessage*>, CompareInboundMsg> PriorityQueue;
+        typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
+                InboundMsgsMap;
 
         ReceiveScheduler(HomaTransport* transport);
         ~ReceiveScheduler();
         void processReceivedRequest(HomaPkt* rxPkt);
-        void processReceivedData(HomaPkt* rxPkt);
+        void processReceivedSchedData(HomaPkt* rxPkt);
+        void processReceivedUnschedData(HomaPkt* rxPkt);
         void sendAndScheduleGrant();
         void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed, cMessage* grantTimer);
         
@@ -162,8 +182,15 @@ class HomaTransport : public cSimpleModule
         cMessage* grantTimer;
         ByteBucket* byteBucket;
         PriorityQueue inboundMsgQueue; 
-        std::list<InboundMessage*> incompleteRxMsgs;
+
+        // keeps a map of all inboundMsgs from their msgId key. The msgId on
+        // can be the same for different messages from different senders so the
+        // value would be a list of all messages with the same msgId.
+        InboundMsgsMap incompleteRxMsgs;
         uint32_t grantMaxBytes;
+
+      protected:
+        InboundMessage* lookupIncompleteRxMsg(HomaPkt* rxPkt);
         friend class HomaTransport;
         friend class InboundMessage;
         

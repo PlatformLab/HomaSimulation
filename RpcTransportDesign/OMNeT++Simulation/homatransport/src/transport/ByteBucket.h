@@ -9,7 +9,7 @@
 #define BYTEBUCKET_H_
 
 #include <omnetpp.h>
-#include "transport/HomaPkt_m.h"
+#include "transport/HomaPkt.h"
 
 class ByteBucket
 {

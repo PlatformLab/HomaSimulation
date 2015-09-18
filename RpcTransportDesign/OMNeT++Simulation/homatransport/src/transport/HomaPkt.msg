@@ -22,7 +22,8 @@ enum PktType
 {
     REQUEST = 0;
     GRANT = 1;
-    DATA = 2;
+    SCHED_DATA = 2;
+    UNSCHED_DATA = 3;
 };
 
 
@@ -30,6 +31,37 @@ struct RequestFields
 {
     uint32_t msgByteLen;
     simtime_t msgCreationTime;
+
+    // num bytes of data that are piggybacked on this request. The index of
+    // these bytes always start at zero.
+    uint16_t numReqBytes;
+
+    // Total number of unscheduled bytes sent for this message. This bytes sent
+    // in the reqPkt (ie. numReqBytes) plus the pure unsched. bytes that are
+    // sent in unsched packets.
+    uint16_t totalUnschedBytes;
+};
+
+struct UnschedDataFields
+{
+    // Unsced pkts contain duplicate information of request pkt plus the range
+    // of bytes they carry.
+    uint32_t msgByteLen;
+    simtime_t msgCreationTime;
+
+    // num bytes of data that are piggybacked on this request. The index of
+    // these bytes always start at zero.
+    uint16_t numReqBytes;
+
+    // Total number of unscheduled bytes sent for this message. This bytes sent
+    // in the reqPkt (ie. numReqBytes) plus the pure unsched. bytes that are
+    // sent in unsched packets.
+    uint16_t totalUnschedBytes;
+
+    // the index of first and last byte data bytes that trailing this unsched.
+    // packet.
+    uint32_t firstByte;
+    uint32_t lastByte;
 };
 
 struct GrantFields
@@ -37,8 +69,10 @@ struct GrantFields
     uint32_t grantBytes;
 };
 
-struct DataFields
+struct SchedDataFields
 {
+    // the index of first and last byte data bytes that trailing this sched.
+    // data packet.
     uint32_t firstByte;
     uint32_t lastByte;
 };
@@ -47,6 +81,8 @@ struct DataFields
 // generated message class
 //
 packet HomaPkt {
+    @customize(true);
+
     inet::L3Address srcAddr; 
     inet::L3Address destAddr;
     uint64_t msgId;
@@ -55,6 +91,7 @@ packet HomaPkt {
     // depending on the pktType, only one of the three following struct are
     // relevant in the context of a HomaPkt.
     RequestFields reqFields;
+    UnschedDataFields unschedDataFields;
     GrantFields grantFields;
-    DataFields dataFields;
+    SchedDataFields schedDataFields;
 }

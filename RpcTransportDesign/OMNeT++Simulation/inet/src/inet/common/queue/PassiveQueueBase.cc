@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #include "inet/common/queue/PassiveQueueBase.h"
-#include "../../homatransport/src/transport/HomaPkt_m.h"
+#include "../../homatransport/src/transport/HomaPkt.h"
 
 namespace inet {
 
@@ -82,7 +82,7 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
                 case PktType::GRANT:
                     emit(grantQueueingTimeSignal, SIMTIME_ZERO);
                     break;
-                case PktType::DATA:
+                case PktType::SCHED_DATA:
                     emit(dataQueueingTimeSignal, SIMTIME_ZERO);
                     break;
                 default:
@@ -138,7 +138,7 @@ void PassiveQueueBase::requestPacket()
                 case PktType::GRANT:
                     emit(grantQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
-                case PktType::DATA:
+                case PktType::SCHED_DATA:
                     emit(dataQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
                 default:
