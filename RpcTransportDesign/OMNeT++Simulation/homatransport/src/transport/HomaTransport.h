@@ -25,7 +25,7 @@
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
-#include "transport/ByteBucket.h"
+#include "transport/TrafficPacer.h"
 
 /**
  * Impelements a grant based, receiver side congection control transport
@@ -175,12 +175,13 @@ class HomaTransport : public cSimpleModule
         void processReceivedSchedData(HomaPkt* rxPkt);
         void processReceivedUnschedData(HomaPkt* rxPkt);
         void sendAndScheduleGrant();
-        void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed, cMessage* grantTimer);
+        void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed,
+                cMessage* grantTimer);
         
       protected:
         HomaTransport* transport;
         cMessage* grantTimer;
-        ByteBucket* byteBucket;
+        TrafficPacer* trafficPacer;
         PriorityQueue inboundMsgQueue; 
 
         // keeps a map of all inboundMsgs from their msgId key. The msgId on
@@ -205,6 +206,7 @@ class HomaTransport : public cSimpleModule
     void sendPacket(HomaPkt* sxPkt);
     void processStart();
     void processGrantTimer();
+    uint32_t getBytesOnWire(uint32_t numDataBytes, PktType homaPktType);
 
   protected:
     // contain the transport code in the send and receive paths.
