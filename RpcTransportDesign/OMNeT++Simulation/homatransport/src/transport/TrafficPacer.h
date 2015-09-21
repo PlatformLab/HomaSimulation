@@ -15,7 +15,7 @@ class TrafficPacer
 {
   public:
     TrafficPacer(double nominalLinkSpeed,
-            uint32_t maxAllowedInFlightBytes = 7500);
+            uint32_t maxAllowedInFlightBytes = 15000);
     ~TrafficPacer();
     static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1.0;
 
