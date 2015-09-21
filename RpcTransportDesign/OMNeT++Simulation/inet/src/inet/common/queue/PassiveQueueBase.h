@@ -41,10 +41,10 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     // state
     int packetRequested;
 
-    // keep the total byte size of the last packet sent out from this queue
-    // (byteSize + INTERFRAME_GAP_BITS) and the time at which we expect the
-    // serialization of this packet on to the wire will be compeleted by the MAC
-    // layer.
+    // keep the total byte size of the last packet sent out from this queue on
+    // wire (ethernet frame total byteSize + INTERFRAME_GAP_BITS + SFD_BYTES +
+    // PREAMBLE_BYTES) and the time at which we expect the serialization of this
+    // packet on to the wire will be compeleted by the MAC layer.
     std::pair<int, simtime_t> lastTxPktDuration;
     
     // in bits per second

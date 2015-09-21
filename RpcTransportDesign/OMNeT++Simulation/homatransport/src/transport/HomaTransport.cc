@@ -594,8 +594,8 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
     }
 
     // Append the unsched data to the inboundMsg
-    inboundMsg->fillinRxBytes(rxPkt->getUnschedDataFields().lastByte,
-            rxPkt->getUnschedDataFields().firstByte);
+    inboundMsg->fillinRxBytes(rxPkt->getUnschedDataFields().firstByte,
+            rxPkt->getUnschedDataFields().lastByte);
 
     if (inboundMsg->bytesToReceive <= 0) {
         ASSERT(inboundMsg->bytesToGrant == 0);
@@ -604,7 +604,7 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
         AppMessage* rxMsg = new AppMessage();
         rxMsg->setDestAddr(rxPkt->getDestAddr());
         rxMsg->setSrcAddr(rxPkt->getSrcAddr());
-        rxMsg->setMsgCreationTime(rxPkt->getReqFields().msgCreationTime);
+        rxMsg->setMsgCreationTime(rxPkt->getUnschedDataFields().msgCreationTime);
         rxMsg->setByteLength(inboundMsg->msgSize);
         transport->send(rxMsg, "appOut", 0);
 
