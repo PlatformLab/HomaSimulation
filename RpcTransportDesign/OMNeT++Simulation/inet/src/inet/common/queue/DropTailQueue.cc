@@ -118,9 +118,10 @@ DropTailQueue::setTxPktDuration(int txPktBytes)
         return;
     }
     
-    lastTxPktDuration.first = txPktBytes + (INTERFRAME_GAP_BITS >> 3);
+    lastTxPktDuration.first = txPktBytes + (INTERFRAME_GAP_BITS >> 3) +
+            PREAMBLE_BYTES + SFD_BYTES;
     double lastTxBits = 0.0;
-    lastTxBits = txPktBytes * 8.0 + INTERFRAME_GAP_BITS;
+    lastTxBits = lastTxPktDuration.first * 8.0;
 
     if (txRate <= 0.0) {
         lastTxPktDuration.second = simTime();
