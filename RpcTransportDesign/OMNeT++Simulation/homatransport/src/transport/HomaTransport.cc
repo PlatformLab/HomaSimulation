@@ -237,13 +237,19 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
 uint32_t
 HomaTransport::SendController::getReqDataBytes(AppMessage* sxMsg)
 {
-    return 10;
+    const uint32_t reqBytes = 100; 
+
+    return std::min((uint32_t)sxMsg->getByteLength(), reqBytes);
 }
 
 uint32_t
 HomaTransport::SendController::getUnschedBytes(AppMessage* sxMsg)
 {
-    return 100;
+    const uint32_t unschedBytes = 500;
+    if (sxMsg->getByteLength() > getReqDataBytes(sxMsg)) {
+        return std::min((uint32_t)sxMsg->getByteLength()-getReqDataBytes(sxMsg), unschedBytes);
+    }
+    return 0;
 }
 
 
