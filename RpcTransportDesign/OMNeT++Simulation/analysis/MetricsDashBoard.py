@@ -393,17 +393,18 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     torsUpStats = queueWaitTimeDigest.queueWaitTime.tors.upward.unschedDataQueueingTime
     torsDownStats = queueWaitTimeDigest.queueWaitTime.tors.downward.unschedDataQueueingTime
     aggrsStats = queueWaitTimeDigest.queueWaitTime.aggrs.unschedDataQueueingTime
-    meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
-    meanFracSum = 0.0
-    for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
-        moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
-        meanFracSum += moduleStats.meanFrac
+    if hostStats != {}:
+        meanSum = hostStats.mean + torsUpStats.mean + torsDownStats.mean + aggrsStats.mean
+        meanFracSum = 0.0
+        for moduleStats in [hostStats, torsUpStats, torsDownStats, aggrsStats]:
+            moduleStats.meanFrac = 0 if meanSum==0 else 100*moduleStats.mean/meanSum
+            meanFracSum += moduleStats.meanFrac
 
-    printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
-    printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
-    printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
-    printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
-    print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
+        printStatsLine(hostStats, 'Host NICs:', tw, fw, unit, printKeys)
+        printStatsLine(torsUpStats, 'TORs upward NICs:', tw, fw, unit, printKeys)
+        printStatsLine(aggrsStats, 'Aggr Switch NICs:', tw, fw, unit, printKeys)
+        printStatsLine(torsDownStats, 'TORs downward NICs:', tw, fw, unit, printKeys)
+        print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
 
     print('\n\n' + "Packet Type: Grant".center(lineMax,' ') + '\n' + "="*lineMax)
