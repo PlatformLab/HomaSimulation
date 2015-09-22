@@ -205,7 +205,11 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
             std::forward_as_tuple(msgId), 
             std::forward_as_tuple(sendMsg, this, msgId));
     outboundMsgMap.at(msgId).sendRequestAndUnsched(); 
-    bytesLeftToSend += outboundMsgMap.at(msgId).bytesLeft;
+    if (outboundMsgMap.at(msgId).bytesLeft <= 0) {
+        outboundMsgMap.erase(msgId);
+    } else {
+        bytesLeftToSend += outboundMsgMap.at(msgId).bytesLeft;
+    }
     msgId++;
     delete sendMsg;
 }
