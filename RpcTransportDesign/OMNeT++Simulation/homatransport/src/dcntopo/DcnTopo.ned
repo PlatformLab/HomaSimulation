@@ -43,13 +43,6 @@ network DcnTopo
         // or when the pkt is send in software until it's received in the NIC.
         double hostSwTurnAroundTime @unit(us);
 
-        double switchFixDelay @unit(us); // when non-zero, it models the intrinsic fixed switching delay on
-                                         // the output ports of the routers 
-        double hostNicSxThinkTime @unit(us);// models NIC send think time in host nics.
-
-
-        double nicSxThinkTime @unit(us) = default(0.0us); 
-
         // when non-zero, it models the intrinsic fixed switching delay 
         // on the output ports of the routers 
         double switchFixDelay @unit(us);         
