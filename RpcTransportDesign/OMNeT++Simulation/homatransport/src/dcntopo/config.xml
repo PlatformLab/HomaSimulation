@@ -13,6 +13,8 @@
         <fabricLinkDelay>0.0us</fabricLinkDelay>
         <edgeLinkDelay>0.0us</edgeLinkDelay>
         <hostSwTurnAroundTime>0.5us</hostSwTurnAroundTime>
+        <hostNicSxThinkTime>0.5us</hostNicSxThinkTime>
+        <switchFixDelay>0.25us</switchFixDelay>
         <workloadType>TEST_DIST</workloadType>
         <interArrivalDist>exponential</interArrivalDist>
         <loadFactor>0.001785714</loadFactor>

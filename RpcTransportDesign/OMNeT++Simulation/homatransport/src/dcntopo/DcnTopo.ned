@@ -41,8 +41,12 @@ network DcnTopo
         // ethFrame is received until the notification is received in software
         // or when the pkt is send in software until it's received in the NIC.
         double hostSwTurnAroundTime @unit(us);
-        double hostNicSxThinkTime @unit(us);
-        double switchFixDelay @unit(us);
+        double switchFixDelay @unit(us); // when non-zero, it models the intrinsic fixed switching delay on
+                                         // the output ports of the routers 
+        double hostNicSxThinkTime @unit(us);// models NIC send think time in host nics.
+
+
+        double nicSxThinkTime @unit(us) = default(0.0us); 
 
 
         double overSubFactor = default(1.0); // must be larger than 1.0
@@ -64,13 +68,11 @@ network DcnTopo
         channel FabricChannel extends DatarateChannel
         {
             datarate = fabricLinkSpeed;
-            delay = fabricLinkDelay;
         }
 
         channel EdgeChannel extends DatarateChannel
         {
             datarate = nicLinkSpeed;
-            delay = edgeLinkDelay;
         }
 
     submodules:
@@ -106,11 +108,12 @@ network DcnTopo
 
     connections allowunconnected:
         for i=0..numTors-1, for j=0..numServersPerTor-1 {
-            tor[i].ethg++ <--> EdgeChannel <--> host[i * numServersPerTor + j].ethg++ ;
+            tor[i].ethg$o++ --> EdgeChannel{delay=(edgeLinkDelay+switchFixDelay);} --> host[i * numServersPerTor + j].ethg$i++;
+            tor[i].ethg$i++ <-- EdgeChannel{delay=(edgeLinkDelay+hostNicSxThinkTime);} <-- host[i * numServersPerTor + j].ethg$o++;
         }
         
         for i=0..numAggSwitches-1, for j=0..numTors-1 {
-            aggRouter[i].ethg++ <--> FabricChannel <--> tor[j].ethg++ ;
+            aggRouter[i].ethg++ <--> FabricChannel{delay=(fabricLinkDelay+switchFixDelay);} <--> tor[j].ethg++ ;
         }
 
 }
