@@ -460,38 +460,48 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     // pass through.
     double totalSwitchDelay = 0;
 
-    double edgeSwitchingDelay = switchFixDelay; 
-    double fabricSwitchinDelay = switchFixDelay;
+    double edgeSwitchFixDelay = switchFixDelay; 
+    double fabricSwitchFixDelay = switchFixDelay;
+    double edgeSwitchSerialDelay = 0;
+    double fabricSwitchSerialDelay = 0;
 
     if (numFullEthFrame != 0) {
-        edgeSwitchingDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+        edgeSwitchSerialDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
                 ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
                 1e-9 * 8 / nicLinkSpeed; 
 
-        fabricSwitchinDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+        fabricSwitchSerialDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
                 ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
                 1e-9 * 8 / fabricLinkSpeed;
     } else {
-        edgeSwitchingDelay += lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
-        fabricSwitchinDelay += lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
+        edgeSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
+        fabricSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
     }
 
     if (destAddr.toIPv4().getDByte(2) == srcAddr.toIPv4().getDByte(2)) {
+
         // src and dest in the same rack
-        totalSwitchDelay = edgeSwitchingDelay;
+        totalSwitchDelay = edgeSwitchFixDelay + edgeSwitchSerialDelay;
 
         // Add 2 edge link delays
         totalSwitchDelay += (2 * edgeLinkDelay);
 
     } else if (destAddr.toIPv4().getDByte(1) == srcAddr.toIPv4().getDByte(1)) {
+
         // src and dest in the same pod 
-        totalSwitchDelay = edgeSwitchingDelay + 2 * fabricSwitchinDelay;
+        totalSwitchDelay = edgeSwitchFixDelay + fabricSwitchSerialDelay + 
+                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
+                           edgeSwitchFixDelay + edgeSwitchSerialDelay;
 
         // Add 2 edge link delays and two fabric link delays
         totalSwitchDelay += (2 * edgeLinkDelay + 2 * fabricLinkDelay);
 
     } else {
-        totalSwitchDelay = edgeSwitchingDelay + 4 * fabricSwitchinDelay;
+        totalSwitchDelay = edgeSwitchFixDelay + fabricSwitchSerialDelay + 
+                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
+                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
+                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
+                           edgeSwitchFixDelay + edgeSwitchSerialDelay;
 
         // Add 2 edge link delays and 4 fabric link delays
         totalSwitchDelay += (2 * edgeLinkDelay + 4 * fabricLinkDelay);
