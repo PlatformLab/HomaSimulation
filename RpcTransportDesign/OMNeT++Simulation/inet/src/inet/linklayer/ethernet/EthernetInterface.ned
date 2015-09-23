@@ -38,8 +38,6 @@ module EthernetInterface like IWiredNic
                                                             // layer after swTurnAroundTime. This models the turn over delay that software
                                                             // has when a packet is to be sent to and received from the NIC. This should be
                                                             // set non zero only for the hosts.
-        double nicSxThinkTime @unit(us) = default(0.0us); // <Behnam> when non-zero, it models the intrinsic fixed switching delay on
-                                                          // the output ports of the routers and models NIC send think time in host nics.
         bool csmacdSupport = default(false);  // by default CSMA/CD is turned off, so only point-to-point duplex links are supported.
         string macType = default(csmacdSupport ? "EtherMAC" : "EtherMACFullDuplex"); // ~EtherMAC or ~EtherMACFullDuplex
         string queueType = default(""); // ~DropTailQueue, or a Diffserv queue; set to "" for use of an internal queue
@@ -84,8 +82,7 @@ module EthernetInterface like IWiredNic
         }
     connections:
         mac.upperLayerOut --> ned.DelayChannel{ @display("m=n"); delay=swTurnAroundTime; } --> encap.lowerLayerIn;
-        mac.phys$i <-- { @display("m=s"); } <-- phys$i;
-        mac.phys$o --> ned.DelayChannel{ @display("m=s"); delay=nicSxThinkTime; } --> phys$o;
+        mac.phys <--> { @display("m=s"); } <--> phys;
 
         if queueType != "" {
             encap.lowerLayerOut --> ned.DelayChannel{ @display("m=n"); delay=swTurnAroundTime; } --> queue.in;

@@ -65,7 +65,6 @@ module HostBase extends NodeBase
 
 
         eth[*].swTurnAroundTime = hostSwTurnAroundTime;
-        eth[*].nicSxThinkTime = hostNicSxThinkTime;
 
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <> like ITrafficGeneratorApp {

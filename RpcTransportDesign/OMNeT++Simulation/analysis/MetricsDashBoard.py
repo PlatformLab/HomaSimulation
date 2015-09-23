@@ -287,6 +287,8 @@ def parseXmlFile(xmlConfigFile):
     edgeLinkDelay = xmlConfig.getElementsByTagName('edgeLinkDelay')[0].firstChild.data
     fabricLinkDelay = xmlConfig.getElementsByTagName('fabricLinkDelay')[0].firstChild.data
     hostSwTurnAroundTime = xmlConfig.getElementsByTagName('hostSwTurnAroundTime')[0].firstChild.data
+    hostNicSxThinkTime = xmlConfig.getElementsByTagName('hostNicSxThinkTime')[0].firstChild.data
+    switchFixDelay = xmlConfig.getElementsByTagName('switchFixDelay')[0].firstChild.data
 
     xmlParsedDic.msgSizeRanges = msgSizeRanges.split()
     xmlParsedDic.numServersPerTor = numServersPerTor
@@ -303,6 +305,8 @@ def parseXmlFile(xmlConfigFile):
     xmlParsedDic.edgeLinkDelay = edgeLinkDelay 
     xmlParsedDic.fabricLinkDelay = fabricLinkDelay 
     xmlParsedDic.hostSwTurnAroundTime = hostSwTurnAroundTime 
+    xmlParsedDic.hostNicSxThinkTime = hostNicSxThinkTime 
+    xmlParsedDic.switchFixDelay = switchFixDelay 
 
     senderIds = list()
     receiverIds = list()
@@ -608,8 +612,8 @@ def printGenralInfo(xmlParsedDic):
         + 'Stop Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.stopTime).center(fw))
     print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(xmlParsedDic.interArrivalDist).center(fw)
         + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
-    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'hostSwTurnAroundTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw))
-    print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw))
+    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'SW Turn-around Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw) + 'NIC Send ThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicSxThinkTime).center(fw))
+    print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw) + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(xmlParsedDic.switchFixDelay).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
