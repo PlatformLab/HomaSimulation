@@ -35,7 +35,9 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         int fabricLinkSpeed @unit(Gbps);
         double fabricLinkDelay @unit(us);
         double edgeLinkDelay @unit(us);
-        double nicThinkTime @unit(us);
+        double hostSwTurnAroundTime @unit(us);
+        double hostNicSxThinkTime @unit(us);
+        double switchFixDelay @unit(us);
         double loadFactor = default(0.5);
 
         // workload types from this set: {"DCTCP", "FACEBOOK_KEY_VALUE"}

@@ -26,7 +26,9 @@ moduleinterface ITrafficGeneratorApp
         int fabricLinkSpeed @unit(Gbps);
         double fabricLinkDelay @unit(us);
         double edgeLinkDelay @unit(us);
-        double nicThinkTime @unit(us);
+        double hostSwTurnAroundTime @unit(us);
+        double hostNicSxThinkTime @unit(us);
+        double switchFixDelay @unit(us);
 
     gates:
         input transportIn @label(AppMessage/up);

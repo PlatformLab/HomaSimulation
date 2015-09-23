@@ -59,8 +59,13 @@ module HostBase extends NodeBase
 
         double edgeLinkDelay @unit(us);
         double fabricLinkDelay @unit(us);
-        double nicThinkTime @unit(us);
-        eth[*].nicThinkTime = nicThinkTime;
+        double hostSwTurnAroundTime @unit(us);
+        double hostNicSxThinkTime @unit(us);
+        double switchFixDelay @unit(us);
+
+
+        eth[*].swTurnAroundTime = hostSwTurnAroundTime;
+        eth[*].nicSxThinkTime = hostNicSxThinkTime;
 
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <> like ITrafficGeneratorApp {
@@ -71,7 +76,10 @@ module HostBase extends NodeBase
                 fabricLinkSpeed = fabricLinkSpeed;
                 edgeLinkDelay = edgeLinkDelay;
                 fabricLinkDelay = fabricLinkDelay;  
-                nicThinkTime = nicThinkTime;
+
+                hostSwTurnAroundTime = hostSwTurnAroundTime;
+                hostNicSxThinkTime = hostNicSxThinkTime;
+                switchFixDelay = switchFixDelay;
         }
 
         transportScheme: <transportSchemeType> like ITransportScheme if hasTransportScheme {

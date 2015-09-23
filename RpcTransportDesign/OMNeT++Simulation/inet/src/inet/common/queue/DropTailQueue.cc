@@ -28,7 +28,6 @@ Define_Module(DropTailQueue);
 void DropTailQueue::initialize()
 {
     PassiveQueueBase::initialize();
-    txRate = getMacTxRate();
 
     queue.setName(par("queueName"));
 
@@ -40,10 +39,20 @@ void DropTailQueue::initialize()
 
     // configuration
     frameCapacity = par("frameCapacity");
+
+    mac = getNextMacLayer();
+    if (!mac) {
+        EV_WARN << "Warning. No mac connected to queue module.\n";
+    }
 }
 
 cMessage *DropTailQueue::enqueue(cMessage *msg)
 {
+    double txRate = 0.0; // transmit speed of the next mac layer 
+    if (mac) {
+        txRate = dynamic_cast<EtherMACBase*>(mac)->getTxRate();
+    }
+
     if (frameCapacity && queue.length() >= frameCapacity) {
         EV << "Queue full, dropping packet.\n";
         return msg;
@@ -111,6 +120,7 @@ bool DropTailQueue::isEmpty()
 void
 DropTailQueue::setTxPktDuration(int txPktBytes)
 {
+    double txRate = 0.0; // transmit speed of the next mac layer
 
     if (txPktBytes == 0) {
         lastTxPktDuration.first = 0;
@@ -123,6 +133,10 @@ DropTailQueue::setTxPktDuration(int txPktBytes)
     double lastTxBits = 0.0;
     lastTxBits = lastTxPktDuration.first * 8.0;
 
+    if (mac) {
+        txRate = dynamic_cast<EtherMACBase*>(mac)->getTxRate();
+    }
+
     if (txRate <= 0.0) {
         lastTxPktDuration.second = simTime();
         return;
@@ -132,12 +146,12 @@ DropTailQueue::setTxPktDuration(int txPktBytes)
     return;
 }
 
-double
-DropTailQueue::getMacTxRate()
+cModule*
+DropTailQueue::getNextMacLayer()
 {
     cModule* parentModule = getParentModule(); 
     if (!parentModule->hasGate("out")) {
-        return 0.0;
+        return NULL;
     }
 
     cGate* parentOutGate = parentModule->gate("out");
@@ -145,11 +159,10 @@ DropTailQueue::getMacTxRate()
     cModule* nextModule = destGate->getOwnerModule();
 
     if (strcmp(nextModule->getName(), "mac") != 0) {
-        return 0.0;
+        return NULL;
     }
 
-    return dynamic_cast<EtherMACBase*>(nextModule)->getTxRate();
-
+    return nextModule;
 
 }
 

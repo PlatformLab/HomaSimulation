@@ -10,12 +10,12 @@
         <numTors>8</numTors>
         <fabricLinkSpeed>40</fabricLinkSpeed> <!--In Gb/s-->
         <nicLinkSpeed>10</nicLinkSpeed> <!--In Gb/s-->
-        <fabricLinkDelay>0.25us</fabricLinkDelay>
-        <edgeLinkDelay>0.5us</edgeLinkDelay>
-        <hostNicThinkTime>0.5us</hostNicThinkTime>
+        <fabricLinkDelay>0.0us</fabricLinkDelay>
+        <edgeLinkDelay>0.0us</edgeLinkDelay>
+        <hostSwTurnAroundTime>0.5us</hostSwTurnAroundTime>
         <workloadType>TEST_DIST</workloadType>
         <interArrivalDist>exponential</interArrivalDist>
-        <loadFactor>0.03214286</loadFactor>
+        <loadFactor>0.001785714</loadFactor>
         <startTime>0s</startTime>
         <stopTime>9.5s</stopTime>
         <warmup-period>0ms</warmup-period>

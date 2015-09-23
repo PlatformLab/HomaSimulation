@@ -71,7 +71,7 @@ class INET_API DropTailQueue : public PassiveQueueBase
     /**
      * Redefined from IPassiveQueue.
      */
-    virtual double getMacTxRate();
+    cModule* getNextMacLayer();
 
 
 };

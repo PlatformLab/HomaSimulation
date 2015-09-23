@@ -17,6 +17,7 @@
 #include<iterator>
 #include<iostream>
 #include "WorkloadSynthesizer.h"
+#include "transport/HomaPkt.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "inet/networklayer/common/InterfaceTable.h"
@@ -98,7 +99,9 @@ WorkloadSynthesizer::initialize()
     fabricLinkSpeed = par("fabricLinkSpeed").longValue(); 
     edgeLinkDelay = 1e-6 * par("edgeLinkDelay").doubleValue();
     fabricLinkDelay = 1e-6 * par("fabricLinkDelay").doubleValue();
-    nicThinkTime = 1e-6 * par("nicThinkTime").doubleValue(); 
+    hostSwTurnAroundTime = 1e-6 * par("hostSwTurnAroundTime").doubleValue(); 
+    hostNicSxThinkTime = 1e-6 * par("hostNicSxThinkTime").doubleValue(); 
+    switchFixDelay = 1e-6 * par("switchFixDelay").doubleValue(); 
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
     xmlConfig = par("appConfig").xmlValue();
@@ -139,8 +142,11 @@ WorkloadSynthesizer::initialize()
         throw cRuntimeError("'%s': Not a valie workload type.",workLoadType);
     }
     
-    maxDataBytesPerPkt = 
+    HomaPkt homaPkt = HomaPkt();
+    homaPkt.setPktType(PktType::SCHED_DATA);
+    maxDataBytesPerEthFrame = 
             MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE; 
+    maxDataBytesPerPkt = maxDataBytesPerEthFrame - homaPkt.headerSize();
 
     MsgSizeDistributions::InterArrivalDist interArrivalDist;
     if (strcmp(par("interArrivalDist").stringValue(), "exponential") == 0) {
@@ -391,6 +397,9 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
     numReceived++;
 }
 
+/** The proper working of this part of the code depends on the 
+ * correct ip assignments based on the config.xml file.
+ */
 double
 WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
 {
@@ -405,69 +414,66 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         return totalBytesTranmitted;
     }
 
-
     // calculate the total transmitted bytes in the the network for this
     // rcvdMsg. These bytes include all headers and ethernet overhead bytes per
     // frame.
     int lastPartialFrameLen = 0;
-    int numFullEthFrame = rcvdMsg->getByteLength() / maxDataBytesPerPkt;
-    uint32_t lastPartialFrameData = rcvdMsg->getByteLength() % maxDataBytesPerPkt;
+    int numFullEthFrame = rcvdMsg->getByteLength() / maxDataBytesPerEthFrame;
+    uint32_t lastPartialFrameData = rcvdMsg->getByteLength() % maxDataBytesPerEthFrame;
 
 
     totalBytesTranmitted = numFullEthFrame *
             (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
-            ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE);
+            ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP);
 
     if (lastPartialFrameData == 0) {
         if (numFullEthFrame == 0) {
-            totalBytesTranmitted = MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE;
+            totalBytesTranmitted = MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE +
+                    ETHERNET_CRC_SIZE + INTER_PKT_GAP;
             lastPartialFrameLen = totalBytesTranmitted;
         }
 
     } else {
-        uint32_t minEthernetPayloadSize = 
-                MIN_ETHERNET_FRAME_SIZE - ETHERNET_HDR_SIZE - ETHERNET_CRC_SIZE;
         if (lastPartialFrameData < 
-                (minEthernetPayloadSize - IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
+                (MIN_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
 
             lastPartialFrameLen =
-                    MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE;
+                    MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
         } else {
             lastPartialFrameLen = lastPartialFrameData + IP_HEADER_SIZE
                     + UDP_HEADER_SIZE + ETHERNET_HDR_SIZE + ETHERNET_CRC_SIZE
-                    + ETHERNET_PREAMBLE_SIZE; 
+                    + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP; 
         }
-
         totalBytesTranmitted += lastPartialFrameLen; 
     }
 
     double msgSerializationDelay = 
             1e-9 * ((totalBytesTranmitted << 3) * 1.0 / nicLinkSpeed);
 
+    // There's always two hostSwTurnAroundTime and one nicThinkTime involved 
+    // in ideal latency for the overhead.
+    double hostDelayOverheads = 2 * hostSwTurnAroundTime + hostNicSxThinkTime;
+
     // The switch models in omnet++ are store and forward therefor the first
     // packet of each message will experience an extra serialialization delay at
-    // each switch. Therefore need to figure out how many switched a packet will
-    // pass through. The proper working of this part of the code depends on the
-    // correct ip assignments.
+    // each switch. Therefore need to figure out how many switches a packet will
+    // pass through.
     double totalSwitchDelay = 0;
 
-    // There's always one nicThinkTime involved ideal latency for software
-    // overhead.
-    totalSwitchDelay += nicThinkTime;                                
-    double edgeSwitchingDelay = 0; 
-    double fabricSwitchinDelay = 0;
+    double edgeSwitchingDelay = switchFixDelay; 
+    double fabricSwitchinDelay = switchFixDelay;
 
     if (numFullEthFrame != 0) {
-        edgeSwitchingDelay = (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
-                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE) *
+        edgeSwitchingDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
                 1e-9 * 8 / nicLinkSpeed; 
 
-        fabricSwitchinDelay = (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
-                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE) *
+        fabricSwitchinDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
                 1e-9 * 8 / fabricLinkSpeed;
     } else {
-        edgeSwitchingDelay = lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
-        fabricSwitchinDelay = lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
+        edgeSwitchingDelay += lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
+        fabricSwitchinDelay += lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
     }
 
     if (destAddr.toIPv4().getDByte(2) == srcAddr.toIPv4().getDByte(2)) {
@@ -490,10 +496,9 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         // Add 2 edge link delays and 4 fabric link delays
         totalSwitchDelay += (2 * edgeLinkDelay + 4 * fabricLinkDelay);
 
-
     }
 
-    return msgSerializationDelay + totalSwitchDelay;
+    return msgSerializationDelay + totalSwitchDelay + hostDelayOverheads;
 }
 
 void

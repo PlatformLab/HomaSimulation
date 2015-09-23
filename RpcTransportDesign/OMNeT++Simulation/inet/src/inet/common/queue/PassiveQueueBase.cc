@@ -50,9 +50,10 @@ void PassiveQueueBase::initialize()
     queueEmpty = 0;
     queueLenOne = 0;
     lastTxPktDuration = std::make_pair(0, SIMTIME_ZERO);
-    txRate = getMacTxRate();
     WATCH(numQueueReceived);
     WATCH(numQueueDropped);
+
+    mac = NULL;
 }
 
 void PassiveQueueBase::handleMessage(cMessage *msg)

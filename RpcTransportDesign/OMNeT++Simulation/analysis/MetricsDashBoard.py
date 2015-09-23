@@ -286,7 +286,7 @@ def parseXmlFile(xmlConfigFile):
     msgSizeRanges = xmlConfig.getElementsByTagName('msgSizeRanges')[0].firstChild.data
     edgeLinkDelay = xmlConfig.getElementsByTagName('edgeLinkDelay')[0].firstChild.data
     fabricLinkDelay = xmlConfig.getElementsByTagName('fabricLinkDelay')[0].firstChild.data
-    hostNicThinkTime = xmlConfig.getElementsByTagName('hostNicThinkTime')[0].firstChild.data
+    hostSwTurnAroundTime = xmlConfig.getElementsByTagName('hostSwTurnAroundTime')[0].firstChild.data
 
     xmlParsedDic.msgSizeRanges = msgSizeRanges.split()
     xmlParsedDic.numServersPerTor = numServersPerTor
@@ -302,7 +302,7 @@ def parseXmlFile(xmlConfigFile):
     xmlParsedDic.warmupPeriod = warmupPeriod 
     xmlParsedDic.edgeLinkDelay = edgeLinkDelay 
     xmlParsedDic.fabricLinkDelay = fabricLinkDelay 
-    xmlParsedDic.hostNicThinkTime = hostNicThinkTime 
+    xmlParsedDic.hostSwTurnAroundTime = hostSwTurnAroundTime 
 
     senderIds = list()
     receiverIds = list()
@@ -483,9 +483,9 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
 
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
-    tw = 20
-    fw = 9 
-    lineMax = 100 
+    tw = 17
+    fw = 10 
+    lineMax = 105 
     title = 'End To End Message Latency For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
@@ -608,7 +608,7 @@ def printGenralInfo(xmlParsedDic):
         + 'Stop Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.stopTime).center(fw))
     print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(xmlParsedDic.interArrivalDist).center(fw)
         + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
-    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'hostNicThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicThinkTime).center(fw))
+    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'hostSwTurnAroundTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw))
     print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):

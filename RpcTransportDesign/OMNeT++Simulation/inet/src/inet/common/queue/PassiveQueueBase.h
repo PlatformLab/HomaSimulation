@@ -47,8 +47,11 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     // packet on to the wire will be compeleted by the MAC layer.
     std::pair<int, simtime_t> lastTxPktDuration;
     
-    // in bits per second
-    double txRate;
+    /**
+     * When this queue module is a part of a network interface where the next
+     * module is a MAC layer, this variable points to that MAC layer.  
+     */
+    cModule* mac;
 
 
     // statistics
@@ -116,16 +119,6 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     virtual void setTxPktDuration(int txPktBytes)
     {
         return;
-    }
-
-    /**
-     * When this queue module is a part of a network interface where the next
-     * module is a MAC layer, this module will be implemented such that it
-     * reads the txRate of the MAC layer. 
-     */
-    virtual double getMacTxRate()
-    {
-        return 0.0;
     }
 
   public:

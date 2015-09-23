@@ -37,9 +37,14 @@ network DcnTopo
         int fabricLinkSpeed @unit(Gbps); // NOTE: always greater and equal
                                          // to nicLinkSpeed
 
-        // models the software trun over time in the hosts between the time
+        // models the software trun around time in the hosts between the time
         // ethFrame is received until the notification is received in software
-        double hostNicThinkTime @unit(us);
+        // or when the pkt is send in software until it's received in the NIC.
+        double hostSwTurnAroundTime @unit(us);
+        double hostNicSxThinkTime @unit(us);
+        double switchFixDelay @unit(us);
+
+
         double overSubFactor = default(1.0); // must be larger than 1.0
                                              // 1.0 means full bisection bw
 
@@ -72,11 +77,13 @@ network DcnTopo
         aggRouter[numAggSwitches]: Router {
             @display("i=abstract/router2");
             **.promiscuous = true;
+            **.nicSxThinkTime = switchFixDelay;
         }
 
         tor[numTors]: Router {
             @display("i=abstract/router");
             **.promiscuous = true;
+            **.nicSxThinkTime = switchFixDelay;
         }
 
         host[numHosts]: HostBase {
@@ -86,7 +93,9 @@ network DcnTopo
             fabricLinkSpeed = fabricLinkSpeed;
             edgeLinkDelay = edgeLinkDelay;
             fabricLinkDelay = fabricLinkDelay;  
-            nicThinkTime = hostNicThinkTime;
+            hostSwTurnAroundTime = hostSwTurnAroundTime;
+            hostNicSxThinkTime = hostNicSxThinkTime;
+            switchFixDelay = switchFixDelay;
         }
 
         configurator: IPv4NetworkConfigurator {
