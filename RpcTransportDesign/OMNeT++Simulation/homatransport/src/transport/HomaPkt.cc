@@ -71,3 +71,20 @@ HomaPkt::headerSize()
     return size;
 }
 
+cPacket*
+HomaPkt::searchEncapHomaPkt(cPacket* pkt)
+{
+    while (pkt) {
+        if (dynamic_cast<HomaPkt*>(pkt)) {
+            return pkt;
+        }
+
+        if (pkt->hasEncapsulatedPacket()) {
+            pkt = dynamic_cast<cPacket*>(pkt->getEncapsulatedPacket());
+        } else {
+            break;
+        }
+    }
+    return NULL;
+}
+

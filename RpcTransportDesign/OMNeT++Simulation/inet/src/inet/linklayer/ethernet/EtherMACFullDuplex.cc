@@ -22,6 +22,7 @@
 #include "inet/common/queue/IPassiveQueue.h"
 #include "inet/common/NotifierConsts.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
+#include "../../homatransport/src/transport/HomaPkt.h"
 
 namespace inet {
 
@@ -270,6 +271,7 @@ void EtherMACFullDuplex::handleEndTxPeriod()
         unsigned long curBytes = curTxFrame->getFrameByteLength();
         numFramesSent++;
         numBytesSent += curBytes;
+        countHomaPktBytes(curTxFrame, true);
         emit(txPkSignal, curTxFrame);
     }
 
@@ -328,6 +330,7 @@ void EtherMACFullDuplex::processReceivedDataFrame(EtherFrame *frame)
     unsigned long curBytes = frame->getByteLength();
     numFramesReceivedOK++;
     numBytesReceivedOK += curBytes;
+    countHomaPktBytes(frame, false);
     emit(rxPkOkSignal, frame);
 
     numFramesPassedToHL++;
@@ -392,6 +395,48 @@ void EtherMACFullDuplex::beginSendFrames()
         }
     }
 }
+
+void
+EtherMACFullDuplex::countHomaPktBytes(EtherFrame* curFrame, bool isSent)
+{
+    cPacket* pkt = HomaPkt::searchEncapHomaPkt(curFrame);
+    if (pkt) {
+        HomaPkt* homaPkt = check_and_cast<HomaPkt*>(pkt);
+        switch (homaPkt->getPktType()) {
+            case PktType::REQUEST:
+                if (isSent) {
+                    homaBytesCounter.numReqBytesSent += curFrame->getByteLength();
+                } else {
+                    homaBytesCounter.numReqBytesRecvOK += curFrame->getByteLength();
+                }
+                break;
+            case PktType::GRANT:
+                if (isSent) {
+                    homaBytesCounter.numGrantBytesSent += curFrame->getByteLength();
+                } else {
+                    homaBytesCounter.numGrantBytesRecvOK += curFrame->getByteLength();
+                }
+                break;
+            case PktType::SCHED_DATA:
+                if (isSent) {
+                    homaBytesCounter.numSchedBytesSent += curFrame->getByteLength();
+                } else {
+                    homaBytesCounter.numSchedBytesRecvOK += curFrame->getByteLength();
+                }
+                break;
+            case PktType::UNSCHED_DATA:
+                if (isSent) {
+                    homaBytesCounter.numUnschedBytesSent += curFrame->getByteLength();
+                } else {
+                    homaBytesCounter.numUnschedBytesRecvOk += curFrame->getByteLength();
+                }
+                break;
+            default:
+                throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
+        }
+    }
+}
+
 
 } // namespace inet
 

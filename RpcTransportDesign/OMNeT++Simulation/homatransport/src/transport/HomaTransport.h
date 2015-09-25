@@ -57,6 +57,8 @@ class HomaTransport : public cSimpleModule
     // Signals
     static simsignal_t msgsLeftToSendSignal;
     static simsignal_t bytesLeftToSendSignal;
+    static simsignal_t outstandingGrantBytesSignal;
+    static simsignal_t totalOutstandingBytesSignal;
  
 
     class SendController;
@@ -221,7 +223,11 @@ class HomaTransport : public cSimpleModule
     int localPort;
     int destPort;
     int nicLinkSpeed;
-    double grantTimeInterval;
+
+    // this variable tracks the outstanding grant bytes. This in only for
+    // getting statistics.
+    int outstandingGrantBytes;
+
     friend class ReceiveScheduler;
 };
 

@@ -64,6 +64,12 @@ class INET_API EtherMACFullDuplex : public EtherMACBase
     // statistics
     simtime_t totalSuccessfulRxTime;    // total duration of successful transmissions on channel
     simtime_t totalSuccessfulTxTime;
+
+  protected:
+    // if a homaPkt is being sent or received, this function counts number of
+    // bytes in that packet.
+    virtual void countHomaPktBytes(EtherFrame* curFrame, bool isSent);
+
 };
 
 } // namespace inet

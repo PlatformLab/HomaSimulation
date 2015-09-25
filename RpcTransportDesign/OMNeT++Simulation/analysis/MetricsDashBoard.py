@@ -612,7 +612,8 @@ def printGenralInfo(xmlParsedDic):
         + 'Stop Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.stopTime).center(fw))
     print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(xmlParsedDic.interArrivalDist).center(fw)
         + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
-    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'SW Turn-around Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw) + 'NIC Send ThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicSxThinkTime).center(fw))
+    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'SW Turn-around Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw)
+        + 'NIC Send ThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicSxThinkTime).center(fw))
     print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw) + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(xmlParsedDic.switchFixDelay).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
@@ -656,7 +657,6 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     nicRxBytes = trafficDic.hostsTraffic.nics.rx.bytes = []
     nicRxRates = trafficDic.hostsTraffic.nics.rx.rates = []
     nicRxDutyCycles = trafficDic.hostsTraffic.nics.rx.dutyCycles = []
-
 
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))

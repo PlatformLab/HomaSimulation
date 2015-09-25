@@ -148,6 +148,7 @@ EtherMACBase::EtherMACBase()
     upperLayerInGate = NULL;
     curTxFrame = NULL;
     endTxMsg = endIFGMsg = endPauseMsg = NULL;
+    homaBytesCounter = HomaByteCounter();
 }
 
 EtherMACBase::~EtherMACBase()
@@ -592,6 +593,7 @@ void EtherMACBase::finish()
             recordScalar("frames/sec rcvd", numFramesReceivedOK / t);
             recordScalar("bits/sec sent", (8.0 * numBytesSent) / t);
             recordScalar("bits/sec rcvd", (8.0 * numBytesReceivedOK) / t);
+            homaBytesCounter.recordThroughputs(this, t);
         }
     }
 }
@@ -716,6 +718,42 @@ int EtherMACBase::InnerQueue::packetCompare(cObject *a, cObject *b)
     int ap = (dynamic_cast<EtherPauseFrame *>(a) == NULL) ? 1 : 0;
     int bp = (dynamic_cast<EtherPauseFrame *>(b) == NULL) ? 1 : 0;
     return ap - bp;
+}
+
+EtherMACBase::HomaByteCounter::HomaByteCounter()
+    : numReqBytesSent(0)
+    , numGrantBytesSent(0)
+    , numSchedBytesSent(0)
+    , numUnschedBytesSent(0)
+    , numReqBytesRecvOK(0)
+    , numGrantBytesRecvOK(0)
+    , numSchedBytesRecvOK(0)
+    , numUnschedBytesRecvOk(0)
+{}
+
+void
+EtherMACBase::HomaByteCounter::recordThroughputs(cComponent* macBase, simtime_t duration)
+{
+    if (duration > 0) {
+        macBase->recordScalar("Homa Req bits/sec sent", 
+                (8.0 * numReqBytesSent) / duration);
+        macBase->recordScalar("Homa Req bits/sec rcvd", 
+                (8.0 * numReqBytesRecvOK) / duration);
+        macBase->recordScalar("Homa  Grant bits/sec sent", 
+                (8.0 * numGrantBytesSent) / duration);
+        macBase->recordScalar("Homa Grant bits/sec rcvd", 
+                (8.0 * numGrantBytesRecvOK) / duration);
+        macBase->recordScalar("Homa Sched bits/sec sent", 
+                (8.0 * numSchedBytesSent) / duration);
+        macBase->recordScalar("Homa Sched bits/sec rcvd", 
+                (8.0 * numSchedBytesRecvOK) / duration);
+        macBase->recordScalar("Homa Unsched bits/sec sent", 
+                (8.0 * numUnschedBytesSent) / duration);
+        macBase->recordScalar("Homa Unsched bits/sec rcvd", 
+                (8.0 * numUnschedBytesRecvOk) / duration);
+
+    }
+
 }
 
 } // namespace inet

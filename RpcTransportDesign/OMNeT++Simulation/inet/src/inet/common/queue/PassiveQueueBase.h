@@ -106,11 +106,6 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     virtual void sendOut(cMessage *msg) = 0;
 
   protected:
-    /**
-     * This function checks if there is a HomaPkt packet encapsulated in the messages
-     * and returns it. Returns null if no HomaPkt in encapsulated.
-     */
-    virtual cPacket* searchEncapHomaPkt(cPacket* msg);
 
     /**
      * Takes in the current transmitting pkt byte size and updates the

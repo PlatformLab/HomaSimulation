@@ -74,7 +74,7 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
         emit(queueLengthSignal, 0);
         emit(queueByteLengthSignal, 0);
 
-        pkt = searchEncapHomaPkt(pkt);
+        pkt = HomaPkt::searchEncapHomaPkt(pkt);
         if (pkt) {
             HomaPkt* homaPkt = check_and_cast<HomaPkt*>(pkt);
             switch (homaPkt->getPktType()) {
@@ -134,7 +134,7 @@ void PassiveQueueBase::requestPacket()
         simtime_t pktWaitTime =  simTime() - msg->getArrivalTime();
         emit(queueingTimeSignal, pktWaitTime);
 
-        cPacket* encapedHomaPkt = searchEncapHomaPkt(pkt);
+        cPacket* encapedHomaPkt = HomaPkt::searchEncapHomaPkt(pkt);
         if (encapedHomaPkt) {
             switch (check_and_cast<HomaPkt*>(encapedHomaPkt)->getPktType()) {
                 case PktType::REQUEST:
@@ -197,23 +197,6 @@ void PassiveQueueBase::notifyListeners()
 {
     for (std::list<IPassiveQueueListener *>::iterator it = listeners.begin(); it != listeners.end(); ++it)
         (*it)->packetEnqueued(this);
-}
-
-cPacket*
-PassiveQueueBase::searchEncapHomaPkt(cPacket* pkt)
-{
-    while (pkt) {
-        if (dynamic_cast<HomaPkt*>(pkt)) {
-            return pkt;
-        }
-
-        if (pkt->hasEncapsulatedPacket()) {
-            pkt = dynamic_cast<cPacket*>(pkt->getEncapsulatedPacket());
-        } else {
-            break;
-        }
-    }
-    return NULL;
 }
 
 } // namespace inet

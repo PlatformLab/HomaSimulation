@@ -24,11 +24,16 @@ class TrafficPacer
     void unschedPendingBytes(uint32_t committedBytes);
     bool okToGrant(simtime_t currentTime);
 
+    // Only
+    inline uint32_t getOutstandingBytes()
+    {
+        return totalOutstandingBytes;
+    }
+
   private:
     double actualLinkSpeed;
     simtime_t nextGrantTime;
     int totalOutstandingBytes;
-
     uint32_t maxAllowedInFlightBytes;
 };
 

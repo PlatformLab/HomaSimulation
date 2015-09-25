@@ -185,6 +185,28 @@ class INET_API EtherMACBase : public MACBase
     static simsignal_t frameRcvdTimeStamptAtMACSignal;
     static simsignal_t frameSentTimeStamptAtMACSignal;
 
+    // Added by <Behnam>. For tracking the throughput statistics of HomaPkt types
+    class HomaByteCounter {
+      public:
+        HomaByteCounter();
+        void recordThroughputs(cComponent* macBase, simtime_t duration);
+
+        
+      public:
+        unsigned long numReqBytesSent;
+        unsigned long numGrantBytesSent;
+        unsigned long numSchedBytesSent;
+        unsigned long numUnschedBytesSent;
+
+        unsigned long numReqBytesRecvOK;
+        unsigned long numGrantBytesRecvOK;
+        unsigned long numSchedBytesRecvOK;
+        unsigned long numUnschedBytesRecvOk;
+
+    };
+
+    HomaByteCounter homaBytesCounter;
+
   public:
     static const double SPEED_OF_LIGHT_IN_CABLE;
 

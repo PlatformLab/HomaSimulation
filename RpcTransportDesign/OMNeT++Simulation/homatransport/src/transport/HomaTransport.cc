@@ -24,6 +24,10 @@ simsignal_t HomaTransport::msgsLeftToSendSignal =
         registerSignal("msgsLeftToSend");
 simsignal_t HomaTransport::bytesLeftToSendSignal = 
         registerSignal("bytesLeftToSend");
+simsignal_t HomaTransport::outstandingGrantBytesSignal =
+        registerSignal("outstandingGrantBytes");
+simsignal_t HomaTransport::totalOutstandingBytesSignal =
+        registerSignal("totalOutstandingBytes");
 
 HomaTransport::HomaTransport()
     : sxController(this)
@@ -55,6 +59,7 @@ HomaTransport::initialize()
     selfMsg->setKind(SelfMsgKind::START);
     rxScheduler.initialize(grantMaxBytes, nicLinkSpeed, selfMsg);
     scheduleAt(simTime(), selfMsg);
+    outstandingGrantBytes = 0;
 }
 
 void
@@ -118,8 +123,8 @@ HomaTransport::handleMessage(cMessage *msg)
 }
 
 /**
- * NOTE: calling this function with numDataBytes=0 assumes that you are sending a
- * packet with no data on the wire and you want to see how many bytes an empty
+ * NOTE: calling this function with numDataBytes=0 assumes that you are sending
+ * a packet with no data on the wire and you want to see how many bytes an empty
  * packet is on the wire.
  */
 uint32_t
@@ -146,7 +151,6 @@ HomaTransport::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
         return bytesOnWire;
     }
 
-
     numPartialBytes += homaPktHdrSize + IP_HEADER_SIZE +
             UDP_HEADER_SIZE;
 
@@ -158,7 +162,6 @@ HomaTransport::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
             ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
     
     bytesOnWire += numPartialBytesOnWire;
-
 
     return bytesOnWire;
 }
@@ -492,6 +495,7 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
         trafficPacer->bytesArrived(transport->getBytesOnWire(numBytesInReqPkt,
                 PktType::REQUEST));
     }
+    transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
 
     // If this req. packet also contains data, we need to add the data to the
     // inbound message and update the incompleteRxMsgs. 
@@ -597,6 +601,9 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
                 pktUnschedBytes, PktType::UNSCHED_DATA));
     }
 
+    transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
+
+
     // Append the unsched data to the inboundMsg
     inboundMsg->fillinRxBytes(rxPkt->getUnschedDataFields().firstByte,
             rxPkt->getUnschedDataFields().lastByte);
@@ -645,8 +652,11 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
     // this is a packet we have already committed in the trafficPacer by sending
     // agrant for it. Now the grant for this packet must be returned to the
     // pacer.
-    trafficPacer->bytesArrived(transport->getBytesOnWire(bytesReceived, 
-            PktType::SCHED_DATA));
+    uint32_t totalOnwireBytesReceived =
+            transport->getBytesOnWire(bytesReceived, PktType::SCHED_DATA);
+    transport->outstandingGrantBytes -= totalOnwireBytesReceived;
+    trafficPacer->bytesArrived(totalOnwireBytesReceived);
+    transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
 
     EV_INFO << "Received " << bytesReceived << " bytes from "
             << inboundMsg->srcAddr.str() << " for msgId "
@@ -720,6 +730,8 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
         // The size of scheduled data bytes on wire.
         uint32_t schedBytesOneWire = transport->getBytesOnWire(
                 grantSize, PktType::SCHED_DATA);
+        transport->outstandingGrantBytes += schedBytesOneWire;
+        transport->emit(outstandingGrantBytesSignal, transport->outstandingGrantBytes);
 
         // set the grantTimer for the next grant
         transport->scheduleAt(trafficPacer->grantSent(

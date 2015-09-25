@@ -30,6 +30,12 @@ class HomaPkt : public HomaPkt_Base
      */
     uint32_t headerSize();
 
+    /**
+     * This function checks if there is a HomaPkt packet encapsulated in the messages
+     * and returns it. Returns null if no HomaPkt is encapsulated.
+     */
+    static cPacket* searchEncapHomaPkt(cPacket* msg);
+
 };
 
 #endif /* HOMAPKT_H_ */
