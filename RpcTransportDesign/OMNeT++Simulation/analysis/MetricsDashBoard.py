@@ -333,6 +333,8 @@ def parseXmlFile(xmlConfigFile):
 def printStatsLine(statsDic, rowTitle, tw, fw, unit, printKeys):
     if unit == 'us':
         scaleFac = 1e6 
+    elif unit == 'KB':
+        scaleFac = 1e-3
     elif unit == '':
         scaleFac = 1
 
@@ -348,7 +350,6 @@ def printStatsLine(statsDic, rowTitle, tw, fw, unit, printKeys):
             else:
                 printStr += '{0:.2f}'.format(statsDic.access(key) * scaleFac).center(fw)
     print(printStr)
-
 
 def printQueueTimeStats(queueWaitTimeDigest, unit):
 
@@ -813,6 +814,46 @@ def printHomaRates(parsedStats, xmlParsedDic):
     digestHomaRates(trafficDic.rxHostsTraffic.nics.sx.grantPkts, 'RX NICs Grant SxRate:')
     printStatsLine(trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest, trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest.title, tw, fw, '', printKeys)
 
+def printHomaOutstandingBytes(parsedStats, xmlParsedDic, unit):
+    tw = 25
+    fw = 8
+    lineMax = 90
+    title = 'Receiver\'s Outstanding Bytes(@ packet arrivals) and Grants (@ new grants)'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+    trafficDic = AttrDict()
+
+    outstandingGrantsStats = []
+    outstandingByteStats = []
+    for host in parsedStats.hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        if hostId in xmlParsedDic.receiverIds:
+            outstandingGrantsHistogramKey = 'host[{0}].transportScheme.outstandingGrantBytes:histogram.bins'.format(hostId)
+            outstandingGrantsStatsKey = 'host[{0}].transportScheme.outstandingGrantBytes:stats'.format(hostId)
+            outstandingGrantsStats.append(getInterestingModuleStats(parsedStats.hosts, outstandingGrantsStatsKey, outstandingGrantsHistogramKey))
+
+            outstandingBytesHistogramKey = 'host[{0}].transportScheme.totalOutstandingBytes:histogram.bins'.format(hostId)
+            outstandingBytesStatsKey = 'host[{0}].transportScheme.totalOutstandingBytes:stats'.format(hostId)
+            outstandingByteStats.append(getInterestingModuleStats(parsedStats.hosts, outstandingBytesStatsKey, outstandingBytesHistogramKey))
+
+    outstandingBytes = AttrDict()
+    outstandingBytes.totalBytes = digestModulesStats(outstandingByteStats)
+    outstandingBytes.grantBytes = digestModulesStats(outstandingGrantsStats)
+    printKeys = ['mean', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
+    print("="*lineMax)
+    print("In Flight Bytes".ljust(tw) + 'mean'.format(unit).center(fw) + 'stddev'.format(unit).center(fw) +
+            'min'.format(unit).center(fw) + 'median'.format(unit).center(fw) + '75%ile'.format(unit).center(fw) +
+            '99%ile'.format(unit).center(fw) + 'max'.format(unit).center(fw) + 'count'.center(fw))
+
+    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + ''.center(fw))
+
+    print("_"*lineMax)
+
+    printStatsLine(outstandingBytes.grantBytes, 'Outstanding Grant Bytes:', tw, fw, unit, printKeys)
+    printStatsLine(outstandingBytes.totalBytes, 'Outstanding Total Bytes:', tw, fw, unit, printKeys)
+
 def digestQueueLenInfo(queueLenDic, title):
     queueLenDigest = queueLenDic.queueLenDigest
     totalCount = sum(queueLenDic.count) * 1.0
@@ -1037,6 +1078,7 @@ def main():
     torsQueueWaitTime(parsedStats.tors, xmlParsedDic, queueWaitTimeDigest)
     aggrsQueueWaitTime(parsedStats.aggrs, xmlParsedDic, queueWaitTimeDigest)
     printGenralInfo(xmlParsedDic)
+    printHomaOutstandingBytes(parsedStats, xmlParsedDic, 'KB')
     printHomaRates(parsedStats, xmlParsedDic)
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
