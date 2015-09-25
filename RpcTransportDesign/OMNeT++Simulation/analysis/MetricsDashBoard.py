@@ -759,6 +759,60 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     digestTrafficInfo(trafficDic.rxHostsTraffic.apps.rx, 'RX Apps Recv:')
     printStatsLine(trafficDic.rxHostsTraffic.apps.rx.trafficDigest, trafficDic.rxHostsTraffic.apps.rx.trafficDigest.title, tw, fw, '', printKeys)
 
+def digestHomaRates(homaTrafficDic, title):
+    trafficDigest = homaTrafficDic.rateDigest
+    trafficDigest.title = title 
+    if 'rates' in homaTrafficDic.keys():
+        trafficDigest.cumRate = sum(homaTrafficDic.rates)
+        trafficDigest.avgRate = trafficDigest.cumRate/float(len(homaTrafficDic.rates)) 
+        trafficDigest.minRate = min(homaTrafficDic.rates)
+        trafficDigest.maxRate = max(homaTrafficDic.rates)
+
+def printHomaRates(parsedStats, xmlParsedDic):
+    printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate']
+    tw = 25
+    fw = 13
+    lineMax = 75
+    title = 'Homa Packets Traffic Rates'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+    trafficDic = AttrDict()
+
+    sxHostsNicUnschedRates = trafficDic.sxHostsTraffic.nics.sx.unschedPkts.rates = []
+    sxHostsNicReqRates = trafficDic.sxHostsTraffic.nics.sx.reqPkts.rates = []
+    sxHostsNicSchedRates = trafficDic.sxHostsTraffic.nics.sx.schedPkts.rates = []
+    rxHostsNicGrantRates = trafficDic.rxHostsTraffic.nics.sx.grantPkts.rates = []
+
+    for host in parsedStats.hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        hostStats = parsedStats.hosts[host]
+        nicSendUnschedRate = hostStats.access('eth[0].mac.\"Homa Unsched bits/sec sent\".value')/1e6
+        nicSendSchedRate = hostStats.access('eth[0].mac.\"Homa Sched bits/sec sent\".value')/1e6
+        nicSendReqRate = hostStats.access('eth[0].mac."Homa Req bits/sec sent".value')/1e6
+        nicSendGrantRate = hostStats.access('eth[0].mac.\"Homa  Grant bits/sec sent\".value')/1e6
+
+        if hostId in xmlParsedDic.senderIds:
+            sxHostsNicUnschedRates.append(nicSendUnschedRate)
+            sxHostsNicSchedRates.append(nicSendSchedRate)
+            sxHostsNicReqRates.append(nicSendReqRate)
+
+        if hostId in xmlParsedDic.receiverIds:
+            rxHostsNicGrantRates.append(nicSendGrantRate)
+
+    print("="*lineMax)
+    print("Homa Packet Type".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw))
+    print("".ljust(tw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw))
+
+    print("_"*lineMax)
+    digestHomaRates(trafficDic.sxHostsTraffic.nics.sx.reqPkts, 'SX NICs Req. SxRate:')
+    printStatsLine(trafficDic.sxHostsTraffic.nics.sx.reqPkts.rateDigest, trafficDic.sxHostsTraffic.nics.sx.reqPkts.rateDigest.title, tw, fw, '', printKeys)
+    digestHomaRates(trafficDic.sxHostsTraffic.nics.sx.unschedPkts, 'SX NICs Unsched. SxRate:')
+    printStatsLine(trafficDic.sxHostsTraffic.nics.sx.unschedPkts.rateDigest, trafficDic.sxHostsTraffic.nics.sx.unschedPkts.rateDigest.title, tw, fw, '', printKeys)
+    digestHomaRates(trafficDic.sxHostsTraffic.nics.sx.schedPkts, 'SX NICs Sched. SxRate:')
+    printStatsLine(trafficDic.sxHostsTraffic.nics.sx.schedPkts.rateDigest, trafficDic.sxHostsTraffic.nics.sx.schedPkts.rateDigest.title, tw, fw, '', printKeys)
+    digestHomaRates(trafficDic.rxHostsTraffic.nics.sx.grantPkts, 'RX NICs Grant SxRate:')
+    printStatsLine(trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest, trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest.title, tw, fw, '', printKeys)
+
 def digestQueueLenInfo(queueLenDic, title):
     queueLenDigest = queueLenDic.queueLenDigest
     totalCount = sum(queueLenDic.count) * 1.0
@@ -983,6 +1037,7 @@ def main():
     torsQueueWaitTime(parsedStats.tors, xmlParsedDic, queueWaitTimeDigest)
     aggrsQueueWaitTime(parsedStats.aggrs, xmlParsedDic, queueWaitTimeDigest)
     printGenralInfo(xmlParsedDic)
+    printHomaRates(parsedStats, xmlParsedDic)
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
