@@ -133,7 +133,7 @@ WorkloadSynthesizer::initialize()
         distFileName = std::string(
                 "../../sizeDistributions/HostidSizeInterarrival.txt");
         cModule* parentHost = this->getParentModule();
-        if (strcmp(parentHost->getName(), "HostBase") != 0) {
+        if (strcmp(parentHost->getName(), "host") != 0) {
             throw cRuntimeError("'%s': Not a valid parent module type. Expected "
                     "\"HostBase\" for parent module type.", parentHost->getName());
         }
