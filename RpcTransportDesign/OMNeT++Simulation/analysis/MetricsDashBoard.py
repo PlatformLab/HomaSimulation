@@ -157,24 +157,35 @@ def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
 
 def digestModulesStats(modulesStatsList):
     statsDigest = AttrDict()
-    statsDigest = statsDigest.fromkeys(modulesStatsList[0].keys(), 0.0) 
-    statsDigest.min = inf
-    for targetStat in modulesStatsList:
-        statsDigest.count += targetStat.count 
-        statsDigest.min = min(targetStat.min, statsDigest.min)
-        statsDigest.max = max(targetStat.max, statsDigest.max)
-        statsDigest.mean += targetStat.mean * targetStat.count 
-        statsDigest.stddev += targetStat.stddev * targetStat.count 
-        statsDigest.median += targetStat.median * targetStat.count
-        statsDigest.threeQuartile += targetStat.threeQuartile  * targetStat.count 
-        statsDigest.ninety9Percentile += targetStat.ninety9Percentile  * targetStat.count 
-    
-    divideNoneZero = lambda stats, count: stats * 1.0/count if count !=0 else 0.0  
-    statsDigest.mean = divideNoneZero(statsDigest.mean, statsDigest.count)
-    statsDigest.stddev = divideNoneZero(statsDigest.stddev, statsDigest.count) 
-    statsDigest.median = divideNoneZero(statsDigest.median, statsDigest.count) 
-    statsDigest.threeQuartile = divideNoneZero(statsDigest.threeQuartile, statsDigest.count) 
-    statsDigest.ninety9Percentile = divideNoneZero(statsDigest.ninety9Percentile, statsDigest.count) 
+    if len(modulesStatsList) > 0:
+        statsDigest = statsDigest.fromkeys(modulesStatsList[0].keys(), 0.0) 
+        statsDigest.min = inf
+        for targetStat in modulesStatsList:
+            statsDigest.count += targetStat.count 
+            statsDigest.min = min(targetStat.min, statsDigest.min)
+            statsDigest.max = max(targetStat.max, statsDigest.max)
+            statsDigest.mean += targetStat.mean * targetStat.count 
+            statsDigest.stddev += targetStat.stddev * targetStat.count 
+            statsDigest.median += targetStat.median * targetStat.count
+            statsDigest.threeQuartile += targetStat.threeQuartile  * targetStat.count 
+            statsDigest.ninety9Percentile += targetStat.ninety9Percentile  * targetStat.count 
+        
+        divideNoneZero = lambda stats, count: stats * 1.0/count if count !=0 else 0.0  
+        statsDigest.mean = divideNoneZero(statsDigest.mean, statsDigest.count)
+        statsDigest.stddev = divideNoneZero(statsDigest.stddev, statsDigest.count) 
+        statsDigest.median = divideNoneZero(statsDigest.median, statsDigest.count) 
+        statsDigest.threeQuartile = divideNoneZero(statsDigest.threeQuartile, statsDigest.count) 
+        statsDigest.ninety9Percentile = divideNoneZero(statsDigest.ninety9Percentile, statsDigest.count) 
+    else:
+        statsDigest.count = 0  
+        statsDigest.min = inf  
+        statsDigest.max = 0 
+        statsDigest.mean = 0 
+        statsDigest.stddev = 0 
+        statsDigest.median = 0 
+        statsDigest.threeQuartile = 0 
+        statsDigest.ninety9Percentile = 0
+        
 
     return statsDigest
 
@@ -198,8 +209,7 @@ def hostQueueWaitTimes(hosts, xmlParsedDic, reportDigest):
 
         queuingTimeDigest = AttrDict()
         queuingTimeDigest = digestModulesStats(queuingTimeStats)
-        if queuingTimeDigest.count != 0:
-            reportDigest.assign('queueWaitTime.hosts.{0}'.format(keyString), queuingTimeDigest)
+        reportDigest.assign('queueWaitTime.hosts.{0}'.format(keyString), queuingTimeDigest)
 
 def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
     senderHostIds = xmlParsedDic.senderIds
@@ -243,13 +253,11 @@ def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
        
         torsUpwardQueuingTimeDigest = AttrDict()
         torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
-        if torsUpwardQueuingTimeDigest.count != 0:
-            reportDigest.assign('queueWaitTime.tors.upward.{0}'.format(keyString), torsUpwardQueuingTimeDigest)
+        reportDigest.assign('queueWaitTime.tors.upward.{0}'.format(keyString), torsUpwardQueuingTimeDigest)
 
         torsDownwardQueuingTimeDigest = AttrDict()
         torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
-        if torsDownwardQueuingTimeDigest.count != 0:
-            reportDigest.assign('queueWaitTime.tors.downward.{0}'.format(keyString), torsDownwardQueuingTimeDigest)
+        reportDigest.assign('queueWaitTime.tors.downward.{0}'.format(keyString), torsDownwardQueuingTimeDigest)
 
 def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
     # Find the queue waiting for aggrs switches NICs
@@ -266,8 +274,7 @@ def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
         
         aggrsQueuingTimeDigest = AttrDict() 
         aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
-        if aggrsQueuingTimeDigest.count != 0: 
-            reportDigest.assign('queueWaitTime.aggrs.{0}'.format(keyString), aggrsQueuingTimeDigest)
+        reportDigest.assign('queueWaitTime.aggrs.{0}'.format(keyString), aggrsQueuingTimeDigest)
 
 def parseXmlFile(xmlConfigFile):
     xmlConfig = minidom.parse(xmlConfigFile)
@@ -620,14 +627,14 @@ def printGenralInfo(xmlParsedDic):
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
     trafficDigest.title = title 
-    if 'bytes' in trafficBytesAndRateDic.keys():
+    if 'bytes' in trafficBytesAndRateDic.keys() and len(trafficBytesAndRateDic.bytes) > 0:
         trafficDigest.cumBytes = sum(trafficBytesAndRateDic.bytes)/1e6
-    if 'rates' in trafficBytesAndRateDic.keys():
+    if 'rates' in trafficBytesAndRateDic.keys() and len(trafficBytesAndRateDic.rates) > 0:
         trafficDigest.cumRate = sum(trafficBytesAndRateDic.rates)
         trafficDigest.avgRate = trafficDigest.cumRate/float(len(trafficBytesAndRateDic.rates)) 
         trafficDigest.minRate = min(trafficBytesAndRateDic.rates)
         trafficDigest.maxRate = max(trafficBytesAndRateDic.rates)
-    if 'dutyCycles' in trafficBytesAndRateDic.keys():
+    if 'dutyCycles' in trafficBytesAndRateDic.keys() and len(trafficBytesAndRateDic.dutyCycles) > 0:
         trafficDigest.avgDutyCycle = sum(trafficBytesAndRateDic.dutyCycles)/float(len(trafficBytesAndRateDic.dutyCycles)) 
         trafficDigest.minDutyCycle = min(trafficBytesAndRateDic.dutyCycles)
         trafficDigest.maxDutyCycle = max(trafficBytesAndRateDic.dutyCycles)
@@ -876,10 +883,12 @@ def digestQueueLenInfo(queueLenDic, title):
             queueLenDigest[key] = nan 
 
     queueLenDigest.title = title 
-    queueLenDigest.minCnt = min(queueLenDic.minCnt)
-    queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
-    queueLenDigest.minBytes = min(queueLenDic.minBytes)
-    queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
+    if len(queueLenDic.minCnt) > 0:
+        queueLenDigest.minCnt = min(queueLenDic.minCnt)
+        queueLenDigest.minBytes = min(queueLenDic.minBytes)
+    if len(queueLenDic.maxCnt) > 0:
+        queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
+        queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
 
 def printQueueLength(parsedStats, xmlParsedDic):
     printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
