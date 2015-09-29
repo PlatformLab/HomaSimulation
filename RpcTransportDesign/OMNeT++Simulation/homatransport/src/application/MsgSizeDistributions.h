@@ -46,7 +46,7 @@ class MsgSizeDistributions {
    
   private:
     std::vector<std::pair<int, double>> msgSizeProbDistVector;
-    std::queue<std::pair<int, uint64_t>> msgSizeInterarrivalQueue;
+    std::queue<std::pair<int, double>> msgSizeInterarrivalQueue;
 
     // Random number generator classes and datastructs
     std::random_device rdDevice;
