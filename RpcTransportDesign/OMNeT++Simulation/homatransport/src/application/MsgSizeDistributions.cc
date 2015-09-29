@@ -35,6 +35,7 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         char buf[100]; 
         snprintf(buf, 100, "%s: Failed to open file.", distFileName);
         throw MsgSizeDistException(buf);
+        distFileStream.close();
     }
 
     if (sizeDistSelector >= DistributionChoice::NO_SIZE_DIST_SPECIFIED || 
@@ -55,8 +56,7 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         int hostId;
         int msgSize;
         double deltaTime;
-        while (!distFileStream.eof()) {
-            getline(distFileStream, hostIdSizeInterarrivalLine);
+        while (getline(distFileStream, hostIdSizeInterarrivalLine)) {
             sscanf(hostIdSizeInterarrivalLine.c_str(), "%d %d %lf",
                     &hostId, &msgSize, &deltaTime);
             dt += deltaTime;
@@ -82,15 +82,15 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         avgInterArrivalTime = 1e-9 * avgMsgSize * 8  / avgRate;
 
         // reads msgSize<->probabilty pairs from "distFileName" file
-        while(!distFileStream.eof()) {
+        while(getline(distFileStream, sizeProbStr)) {
             int msgSize;
             double prob;
-            getline(distFileStream, sizeProbStr);
             sscanf(sizeProbStr.c_str(), "%d %lf", 
                     &msgSize, &prob);
             msgSizeProbDistVector.push_back(std::make_pair(msgSize, prob));
         }
     }
+    distFileStream.close();
 }
 
 void
