@@ -22,7 +22,7 @@ class TrafficPacer
     simtime_t grantSent(uint32_t grantedPktSizeOnWire, simtime_t currentTime);
     void bytesArrived(uint32_t arrivedBytes);
     void unschedPendingBytes(uint32_t committedBytes);
-    bool okToGrant(simtime_t currentTime);
+    bool okToGrant(simtime_t currentTime, uint32_t grantSize);
 
     // Only
     inline uint32_t getOutstandingBytes()

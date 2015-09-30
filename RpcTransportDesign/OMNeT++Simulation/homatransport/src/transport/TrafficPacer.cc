@@ -33,10 +33,10 @@ TrafficPacer::grantSent(uint32_t grantedPktSizeOnWire, simtime_t currentTime)
 }
 
 bool
-TrafficPacer::okToGrant(simtime_t currentTime)
+TrafficPacer::okToGrant(simtime_t currentTime, uint32_t grantSize)
 {
     return (nextGrantTime <= currentTime) && 
-            (totalOutstandingBytes < (int)maxAllowedInFlightBytes);
+            ((totalOutstandingBytes + (int)grantSize) <= (int)maxAllowedInFlightBytes);
 }
 
 void

@@ -252,7 +252,7 @@ HomaTransport::SendController::getReqDataBytes(AppMessage* sxMsg)
 uint32_t
 HomaTransport::SendController::getUnschedBytes(AppMessage* sxMsg)
 {
-    const uint32_t unschedBytes = 500;
+    const uint32_t unschedBytes = 0;
     if (sxMsg->getByteLength() > getReqDataBytes(sxMsg)) {
         return std::min((uint32_t)sxMsg->getByteLength()-getReqDataBytes(sxMsg), unschedBytes);
     }
@@ -487,15 +487,19 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
             uint32_t unschedBytesOnWire = transport->getBytesOnWire(
                     unschedBytesToArrive, PktType::UNSCHED_DATA); 
             trafficPacer->unschedPendingBytes(unschedBytesOnWire);
+            transport->emit(totalOutstandingBytesSignal,
+                    trafficPacer->getOutstandingBytes());
         }
     } else {
 
         // this request bytes are previously accounted for in the trafficPacer
         // and now we need to return them to the pacer
+        transport->emit(totalOutstandingBytesSignal, 
+                trafficPacer->getOutstandingBytes());
         trafficPacer->bytesArrived(transport->getBytesOnWire(numBytesInReqPkt,
                 PktType::REQUEST));
+
     }
-    transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
 
     // If this req. packet also contains data, we need to add the data to the
     // inbound message and update the incompleteRxMsgs. 
@@ -593,15 +597,19 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
         }
 
         trafficPacer->unschedPendingBytes(unschedBytesOnWire);
+        transport->emit(totalOutstandingBytesSignal,
+                trafficPacer->getOutstandingBytes());
     } else {
         // this is a packet that we expected to receive and have previously
         // accounted for in the trafficPacer. Now we need to return it to the
         // pacer.
+
+        transport->emit(totalOutstandingBytesSignal, 
+                trafficPacer->getOutstandingBytes());
         trafficPacer->bytesArrived(transport->getBytesOnWire(
                 pktUnschedBytes, PktType::UNSCHED_DATA));
     }
 
-    transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
 
 
     // Append the unsched data to the inboundMsg
@@ -655,8 +663,8 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
     uint32_t totalOnwireBytesReceived =
             transport->getBytesOnWire(bytesReceived, PktType::SCHED_DATA);
     transport->outstandingGrantBytes -= totalOnwireBytesReceived;
-    trafficPacer->bytesArrived(totalOnwireBytesReceived);
     transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
+    trafficPacer->bytesArrived(totalOnwireBytesReceived);
 
     EV_INFO << "Received " << bytesReceived << " bytes from "
             << inboundMsg->srcAddr.str() << " for msgId "
@@ -713,7 +721,7 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
             std::min(highPrioMsg->bytesToGrant, grantMaxBytes);
 
     
-    if (trafficPacer->okToGrant(currentTime)) {
+    if (trafficPacer->okToGrant(currentTime, grantSize)) {
 
         // prepare a grant and send out
         HomaPkt* grantPkt = new(HomaPkt);
