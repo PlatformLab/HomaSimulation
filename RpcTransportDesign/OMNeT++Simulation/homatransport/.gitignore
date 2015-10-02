@@ -3,9 +3,9 @@
 *_m.cc
 *_sm.h
 *_sm.cc
-*/**/Makefile
-*/**/Makefile.vc
-**/results*/
+*/**/results*
+**/Makefile
+**/Makefile.vc
 *.log
 *.sim
 *.pyc
