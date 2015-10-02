@@ -25,6 +25,7 @@ simple HomaTransport like ITransportScheme
         xml transportConfig = default(xml("<param/>"));
         int nicLinkSpeed @unit(Gbps);
         int grantMaxBytes @unit(byte) = default(1472B);
+        int maxOutstandingRecvBytes @unit(byte) = default(15000B);
         int maxRtt @unit(us) = default(15us);
         int localPort = default(-1);
         int destPort;

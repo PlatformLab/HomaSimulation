@@ -45,6 +45,7 @@ HomaTransport::initialize()
     localPort = par("localPort");
     destPort = par("destPort");
     nicLinkSpeed = par("nicLinkSpeed");
+    maxOutstandingRecvBytes = par("maxOutstandingRecvBytes");
     uint32_t grantMaxBytes = (uint32_t) par("grantMaxBytes");
     HomaPkt dataPkt = HomaPkt();
     dataPkt.setPktType(PktType::SCHED_DATA);
@@ -252,9 +253,10 @@ HomaTransport::SendController::getReqDataBytes(AppMessage* sxMsg)
 uint32_t
 HomaTransport::SendController::getUnschedBytes(AppMessage* sxMsg)
 {
-    const uint32_t unschedBytes = 0;
+    const uint32_t unschedBytes = 1448;
     if (sxMsg->getByteLength() > getReqDataBytes(sxMsg)) {
-        return std::min((uint32_t)sxMsg->getByteLength()-getReqDataBytes(sxMsg), unschedBytes);
+        return std::min((uint32_t)sxMsg->getByteLength()-getReqDataBytes(sxMsg),
+                unschedBytes);
     }
     return 0;
 }
@@ -438,7 +440,8 @@ HomaTransport::ReceiveScheduler::initialize(uint32_t grantMaxBytes,
         uint32_t nicLinkSpeed, cMessage* grantTimer)
 {
     this->grantMaxBytes = grantMaxBytes;
-    this->trafficPacer = new(this->trafficPacer) TrafficPacer(nicLinkSpeed);
+    this->trafficPacer = new(this->trafficPacer) TrafficPacer(nicLinkSpeed, 
+            transport->maxOutstandingRecvBytes);
     this->grantTimer = grantTimer;
 }
 

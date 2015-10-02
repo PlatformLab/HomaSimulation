@@ -223,6 +223,7 @@ class HomaTransport : public cSimpleModule
     int localPort;
     int destPort;
     int nicLinkSpeed;
+    int maxOutstandingRecvBytes;
 
     // this variable tracks the outstanding grant bytes. This in only for
     // getting statistics.
