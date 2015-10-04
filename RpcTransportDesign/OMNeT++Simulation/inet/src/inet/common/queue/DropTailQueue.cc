@@ -20,6 +20,7 @@
 #include "inet/common/queue/DropTailQueue.h"
 #include "inet/linklayer/ethernet/EtherMACBase.h"
 #include "inet/linklayer/ethernet/Ethernet.h"
+#include "../../homatransport/src/transport/HomaPkt.h"
 
 namespace inet {
 
@@ -30,6 +31,9 @@ void DropTailQueue::initialize()
     PassiveQueueBase::initialize();
 
     queue.setName(par("queueName"));
+
+    // Configure the HomaPkt priority sort function
+    queue.setup(&HomaPkt::compareHomaPkts);
 
     //statistics
     emit(queueLengthSignal, queue.length());
@@ -44,6 +48,7 @@ void DropTailQueue::initialize()
     if (!mac) {
         EV_WARN << "Warning. No mac connected to queue module.\n";
     }
+
 }
 
 cMessage *DropTailQueue::enqueue(cMessage *msg)

@@ -86,6 +86,7 @@ packet HomaPkt {
     inet::L3Address srcAddr; 
     inet::L3Address destAddr;
     uint64_t msgId;
+    uint32_t priority = 1;
     int pktType @enum(PktType);   
     
     // depending on the pktType, only one of the three following struct are

@@ -36,6 +36,11 @@ class HomaPkt : public HomaPkt_Base
      */
     static cPacket* searchEncapHomaPkt(cPacket* msg);
 
+    /**
+     * This function compares priority of two HomaPkt.
+     */
+    static int compareHomaPkts(cObject* obj1, cObject* obj2);
+
 };
 
 #endif /* HOMAPKT_H_ */

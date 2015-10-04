@@ -336,6 +336,7 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
     reqPkt->setDestAddr(this->destAddr);
     reqPkt->setSrcAddr(this->srcAddr);
     reqPkt->setMsgId(this->msgId);
+    reqPkt->setPriority(0);
 
     // set homa pkt length
     reqPkt->setByteLength(reqPkt->headerSize() + reqFields.numReqBytes);
@@ -736,6 +737,7 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
         grantPkt->setSrcAddr(highPrioMsg->destAddr);
         grantPkt->setMsgId(highPrioMsg->msgIdAtSender);
         grantPkt->setByteLength(grantPkt->headerSize());
+        grantPkt->setPriority(0);
         transport->sendPacket(grantPkt);
 
         // The size of scheduled data bytes on wire.
