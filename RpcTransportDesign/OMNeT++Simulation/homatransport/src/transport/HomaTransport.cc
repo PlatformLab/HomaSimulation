@@ -253,7 +253,8 @@ HomaTransport::SendController::getReqDataBytes(AppMessage* sxMsg)
 uint32_t
 HomaTransport::SendController::getUnschedBytes(AppMessage* sxMsg)
 {
-    const uint32_t unschedBytes = 1448;
+    //const uint32_t unschedBytes = 1448;
+    const uint32_t unschedBytes = 0;
     if (sxMsg->getByteLength() > getReqDataBytes(sxMsg)) {
         return std::min((uint32_t)sxMsg->getByteLength()-getReqDataBytes(sxMsg),
                 unschedBytes);
@@ -724,8 +725,10 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
     grantSize = 
             std::min(highPrioMsg->bytesToGrant, grantMaxBytes);
 
-    
-    if (trafficPacer->okToGrant(currentTime, grantSize)) {
+    // The size of scheduled data bytes on wire.
+    uint32_t schedBytesOneWire = transport->getBytesOnWire(
+            grantSize, PktType::SCHED_DATA);
+    if (trafficPacer->okToGrant(currentTime, schedBytesOneWire)) {
 
         // prepare a grant and send out
         HomaPkt* grantPkt = new(HomaPkt);
@@ -740,9 +743,6 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
         grantPkt->setPriority(0);
         transport->sendPacket(grantPkt);
 
-        // The size of scheduled data bytes on wire.
-        uint32_t schedBytesOneWire = transport->getBytesOnWire(
-                grantSize, PktType::SCHED_DATA);
         transport->outstandingGrantBytes += schedBytesOneWire;
         transport->emit(outstandingGrantBytesSignal, transport->outstandingGrantBytes);
 
