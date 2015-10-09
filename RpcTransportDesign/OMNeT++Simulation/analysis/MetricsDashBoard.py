@@ -341,7 +341,7 @@ def printStatsLine(statsDic, rowTitle, tw, fw, unit, printKeys):
     if unit == 'us':
         scaleFac = 1e6 
     elif unit == 'KB':
-        scaleFac = 1e-3
+        scaleFac = 2**-10 
     elif unit == '':
         scaleFac = 1
 
@@ -925,10 +925,10 @@ def printQueueLength(parsedStats, xmlParsedDic):
         transQueueLenMax = hostStats.access('transportScheme.msgsLeftToSend:stats.max')
         transQueueLenMean = hostStats.access('transportScheme.msgsLeftToSend:stats.mean')
         transQueueLenStddev = hostStats.access('transportScheme.msgsLeftToSend:stats.stddev')
-        transQueueBytesMin = hostStats.access('transportScheme.bytesLeftToSend:stats.min')/1e3
-        transQueueBytesMax = hostStats.access('transportScheme.bytesLeftToSend:stats.max')/1e3
-        transQueueBytesMean = hostStats.access('transportScheme.bytesLeftToSend:stats.mean')/1e3
-        transQueueBytesStddev = hostStats.access('transportScheme.bytesLeftToSend:stats.stddev')/1e3
+        transQueueBytesMin = hostStats.access('transportScheme.bytesLeftToSend:stats.min')/2**10
+        transQueueBytesMax = hostStats.access('transportScheme.bytesLeftToSend:stats.max')/2**10
+        transQueueBytesMean = hostStats.access('transportScheme.bytesLeftToSend:stats.mean')/2**10
+        transQueueBytesStddev = hostStats.access('transportScheme.bytesLeftToSend:stats.stddev')/2**10
         
         nicQueueLenCnt = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.count')
         nicQueueLenMin = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.min')
@@ -937,10 +937,10 @@ def printQueueLength(parsedStats, xmlParsedDic):
         nicQueueLenMax = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.max')
         nicQueueLenMean = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.mean')
         nicQueueLenStddev = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.stddev')
-        nicQueueBytesMin = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.min')/1e3
-        nicQueueBytesMax = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.max')/1e3
-        nicQueueBytesMean = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.mean')/1e3
-        nicQueueBytesStddev = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.stddev')/1e3
+        nicQueueBytesMin = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.min')/2**10
+        nicQueueBytesMax = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.max')/2**10
+        nicQueueBytesMean = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.mean')/2**10
+        nicQueueBytesStddev = hostStats.access('eth[0].queue.dataQueue.queueByteLength:stats.stddev')/2**10
         queueLen.hosts.nic.empty.append(nicQueueLenEmpty)
         queueLen.hosts.nic.onePkt.append(nicQueueLenOnePkt)
         queueLen.hosts.nic.count.append(nicQueueLenCnt)
@@ -994,10 +994,10 @@ def printQueueLength(parsedStats, xmlParsedDic):
             nicQueueLenMax = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.max'.format(ifaceId))
             nicQueueLenMean = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.mean'.format(ifaceId))
             nicQueueLenStddev = tor.access('eth[{0}].queue.dataQueue.queueLength:stats.stddev'.format(ifaceId))
-            nicQueueBytesMin = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.min'.format(ifaceId))/1e3
-            nicQueueBytesMax = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.max'.format(ifaceId))/1e3
-            nicQueueBytesMean = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.mean'.format(ifaceId))/1e3
-            nicQueueBytesStddev = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.stddev'.format(ifaceId))/1e3
+            nicQueueBytesMin = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.min'.format(ifaceId))/2**10
+            nicQueueBytesMax = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.max'.format(ifaceId))/2**10
+            nicQueueBytesMean = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.mean'.format(ifaceId))/2**10
+            nicQueueBytesStddev = tor.access('eth[{0}].queue.dataQueue.queueByteLength:stats.stddev'.format(ifaceId))/2**10
 
             if ifaceId < numServersPerTor:
                 queueLen.tors.down.nic.minCnt.append(nicQueueLenMin)
