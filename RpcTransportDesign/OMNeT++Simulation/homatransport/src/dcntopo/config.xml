@@ -17,11 +17,11 @@
         <switchFixDelay>0.25us</switchFixDelay>
         <workloadType>TEST_DIST</workloadType>
         <interArrivalDist>exponential</interArrivalDist>
-        <loadFactor>0.001785714</loadFactor>
+        <loadFactor>0.01785714</loadFactor>
         <startTime>0s</startTime>
         <stopTime>9.5s</stopTime>
         <warmup-period>0ms</warmup-period>
-        <msgSizeRanges>100 1456 10000 100000 1000000</msgSizeRanges>
+        <msgSizeRanges>100 1448 10000 100000 1000000</msgSizeRanges>
     </param>
     <IPv4Configurator>
         <config>

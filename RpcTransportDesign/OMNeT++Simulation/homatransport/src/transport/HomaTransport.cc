@@ -20,6 +20,9 @@
 
 Define_Module(HomaTransport);
 
+/**
+ * Registering all of the statistics collection signals.
+ */
 simsignal_t HomaTransport::msgsLeftToSendSignal = 
         registerSignal("msgsLeftToSend");
 simsignal_t HomaTransport::bytesLeftToSendSignal = 
@@ -47,6 +50,8 @@ HomaTransport::initialize()
     nicLinkSpeed = par("nicLinkSpeed");
     maxOutstandingRecvBytes = par("maxOutstandingRecvBytes");
     uint32_t grantMaxBytes = (uint32_t) par("grantMaxBytes");
+    sxController.initSendController((uint32_t) par("defaultReqBytes"),
+            (uint32_t) par("defaultUnschedBytes"));
     HomaPkt dataPkt = HomaPkt();
     dataPkt.setPktType(PktType::SCHED_DATA);
     uint32_t maxDataBytes = MAX_ETHERNET_PAYLOAD_BYTES - 
@@ -55,7 +60,6 @@ HomaTransport::initialize()
         grantMaxBytes = maxDataBytes;
     }
 
-    //maxGrantTimeInterval = 8.0 * grantMaxBytes * 10e-9 / nicLinkSpeed;
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);
     rxScheduler.initialize(grantMaxBytes, nicLinkSpeed, selfMsg);
@@ -188,26 +192,43 @@ HomaTransport::SendController::SendController(HomaTransport* transport)
     , bytesLeftToSend(0)
     , msgId(0)
     , outboundMsgMap()
+    , unschedByteAllocator(NULL)
+{}
+
+void
+HomaTransport::SendController::initSendController(uint32_t defaultReqBytes,
+        uint32_t defaultUnschedBytes)
 {
+    bytesLeftToSend = 0;
     std::random_device rd;
     std::mt19937_64 merceneRand(rd());
     std::uniform_int_distribution<uint64_t> dist(0, UINTMAX_MAX);
     msgId = dist(merceneRand);
-
+    unschedByteAllocator = 
+            new UnschedByteAllocator(defaultReqBytes, defaultUnschedBytes);
 }
 
 HomaTransport::SendController::~SendController()
-{}
+{
+    delete unschedByteAllocator;
+}
 
 void
 HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
 {
-
     transport->emit(msgsLeftToSendSignal, outboundMsgMap.size());
     transport->emit(bytesLeftToSendSignal, bytesLeftToSend);
+    uint32_t destAddr = 
+            sendMsg->getDestAddr().toIPv4().getInt();
+    uint32_t msgSize = sendMsg->getByteLength();
+    uint32_t dataBytesInReq = 
+            unschedByteAllocator->getReqDataBytes(destAddr, msgSize);
+    uint32_t unschedDataBytes = 
+            unschedByteAllocator->getUnschedBytes(destAddr, msgSize);
     outboundMsgMap.emplace(std::piecewise_construct, 
             std::forward_as_tuple(msgId), 
-            std::forward_as_tuple(sendMsg, this, msgId));
+            std::forward_as_tuple(sendMsg, this, msgId, dataBytesInReq,
+            unschedDataBytes));
     outboundMsgMap.at(msgId).sendRequestAndUnsched(); 
     if (outboundMsgMap.at(msgId).bytesLeft <= 0) {
         outboundMsgMap.erase(msgId);
@@ -231,7 +252,7 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
 
     int bytesLeftOld = outboundMsg->bytesLeft;
     int bytesLeftNew = 
-        outboundMsg->sendBytes(rxPkt->getGrantFields().grantBytes);
+        outboundMsg->sendSchedBytes(rxPkt->getGrantFields().grantBytes);
     int bytesSent = bytesLeftOld - bytesLeftNew;
     bytesLeftToSend -= bytesSent;
     ASSERT(bytesSent > 0 && bytesLeftToSend >= 0);
@@ -242,39 +263,18 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
     delete rxPkt;   
 }
 
-uint32_t
-HomaTransport::SendController::getReqDataBytes(AppMessage* sxMsg)
-{
-    const uint32_t reqBytes = 100; 
-
-    return std::min((uint32_t)sxMsg->getByteLength(), reqBytes);
-}
-
-uint32_t
-HomaTransport::SendController::getUnschedBytes(AppMessage* sxMsg)
-{
-    //const uint32_t unschedBytes = 1448;
-    const uint32_t unschedBytes = 0;
-    if (sxMsg->getByteLength() > getReqDataBytes(sxMsg)) {
-        return std::min((uint32_t)sxMsg->getByteLength()-getReqDataBytes(sxMsg),
-                unschedBytes);
-    }
-    return 0;
-}
-
-
-
 /**
  * HomaTransport::OutboundMessage
  */
 HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
-        SendController* sxController, uint64_t msgId)
+        SendController* sxController, uint64_t msgId, uint32_t dataBytesInReq, 
+        uint32_t unschedDataBytes)
     : sxController(sxController)
     , msgId(msgId)
     , bytesLeft(outMsg->getByteLength())
     , nextByteToSend(0) 
-    , dataBytesInReq(sxController->getReqDataBytes(outMsg))
-    , unschedDataBytes(sxController->getUnschedBytes(outMsg))
+    , dataBytesInReq(dataBytesInReq)
+    , unschedDataBytes(unschedDataBytes)
     , destAddr(outMsg->getDestAddr())
     , srcAddr(outMsg->getSrcAddr())
     , msgCreationTime(outMsg->getCreationTime())
@@ -379,6 +379,7 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
         unschedPkt->setDestAddr(this->destAddr);
         unschedPkt->setSrcAddr(this->srcAddr);
         unschedPkt->setMsgId(this->msgId);
+        unschedPkt->setPriority(1);
 
         // set homa pkt length
         unschedPkt->setByteLength(unschedPkt->headerSize() + bytesToSend);
@@ -394,7 +395,7 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
 }
 
 int
-HomaTransport::OutboundMessage::sendBytes(uint32_t numBytes)
+HomaTransport::OutboundMessage::sendSchedBytes(uint32_t numBytes)
 {
     ASSERT(this->bytesLeft > 0);
     uint32_t bytesToSend = std::min(numBytes, this->bytesLeft); 
@@ -405,6 +406,7 @@ HomaTransport::OutboundMessage::sendBytes(uint32_t numBytes)
     dataPkt->setSrcAddr(this->srcAddr);
     dataPkt->setDestAddr(this->destAddr);
     dataPkt->setMsgId(this->msgId);
+    dataPkt->setPriority(2);
     SchedDataFields dataFields;
     dataFields.firstByte = this->nextByteToSend;
     dataFields.lastByte = dataFields.firstByte + bytesToSend - 1;

@@ -26,14 +26,22 @@
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
 #include "transport/TrafficPacer.h"
+#include "transport/UnschedByteAllocator.h"
 
 /**
- * Impelements a grant based, receiver side congection control transport
- * protocol. 
+ * A grant based, receiver driven, congection control transport protocol over
+ * UDP datagram. For every message transmission, the sender side sends a req.
+ * pkt defining the length of the message. The reciever on the other side send a
+ * grant every packet time for the shortest remaining outstanding message among
+ * all outstanding messages.
  */
 class HomaTransport : public cSimpleModule
 {
   public:
+    /**
+     * All of the constants packet and header byte sizes for different types of
+     * datagrams.
+     */
     static const uint32_t ETHERNET_PREAMBLE_SIZE = 8;
     static const uint32_t ETHERNET_HDR_SIZE = 14; 
     static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
@@ -43,76 +51,138 @@ class HomaTransport : public cSimpleModule
     static const uint32_t ETHERNET_CRC_SIZE = 4;
     static const uint32_t INTER_PKT_GAP = 12; 
 
-
+    /**
+     * A self message essentially models a timer for this transport and can have
+     * one the below types.
+     */
     enum SelfMsgKind
     {
-        START = 1,
-        GRANT = 2,
-        STOP  = 3
+        START = 1,  // Timer type when the transport is in initialization phase.
+        GRANT = 2,  // Timer type in normal working state of transport.
+        STOP  = 3   // Timer type when the transport is in cleaning phase.
     };
 
     HomaTransport();
     ~HomaTransport();
 
-    // Signals
+    /**
+     * C++ declration of signals defined in .ned file.
+     */
+    // Signal for number of incomplete TX msgs received from the application.
     static simsignal_t msgsLeftToSendSignal;
+
+    // Signal for total numbet of msg bytes remained to send for all msgs.
     static simsignal_t bytesLeftToSendSignal;
+
+    // Signal for total number of in flight grant bytes.
     static simsignal_t outstandingGrantBytesSignal;
+
+    // Signal for total number of in flight bytes including both grants and
+    // unscheduled packets.
     static simsignal_t totalOutstandingBytesSignal;
  
-
     class SendController;
     class ReceiveScheduler;
     class CompareInboundMsg;
 
-
+    /**
+     * Represents and handles transmiting a message from the senders side.
+     * For each message represented by this class, this class exposes the api
+     * for sending the req. pkt and some number of unscheduled pkts following
+     * the request. This class also allows scheduled data to transmitted.
+     */
     class OutboundMessage
     {
       public:
         explicit OutboundMessage();
         explicit OutboundMessage(AppMessage* outMsg, 
-                SendController* sxController, uint64_t msgId);
+                SendController* sxController, uint64_t msgId,
+                uint32_t dataBytesInReq, uint32_t unschedDataBytes);
         explicit OutboundMessage(const OutboundMessage& outboundMsg);
         ~OutboundMessage();
         OutboundMessage& operator=(const OutboundMessage& other);
-        int sendBytes(uint32_t numBytes);
         void sendRequestAndUnsched();
+        int sendSchedBytes(uint32_t numBytes);
 
       protected:
-        SendController* sxController;
-        uint64_t msgId; 
-        uint32_t bytesLeft;
-        uint32_t nextByteToSend;
 
-        uint32_t dataBytesInReq; // number of data bytes the req. pkt will carry.
-        uint32_t unschedDataBytes; // number of unsched bytes sent after the req.
+        // The SendController that manages the transmission of this msg. 
+        SendController* sxController;
+
+        // Unique identification number assigned by in the construction time for
+        // the purpose of easy external tracking of this message.
+        uint64_t msgId; 
+
+        // Total num bytes remained to be sent for this msg.
+        uint32_t bytesLeft;
+
+        // Index of the next byte to be transmitted for this msg. Always
+        // initialized to zero.
+        uint32_t nextByteToSend;
+        
+        // number of data bytes pibby backed in the req. pkt.
+        uint32_t dataBytesInReq;
+
+        // number of unsched bytes sent in unsched. pkts following the req pkt.
+        uint32_t unschedDataBytes;
+
+        // IpAddress of destination host for this outbound msg.
         inet::L3Address destAddr;
+
+        // IpAddress of sender host (local host).
         inet::L3Address srcAddr;
+
+        // Simulation global time at which this message was originally created
+        // in the application.
         simtime_t msgCreationTime;
 
       private:
         void copy(const OutboundMessage &other);
-        void sendUnsched();
         friend class SendController;
     };
-
+    
+    /**
+     * Manages the transmission of all OutboundMessages from this transport and
+     * keeps the state necessary for transmisssion of the messages. For every
+     * new message that arrives from the applications, this class is responsible
+     * for sending the request packet, unscheduled packets, and scheduled packet
+     * (when a grants are received).
+     */
     class SendController
     {
       public:
         SendController(HomaTransport* transport);
         ~SendController();
+        void initSendController(uint32_t defaultReqBytes,
+                uint32_t defaultUnschedBytes);
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
-        uint32_t getReqDataBytes(AppMessage* sxMsg);
-        uint32_t getUnschedBytes(AppMessage* sxMsg);
+
       protected:
+
+        // Transport that owns this SendController.
         HomaTransport* transport;
-        uint64_t bytesLeftToSend; //statistics
+
+        // For the purpose of statistics recording, this variable tracks the
+        // total number bytes left to send over all outstanding messages. 
+        uint64_t bytesLeftToSend;
+
+        // The identification number for the next outstanding message.
         uint64_t msgId;
+
+        // The hash map from the msgId to outstanding messages.
         std::unordered_map<uint64_t, OutboundMessage> outboundMsgMap;
+
+        // For each distinct receiver, allocates the number of request and
+        // unsched bytes for various sizes of message. 
+        UnschedByteAllocator* unschedByteAllocator;
         friend class OutboundMessage;
     };
 
+    /**
+     * Handles reception of an incoming message by concatanations of data
+     * fragments in received packets and keeping track of reception progress.
+     */
     class InboundMessage {
       public:
         explicit InboundMessage();
@@ -121,51 +191,87 @@ class HomaTransport : public cSimpleModule
         ~InboundMessage();
          
       protected:
+        // The ReceiveScheduler that manages the reception of this message.
         ReceiveScheduler *rxScheduler;
+
+        // Address of the sender of this message.
         inet::L3Address srcAddr;
+
+        // Address of the receiver (ie. this host) of this message. Used to
+        // specify the sources address when grant packets are being sent. 
         inet::L3Address destAddr;
+
+        // The id of this message at the sender host. Used in the grant packets
+        // to help the sender identify which outbound message a received grant
+        // belongs to.
         uint64_t msgIdAtSender;
         
-        // variables that track the message completion
+        // Tracks the total number of grant bytes that the rxScheduler should
+        // send for this message. 
         uint32_t bytesToGrant;
+
+        // Tracks the total number of bytes that has not yet been received for
+        // this message. The message is complete when this value reaches zero
+        // and therefore it can be handed over to the application.
         uint32_t bytesToReceive;
 
-        // states that keeps the general infor about the message
+        // The total size of the message as indicated in the req. packet.
         uint32_t msgSize;
+
+        // Number of data bytes carried over in the req. packets.
         uint16_t bytesInReq;
+
+        // All unscheduled bytes that follow the request packet in one of more
+        // packets for this message.
         uint16_t totalUnschedBytes;
 
-        // Meta data for statistic collecting
+        // simulation time at which this message was created in the sender side.
+        // Used to calculate the end to end latency of this message.
         simtime_t msgCreationTime;
-        
         friend class CompareInboundMsg;
         friend class ReceiveScheduler;
 
       protected:
         void copy(const InboundMessage& other);
-
-        /**
-         * add received bytes to the inboundMsg 
-         */
         void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd);
     };
  
-    class CompareInboundMsg
-    {
-      public:
-        CompareInboundMsg()
-        {}
-
-        bool operator()(const InboundMessage* msg1, const InboundMessage* msg2)
-        {
-            return msg1->bytesToGrant > msg2->bytesToGrant;
-        }
-    };
-
+    /**
+     * Manages reception of messages that are being sent to this host through
+     * this transport. Keeps a list of all incomplete rx messages and sends
+     * grants for them based on SRPT policy. At the completion of each message,
+     * it will be handed off to the application. 
+     */
     class ReceiveScheduler
     {
-
       public:
+
+        /**
+         * A predicate functor that compares the remaining required grants to be
+         * sent for two inbound message.
+         */
+        class CompareInboundMsg
+        {
+          public:
+            CompareInboundMsg()
+            {}
+            
+            /**
+             * Predicate functor operator () for comparison.
+             *
+             * \param msg1
+             *      inbound message 1 in the comparison
+             * \param msg2
+             *      inbound message 2 in the comparison
+             * \return
+             *      a bool from the result of the comparison
+             */
+            bool operator()(const InboundMessage* msg1, const InboundMessage* msg2)
+            {
+                return msg1->bytesToGrant > msg2->bytesToGrant;
+            }
+        };
+
         typedef std::priority_queue<InboundMessage*,
                 std::vector<InboundMessage*>, CompareInboundMsg> PriorityQueue;
         typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
@@ -184,12 +290,18 @@ class HomaTransport : public cSimpleModule
         HomaTransport* transport;
         cMessage* grantTimer;
         TrafficPacer* trafficPacer;
+
+        // A container for incomplete messages that are sorted based on the
+        // remaining bytes to grant.
         PriorityQueue inboundMsgQueue; 
 
-        // keeps a map of all inboundMsgs from their msgId key. The msgId on
-        // can be the same for different messages from different senders so the
-        // value would be a list of all messages with the same msgId.
+        // Keeps a hash map of all incomplete inboundMsgs from their msgId key.
+        // the value of the map is list of all messages with the same msgId from
+        // different senders
         InboundMsgsMap incompleteRxMsgs;
+
+        // The upper bound on the number of grant data byte carried sent in
+        // individual grant packets .
         uint32_t grantMaxBytes;
 
       protected:
@@ -198,7 +310,6 @@ class HomaTransport : public cSimpleModule
         friend class InboundMessage;
         
     };
-
 
   protected:
     virtual void initialize();
@@ -211,22 +322,37 @@ class HomaTransport : public cSimpleModule
     uint32_t getBytesOnWire(uint32_t numDataBytes, PktType homaPktType);
 
   protected:
-    // contain the transport code in the send and receive paths.
+
+    // Control the transmission of outbound messages based on the logic of
+    // HomaProtocol. 
     SendController sxController;
+
+    // Manages the reception of all inbound messages.
     ReceiveScheduler rxScheduler;
 
-    // State
+    // UDP socket through which this transport send and receive packets.
     inet::UDPSocket socket;
+
+    // Timer object for this transport. Will be used for implementing timely
+    // scheduled  
     cMessage* selfMsg;
 
-    // parameters
+    // udp ports assigned to this transprt
     int localPort;
     int destPort;
+
+    // NIC link speed (in Gb/s) connected to this host. This parameter will be
+    // read from the omnetpp.ini config file. 
     int nicLinkSpeed;
+
+    // This parameter is read from the omnetpp.ini config file and provides an
+    // upper bound on the total allowed outstanding bytes. It is necessary (BUT
+    // NOT ENOUGH) for the rxScheduler to check that the total outstanding bytes
+    // is smaller than this value every time a new grant is to be sent.
     int maxOutstandingRecvBytes;
 
-    // this variable tracks the outstanding grant bytes. This in only for
-    // getting statistics.
+    // Tracks the total outstanding grant bytes which will be used for stats
+    // collection and recording.
     int outstandingGrantBytes;
 
     friend class ReceiveScheduler;

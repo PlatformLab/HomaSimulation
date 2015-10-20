@@ -26,6 +26,8 @@ simple HomaTransport like ITransportScheme
         int nicLinkSpeed @unit(Gbps);
         int grantMaxBytes @unit(byte) = default(1472B);
         int maxOutstandingRecvBytes @unit(byte) = default(15000B);
+        int defaultReqBytes @unit(byte) = default(0B);
+        int defaultUnschedBytes @unit(byte) = default(9700B);
         int maxRtt @unit(us) = default(15us);
         int localPort = default(-1);
         int destPort;
