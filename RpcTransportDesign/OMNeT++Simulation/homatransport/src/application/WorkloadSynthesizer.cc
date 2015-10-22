@@ -153,6 +153,8 @@ WorkloadSynthesizer::initialize()
         interArrivalDist = MsgSizeDistributions::InterArrivalDist::EXPONENTIAL;
     } else if (strcmp(par("interArrivalDist").stringValue(), "preset_in_file") == 0) {
         interArrivalDist = MsgSizeDistributions::InterArrivalDist::INTERARRIVAL_IN_FILE;
+    } else if (strcmp(par("interArrivalDist").stringValue(), "facebook_key_value") == 0){
+        interArrivalDist = MsgSizeDistributions::InterArrivalDist::FACEBOOK_PARETO;
     } else {
         throw cRuntimeError("'%s': Not a valid Interarrival Distribution",
                 par("interArrivalDist").stringValue());

@@ -194,17 +194,37 @@ MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize, double &nextInte
         size = msgSizeProbDistVector[first].first;
 
     } else {
-        double msgSize = 
+        double msgSizeTemp = 
             round( sizeOffset + 
             (pow((1-probOffset)/(1-prob), k) - 1) * sigma / k );
 
-        size =  msgSize > maxSize ? maxSize : (int)(msgSize); 
+        size =  msgSizeTemp > maxSize ? maxSize : (int)(msgSize); 
     }
     msgSize = size;
 
-    //generate the interarrival time
+    //generate the interarrival gap 
     nextInterarrivalTime = getInterarrivalTime();
     return;
+}
+
+double
+MsgSizeDistributions::facebookParetoInterGap()
+{
+    // Generalized pareto distribution parameters
+    const double k = 0.154971;
+    const double sigma = 16.0292;
+
+    // Maximum interarrival gap 
+    const int maxGap = 1000;
+    double prob = dist(randGen);
+    
+    double gapTime = (pow(1/(1-prob), k) - 1) * sigma / k;
+
+    // Capping the gap value at the maxGap
+    if (gapTime > maxGap) {
+        gapTime = maxGap;
+    }
+    return gapTime;
 }
 
 double
@@ -212,6 +232,8 @@ MsgSizeDistributions::getInterarrivalTime()
 {
     if (interArrivalDist == InterArrivalDist::EXPONENTIAL) {
         return exponential(avgInterArrivalTime);     
+    } else if (interArrivalDist == InterArrivalDist::FACEBOOK_PARETO) {
+        return facebookParetoInterGap();
     } else {
         throw MsgSizeDistException("InterArrival generator not defined.");
     }

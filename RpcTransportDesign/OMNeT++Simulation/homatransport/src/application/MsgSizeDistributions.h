@@ -32,7 +32,7 @@ class MsgSizeDistributions {
         INTERARRIVAL_IN_FILE = 0,
         EXPONENTIAL,
         GAUSSIAN,
-        FACEBOOK_KEY_VALU,
+        FACEBOOK_PARETO,
         CONSTANT,
         NO_INTERARRIAVAL_DIST_SPECIFIED //Should always remain the last
     };
@@ -70,6 +70,7 @@ class MsgSizeDistributions {
     void getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
     void getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
     void getInterarrivalSizeFromVec(int &msgSize, double &nextInterarrivalTime);
+    double facebookParetoInterGap();
     double getInterarrivalTime();
 };
 
