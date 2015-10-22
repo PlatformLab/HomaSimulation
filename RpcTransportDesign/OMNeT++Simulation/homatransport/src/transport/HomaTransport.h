@@ -323,7 +323,7 @@ class HomaTransport : public cSimpleModule
 
   protected:
 
-    // Control the transmission of outbound messages based on the logic of
+    // Handles the transmission of outbound messages based on the logic of
     // HomaProtocol. 
     SendController sxController;
 

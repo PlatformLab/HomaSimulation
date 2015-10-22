@@ -19,7 +19,6 @@ TrafficPacer::TrafficPacer(double nominalLinkSpeed,
 TrafficPacer::~TrafficPacer()
 {}
 
-
 /**
  * returns a lower bound on the next grant time
  */
@@ -36,7 +35,8 @@ bool
 TrafficPacer::okToGrant(simtime_t currentTime, uint32_t grantSize)
 {
     return (nextGrantTime <= currentTime) && 
-            ((totalOutstandingBytes + (int)grantSize) <= (int)maxAllowedInFlightBytes);
+            ((totalOutstandingBytes + (int)grantSize) <=
+            (int)maxAllowedInFlightBytes);
 }
 
 void

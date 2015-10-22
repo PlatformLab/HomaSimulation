@@ -7,7 +7,7 @@
 
 #include <map>
 #include <unordered_map>
-#include "HomaPkt.h"
+#include "transport/HomaPkt.h"
 
 #ifndef UNSCHEDBYTEALLOCATOR_H_
 #define UNSCHEDBYTEALLOCATOR_H_

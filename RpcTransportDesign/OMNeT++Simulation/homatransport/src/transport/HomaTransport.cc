@@ -23,15 +23,18 @@ Define_Module(HomaTransport);
 /**
  * Registering all of the statistics collection signals.
  */
-simsignal_t HomaTransport::msgsLeftToSendSignal = 
+simsignal_t HomaTransport::msgsLeftToSendSignal =
         registerSignal("msgsLeftToSend");
-simsignal_t HomaTransport::bytesLeftToSendSignal = 
+simsignal_t HomaTransport::bytesLeftToSendSignal =
         registerSignal("bytesLeftToSend");
 simsignal_t HomaTransport::outstandingGrantBytesSignal =
         registerSignal("outstandingGrantBytes");
 simsignal_t HomaTransport::totalOutstandingBytesSignal =
         registerSignal("totalOutstandingBytes");
 
+/**
+ * Contstructor for the HomaTransport.
+ */
 HomaTransport::HomaTransport()
     : sxController(this)
     , rxScheduler(this)
@@ -39,9 +42,15 @@ HomaTransport::HomaTransport()
     , selfMsg(NULL)
 {}
 
+/**
+ * Destructor of HomaTransport.
+ */
 HomaTransport::~HomaTransport()
 {}
 
+/**
+ *
+ */
 void
 HomaTransport::initialize()
 {
@@ -54,7 +63,7 @@ HomaTransport::initialize()
             (uint32_t) par("defaultUnschedBytes"));
     HomaPkt dataPkt = HomaPkt();
     dataPkt.setPktType(PktType::SCHED_DATA);
-    uint32_t maxDataBytes = MAX_ETHERNET_PAYLOAD_BYTES - 
+    uint32_t maxDataBytes = MAX_ETHERNET_PAYLOAD_BYTES -
             IP_HEADER_SIZE - UDP_HEADER_SIZE - dataPkt.headerSize();
     if (grantMaxBytes > maxDataBytes) {
         grantMaxBytes = maxDataBytes;
@@ -312,11 +321,14 @@ void
 HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
 {
     this->sxController = other.sxController;
+    this->msgId = other.msgId;
     this->bytesLeft = other.bytesLeft;
     this->nextByteToSend = other.nextByteToSend;
+    this->dataBytesInReq = other.dataBytesInReq;
+    this->unschedDataBytes = other.unschedDataBytes;
     this->destAddr = other.destAddr;
     this->srcAddr = other.srcAddr;
-    this->msgId = other.msgId;
+    this->msgCreationTime = other.msgCreationTime;
 }
 
 void

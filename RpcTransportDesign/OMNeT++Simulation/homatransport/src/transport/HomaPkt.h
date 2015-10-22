@@ -8,7 +8,7 @@
 #ifndef HOMAPKT_H_
 #define HOMAPKT_H_
 
-#include "HomaPkt_m.h"
+#include "transport/HomaPkt_m.h"
 
 class HomaPkt : public HomaPkt_Base
 {
