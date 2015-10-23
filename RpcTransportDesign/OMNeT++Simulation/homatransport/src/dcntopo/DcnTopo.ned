@@ -53,6 +53,9 @@ network DcnTopo
         // must be greater than or equal to 1.0 (1.0 means full bisection bw)
         double overSubFactor = default(1.0);
 
+        // Enables the cut-through switching wherever possible
+        bool hasCutThroughSwitching = default(false); 
+
         int numAggSwitches = (numServersPerTor * nicLinkSpeed) / 
                 (overSubFactor * fabricLinkSpeed);
 

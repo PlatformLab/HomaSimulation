@@ -62,7 +62,11 @@ void EtherMACFullDuplex::initializeFlags()
     EtherMACBase::initializeFlags();
 
     duplexMode = true;
-    physInGate->setDeliverOnReceptionStart(false);
+    if (par("isReceiveOnStart").boolValue()) {
+        physInGate->setDeliverOnReceptionStart(true);
+    } else {
+        physInGate->setDeliverOnReceptionStart(false);
+    }
 }
 
 void EtherMACFullDuplex::handleMessage(cMessage *msg)

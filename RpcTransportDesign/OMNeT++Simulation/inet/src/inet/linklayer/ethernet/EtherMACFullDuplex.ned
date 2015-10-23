@@ -130,6 +130,8 @@ simple EtherMACFullDuplex like IEtherMAC
         int txQueueLimit = default(1000);   // maximum number of frames queued up for transmission in the internal queue
                                             // (only used if queueModule==""); additional frames cause a runtime error
         string queueModule = default("");   // name of optional external queue module
+        bool isReceiveOnStart = default(false);  // <Behnam> Setting this to true enables setDeliverOnReceptionStart for input phys gate of the mac.
+                                                 // This is used for hacky implementation ofe cut-through switching. 
         int mtu @unit("B") = default(1500B);
         bool connectionColoring = default(true); // colors the connection when transmitting
         @display("i=block/rxtx");

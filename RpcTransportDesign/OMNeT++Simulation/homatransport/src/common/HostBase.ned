@@ -62,9 +62,10 @@ module HostBase extends NodeBase
         double hostSwTurnAroundTime @unit(us);
         double hostNicSxThinkTime @unit(us);
         double switchFixDelay @unit(us);
-
+        bool hasCutThroughSwitching;
 
         eth[*].swTurnAroundTime = hostSwTurnAroundTime;
+        eth[*].mac.isReceiveOnStart = hasCutThroughSwitching;
 
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <> like ITrafficGeneratorApp {
@@ -79,6 +80,7 @@ module HostBase extends NodeBase
                 hostSwTurnAroundTime = hostSwTurnAroundTime;
                 hostNicSxThinkTime = hostNicSxThinkTime;
                 switchFixDelay = switchFixDelay;
+                hasCutThroughSwitching = hasCutThroughSwitching;
         }
 
         transportScheme: <transportSchemeType> like ITransportScheme if hasTransportScheme {
