@@ -20,7 +20,7 @@
 #include "inet/common/queue/DropTailQueue.h"
 #include "inet/linklayer/ethernet/EtherMACBase.h"
 #include "inet/linklayer/ethernet/Ethernet.h"
-#include "../../homatransport/src/transport/HomaPkt.h"
+#include "transport/HomaPkt.h"
 
 namespace inet {
 

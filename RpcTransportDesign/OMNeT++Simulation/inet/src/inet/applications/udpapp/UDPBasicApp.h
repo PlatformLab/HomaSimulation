@@ -25,7 +25,7 @@
 
 #include "inet/applications/common/ApplicationBase.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
-#include "../../homatransport/src/application/MsgSizeDistributions.h"
+#include "application/MsgSizeDistributions.h"
 
 namespace inet {
 

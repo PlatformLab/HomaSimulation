@@ -22,7 +22,7 @@
 #include "inet/common/queue/IPassiveQueue.h"
 #include "inet/common/NotifierConsts.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
-#include "../../homatransport/src/transport/HomaPkt.h"
+#include "transport/HomaPkt.h"
 
 namespace inet {
 

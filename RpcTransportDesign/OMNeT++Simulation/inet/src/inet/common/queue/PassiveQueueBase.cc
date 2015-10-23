@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #include "inet/common/queue/PassiveQueueBase.h"
-#include "../../homatransport/src/transport/HomaPkt.h"
+#include "transport/HomaPkt.h"
 
 namespace inet {
 
