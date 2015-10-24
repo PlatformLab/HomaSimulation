@@ -430,8 +430,8 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
 
     if (lastPartialFrameData == 0) {
         if (numFullEthFrame == 0) {
-            totalBytesTranmitted = MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE +
-                    ETHERNET_CRC_SIZE + INTER_PKT_GAP;
+            totalBytesTranmitted = MIN_ETHERNET_FRAME_SIZE +
+                    ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
             lastPartialFrameLen = totalBytesTranmitted;
         }
 
@@ -439,8 +439,8 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         if (lastPartialFrameData < 
                 (MIN_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
 
-            lastPartialFrameLen =
-                    MIN_ETHERNET_FRAME_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
+            lastPartialFrameLen = MIN_ETHERNET_FRAME_SIZE +
+                    ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
         } else {
             lastPartialFrameLen = lastPartialFrameData + IP_HEADER_SIZE
                     + UDP_HEADER_SIZE + ETHERNET_HDR_SIZE + ETHERNET_CRC_SIZE
@@ -472,9 +472,9 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
                 ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
                 1e-9 * 8 / nicLinkSpeed; 
 
-        fabricSwitchSerialDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
-                ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
-                1e-9 * 8 / fabricLinkSpeed;
+        fabricSwitchSerialDelay += (MAX_ETHERNET_PAYLOAD_BYTES +
+                ETHERNET_HDR_SIZE + ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE +
+                INTER_PKT_GAP) * 1e-9 * 8 / fabricLinkSpeed;
     } else {
         edgeSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
         fabricSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
