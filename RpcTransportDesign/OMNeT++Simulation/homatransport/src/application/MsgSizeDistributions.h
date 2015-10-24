@@ -39,8 +39,9 @@ class MsgSizeDistributions {
 
 
     MsgSizeDistributions(const char* distFileName, int maxDataBytesPerPkt,
-            InterArrivalDist interArrivalDist, DistributionChoice sizeDistSelector,
-            double avgRate = 5.0, int callerHostId = -1);
+            InterArrivalDist interArrivalDist,
+            DistributionChoice sizeDistSelector, double avgRate = 5.0,
+            int callerHostId = -1);
     ~MsgSizeDistributions() {};
     void getSizeAndInterarrival(int &nextMsgSize, double &nextInterarrivalTime);
    
@@ -68,7 +69,8 @@ class MsgSizeDistributions {
     
   private:
     void getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
-    void getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
+    void getFacebookSizeInterarrival(int &msgSize,
+            double &nextInterarrivalTime);
     void getInterarrivalSizeFromVec(int &msgSize, double &nextInterarrivalTime);
     double facebookParetoInterGap();
     double getInterarrivalTime();

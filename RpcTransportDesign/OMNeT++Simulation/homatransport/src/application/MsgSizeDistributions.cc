@@ -94,7 +94,8 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
 }
 
 void
-MsgSizeDistributions::getSizeAndInterarrival(int &msgSize, double &nextInterarrivalTime)
+MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
+        double &nextInterarrivalTime)
 {
     std::pair<int, double> sizeInterarrivalPair;
     switch(sizeDistSelector) {
@@ -117,7 +118,8 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize, double &nextInterarri
 }
 
 void
-MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime)
+MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize,
+        double &nextInterarrivalTime)
 {
     ASSERT(interArrivalDist == InterArrivalDist::INTERARRIVAL_IN_FILE);
     if (msgSizeInterarrivalQueue.empty()) {
@@ -137,7 +139,8 @@ MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize, double &nextIntera
  * Internal api for DCTCP or TestDist
  */
 void
-MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize, double &nextInterarrivalTime)
+MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
+        double &nextInterarrivalTime)
 {
     
     double prob = dist(randGen);
@@ -163,7 +166,8 @@ MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize, double &nextInter
 
 
 void
-MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize, double &nextInterarrivalTime)
+MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize,
+        double &nextInterarrivalTime)
 {
     // Facebook workload constants
     int sizeOffset = msgSizeProbDistVector.back().first; 
@@ -198,7 +202,7 @@ MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize, double &nextInte
             round( sizeOffset + 
             (pow((1-probOffset)/(1-prob), k) - 1) * sigma / k );
 
-        size =  msgSizeTemp > maxSize ? maxSize : (int)(msgSize); 
+        size =  msgSizeTemp > maxSize ? maxSize : (int)(msgSizeTemp); 
     }
     msgSize = size;
 
