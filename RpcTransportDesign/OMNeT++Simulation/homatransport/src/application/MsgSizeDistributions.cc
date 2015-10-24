@@ -216,7 +216,7 @@ MsgSizeDistributions::facebookParetoInterGap()
 {
     // Generalized pareto distribution parameters
     const double k = 0.154971;
-    const double sigma = 16.0292;
+    const double sigma = 16.0292e-6;
 
     // Maximum interarrival gap 
     const int maxGap = 1000;
