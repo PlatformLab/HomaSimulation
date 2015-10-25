@@ -39,7 +39,8 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         double hostNicSxThinkTime @unit(us);
         double switchFixDelay @unit(us);
         bool isFabricCutThrough;
-        double loadFactor = default(0.5);
+        bool isSingleSpeedFabric;
+        double loadFactor;
 
         // workload types from this set: {"DCTCP", "FACEBOOK_KEY_VALUE"}
         string workloadType = default("DCTCP");

@@ -65,7 +65,8 @@ module HostBase extends NodeBase
         double switchFixDelay @unit(us);
 
         eth[*].swTurnAroundTime = hostSwTurnAroundTime;
-        trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough;
+        trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough; 
+        trafficGeneratorApp[*].isSingleSpeedFabric = isSingleSpeedFabric; 
 
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <default("WorkloadSynthesizer")> like ITrafficGeneratorApp {

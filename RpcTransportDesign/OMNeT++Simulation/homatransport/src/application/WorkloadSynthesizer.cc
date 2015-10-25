@@ -102,6 +102,8 @@ WorkloadSynthesizer::initialize()
     hostSwTurnAroundTime = 1e-6 * par("hostSwTurnAroundTime").doubleValue(); 
     hostNicSxThinkTime = 1e-6 * par("hostNicSxThinkTime").doubleValue(); 
     switchFixDelay = 1e-6 * par("switchFixDelay").doubleValue(); 
+    isFabricCutThrough = par("isFabricCutThrough").boolValue();
+    isSingleSpeedFabric = par("isSingleSpeedFabric").boolValue();
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
     xmlConfig = par("appConfig").xmlValue();
@@ -456,10 +458,11 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     // in ideal latency for the overhead.
     double hostDelayOverheads = 2 * hostSwTurnAroundTime + hostNicSxThinkTime;
 
-    // The switch models in omnet++ are store and forward therefor the first
-    // packet of each message will experience an extra serialialization delay at
-    // each switch. Therefore need to figure out how many switches a packet will
-    // pass through.
+    // Depending on if the switch model is store-forward (omnet++ default model)
+    // or cutthrough (as we implemented), the switch serialization delay would
+    // be different. The code snipet below finds how many switch a packet passes
+    // through and adds the correct switch delay to total delay based on the
+    // switch model.
     double totalSwitchDelay = 0;
 
     double edgeSwitchFixDelay = switchFixDelay; 
@@ -483,7 +486,10 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     if (destAddr.toIPv4().getDByte(2) == srcAddr.toIPv4().getDByte(2)) {
 
         // src and dest in the same rack
-        totalSwitchDelay = edgeSwitchFixDelay + edgeSwitchSerialDelay;
+        totalSwitchDelay = edgeSwitchFixDelay;
+        if (!isFabricCutThrough) {
+            totalSwitchDelay =+ edgeSwitchSerialDelay;
+        }
 
         // Add 2 edge link delays
         totalSwitchDelay += (2 * edgeLinkDelay);
@@ -491,23 +497,35 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     } else if (destAddr.toIPv4().getDByte(1) == srcAddr.toIPv4().getDByte(1)) {
 
         // src and dest in the same pod 
-        totalSwitchDelay = edgeSwitchFixDelay + fabricSwitchSerialDelay + 
-                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
-                           edgeSwitchFixDelay + edgeSwitchSerialDelay;
+        totalSwitchDelay =
+                edgeSwitchFixDelay +  fabricSwitchFixDelay + edgeSwitchFixDelay;
+        if (!isFabricCutThrough) {
+            totalSwitchDelay += (2*fabricSwitchSerialDelay + edgeSwitchSerialDelay ); 
+        } else if (!isSingleSpeedFabric) {
+            // have cutthrough but still one serialization is necessary when
+            // forwarding a packet coming from low speed port to high speed port
+            totalSwitchDelay += fabricSwitchSerialDelay;
+        }
 
         // Add 2 edge link delays and two fabric link delays
         totalSwitchDelay += (2 * edgeLinkDelay + 2 * fabricLinkDelay);
 
     } else {
-        totalSwitchDelay = edgeSwitchFixDelay + fabricSwitchSerialDelay + 
-                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
-                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
-                           fabricSwitchFixDelay + fabricSwitchSerialDelay +
-                           edgeSwitchFixDelay + edgeSwitchSerialDelay;
+        totalSwitchDelay = edgeSwitchFixDelay +   
+                           fabricSwitchFixDelay + 
+                           fabricSwitchFixDelay + 
+                           fabricSwitchFixDelay + 
+                           edgeSwitchFixDelay;    
+        if (isFabricCutThrough) {
+            totalSwitchDelay += (fabricSwitchSerialDelay +
+                    fabricSwitchSerialDelay + fabricSwitchSerialDelay +
+                    fabricSwitchSerialDelay + edgeSwitchSerialDelay); 
+        } else if (!isSingleSpeedFabric) {
+            totalSwitchDelay += fabricSwitchSerialDelay;
+        }
 
         // Add 2 edge link delays and 4 fabric link delays
         totalSwitchDelay += (2 * edgeLinkDelay + 4 * fabricLinkDelay);
-
     }
 
     return msgSerializationDelay + totalSwitchDelay + hostDelayOverheads;

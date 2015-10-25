@@ -69,6 +69,8 @@ class WorkloadSynthesizer : public cSimpleModule
     double hostSwTurnAroundTime;
     double hostNicSxThinkTime;
     double switchFixDelay;
+    bool isFabricCutThrough;
+    bool isSingleSpeedFabric;
 
     // states
     cMessage* selfMsg;
