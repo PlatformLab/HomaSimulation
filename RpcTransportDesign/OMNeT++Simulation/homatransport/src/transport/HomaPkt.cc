@@ -47,8 +47,9 @@ HomaPkt::headerSize()
     uint32_t size = sizeof(msgId_var);
     switch(getPktType()) {
         case PktType::REQUEST:
-            size += sizeof(getReqFields().msgByteLen) + sizeof(getReqFields().numReqBytes)
-                    + sizeof(getReqFields().totalUnschedBytes);
+            size += sizeof(getReqFields().msgByteLen) +
+                    sizeof(getReqFields().numReqBytes) +
+                    sizeof(getReqFields().totalUnschedBytes);
             break;
 
         case PktType::UNSCHED_DATA:
