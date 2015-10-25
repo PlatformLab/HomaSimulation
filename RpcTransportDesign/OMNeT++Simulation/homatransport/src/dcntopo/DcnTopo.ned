@@ -24,6 +24,7 @@ import homatransport.common.HostBase;
 network DcnTopo
 {
     parameters:
+        @display("bgb=319,325");
         xml topologyConfig = xmldoc("config.xml");
         int numServersPerTor;
         double edgeLinkDelay @unit(us) = default(0.0us); // This models NIC
@@ -54,19 +55,17 @@ network DcnTopo
         double overSubFactor = default(1.0);
 
         // Enables the cut-through switching wherever possible
-        bool hasCutThroughSwitching = default(false); 
+        bool isFabricCutThrough = default(false);
 
         int numAggSwitches = (numServersPerTor * nicLinkSpeed) / 
                 (overSubFactor * fabricLinkSpeed);
-
-
-        tor[*].networkLayer.ip.numUpLinks =  numAggSwitches;
-        tor[*].networkLayer.ip.supportMultiPathRouting = true;
-        aggRouter[*].networkLayer.ip.supportMultiPathRouting = true;
-
         int numHosts = numServersPerTor * numTors;
 
-        @display("bgb=319,325");
+        // Set parameters to enablle random spray multipath routing
+        tor[*].networkLayer.ip.numUpLinks =  numAggSwitches;
+        tor[*].networkLayer.ip.supportMultiPathRouting = true;
+        aggRouter[*].networkLayer.ip.numUpLinks = 0;
+        aggRouter[*].networkLayer.ip.supportMultiPathRouting = true;
 
     types:
         channel FabricChannel extends DatarateChannel
@@ -83,11 +82,24 @@ network DcnTopo
         aggRouter[numAggSwitches]: Router {
             @display("i=abstract/router2");
             **.promiscuous = true;
+
+            // Set parameters for cut-through switching
+            nodeType = "AGGR";
+            isFabricCutThrough = isFabricCutThrough;
+            isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
+            numDownLinks = numTors;
         }
 
         tor[numTors]: Router {
             @display("i=abstract/router");
             **.promiscuous = true;
+
+            // Set parameters for cut-through switching
+            nodeType = "TOR";
+            isFabricCutThrough = isFabricCutThrough;
+            isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
+            numDownLinks = numServersPerTor;
+
         }
 
         host[numHosts]: HostBase {
@@ -100,6 +112,12 @@ network DcnTopo
             hostSwTurnAroundTime = hostSwTurnAroundTime;
             hostNicSxThinkTime = hostNicSxThinkTime;
             switchFixDelay = switchFixDelay;
+
+            // Set parameters for cut-through switching
+            nodeType = "HOST";
+            isFabricCutThrough = isFabricCutThrough;
+            isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
+            numDownLinks = 0;
         }
 
         configurator: IPv4NetworkConfigurator {
@@ -117,5 +135,4 @@ network DcnTopo
         for i=0..numAggSwitches-1, for j=0..numTors-1 {
             aggRouter[i].ethg++ <--> FabricChannel{delay=(fabricLinkDelay+switchFixDelay);} <--> tor[j].ethg++ ;
         }
-
 }

@@ -36,6 +36,7 @@ module HostBase extends NodeBase
         int nicLinkSpeed @unit(Gbps);
         int fabricLinkSpeed @unit(Gbps);
 
+
         int numTrafficGeneratorApp = default(0);
         // no of TCP apps. Specify the app types in INI file with
         // tcpApp[0..1].typename="TCPEchoApp" syntax
@@ -62,13 +63,12 @@ module HostBase extends NodeBase
         double hostSwTurnAroundTime @unit(us);
         double hostNicSxThinkTime @unit(us);
         double switchFixDelay @unit(us);
-        bool hasCutThroughSwitching;
 
         eth[*].swTurnAroundTime = hostSwTurnAroundTime;
-        eth[*].mac.isReceiveOnStart = hasCutThroughSwitching;
+        trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough;
 
     submodules:
-        trafficGeneratorApp[numTrafficGeneratorApp]: <> like ITrafficGeneratorApp {
+        trafficGeneratorApp[numTrafficGeneratorApp]: <default("WorkloadSynthesizer")> like ITrafficGeneratorApp {
             parameters:
                 @display("p=490,38");
                 appConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$PARENTMODULE_INDEX]/appConfig");
@@ -80,7 +80,6 @@ module HostBase extends NodeBase
                 hostSwTurnAroundTime = hostSwTurnAroundTime;
                 hostNicSxThinkTime = hostNicSxThinkTime;
                 switchFixDelay = switchFixDelay;
-                hasCutThroughSwitching = hasCutThroughSwitching;
         }
 
         transportScheme: <transportSchemeType> like ITransportScheme if hasTransportScheme {

@@ -62,6 +62,13 @@ module NodeBase
         *.routingTableModule = default(routingTableType != "" ? absPath(".routingTable") : "");
         *.energySourceModule = default(energyStorageType != "" ? absPath(".energyStorage") : "");
         *.mobilityModule = default(mobilityType != "" ? absPath(".mobility") : "");
+
+        //<Behnam> Information requiered for cut-through implementation
+        string nodeType = default("HOST"); // can be "HOST", "TOR", "AGGR", "CORE"
+        bool isFabricCutThrough = default(false);
+        bool isSingleSpeedFabric = default(false); // set true if nicLinkSpeed and fabricLinkSpeed are equal
+        int numDownLinks = default(0); // number of links from this module to
+                                       // the lower tier modules in the topology
     gates:
         input radioIn[numRadios] @directIn;
         inout pppg[] @labels(PPPFrame-conn);
@@ -111,6 +118,7 @@ module NodeBase
         eth[sizeof(ethg)]: <default("EthernetInterface")> like IWiredNic {
             parameters:
                 @display("p=368,406,row,60;q=txQueue");
+                mac.isReceiveOnStart = (isFabricCutThrough && ((nodeType == "HOST") || (nodeType == "CORE") || (nodeType == "TOR" && index >= numDownLinks) || (nodeType == "AGGR" && (index >= numDownLinks || isSingleSpeedFabric))));
         }
         ppp[sizeof(pppg)]: <default("PPPInterface")> like IWiredNic {
             parameters:

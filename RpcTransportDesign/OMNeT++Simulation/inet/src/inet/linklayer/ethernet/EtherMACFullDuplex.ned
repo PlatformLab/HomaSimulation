@@ -131,7 +131,7 @@ simple EtherMACFullDuplex like IEtherMAC
                                             // (only used if queueModule==""); additional frames cause a runtime error
         string queueModule = default("");   // name of optional external queue module
         bool isReceiveOnStart = default(false);  // <Behnam> Setting this to true enables setDeliverOnReceptionStart for input phys gate of the mac.
-                                                 // This is used for hacky implementation ofe cut-through switching. 
+                                                 // This is used for hacky implementation of cut-through switching.
         int mtu @unit("B") = default(1500B);
         bool connectionColoring = default(true); // colors the connection when transmitting
         @display("i=block/rxtx");
