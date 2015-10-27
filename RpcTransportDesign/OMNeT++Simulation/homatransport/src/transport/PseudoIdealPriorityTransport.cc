@@ -147,6 +147,7 @@ PseudoIdealPriorityTransport::processMsgFromApp(AppMessage* sendMsg)
         sxPkt->setMsgId(msgId);
         sxPkt->setPriority(bytesToSend);
         sxPkt->setPktType(PktType::UNSCHED_DATA);
+        sxPkt->setUnschedDataFields(unschedDataFields);
         sxPkt->setByteLength(pktDataBytes + sxPkt->headerSize());
 
         // Send the packet out
