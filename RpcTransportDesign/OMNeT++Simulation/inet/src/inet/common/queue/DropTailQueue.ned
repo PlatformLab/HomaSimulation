@@ -27,6 +27,8 @@ simple DropTailQueue like IOutputQueue
     parameters:
         int frameCapacity = default(0);
         string queueName = default("l2queue"); // name of the inner cQueue object, used in the 'q' tag of the display string
+        string transportType = default(""); // <Behnam> can be "HomaTransport" or "PseudoIdealTransport".
+                                            // Determines which priority scheduling function should be used.
         @display("i=block/queue");
         @signal[rcvdPk](type=cPacket);
         @signal[enqueuePk](type=cPacket);

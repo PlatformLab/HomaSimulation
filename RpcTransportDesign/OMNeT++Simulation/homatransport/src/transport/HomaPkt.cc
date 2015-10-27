@@ -90,12 +90,12 @@ HomaPkt::searchEncapHomaPkt(cPacket* pkt)
 }
 
 int
-HomaPkt::compareHomaPkts(cObject* obj1, cObject* obj2)
+HomaPkt::comparePrios(cObject* obj1, cObject* obj2)
 {
     cPacket* pkt1 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj1));
     cPacket* pkt2 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj2));
     if (!pkt1 || !pkt2) {
-        return 0;
+        return -1;
     }
     
     HomaPkt* homaPkt1 = check_and_cast<HomaPkt*>(pkt1);
@@ -107,4 +107,37 @@ HomaPkt::compareHomaPkts(cObject* obj1, cObject* obj2)
     } else {
         return 0;
     }
+}
+
+int
+HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
+{
+    cPacket* pkt1 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj1));
+    cPacket* pkt2 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj2));
+    if (!pkt1 || !pkt2) {
+        return -1;
+    }
+
+    HomaPkt* homaPkt1 = check_and_cast<HomaPkt*>(pkt1);
+    HomaPkt* homaPkt2 = check_and_cast<HomaPkt*>(pkt2);
+
+    if ((homaPkt1->getPktType() != PktType::UNSCHED_DATA) ||
+            (homaPkt2->getPktType() != PktType::UNSCHED_DATA))  {
+        return -1;
+    }
+
+    uint32_t prio1 = homaPkt1->getPriority();
+    uint32_t prio2 = homaPkt2->getPriority();
+    uint32_t msgByteLen1 = homaPkt1->getUnschedDataFields().msgByteLen;
+    uint32_t msgByteLen2 = homaPkt2->getUnschedDataFields().msgByteLen;
+    if (msgByteLen1 < msgByteLen2) {
+        return -1;
+    }
+    if ((msgByteLen1 == msgByteLen2) && (prio1 > prio2)) {
+        return -1;
+    }
+    if ((msgByteLen1 == msgByteLen2) && (prio1 == prio2)) {
+        return 0;
+    }
+    return 1; 
 }

@@ -39,8 +39,12 @@ class HomaPkt : public HomaPkt_Base
     /**
      * This function compares priority of two HomaPkt.
      */
-    static int compareHomaPkts(cObject* obj1, cObject* obj2);
+    static int comparePrios(cObject* obj1, cObject* obj2);
 
+    /**
+     * This function compares priority and msg sizes of two Unsched. HomaPkt.
+     */
+    static int compareSizeAndPrios(cObject* obj1, cObject* obj2);
 };
 
 #endif /* HOMAPKT_H_ */

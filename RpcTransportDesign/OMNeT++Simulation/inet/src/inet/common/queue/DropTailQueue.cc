@@ -33,7 +33,11 @@ void DropTailQueue::initialize()
     queue.setName(par("queueName"));
 
     // Configure the HomaPkt priority sort function
-    queue.setup(&HomaPkt::compareHomaPkts);
+    if (par("transportType").stdstringValue() == "HomaTransport") {
+        queue.setup(&HomaPkt::comparePrios);
+    } else if (par("transportType").stdstringValue() == "PseudoIdealTransport") {
+        queue.setup(&HomaPkt::compareSizeAndPrios);
+    }
 
     //statistics
     emit(queueLengthSignal, queue.length());
