@@ -27,9 +27,10 @@ simple PseudoIdealPriorityTransport like ITransportScheme
         xml transportConfig = default(xml("<param/>"));
         int localPort = default(-1);
         int destPort;
+        int nicLinkSpeed @unit(Gbps) = default(10Gbps);
 
         @signal[msgsLeftToSend](type=long);
-        @signal[numBytesLeftToSend](type=long);
+        @signal[bytesLeftToSend](type=long);
         @statistic[msgsLeftToSend](title="num msgs left to send"; source=msgsLeftToSend; record=stats, histogram; interpolationmode=none);
         @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);
 

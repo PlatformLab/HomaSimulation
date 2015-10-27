@@ -14,9 +14,9 @@
 // 
 
 #include <algorithm>
-#include "HomaTransport.h"
 #include <random>
 #include <cmath>
+#include "HomaTransport.h"
 
 Define_Module(HomaTransport);
 

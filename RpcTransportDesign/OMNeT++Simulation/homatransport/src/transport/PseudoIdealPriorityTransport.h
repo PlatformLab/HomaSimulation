@@ -17,6 +17,11 @@
 #define __HOMATRANSPORT_PSEUDOIDEALPRIORITYTRANSPORT_H_
 
 #include <omnetpp.h>
+#include <unordered_map>
+#include <list>
+#include "inet/transportlayer/contract/udp/UDPSocket.h"
+#include "application/AppMessage_m.h"
+#include "transport/HomaPkt.h"
 
 /**
  * An near optimal priority based transport scheme for minimizing the average
@@ -31,12 +36,36 @@
 class PseudoIdealPriorityTransport : public cSimpleModule
 {
   public:
+
+    /**
+     * Constant packet and header byte sizes for the common datagram types that
+     * we use in our simulations.
+     */
+    static const uint32_t ETHERNET_PREAMBLE_SIZE = 8;
+    static const uint32_t ETHERNET_HDR_SIZE = 14; 
+    static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
+    static const uint32_t MIN_ETHERNET_PAYLOAD_BYTES = 46;
+    static const uint32_t IP_HEADER_SIZE = 20;
+    static const uint32_t UDP_HEADER_SIZE = 8;
+    static const uint32_t ETHERNET_CRC_SIZE = 4;
+    static const uint32_t INTER_PKT_GAP = 12; 
+
+    // Signal definitions for statistics gathering
+    static simsignal_t msgsLeftToSendSignal;
+    static simsignal_t bytesLeftToSendSignal;
+
+  public:
     PseudoIdealPriorityTransport();
     ~PseudoIdealPriorityTransport();
     
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void processStart();
+    virtual void processStop();
+    virtual void processMsgFromApp(AppMessage* sendMsg);
+    virtual void processRcvdPkt(HomaPkt* rxPkt);
+    virtual void finish();
 
     /**
      * A self message essentially models a timer object for this transport and
@@ -45,20 +74,52 @@ class PseudoIdealPriorityTransport : public cSimpleModule
     enum SelfMsgKind
     {
         START = 1,  // Timer type when the transport is in initialization phase.
-        GRANT = 2,  // Timer type in normal working state of transport.
-        STOP  = 3   // Timer type when the transport is in cleaning phase.
+        STOP  = 2   // Timer type when the transport is in cleaning phase.
+    };
+
+    class InboundMsg
+    {
+      public:
+        explicit InboundMsg();
+        explicit InboundMsg(HomaPkt* rxPkt);
+        ~InboundMsg();
+        bool appendPktData(HomaPkt* rxPkt);
+
+      public:
+        int numBytesToRecv;
+        uint32_t msgByteLen;
+        inet::L3Address srcAddr;
+        inet::L3Address destAddr;
+        uint64_t msgIdAtSender;
+        simtime_t msgCreationTime;
     };
 
   protected:
 
-    // Signal definitions for statistics gathering
-    simsignal_t msgsLeftToSendSignal;
-    simsignal_t bytesLeftToSend;
+    // UDP socket through which this transport send and receive packets.
+    inet::UDPSocket socket;
+
+    // Timer object for this transport. Will be used for implementing timely
+    // scheduled  
+    cMessage* selfMsg;
 
     // udp ports through which this transport send and receive packets
     int localPort;
     int destPort;
 
+    // variables and states kept for administering outbound messages
+    uint64_t msgId; // unique monotonically increasing id for 
+                    // each messages to send
+    uint32_t maxDataBytesInPkt;
+
+    // State and variables kept for managing inbound messages 
+    // Defines a map to keep a all partially received inbound messages. The key
+    // is the msgId at the sender and value is a list of pointer to rx
+    // messages currently under transmission from different senders that
+    // happened to have same id at the sender side. 
+    typedef std::unordered_map<uint64_t, std::list<InboundMsg*>>
+            IncompleteRxMsgsMap;
+    IncompleteRxMsgsMap incompleteRxMsgsMap;
 };
 
 #endif
