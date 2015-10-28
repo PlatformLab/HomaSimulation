@@ -83,22 +83,11 @@ network DcnTopo
             @display("i=abstract/router2");
             **.promiscuous = true;
 
-            // Set parameters for cut-through switching
-            nodeType = "AGGR";
-            isFabricCutThrough = isFabricCutThrough;
-            isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
-            numDownLinks = numTors;
         }
 
         tor[numTors]: Router {
             @display("i=abstract/router");
             **.promiscuous = true;
-
-            // Set parameters for cut-through switching
-            nodeType = "TOR";
-            isFabricCutThrough = isFabricCutThrough;
-            isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
-            numDownLinks = numServersPerTor;
 
         }
 
@@ -113,11 +102,6 @@ network DcnTopo
             hostNicSxThinkTime = hostNicSxThinkTime;
             switchFixDelay = switchFixDelay;
 
-            // Set parameters for cut-through switching
-            nodeType = "HOST";
-            isFabricCutThrough = isFabricCutThrough;
-            isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
-            numDownLinks = 0;
         }
 
         configurator: IPv4NetworkConfigurator {
