@@ -34,10 +34,6 @@ module EthernetInterface like IWiredNic
 {
     parameters:
         string interfaceTableModule;
-        double swTurnAroundTime @unit(us) = default(0.0us); // <Behnam> if non zero, the frames will be sent to and received from upper
-                                                            // layer after swTurnAroundTime. This models the turn over delay that software
-                                                            // has when a packet is to be sent to and received from the NIC. This should be
-                                                            // set non zero only for the hosts.
         bool csmacdSupport = default(false);  // by default CSMA/CD is turned off, so only point-to-point duplex links are supported.
         string macType = default(csmacdSupport ? "EtherMAC" : "EtherMACFullDuplex"); // ~EtherMAC or ~EtherMACFullDuplex
         string queueType = default(""); // ~DropTailQueue, or a Diffserv queue; set to "" for use of an internal queue
@@ -81,15 +77,15 @@ module EthernetInterface like IWiredNic
                 @display("p=182,205");
         }
     connections:
-        mac.upperLayerOut --> ned.DelayChannel{ @display("m=n"); delay=swTurnAroundTime; } --> encap.lowerLayerIn;
+        mac.upperLayerOut --> { @display("m=n"); } --> encap.lowerLayerIn;
         mac.phys <--> { @display("m=s"); } <--> phys;
 
         if queueType != "" {
-            encap.lowerLayerOut --> ned.DelayChannel{ @display("m=n"); delay=swTurnAroundTime; } --> queue.in;
+            encap.lowerLayerOut --> { @display("m=n"); } --> queue.in;
             queue.out --> mac.upperLayerIn;
         }
 
-        encap.lowerLayerOut --> ned.DelayChannel{ @display("m=n"); delay=swTurnAroundTime; } --> mac.upperLayerIn if queueType == "";
+        encap.lowerLayerOut --> { @display("m=n"); } --> mac.upperLayerIn if queueType == "";
 
         // no input hooks, no ingressTC
         encap.upperLayerOut --> { @display("m=n"); } --> upperLayerOut if numInputHooks == 0 && ingressTCType == "";

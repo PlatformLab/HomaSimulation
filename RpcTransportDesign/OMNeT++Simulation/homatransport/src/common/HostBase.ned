@@ -64,8 +64,6 @@ module HostBase extends NodeBase
         double hostNicSxThinkTime @unit(us);
         double switchFixDelay @unit(us);
 
-        eth[*].swTurnAroundTime = hostSwTurnAroundTime;
-
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <default("WorkloadSynthesizer")> like ITrafficGeneratorApp {
             parameters:

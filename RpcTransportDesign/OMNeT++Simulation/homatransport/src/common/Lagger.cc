@@ -29,7 +29,7 @@ Lagger::Lagger()
 void
 Lagger::initialize()
 {
-    delayPar = &par("delay");
+    delayPar = &par("delayPar");
     hookType = par("hookType").stdstringValue();
 
     // get pointer to the mac module of this Interface

@@ -35,7 +35,7 @@ import inet.common.IHook;
 simple Lagger like IHook
 {
     parameters:
-        volatile double delay @unit(s) = default(0s);    // delay [seconds] e.g. uniform(20ms,40ms)
+        volatile double delayPar @unit(s) = default(0s);    // delay [seconds] e.g. uniform(20ms,40ms)
         string hookType; // should be "InputHook" or "OutputHook"
         @display("i=status/lightning");
     gates:

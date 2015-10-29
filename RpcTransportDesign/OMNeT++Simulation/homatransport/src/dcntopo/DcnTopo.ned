@@ -39,9 +39,9 @@ network DcnTopo
         // NOTE: always greater and equal to nicLinkSpeed
         int fabricLinkSpeed @unit(Gbps);
 
-        // models the software trun around time in the hosts between the time
+        // models the software trun around time, in the hosts, between the time
         // ethFrame is received until the notification is received in software
-        // or when the pkt is send in software until it's received in the NIC.
+        // or when the pkt is send in software until it's received at the NIC.
         double hostSwTurnAroundTime @unit(us);
 
         // when non-zero, it models the intrinsic fixed switching delay 
@@ -71,13 +71,16 @@ network DcnTopo
         tor[*].eth[*].mac.isReceiveOnStart = isFabricCutThrough;
         aggRouter[*].eth[*].mac.isReceiveOnStart = isFabricCutThrough;
 
-        // Set input and output hooks in NICs to Lagger
+        // Set input and output hooks in NICs to "Lagger" type and set the delayPar to
+        // hostSwTurnAroundTime
         **.eth[*].numInputHooks = 1;
         **.eth[*].inputHook[*].typename = "Lagger";
         **.eth[*].inputHook[*].hookType = "InputHook";
+        host[*].eth[*].inputHook[*].delayPar = convertUnit(hostSwTurnAroundTime, "s");
         **.eth[*].numOutputHooks = 1;
         **.eth[*].outputHook[*].typename = "Lagger";
         **.eth[*].outputHook[*].hookType = "OutputHook";
+        host[*].eth[*].outputHook[*].delayPar = convertUnit(hostSwTurnAroundTime, "s");
 
     types:
         channel FabricChannel extends DatarateChannel
