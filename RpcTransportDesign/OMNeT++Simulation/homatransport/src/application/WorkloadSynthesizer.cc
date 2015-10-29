@@ -502,9 +502,10 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         if (!isFabricCutThrough) {
             totalSwitchDelay += (2*fabricSwitchSerialDelay + edgeSwitchSerialDelay ); 
         } else if (!isSingleSpeedFabric) {
-            // have cutthrough but still one serialization is necessary when
-            // forwarding a packet coming from low speed port to high speed port
-            totalSwitchDelay += fabricSwitchSerialDelay;
+            // have cutthrough but forwarding a packet coming from low
+            // speed port to high speed port. There will inevitably be one
+            // serialization at low speed.
+            totalSwitchDelay += edgeSwitchSerialDelay;
         }
 
         // Add 2 edge link delays and two fabric link delays
@@ -516,12 +517,13 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
                            fabricSwitchFixDelay + 
                            fabricSwitchFixDelay + 
                            edgeSwitchFixDelay;    
-        if (isFabricCutThrough) {
+        if (!isFabricCutThrough) {
             totalSwitchDelay += (fabricSwitchSerialDelay +
                     fabricSwitchSerialDelay + fabricSwitchSerialDelay +
                     fabricSwitchSerialDelay + edgeSwitchSerialDelay); 
         } else if (!isSingleSpeedFabric) {
-            totalSwitchDelay += fabricSwitchSerialDelay;
+
+            totalSwitchDelay += edgeSwitchFixDelay;
         }
 
         // Add 2 edge link delays and 4 fabric link delays
