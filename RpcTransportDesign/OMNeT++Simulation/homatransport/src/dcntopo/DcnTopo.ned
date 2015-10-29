@@ -67,6 +67,18 @@ network DcnTopo
         aggRouter[*].networkLayer.ip.numUpLinks = 0;
         aggRouter[*].networkLayer.ip.supportMultiPathRouting = true;
 
+        // set cutThrough for mac modules in the Switches
+        tor[*].eth[*].mac.isReceiveOnStart = isFabricCutThrough;
+        aggRouter[*].eth[*].mac.isReceiveOnStart = isFabricCutThrough;
+
+        // Set input and output hooks in NICs to Lagger
+        **.eth[*].numInputHooks = 1;
+        **.eth[*].inputHook[*].typename = "Lagger";
+        **.eth[*].inputHook[*].hookType = "InputHook";
+        **.eth[*].numOutputHooks = 1;
+        **.eth[*].outputHook[*].typename = "Lagger";
+        **.eth[*].outputHook[*].hookType = "OutputHook";
+
     types:
         channel FabricChannel extends DatarateChannel
         {
@@ -82,13 +94,11 @@ network DcnTopo
         aggRouter[numAggSwitches]: Router {
             @display("i=abstract/router2");
             **.promiscuous = true;
-
         }
 
         tor[numTors]: Router {
             @display("i=abstract/router");
             **.promiscuous = true;
-
         }
 
         host[numHosts]: HostBase {
@@ -101,7 +111,8 @@ network DcnTopo
             hostSwTurnAroundTime = hostSwTurnAroundTime;
             hostNicSxThinkTime = hostNicSxThinkTime;
             switchFixDelay = switchFixDelay;
-
+            trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough; 
+            trafficGeneratorApp[*].isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed); 
         }
 
         configurator: IPv4NetworkConfigurator {
