@@ -290,7 +290,7 @@ WorkloadSynthesizer::sendMsg()
     appMessage->setByteLength(sendMsgSize);
     appMessage->setDestAddr(destAddrs);
     appMessage->setSrcAddr(srcAddress);
-    appMessage->setMsgCreationTime(0);
+    appMessage->setMsgCreationTime(appMessage->getCreationTime());
     emit(sentMsgSignal, appMessage);
     send(appMessage, "transportOut");
     numSent++;

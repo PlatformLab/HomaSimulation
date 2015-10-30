@@ -94,8 +94,14 @@ HomaPkt::comparePrios(cObject* obj1, cObject* obj2)
 {
     cPacket* pkt1 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj1));
     cPacket* pkt2 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj2));
-    if (!pkt1 || !pkt2) {
-        return -1;
+    if (!pkt1) {
+        if (!pkt2) {
+            return 0;
+        } else {
+            return -1;
+        }
+    } else if (!pkt2) {
+        return 1;
     }
     
     HomaPkt* homaPkt1 = check_and_cast<HomaPkt*>(pkt1);
@@ -114,8 +120,14 @@ HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
 {
     cPacket* pkt1 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj1));
     cPacket* pkt2 = searchEncapHomaPkt(dynamic_cast<cPacket*>(obj2));
-    if (!pkt1 || !pkt2) {
-        return -1;
+    if (!pkt1) {
+        if (!pkt2) {
+            return 0;
+        } else {
+            return -1;
+        }
+    } else if (!pkt2) {
+        return 1;
     }
 
     HomaPkt* homaPkt1 = check_and_cast<HomaPkt*>(pkt1);

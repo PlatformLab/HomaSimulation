@@ -286,7 +286,7 @@ HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
     , unschedDataBytes(unschedDataBytes)
     , destAddr(outMsg->getDestAddr())
     , srcAddr(outMsg->getSrcAddr())
-    , msgCreationTime(outMsg->getCreationTime())
+    , msgCreationTime(outMsg->getMsgCreationTime())
 {}
 
 HomaTransport::OutboundMessage::OutboundMessage()

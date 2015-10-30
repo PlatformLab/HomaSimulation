@@ -279,6 +279,7 @@ def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
 def parseXmlFile(xmlConfigFile):
     xmlConfig = minidom.parse(xmlConfigFile)
     xmlParsedDic = AttrDict()
+    transportScheme = xmlConfig.getElementsByTagName('transportScheme')[0].firstChild.data
     numServersPerTor = int(xmlConfig.getElementsByTagName('numServersPerTor')[0].firstChild.data)
     numTors = int(xmlConfig.getElementsByTagName('numTors')[0].firstChild.data)
     fabricLinkSpeed = int(xmlConfig.getElementsByTagName('fabricLinkSpeed')[0].firstChild.data)
@@ -297,6 +298,7 @@ def parseXmlFile(xmlConfigFile):
     hostNicSxThinkTime = xmlConfig.getElementsByTagName('hostNicSxThinkTime')[0].firstChild.data
     switchFixDelay = xmlConfig.getElementsByTagName('switchFixDelay')[0].firstChild.data
 
+    xmlParsedDic.transportScheme = transportScheme
     xmlParsedDic.msgSizeRanges = msgSizeRanges.split()
     xmlParsedDic.numServersPerTor = numServersPerTor
     xmlParsedDic.numTors = numTors 
@@ -622,7 +624,8 @@ def printGenralInfo(xmlParsedDic):
         + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
     print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'SW Turn-around Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw)
         + 'NIC Send ThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicSxThinkTime).center(fw))
-    print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw) + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(xmlParsedDic.switchFixDelay).center(fw))
+    print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw) + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(xmlParsedDic.switchFixDelay).center(fw)
+        + 'TransportScheme:'.ljust(tw) + '{0}'.format(xmlParsedDic.transportScheme).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
@@ -1087,7 +1090,8 @@ def main():
     torsQueueWaitTime(parsedStats.tors, xmlParsedDic, queueWaitTimeDigest)
     aggrsQueueWaitTime(parsedStats.aggrs, xmlParsedDic, queueWaitTimeDigest)
     printGenralInfo(xmlParsedDic)
-    printHomaOutstandingBytes(parsedStats, xmlParsedDic, 'KB')
+    if xmlParsedDic.transportScheme == 'HomaTransport':
+        printHomaOutstandingBytes(parsedStats, xmlParsedDic, 'KB')
     printHomaRates(parsedStats, xmlParsedDic)
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
