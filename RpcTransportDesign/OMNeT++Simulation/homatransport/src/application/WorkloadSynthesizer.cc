@@ -125,12 +125,33 @@ WorkloadSynthesizer::initialize()
         distFileName = std::string(
                 "../../sizeDistributions/TestDistribution.txt");
     } else if (strcmp(workLoadType, "FACEBOOK_KEY_VALUE") == 0) {
-        distSelector = 
+        distSelector =
                 MsgSizeDistributions::DistributionChoice::FACEBOOK_KEY_VALUE;
         distFileName = std::string(
                 "../../sizeDistributions/FacebookKeyValueMsgSizeDist.txt");
+    } else if (strcmp(workLoadType, "FACEBOOK_WEB_SERVER_INTRACLUSTER")
+            == 0) {
+        distSelector =
+                MsgSizeDistributions::DistributionChoice::
+                FACEBOOK_WEB_SERVER_INTRACLUSTER;
+        distFileName = std::string("../../sizeDistributions/"
+                "Facebook_WebServerDist_IntraCluster.txt");
+    } else if (strcmp(workLoadType, "FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER")
+            == 0) {
+        distSelector =
+                MsgSizeDistributions::DistributionChoice::
+                FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER;
+        distFileName = std::string("../../sizeDistributions/"
+                "Facebook_CacheFollowerDist_IntraCluster.txt");
+    } else if (strcmp(workLoadType, "FACEBOOK_HADOOP_ALL")
+            == 0) {
+        distSelector =
+                MsgSizeDistributions::DistributionChoice::
+                FACEBOOK_HADOOP_ALL;
+        distFileName = std::string("../../sizeDistributions/"
+                "Facebook_HadoopDist_All.txt");
     } else if (strcmp(workLoadType, "PRESET_IN_FILE") == 0){
-        distSelector = 
+        distSelector =
                 MsgSizeDistributions::DistributionChoice::SIZE_IN_FILE;
         distFileName = std::string(
                 "../../sizeDistributions/HostidSizeInterarrival.txt");

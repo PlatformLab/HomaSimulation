@@ -23,6 +23,9 @@ class MsgSizeDistributions {
         SIZE_IN_FILE = 0,
         DCTCP,
         FACEBOOK_KEY_VALUE,
+        FACEBOOK_WEB_SERVER_INTRACLUSTER,
+        FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER,
+        FACEBOOK_HADOOP_ALL,
         TEST_DIST,
         NO_SIZE_DIST_SPECIFIED //Should always remain the last 
 
