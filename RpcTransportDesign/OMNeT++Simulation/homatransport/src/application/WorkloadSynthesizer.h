@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 #ifndef __HOMATRANSPORT_WORKLOADSYNTHESIZER_H_
 #define __HOMATRANSPORT_WORKLOADSYNTHESIZER_H_
@@ -28,8 +28,8 @@
 /**
  * Mocks message generating behaviour of an application. Given a messge size
  * distribution and a interarrival time distribution, this module generates
- * message sizes of that distribution and sends them in interarrival times 
- * sampled from the interarrival distribution. 
+ * message sizes of that distribution and sends them in interarrival times
+ * sampled from the interarrival distribution.
  */
 class WorkloadSynthesizer : public cSimpleModule
 {
@@ -39,19 +39,19 @@ class WorkloadSynthesizer : public cSimpleModule
     ~WorkloadSynthesizer();
 
     static const uint32_t MIN_ETHERNET_PAYLOAD_BYTES = 46;
-    static const uint32_t MIN_ETHERNET_FRAME_SIZE = 64; 
+    static const uint32_t MIN_ETHERNET_FRAME_SIZE = 64;
     static const uint32_t ETHERNET_PREAMBLE_SIZE = 8;
-    static const uint32_t ETHERNET_HDR_SIZE = 14; 
+    static const uint32_t ETHERNET_HDR_SIZE = 14;
     static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
     static const uint32_t IP_HEADER_SIZE = 20;
     static const uint32_t UDP_HEADER_SIZE = 8;
     static const uint32_t ETHERNET_CRC_SIZE = 4;
-    static const uint32_t INTER_PKT_GAP = 12; 
+    static const uint32_t INTER_PKT_GAP = 12;
 
   protected:
     enum SelfMsgKinds { START = 1, SEND, STOP };
 
-    // generates samples from the a given random distribution 
+    // generates samples from the a given random distribution
     MsgSizeDistributions *msgSizeGenerator;
 
     // parameters
@@ -85,8 +85,8 @@ class WorkloadSynthesizer : public cSimpleModule
     static simsignal_t rcvdMsgSignal;
 
     // Signal for end to end to delay every received messages
-    static simsignal_t msgE2EDelaySignal; 
-    
+    static simsignal_t msgE2EDelaySignal;
+
     // keep pairs of upper bound message size range and its corresponding
     // signal id.
     std::vector<uint64_t> msgSizeRangeUpperBounds;
@@ -110,7 +110,7 @@ class WorkloadSynthesizer : public cSimpleModule
     void parseAndProcessXMLConfig();
     void registerTemplatedStats(const char* msgSizeRanges);
     double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
-    
+
 };
 
 #endif //__HOMATRANSPORT_WORKLOADSYNTHESIZER_H_

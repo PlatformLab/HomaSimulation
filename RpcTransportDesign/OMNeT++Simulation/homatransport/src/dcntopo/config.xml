@@ -16,13 +16,13 @@
         <hostSwTurnAroundTime>0.5us</hostSwTurnAroundTime>
         <hostNicSxThinkTime>0.5us</hostNicSxThinkTime>
         <switchFixDelay>0.25us</switchFixDelay>
-        <workloadType>TEST_DIST</workloadType>
+        <workloadType>WEB_SERVER</workloadType>
         <interArrivalDist>exponential</interArrivalDist>
-        <loadFactor>0.03114286</loadFactor>
+        <loadFactor>0.01785714</loadFactor>
         <startTime>0s</startTime>
-        <stopTime>9.5s</stopTime>
+        <stopTime>2s</stopTime>
         <warmup-period>0ms</warmup-period>
-        <msgSizeRanges>100 1456 10000 100000 1000000</msgSizeRanges>
+        <msgSizeRanges>100 1000 10000 100000 1000000 10000000</msgSizeRanges>
     </param>
     <IPv4Configurator>
         <config>
@@ -61,7 +61,7 @@
         <transportConfig>
         </transportConfig>
         <appConfig>
-            <isSender>false</isSender>
+            <isSender>true</isSender>
             <destIds>0</destIds>
         </appConfig>
     </hostConfig>
@@ -70,7 +70,7 @@
         <transportConfig>
         </transportConfig>
         <appConfig>
-            <isSender>false</isSender>
+            <isSender>true</isSender>
             <destIds>0</destIds>
         </appConfig>
     </hostConfig>
@@ -79,7 +79,7 @@
         <transportConfig>
         </transportConfig>
         <appConfig>
-            <isSender>false</isSender>
+            <isSender>true</isSender>
             <destIds>0</destIds>
         </appConfig>
     </hostConfig>

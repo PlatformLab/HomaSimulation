@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 #include <unordered_set>
 #include<iterator>
@@ -61,56 +61,61 @@ WorkloadSynthesizer::registerTemplatedStats(const char* msgSizeRanges)
         char latencySignalName[50];
         sprintf(latencySignalName, "msg%sE2EDelay", sizeUpperBound.c_str());
         simsignal_t latencySignal = registerSignal(latencySignalName);
-        msgE2ELatencySignalVec.push_back(latencySignal); 
+        msgE2ELatencySignalVec.push_back(latencySignal);
         char latencyStatsName[50];
         sprintf(latencyStatsName, "msg%sE2EDelay", sizeUpperBound.c_str());
-        cProperty *statisticTemplate = 
+        cProperty *statisticTemplate =
                 getProperties()->get("statisticTemplate", "msgRangesE2EDelay");
-        ev.addResultRecorders(this, latencySignal, latencyStatsName, statisticTemplate);
+        ev.addResultRecorders(this, latencySignal, latencyStatsName,
+                statisticTemplate);
 
         char queueDelaySignalName[50];
-        sprintf(queueDelaySignalName, "msg%sQueuingDelay", sizeUpperBound.c_str());
+        sprintf(queueDelaySignalName, "msg%sQueuingDelay",
+                sizeUpperBound.c_str());
         simsignal_t queueDelaySignal = registerSignal(queueDelaySignalName);
-        msgQueueDelaySignalVec.push_back(queueDelaySignal); 
+        msgQueueDelaySignalVec.push_back(queueDelaySignal);
         char queueDelayStatsName[50];
-        sprintf(queueDelayStatsName, "msg%sQueuingDelay", sizeUpperBound.c_str());
+        sprintf(queueDelayStatsName, "msg%sQueuingDelay",
+                sizeUpperBound.c_str());
         statisticTemplate = getProperties()->get("statisticTemplate",
                 "msgRangesQueuingDelay");
-        ev.addResultRecorders(this, queueDelaySignal, queueDelayStatsName, statisticTemplate);
+        ev.addResultRecorders(this, queueDelaySignal, queueDelayStatsName,
+                statisticTemplate);
 
         char stretchSignalName[50];
         sprintf(stretchSignalName, "msg%sE2EStretch", sizeUpperBound.c_str());
         simsignal_t stretchSignal = registerSignal(stretchSignalName);
-        msgE2EStretchSignalVec.push_back(stretchSignal); 
+        msgE2EStretchSignalVec.push_back(stretchSignal);
         char stretchStatsName[50];
         sprintf(stretchStatsName, "msg%sE2EStretch", sizeUpperBound.c_str());
         statisticTemplate = getProperties()->get("statisticTemplate",
                 "msgRangesE2EStretch");
-        ev.addResultRecorders(this, stretchSignal, stretchStatsName, statisticTemplate);
+        ev.addResultRecorders(this, stretchSignal, stretchStatsName,
+                statisticTemplate);
     }
 }
 
 void
 WorkloadSynthesizer::initialize()
-{   
+{
     // read in module parameters
     int parentHostIdx = -1;
     nicLinkSpeed = par("nicLinkSpeed").longValue();
-    fabricLinkSpeed = par("fabricLinkSpeed").longValue(); 
+    fabricLinkSpeed = par("fabricLinkSpeed").longValue();
     edgeLinkDelay = 1e-6 * par("edgeLinkDelay").doubleValue();
     fabricLinkDelay = 1e-6 * par("fabricLinkDelay").doubleValue();
-    hostSwTurnAroundTime = 1e-6 * par("hostSwTurnAroundTime").doubleValue(); 
-    hostNicSxThinkTime = 1e-6 * par("hostNicSxThinkTime").doubleValue(); 
-    switchFixDelay = 1e-6 * par("switchFixDelay").doubleValue(); 
+    hostSwTurnAroundTime = 1e-6 * par("hostSwTurnAroundTime").doubleValue();
+    hostNicSxThinkTime = 1e-6 * par("hostNicSxThinkTime").doubleValue();
+    switchFixDelay = 1e-6 * par("switchFixDelay").doubleValue();
     isFabricCutThrough = par("isFabricCutThrough").boolValue();
     isSingleSpeedFabric = par("isSingleSpeedFabric").boolValue();
     startTime = par("startTime").doubleValue();
     stopTime = par("stopTime").doubleValue();
     xmlConfig = par("appConfig").xmlValue();
 
-    // Setup templated statistics ans signals 
+    // Setup templated statistics ans signals
     const char* msgSizeRanges = par("msgSizeRanges").stringValue();
-    registerTemplatedStats(msgSizeRanges); 
+    registerTemplatedStats(msgSizeRanges);
 
     // Initialize the msgSizeGenerator
     const char* workLoadType = par("workloadType").stringValue();
@@ -157,27 +162,32 @@ WorkloadSynthesizer::initialize()
                 "../../sizeDistributions/HostidSizeInterarrival.txt");
         cModule* parentHost = this->getParentModule();
         if (strcmp(parentHost->getName(), "host") != 0) {
-            throw cRuntimeError("'%s': Not a valid parent module type. Expected "
-                    "\"HostBase\" for parent module type.", parentHost->getName());
+            throw cRuntimeError("'%s': Not a valid parent module type. Expected"
+                    " \"HostBase\" for parent module type.",
+                    parentHost->getName());
         }
         parentHostIdx = parentHost->getIndex();
     } else {
         throw cRuntimeError("'%s': Not a valie workload type.",workLoadType);
     }
-    
+
     HomaPkt homaPkt = HomaPkt();
-    homaPkt.setPktType(PktType::SCHED_DATA);
-    maxDataBytesPerEthFrame = 
-            MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE; 
+    homaPkt.setPktType(PktType::UNSCHED_DATA);
+    maxDataBytesPerEthFrame =
+            MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE;
     maxDataBytesPerPkt = maxDataBytesPerEthFrame - homaPkt.headerSize();
 
     MsgSizeDistributions::InterArrivalDist interArrivalDist;
     if (strcmp(par("interArrivalDist").stringValue(), "exponential") == 0) {
         interArrivalDist = MsgSizeDistributions::InterArrivalDist::EXPONENTIAL;
-    } else if (strcmp(par("interArrivalDist").stringValue(), "preset_in_file") == 0) {
-        interArrivalDist = MsgSizeDistributions::InterArrivalDist::INTERARRIVAL_IN_FILE;
-    } else if (strcmp(par("interArrivalDist").stringValue(), "facebook_key_value") == 0){
-        interArrivalDist = MsgSizeDistributions::InterArrivalDist::FACEBOOK_PARETO;
+    } else if (strcmp(par("interArrivalDist").stringValue(),
+            "preset_in_file") == 0) {
+        interArrivalDist =
+                MsgSizeDistributions::InterArrivalDist::INTERARRIVAL_IN_FILE;
+    } else if (strcmp(par("interArrivalDist").stringValue(),
+            "facebook_key_value") == 0){
+        interArrivalDist =
+                MsgSizeDistributions::InterArrivalDist::FACEBOOK_PARETO;
     } else {
         throw cRuntimeError("'%s': Not a valid Interarrival Distribution",
                 par("interArrivalDist").stringValue());
@@ -215,7 +225,7 @@ void
 WorkloadSynthesizer::parseAndProcessXMLConfig()
 {
     // determine if this app is also a sender or only a receiver
-    const char* isSenderParam = 
+    const char* isSenderParam =
             xmlConfig->getElementByPath("isSender")->getNodeValue();
     if (strcmp(isSenderParam, "false") == 0) {
         isSender = false;
@@ -233,7 +243,7 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
     // dest host be chosen randomly among all the possible dest hosts.
     std::string destIdsStr =
             std::string(xmlConfig->getElementByPath("destIds")->getNodeValue());
-    std::stringstream destIdsStream(destIdsStr); 
+    std::stringstream destIdsStream(destIdsStr);
     int id;
     std::unordered_set<int> destHostIds;
     while (destIdsStream >> id) {
@@ -275,7 +285,7 @@ WorkloadSynthesizer::handleMessage(cMessage *msg)
                 break;
             default:
                 throw cRuntimeError("Invalid kind %d in self message",
-                        (int)selfMsg->getKind());  
+                        (int)selfMsg->getKind());
         }
     } else {
         processRcvdMsg(check_and_cast<AppMessage*>(msg));
@@ -322,7 +332,7 @@ WorkloadSynthesizer::processStart()
 {
     // set srcAddress. The assumption here is that each host has only one
     // non-loopback interface and the IP of that interface is srcAddress.
-    inet::InterfaceTable* ifaceTable = 
+    inet::InterfaceTable* ifaceTable =
             check_and_cast<inet::InterfaceTable*>(
             getModuleByPath(par("interfaceTableModule").stringValue()));
     inet::InterfaceEntry* srcIface = NULL;
@@ -397,7 +407,7 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
 
     double idealDelay = idealMsgEndToEndDelay(rcvdMsg);
     double queuingDelay =  completionTime.dbl() - idealDelay;
-    double stretchFactor = 
+    double stretchFactor =
             (idealDelay == 0.0 ? 1.0 : completionTime.dbl()/idealDelay);
 
     size_t i;
@@ -422,7 +432,7 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
     numReceived++;
 }
 
-/** The proper working of this part of the code depends on the 
+/** The proper working of this part of the code depends on the
  * correct ip assignments based on the config.xml file.
  */
 double
@@ -433,7 +443,7 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     ASSERT(srcAddr.getType() == inet::L3Address::AddressType::IPv4);
     inet::L3Address destAddr = rcvdMsg->getDestAddr();
     ASSERT(destAddr.getType() == inet::L3Address::AddressType::IPv4);
-    
+
     if (destAddr == srcAddr) {
         // no switching delay
         return totalBytesTranmitted;
@@ -444,7 +454,8 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     // frame.
     int lastPartialFrameLen = 0;
     int numFullEthFrame = rcvdMsg->getByteLength() / maxDataBytesPerEthFrame;
-    uint32_t lastPartialFrameData = rcvdMsg->getByteLength() % maxDataBytesPerEthFrame;
+    uint32_t lastPartialFrameData =
+            rcvdMsg->getByteLength() % maxDataBytesPerEthFrame;
 
 
     totalBytesTranmitted = numFullEthFrame *
@@ -459,23 +470,22 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         }
 
     } else {
-        if (lastPartialFrameData < 
-                (MIN_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
-
+        if (lastPartialFrameData < (MIN_ETHERNET_PAYLOAD_BYTES -
+                IP_HEADER_SIZE - UDP_HEADER_SIZE)) {
             lastPartialFrameLen = MIN_ETHERNET_FRAME_SIZE +
                     ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
         } else {
             lastPartialFrameLen = lastPartialFrameData + IP_HEADER_SIZE
                     + UDP_HEADER_SIZE + ETHERNET_HDR_SIZE + ETHERNET_CRC_SIZE
-                    + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP; 
+                    + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
         }
-        totalBytesTranmitted += lastPartialFrameLen; 
+        totalBytesTranmitted += lastPartialFrameLen;
     }
 
-    double msgSerializationDelay = 
+    double msgSerializationDelay =
             1e-9 * ((totalBytesTranmitted << 3) * 1.0 / nicLinkSpeed);
 
-    // There's always two hostSwTurnAroundTime and one nicThinkTime involved 
+    // There's always two hostSwTurnAroundTime and one nicThinkTime involved
     // in ideal latency for the overhead.
     double hostDelayOverheads = 2 * hostSwTurnAroundTime + hostNicSxThinkTime;
 
@@ -486,22 +496,24 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     // switch model.
     double totalSwitchDelay = 0;
 
-    double edgeSwitchFixDelay = switchFixDelay; 
+    double edgeSwitchFixDelay = switchFixDelay;
     double fabricSwitchFixDelay = switchFixDelay;
     double edgeSwitchSerialDelay = 0;
     double fabricSwitchSerialDelay = 0;
 
     if (numFullEthFrame != 0) {
-        edgeSwitchSerialDelay += (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
+        edgeSwitchSerialDelay +=
+                (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
                 ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP) *
-                1e-9 * 8 / nicLinkSpeed; 
+                1e-9 * 8 / nicLinkSpeed;
 
         fabricSwitchSerialDelay += (MAX_ETHERNET_PAYLOAD_BYTES +
                 ETHERNET_HDR_SIZE + ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE +
                 INTER_PKT_GAP) * 1e-9 * 8 / fabricLinkSpeed;
     } else {
-        edgeSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed; 
-        fabricSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
+        edgeSwitchSerialDelay += lastPartialFrameLen * 1e-9 * 8 / nicLinkSpeed;
+        fabricSwitchSerialDelay +=
+                lastPartialFrameLen * 1e-9 * 8 / fabricLinkSpeed;
     }
 
     if (destAddr.toIPv4().getDByte(2) == srcAddr.toIPv4().getDByte(2)) {
@@ -517,11 +529,12 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
 
     } else if (destAddr.toIPv4().getDByte(1) == srcAddr.toIPv4().getDByte(1)) {
 
-        // src and dest in the same pod 
+        // src and dest in the same pod
         totalSwitchDelay =
                 edgeSwitchFixDelay +  fabricSwitchFixDelay + edgeSwitchFixDelay;
         if (!isFabricCutThrough) {
-            totalSwitchDelay += (2*fabricSwitchSerialDelay + edgeSwitchSerialDelay ); 
+            totalSwitchDelay +=
+                    (2*fabricSwitchSerialDelay + edgeSwitchSerialDelay);
         } else if (!isSingleSpeedFabric) {
             // have cutthrough but forwarding a packet coming from low
             // speed port to high speed port. There will inevitably be one
@@ -533,15 +546,15 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
         totalSwitchDelay += (2 * edgeLinkDelay + 2 * fabricLinkDelay);
 
     } else {
-        totalSwitchDelay = edgeSwitchFixDelay +   
-                           fabricSwitchFixDelay + 
-                           fabricSwitchFixDelay + 
-                           fabricSwitchFixDelay + 
-                           edgeSwitchFixDelay;    
+        totalSwitchDelay = edgeSwitchFixDelay +
+                           fabricSwitchFixDelay +
+                           fabricSwitchFixDelay +
+                           fabricSwitchFixDelay +
+                           edgeSwitchFixDelay;
         if (!isFabricCutThrough) {
             totalSwitchDelay += (fabricSwitchSerialDelay +
                     fabricSwitchSerialDelay + fabricSwitchSerialDelay +
-                    fabricSwitchSerialDelay + edgeSwitchSerialDelay); 
+                    fabricSwitchSerialDelay + edgeSwitchSerialDelay);
         } else if (!isSingleSpeedFabric) {
 
             totalSwitchDelay += edgeSwitchFixDelay;
