@@ -29,6 +29,7 @@ simple HomaTransport like ITransportScheme
         int defaultReqBytes @unit(byte) = default(0B);
         int defaultUnschedBytes @unit(byte) = default(9700B);
         int maxRtt @unit(us) = default(15us);
+        bool isRoundRobinScheduler = default(false);
         int localPort = default(-1);
         int destPort;
 

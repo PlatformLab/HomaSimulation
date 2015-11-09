@@ -42,17 +42,20 @@ cdfFrame <- rbind(predefProb, cdfFrame)
 
 cdfFrame$WorkLoad <- factor(cdfFrame$WorkLoad)
 
-png(file='WorkloadCDFs.png', width=1300, height=1000)
+png(file='WorkloadCDFs.png', width=1200, height=500)
 valueCdf <- ggplot(cdfFrame, aes(x=MessageSize,y=CDF))
 valueCdf + geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
+        labs(title = "Message Size Distribution Used In Simulation") +
         theme(axis.text=element_text(size=30),
             axis.title=element_text(size=30, face="bold"),
             panel.grid.major = 
                 element_line(size = 0.75, linetype = 'solid', colour = "black"),
             panel.grid.minor = 
                 element_line(size = 0.5, linetype = 'solid', colour = "gray"),
-            legend.text=element_text(size=20),
-            legend.title=element_text(size=30, face="bold")) +
+            legend.text=element_text(size=30),
+            legend.title=element_text(size=20, face="bold"),
+            legend.position="top",
+            plot.title = element_text(size=20, face="bold")) +
         scale_x_log10("Message Sizes (Bytes)")+
         scale_y_continuous(breaks = round(seq(min(cdfFrame$CDF), max(cdfFrame$CDF), by = 0.1),1))
 

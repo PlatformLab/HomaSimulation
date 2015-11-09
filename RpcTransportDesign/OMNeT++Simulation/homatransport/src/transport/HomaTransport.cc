@@ -71,7 +71,17 @@ HomaTransport::initialize()
 
     selfMsg = new cMessage("GrantTimer");
     selfMsg->setKind(SelfMsgKind::START);
-    rxScheduler.initialize(grantMaxBytes, nicLinkSpeed, selfMsg);
+
+    HomaTransport::ReceiveScheduler::QueueType rxInboundQueueType;
+    if (par("isRoundRobinScheduler").boolValue()) {
+        rxInboundQueueType =
+                HomaTransport::ReceiveScheduler::QueueType::FIFO_QUEUE;
+    } else {
+        rxInboundQueueType =
+                HomaTransport::ReceiveScheduler::QueueType::PRIO_QUEUE;
+    }
+    rxScheduler.initialize(grantMaxBytes, 
+            nicLinkSpeed, selfMsg, rxInboundQueueType);
     scheduleAt(simTime(), selfMsg);
     outstandingGrantBytes = 0;
 }
@@ -453,12 +463,14 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
 
 void
 HomaTransport::ReceiveScheduler::initialize(uint32_t grantMaxBytes,
-        uint32_t nicLinkSpeed, cMessage* grantTimer)
+        uint32_t nicLinkSpeed, cMessage* grantTimer, 
+        HomaTransport::ReceiveScheduler::QueueType queueType)
 {
     this->grantMaxBytes = grantMaxBytes;
     this->trafficPacer = new(this->trafficPacer) TrafficPacer(nicLinkSpeed, 
             transport->maxOutstandingRecvBytes);
     this->grantTimer = grantTimer;
+    inboundMsgQueue.initialize(queueType);
 }
 
 HomaTransport::ReceiveScheduler::~ReceiveScheduler()
@@ -766,8 +778,13 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
 
         // update highPrioMsg and msgQueue
         highPrioMsg->bytesToGrant -= grantSize;
-        if (highPrioMsg->bytesToGrant <= 0) {
-            inboundMsgQueue.pop();
+
+        // Pop the highPrioMsg and push it back if it still needs grant.
+        // (This process is necessary for round robin scheduling and doesn't
+        // make any difference for SRPT scheduler.)
+        inboundMsgQueue.pop(); 
+        if (highPrioMsg->bytesToGrant > 0) {
+            inboundMsgQueue.push(highPrioMsg);
         }
 
         EV_INFO << " Sent a grant, among " << inboundMsgQueue.size()
@@ -777,6 +794,77 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
                 << " Bytes left to grant.)" << endl;
     }
 }
+
+HomaTransport::ReceiveScheduler::InboundMsgQueue::InboundMsgQueue()
+    : prioQueue()
+    , fifoQueue()
+    , queueType()
+{}
+
+void
+HomaTransport::ReceiveScheduler::InboundMsgQueue::initialize(
+        HomaTransport::ReceiveScheduler::QueueType queueType)
+{
+    if (queueType >= INVALID_TYPE || queueType < 0) {
+        cRuntimeError("InboundMsgQueue was constructed with an invalid type.");
+    }
+    this->queueType = queueType; 
+}
+
+void
+HomaTransport::ReceiveScheduler::InboundMsgQueue::push(
+        HomaTransport::InboundMessage* inboundMsg)
+{
+    if (queueType == QueueType::PRIO_QUEUE) {
+        prioQueue.push(inboundMsg);
+    } else if (queueType == QueueType::FIFO_QUEUE) {
+        fifoQueue.push(inboundMsg);
+    }
+}
+
+HomaTransport::InboundMessage*
+HomaTransport::ReceiveScheduler::InboundMsgQueue::top()
+{
+    if (queueType == QueueType::PRIO_QUEUE) {
+        return prioQueue.top();
+    } else if (queueType == QueueType::FIFO_QUEUE) {
+        return fifoQueue.front();
+    }
+    return NULL;
+}
+
+void
+HomaTransport::ReceiveScheduler::InboundMsgQueue::pop()
+{
+    if (queueType == QueueType::PRIO_QUEUE) {
+        prioQueue.pop();
+    } else if (queueType == QueueType::FIFO_QUEUE) {
+        fifoQueue.pop();
+    }
+}
+
+bool
+HomaTransport::ReceiveScheduler::InboundMsgQueue::empty()
+{
+    if (queueType == QueueType::PRIO_QUEUE) {
+        return prioQueue.empty();
+    } else if (queueType == QueueType::FIFO_QUEUE) {
+        return fifoQueue.empty();
+    }
+    return false;
+}
+
+size_t
+HomaTransport::ReceiveScheduler::InboundMsgQueue::size()
+{
+    if (queueType == QueueType::PRIO_QUEUE) {
+        return prioQueue.size();
+    } else if (queueType == QueueType::FIFO_QUEUE) {
+        return fifoQueue.size();
+    }
+    return 0;
+}
+
 
 /**
  * HomaTransport::InboundMessage

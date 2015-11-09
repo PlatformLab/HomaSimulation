@@ -246,34 +246,61 @@ class HomaTransport : public cSimpleModule
     {
       public:
 
-        /**
-         * A predicate functor that compares the remaining required grants to be
-         * sent for two inbound message.
-         */
-        class CompareInboundMsg
+        enum QueueType
         {
-          public:
-            CompareInboundMsg()
-            {}
-            
-            /**
-             * Predicate functor operator () for comparison.
-             *
-             * \param msg1
-             *      inbound message 1 in the comparison
-             * \param msg2
-             *      inbound message 2 in the comparison
-             * \return
-             *      a bool from the result of the comparison
-             */
-            bool operator()(const InboundMessage* msg1, const InboundMessage* msg2)
-            {
-                return msg1->bytesToGrant > msg2->bytesToGrant;
-            }
+            PRIO_QUEUE = 0,
+            FIFO_QUEUE = 1,
+            INVALID_TYPE = 2
         };
 
-        typedef std::priority_queue<InboundMessage*,
-                std::vector<InboundMessage*>, CompareInboundMsg> PriorityQueue;
+        class InboundMsgQueue 
+        {
+          public:
+            
+            /**
+             * A predicate functor that compares the remaining required grants
+             * to be sent for two inbound message.
+             */
+            class CompareInboundMsg
+            {
+              public:
+                CompareInboundMsg()
+                {}
+                
+                /**
+                 * Predicate functor operator () for comparison.
+                 *
+                 * \param msg1
+                 *      inbound message 1 in the comparison
+                 * \param msg2
+                 *      inbound message 2 in the comparison
+                 * \return
+                 *      a bool from the result of the comparison
+                 */
+                bool operator()(const InboundMessage* msg1,
+                    const InboundMessage* msg2)
+                {
+                    return msg1->bytesToGrant > msg2->bytesToGrant;
+                }
+            };
+
+            typedef std::priority_queue<InboundMessage*,
+                    std::vector<InboundMessage*>, CompareInboundMsg> PriorityQueue;
+
+            explicit InboundMsgQueue();
+            void initialize (QueueType queueType);
+            void push(InboundMessage* inboundMsg);
+            InboundMessage* top();
+            void pop();
+            bool empty();
+            size_t size();
+
+          private:
+            PriorityQueue prioQueue; 
+            std::queue<InboundMessage*> fifoQueue;
+            QueueType queueType;    
+        };
+
         typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
                 InboundMsgsMap;
 
@@ -284,7 +311,7 @@ class HomaTransport : public cSimpleModule
         void processReceivedUnschedData(HomaPkt* rxPkt);
         void sendAndScheduleGrant();
         void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed,
-                cMessage* grantTimer);
+                cMessage* grantTimer, QueueType queueType);
         
       protected:
         HomaTransport* transport;
@@ -293,7 +320,7 @@ class HomaTransport : public cSimpleModule
 
         // A container for incomplete messages that are sorted based on the
         // remaining bytes to grant.
-        PriorityQueue inboundMsgQueue; 
+        InboundMsgQueue inboundMsgQueue; 
 
         // Keeps a hash map of all incomplete inboundMsgs from their msgId key.
         // the value of the map is list of all messages with the same msgId from

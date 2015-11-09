@@ -6,7 +6,7 @@
      parameters.-->
 <topologyConfig>
     <param>
-        <transportScheme>IdealTransport</transportScheme>
+        <transportScheme>HomaTransport</transportScheme>
         <numServersPerTor>4</numServersPerTor>
         <numTors>8</numTors>
         <fabricLinkSpeed>40</fabricLinkSpeed> <!--In Gb/s-->
