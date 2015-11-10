@@ -52,11 +52,6 @@ class MsgSizeDistributions {
     std::vector<std::pair<int, double>> msgSizeProbDistVector;
     std::queue<std::pair<int, double>> msgSizeInterarrivalQueue;
 
-    // Random number generator classes and datastructs
-    std::random_device rdDevice;
-    std::mt19937 randGen;
-    std::uniform_real_distribution<> dist;
- 
     // The value of this variable will determine which distribution should be
     // used for generating new messages in the sizeGenratorWrapper()
     DistributionChoice sizeDistSelector;

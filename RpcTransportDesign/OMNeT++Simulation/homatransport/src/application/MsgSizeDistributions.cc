@@ -20,9 +20,6 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         DistributionChoice sizeDistSelector, double avgRate, int callerHostId)
     : msgSizeProbDistVector()
     , msgSizeInterarrivalQueue()
-    , rdDevice()
-    , randGen(rdDevice())
-    , dist(0, 1)
     , sizeDistSelector(sizeDistSelector)
     , interArrivalDist(interArrivalDist)
     , avgMsgSize(0.0)
@@ -146,7 +143,7 @@ MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
         double &nextInterarrivalTime)
 {
     
-    double prob = dist(randGen);
+    double prob = uniform(0.0, 1.0);
     int size = 0;
     for (size_t i = 0; i < msgSizeProbDistVector.size(); ++i)
     {
@@ -183,7 +180,7 @@ MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize,
     // Maximum allowed Msg size
     const int maxSize = 0x40000000;
 
-    double prob = dist(randGen);
+    double prob = uniform(0.0, 1.0);
     int size;
     
     if (prob <= msgSizeProbDistVector.back().second) {
@@ -223,7 +220,7 @@ MsgSizeDistributions::facebookParetoInterGap()
 
     // Maximum interarrival gap 
     const int maxGap = 1000;
-    double prob = dist(randGen);
+    double prob = uniform(0.0, 1.0);
     
     double gapTime = (pow(1/(1-prob), k) - 1) * sigma / k;
 
