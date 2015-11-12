@@ -17,7 +17,7 @@ import re
 import sys
 import warnings
 
-__all__ = ['parse', 'copyExclude']
+__all__ = ['parse', 'copyExclude', 'AttrDict']
 
 class AttrDict(dict):
     """A mapping with string keys that aliases x.y syntax to x['y'] syntax.
@@ -67,14 +67,20 @@ def parse(f):
     tors = AttrDict()
     aggrs = AttrDict()
     cores = AttrDict()
-    currDict = AttrDict()
+    generalInfo = AttrDict()
+    net = ""
     for line in f:
-        match = re.match('attr\s+network\s+(\S+)',line)
+        if not line or line.isspace():
+            break;
+        match = re.match('attr\s+(\S+)\s+(".+"|\S+)', line)
         if match:
-            net = match.group(1)
-            break
-    if not match:
+            generalInfo.assign(match.group(1), match.group(2))
+            if match.group(1) == 'network':
+                net = match.group(2)
+    if net == "":
         raise Exception, 'no network name in file: {0}'.format(f.name)
+
+    currDict = AttrDict()
     for line in f:
         match = re.match('(\S+)\s+{0}\.(([a-zA-Z]+).+\.\S+)\s+(".+"|\S+)\s*(\S*)'.format(net), line)
         if match:
@@ -118,7 +124,8 @@ def parse(f):
                 currDict.access(subVar).append(valuePair)
             else:
                 warnings.warn('Entry type not known to parser: {0}'.format(entryType), RuntimeWarning) 
-    return hosts, tors, aggrs, cores
+    f.close()
+    return hosts, tors, aggrs, cores, generalInfo
 
 def copyExclude(source, dest, exclude):
     selectKeys = (key for key in source if key not in exclude)
@@ -1083,8 +1090,7 @@ def main():
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile)
     parsedStats = AttrDict() 
-    parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores  = parse(open(scalarResultFile))
-    #pprint(parsedStats)
+    parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(scalarResultFile))
     queueWaitTimeDigest = AttrDict()
     hostQueueWaitTimes(parsedStats.hosts, xmlParsedDic, queueWaitTimeDigest)
     torsQueueWaitTime(parsedStats.tors, xmlParsedDic, queueWaitTimeDigest)

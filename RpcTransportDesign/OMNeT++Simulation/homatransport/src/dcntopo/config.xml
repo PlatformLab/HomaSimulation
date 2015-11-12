@@ -9,8 +9,8 @@
         <transportScheme>HomaTransport</transportScheme>
         <numServersPerTor>4</numServersPerTor>
         <numTors>8</numTors>
-        <fabricLinkSpeed>40</fabricLinkSpeed> <!--In Gb/s-->
-        <nicLinkSpeed>10</nicLinkSpeed> <!--In Gb/s-->
+        <fabricLinkSpeed>40</fabricLinkSpeed>
+        <nicLinkSpeed>10</nicLinkSpeed>
         <fabricLinkDelay>0.0us</fabricLinkDelay>
         <edgeLinkDelay>0.0us</edgeLinkDelay>
         <hostSwTurnAroundTime>0.5us</hostSwTurnAroundTime>
@@ -35,11 +35,6 @@
             <interface hosts='**.host[24..27]' address='10.x.6.x' netmask='255.x.x.x'/>
             <interface hosts='**.host[28..31]' address='10.x.7.x' netmask='255.x.x.x'/>
             <interface hosts='**' address='10.x.x.x' netmask='255.x.x.x'/>
-            <!--
-            <interface hosts='**.host[0..1]' address='10.x.0.x' netmask='255.x.x.x'/>
-            <interface hosts='**.host[2..3]' address='10.x.1.x' netmask='255.x.x.x'/>
-            <interface hosts='**' address='10.x.x.x' netmask='255.x.x.x'/>
-            -->
         </config>
     </IPv4Configurator>
 

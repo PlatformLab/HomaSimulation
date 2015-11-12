@@ -36,7 +36,6 @@ module HostBase extends NodeBase
         int nicLinkSpeed @unit(Gbps);
         int fabricLinkSpeed @unit(Gbps);
 
-
         int numTrafficGeneratorApp = default(0);
         // no of TCP apps. Specify the app types in INI file with
         // tcpApp[0..1].typename="TCPEchoApp" syntax
