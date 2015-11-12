@@ -17,8 +17,6 @@ import re
 import sys
 import warnings
 
-__all__ = ['parse', 'copyExclude', 'AttrDict']
-
 class AttrDict(dict):
     """A mapping with string keys that aliases x.y syntax to x['y'] syntax.
     The attribute syntax is easier to read and type than the item syntax.
@@ -218,13 +216,15 @@ def hostQueueWaitTimes(hosts, xmlParsedDic, reportDigest):
         queuingTimeDigest = digestModulesStats(queuingTimeStats)
         reportDigest.assign('queueWaitTime.hosts.{0}'.format(keyString), queuingTimeDigest)
 
-def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
+def torsQueueWaitTime(tors, generalInfo, xmlParsedDic, reportDigest):
+    numServersPerTor = int(generalInfo.numServersPerTor)
+    fabricLinkSpeed = int(generalInfo.fabricLinkSpeed.strip('Gbps'))
+    nicLinkSpeed = int(generalInfo.nicLinkSpeed.strip('Gbps'))
     senderHostIds = xmlParsedDic.senderIds
-    senderTorIds = [elem for elem in set([int(id / xmlParsedDic.numServersPerTor) for id in senderHostIds])]
-    numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
-    numServersPerTor = xmlParsedDic.numServersPerTor
+    senderTorIds = [elem for elem in set([int(id / numServersPerTor) for id in senderHostIds])]
+    numTorUplinkNics = int(floor(numServersPerTor * nicLinkSpeed / fabricLinkSpeed))
     receiverHostIds = xmlParsedDic.receiverIds
-    receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
+    receiverTorIdsIfaces = [(int(id / numServersPerTor), id % numServersPerTor) for id in receiverHostIds]
     keyStrings = ['queueingTime','unschedDataQueueingTime','schedDataQueueingTime','grantQueueingTime','requestQueueingTime']
     for keyString in keyStrings:
         torsUpwardQueuingTimeStats = list()
@@ -266,13 +266,13 @@ def torsQueueWaitTime(tors, xmlParsedDic, reportDigest):
         torsDownwardQueuingTimeDigest = digestModulesStats(torsDownwardQueuingTimeStats)
         reportDigest.assign('queueWaitTime.tors.downward.{0}'.format(keyString), torsDownwardQueuingTimeDigest)
 
-def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
+def aggrsQueueWaitTime(aggrs, generalInfo, xmlParsedDic, reportDigest):
     # Find the queue waiting for aggrs switches NICs
     keyStrings = ['queueingTime','unschedDataQueueingTime','schedDataQueueingTime','grantQueueingTime','requestQueueingTime']
     for keyString in keyStrings:
         aggrsQueuingTimeStats = list()
         for aggr in aggrs.keys():
-            for ifaceId in range(0, xmlParsedDic.numTors):
+            for ifaceId in range(0, int(generalInfo.numTors)):
                 queuingTimeHistogramKey = '{0}.eth[{1}].queue.dataQueue.{2}:histogram.bins'.format(aggr, ifaceId,  keyString)
                 queuingTimeStatsKey = '{0}.eth[{1}].queue.dataQueue.{2}:stats'.format(aggr, ifaceId, keyString)
                 aggrsStats = AttrDict()
@@ -286,43 +286,6 @@ def aggrsQueueWaitTime(aggrs, xmlParsedDic, reportDigest):
 def parseXmlFile(xmlConfigFile):
     xmlConfig = minidom.parse(xmlConfigFile)
     xmlParsedDic = AttrDict()
-    transportScheme = xmlConfig.getElementsByTagName('transportScheme')[0].firstChild.data
-    numServersPerTor = int(xmlConfig.getElementsByTagName('numServersPerTor')[0].firstChild.data)
-    numTors = int(xmlConfig.getElementsByTagName('numTors')[0].firstChild.data)
-    fabricLinkSpeed = int(xmlConfig.getElementsByTagName('fabricLinkSpeed')[0].firstChild.data)
-    nicLinkSpeed = int(xmlConfig.getElementsByTagName('nicLinkSpeed')[0].firstChild.data)
-    numTors = int(xmlConfig.getElementsByTagName('numTors')[0].firstChild.data)
-    workloadType = xmlConfig.getElementsByTagName('workloadType')[0].firstChild.data
-    interArrivalDist = xmlConfig.getElementsByTagName('interArrivalDist')[0].firstChild.data
-    loadFactor = xmlConfig.getElementsByTagName('loadFactor')[0].firstChild.data
-    startTime = xmlConfig.getElementsByTagName('startTime')[0].firstChild.data
-    stopTime = xmlConfig.getElementsByTagName('stopTime')[0].firstChild.data
-    warmupPeriod = xmlConfig.getElementsByTagName('warmup-period')[0].firstChild.data
-    msgSizeRanges = xmlConfig.getElementsByTagName('msgSizeRanges')[0].firstChild.data
-    edgeLinkDelay = xmlConfig.getElementsByTagName('edgeLinkDelay')[0].firstChild.data
-    fabricLinkDelay = xmlConfig.getElementsByTagName('fabricLinkDelay')[0].firstChild.data
-    hostSwTurnAroundTime = xmlConfig.getElementsByTagName('hostSwTurnAroundTime')[0].firstChild.data
-    hostNicSxThinkTime = xmlConfig.getElementsByTagName('hostNicSxThinkTime')[0].firstChild.data
-    switchFixDelay = xmlConfig.getElementsByTagName('switchFixDelay')[0].firstChild.data
-
-    xmlParsedDic.transportScheme = transportScheme
-    xmlParsedDic.msgSizeRanges = msgSizeRanges.split()
-    xmlParsedDic.numServersPerTor = numServersPerTor
-    xmlParsedDic.numTors = numTors 
-    xmlParsedDic.fabricLinkSpeed = fabricLinkSpeed 
-    xmlParsedDic.nicLinkSpeed = nicLinkSpeed 
-    xmlParsedDic.numTors = numTors 
-    xmlParsedDic.workloadType = workloadType 
-    xmlParsedDic.interArrivalDist = interArrivalDist 
-    xmlParsedDic.loadFactor = '%' + str(double(loadFactor) * 100)
-    xmlParsedDic.startTime = startTime
-    xmlParsedDic.stopTime = stopTime
-    xmlParsedDic.warmupPeriod = warmupPeriod 
-    xmlParsedDic.edgeLinkDelay = edgeLinkDelay 
-    xmlParsedDic.fabricLinkDelay = fabricLinkDelay 
-    xmlParsedDic.hostSwTurnAroundTime = hostSwTurnAroundTime 
-    xmlParsedDic.hostNicSxThinkTime = hostNicSxThinkTime 
-    xmlParsedDic.switchFixDelay = switchFixDelay 
 
     senderIds = list()
     receiverIds = list()
@@ -501,12 +464,11 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
-
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
-    tw = 17
+    tw = 19
     fw = 10 
-    lineMax = 105 
+    lineMax = 105
     title = 'End To End Message Latency For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
@@ -559,11 +521,11 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     for i, e2eSizedStretch in enumerate(end2EndStretchDigest):
         printStatsLine(e2eSizedStretch, '({0}, {1}]'.format(sizeLowBound[i], e2eSizedStretch.sizeUpBound), tw, fw, '', printKeys)
 
-def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
+def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, e2eStretchAndDelayDigest):
     # For the hosts that are receivers, find the stretch and endToend stats and
     # return them. 
     receiverHostIds = xmlParsedDic.receiverIds 
-    sizes = xmlParsedDic.msgSizeRanges[:]
+    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:] 
     sizes.append('Huge')
 
     e2eStretchAndDelayDigest.delay = []
@@ -614,25 +576,24 @@ def e2eStretchAndDelay(hosts, xmlParsedDic, e2eStretchAndDelayDigest):
 
     return e2eStretchAndDelayDigest
 
-def printGenralInfo(xmlParsedDic):
+def printGenralInfo(xmlParsedDic, generalInfo):
     tw = 20
-    fw = 12
+    fw = 12 
     lineMax = 100
     title = 'General Simulation Information'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' ')) 
-    print('Num Servers Per TOR:'.ljust(tw) + '{0}'.format(xmlParsedDic.numServersPerTor).center(fw) + 'Num Sender Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.senderIds)).center(fw)
-        + 'Load Factor:'.ljust(tw) + '{0}'.format(xmlParsedDic.loadFactor).center(fw))
-    print('Num TORs:'.ljust(tw) + '{0}'.format(xmlParsedDic.numTors).center(fw) + 'Num Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw)
-        + 'Start Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.startTime).center(fw))
-    print('Server Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.nicLinkSpeed).center(fw) + 'Workload Type:'.ljust(tw) + '{0}'.format(xmlParsedDic.workloadType).center(fw)
-        + 'Stop Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.stopTime).center(fw))
-    print('Fabric Link Speed:'.ljust(tw) + '{0}Gb/s'.format(xmlParsedDic.fabricLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(xmlParsedDic.interArrivalDist).center(fw)
-        + 'Warmup Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.warmupPeriod).center(fw))
-    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.fabricLinkDelay).center(fw) + 'SW Turn-around Time:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostSwTurnAroundTime).center(fw)
-        + 'NIC Send ThinkTime:'.ljust(tw) + '{0}'.format(xmlParsedDic.hostNicSxThinkTime).center(fw))
-    print('Edge Link Delay'.ljust(tw) + '{0}'.format(xmlParsedDic.edgeLinkDelay).center(fw) + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(xmlParsedDic.switchFixDelay).center(fw)
-        + 'TransportScheme:'.ljust(tw) + '{0}'.format(xmlParsedDic.transportScheme).center(fw))
+    print('Servers Per TOR:'.ljust(tw) + '{0}'.format(generalInfo.numServersPerTor).center(fw) + 'Sender Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.senderIds)).center(fw)
+        + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.loadFactor)*100))).center(fw))
+    print('TORs:'.ljust(tw) + '{0}'.format(generalInfo.numTors).center(fw) + 'Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw)
+        + 'Start Time:'.ljust(tw) + '{0}'.format(generalInfo.startTime).center(fw))
+    print('Host Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.nicLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(generalInfo.interArrivalDist).center(fw)
+        + 'Stop Time:'.ljust(tw) + '{0}'.format(generalInfo.stopTime).center(fw))
+    print('Fabric Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.fabricLinkSpeed).center(fw) + 'Edge Link Delay'.ljust(tw) + '{0}'.format(generalInfo.edgeLinkDelay).center(fw)
+        + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(generalInfo.switchFixDelay).center(fw))
+    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(generalInfo.fabricLinkDelay).center(fw) + 'SW Turnaround Time:'.ljust(tw) + '{0}'.format(generalInfo.hostSwTurnAroundTime).center(fw)
+        + 'NIC Sx ThinkTime:'.ljust(tw) + '{0}'.format(generalInfo.hostNicSxThinkTime).center(fw))
+    print('TransportScheme:'.ljust(tw) + '{0} '.format(generalInfo.transportSchemeType).center(fw) + 'Workload Type:'.ljust(tw) + '{0}'.format(generalInfo.workloadType).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
@@ -718,8 +679,10 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     downNicsRxRates = trafficDic.torsTraffic.downNics.rx.rates = []
     downNicsRxDutyCycle = trafficDic.torsTraffic.downNics.rx.dutyCycles = []
 
-    numServersPerTor = xmlParsedDic.numServersPerTor
-    numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
+    numServersPerTor = int(parsedStats.generalInfo.numServersPerTor)
+    fabricLinkSpeed = int(parsedStats.generalInfo.fabricLinkSpeed.strip('Gbps'))
+    nicLinkSpeed = int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
+    numTorUplinkNics = int(floor(numServersPerTor * nicLinkSpeed / fabricLinkSpeed))
     for torKey in parsedStats.tors.keys():
         tor = parsedStats.tors[torKey]
         for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
@@ -986,12 +949,14 @@ def printQueueLength(parsedStats, xmlParsedDic):
             queueLen.sxHosts.nic.meanBytes.append(nicQueueBytesMean)
             queueLen.sxHosts.nic.stddevBytes.append(nicQueueBytesStddev)
 
-    numServersPerTor = xmlParsedDic.numServersPerTor
-    numTorUplinkNics = int(floor(xmlParsedDic.numServersPerTor * xmlParsedDic.nicLinkSpeed / xmlParsedDic.fabricLinkSpeed))
+    numServersPerTor = int(parsedStats.generalInfo.numServersPerTor)
+    fabricLinkSpeed = int(parsedStats.generalInfo.fabricLinkSpeed.strip('Gbps'))
+    nicLinkSpeed = int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
+    numTorUplinkNics = int(floor(numServersPerTor * nicLinkSpeed / fabricLinkSpeed))
     senderHostIds = xmlParsedDic.senderIds
-    senderTorIds = [elem for elem in set([int(id / xmlParsedDic.numServersPerTor) for id in senderHostIds])]
+    senderTorIds = [elem for elem in set([int(id / numServersPerTor) for id in senderHostIds])]
     receiverHostIds = xmlParsedDic.receiverIds
-    receiverTorIdsIfaces = [(int(id / xmlParsedDic.numServersPerTor), id % xmlParsedDic.numServersPerTor) for id in receiverHostIds]
+    receiverTorIdsIfaces = [(int(id / numServersPerTor), id % numServersPerTor) for id in receiverHostIds]
 
     for torKey in parsedStats.tors.keys():
         tor = parsedStats.tors[torKey]
@@ -1061,7 +1026,6 @@ def printQueueLength(parsedStats, xmlParsedDic):
                     queueLen.sxTors.up.nic.meanBytes.append(nicQueueBytesMean)
                     queueLen.sxTors.up.nic.stddevBytes.append(nicQueueBytesStddev)
 
-
     digestQueueLenInfo(queueLen.sxHosts.transport, 'SX Transports')
     printStatsLine(queueLen.sxHosts.transport.queueLenDigest, queueLen.sxHosts.transport.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.sxHosts.nic, 'SX NICs')
@@ -1093,17 +1057,17 @@ def main():
     parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(scalarResultFile))
     queueWaitTimeDigest = AttrDict()
     hostQueueWaitTimes(parsedStats.hosts, xmlParsedDic, queueWaitTimeDigest)
-    torsQueueWaitTime(parsedStats.tors, xmlParsedDic, queueWaitTimeDigest)
-    aggrsQueueWaitTime(parsedStats.aggrs, xmlParsedDic, queueWaitTimeDigest)
-    printGenralInfo(xmlParsedDic)
-    if xmlParsedDic.transportScheme == 'HomaTransport':
+    torsQueueWaitTime(parsedStats.tors, parsedStats.generalInfo, xmlParsedDic, queueWaitTimeDigest)
+    aggrsQueueWaitTime(parsedStats.aggrs, parsedStats.generalInfo, xmlParsedDic, queueWaitTimeDigest)
+    printGenralInfo(xmlParsedDic, parsedStats.generalInfo)
+    if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         printHomaOutstandingBytes(parsedStats, xmlParsedDic, 'KB')
     printHomaRates(parsedStats, xmlParsedDic)
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     e2eStretchAndDelayDigest = AttrDict()
-    e2eStretchAndDelay(parsedStats.hosts, xmlParsedDic, e2eStretchAndDelayDigest)
+    e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, e2eStretchAndDelayDigest)
     printE2EStretchAndDelay(e2eStretchAndDelayDigest, 'us')
 
 if __name__ == '__main__':

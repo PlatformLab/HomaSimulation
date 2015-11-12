@@ -87,6 +87,4 @@ struct MsgSizeDistException : std::exception {
     }
 };
 
-
-
 #endif /* MSGSIZEDISTRIBUTIONS_H_ */
