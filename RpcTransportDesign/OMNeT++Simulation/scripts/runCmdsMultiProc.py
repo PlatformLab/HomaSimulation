@@ -54,10 +54,6 @@ def workerMain(filename, numThreads):
     queue = Queue()
     threads = (
         [Thread(target=simWorker, args=(queue,)) for _ in range(numThreads)])
-    for t in threads:
-        t.daemon = True # threads die if the program dies
-        t.start()
-
     filepath = os.path.join(os.environ['HOME'], 
         ('Research/RpcTransportDesign/'
         'OMNeT++Simulation/homatransport/simulations/runCommands/'),
@@ -70,6 +66,10 @@ def workerMain(filename, numThreads):
         queue.put_nowait(cmd)
     f.close()
     for _ in threads: queue.put_nowait(None) # signal no more files
+
+    for t in threads:
+        t.daemon = True # threads die if the program dies
+        t.start()
     for t in threads: t.join() # wait for completion
 
 def masterMain():
@@ -133,6 +133,28 @@ def masterMain():
             print('Can not ssh to worker node: %s' % (workerName),
                 file=sys.stderr)
 
+def killAll():
+    """
+    ssh into all worker nodes and kill simulation runs
+    """
+    allWorkers = workerNodes[:]
+    allWorkers.append(masterNode)
+    for worker in allWorkers:
+        workerName = worker[0]
+        killCmd = ("kill -9 $(ps aux | grep runCmdsMultiProc | grep worker |"
+            " grep -v grep | awk '{print $2}') > /dev/null 2>&1;"
+            " kill -9 $(pidof homatransport) > /dev/null 2>&1 &")
+        sshKillCmd = ("""ssh -n -f %s "sh -c '%s'" """
+            % (workerName, killCmd,))
+        try:
+            devNull = open(os.devnull,"w")
+            subprocess.check_call(sshKillCmd, shell=True, stdout=devNull)
+            devNull.close()
+        except Exception as e:
+            devNull.close()
+            print('Can not kill simulaton on worker node: %s' % (workerName),
+                file=sys.stderr)
+
 if __name__=="__main__":
     parser = OptionParser(description='Runs multiple homatransport simulations'
         ' in multiprocess fashion on a subset of rcXX machines defined in'
@@ -152,11 +174,19 @@ if __name__=="__main__":
         default = '6',
         dest='numThreads',
         help='The number of available cores on the worker machine')
- 
+    parser.add_option("--kill",
+        action="store_true", dest="kill", default=False,
+        help="Kills all simulation runs on all worker nodes.")
+
     options, args = parser.parse_args()
     filename = options.fileName
     numThreads = int(options.numThreads)
     serverType = options.serverType
+
+    if options.kill:
+        print('Killing all simulation instances on worker nodes.')
+        killAll()
+        exit()
 
     if serverType == '':
         # make sure the master node is defined in the schedulingConfig.py
