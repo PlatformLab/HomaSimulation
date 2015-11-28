@@ -96,7 +96,7 @@ def masterMain():
             break
         workerName = worker[0]
         workerThreads= worker[1]
-        runsForWorker = int(numpy.ceil(workerThreads*numAllRuns/allThreads))
+        runsForWorker = int(numpy.ceil(1.0*workerThreads*numAllRuns/allThreads))
         cmdfilename = 'runCmds_%s' % workerName 
         cmdFullFilename = os.path.join(os.environ['HOME'], 
             ('Research/RpcTransportDesign/'
@@ -141,10 +141,10 @@ def killAll():
     allWorkers.append(masterNode)
     for worker in allWorkers:
         workerName = worker[0]
-        killCmd = ("kill -9 $(ps aux | grep runCmdsMultiProc | grep worker |"
-            " grep -v grep | awk '{print $2}') > /dev/null 2>&1;"
-            " kill -9 $(pidof homatransport) > /dev/null 2>&1 &")
-        sshKillCmd = ("""ssh -n -f %s "sh -c '%s'" """
+        killCmd = ("kill -9 \$(ps aux | grep runCmdsMultiProc | grep worker |"
+            " grep -v grep | awk '{print \$2}') > /dev/null 2>&1;"
+            " kill -9 \$(pidof homatransport) > /dev/null 2>&1 &")
+        sshKillCmd = ('ssh -n -f %s "%s"'
             % (workerName, killCmd,))
         try:
             devNull = open(os.devnull,"w")
