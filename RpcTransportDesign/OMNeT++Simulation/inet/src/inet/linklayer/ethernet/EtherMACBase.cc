@@ -722,13 +722,22 @@ int EtherMACBase::InnerQueue::packetCompare(cObject *a, cObject *b)
 
 EtherMACBase::HomaByteCounter::HomaByteCounter()
     : numReqBytesSent(0)
+    , numReqPktSent(0)
     , numGrantBytesSent(0)
+    , numGrantPktSent(0)
     , numSchedBytesSent(0)
+    , numSchedPktSent(0)
     , numUnschedBytesSent(0)
+    , numUnschedPktSent(0)
     , numReqBytesRecvOK(0)
+    , numReqPktRecvOK(0)
     , numGrantBytesRecvOK(0)
+    , numGrantPktRecvOK(0)
     , numSchedBytesRecvOK(0)
+    , numSchedPktRecvOK(0)
     , numUnschedBytesRecvOk(0)
+    , numUnschedPktRecvOk(0)
+
 {}
 
 void
@@ -737,21 +746,36 @@ EtherMACBase::HomaByteCounter::recordThroughputs(cComponent* macBase, simtime_t 
     if (duration > 0) {
         macBase->recordScalar("Homa Req bits/sec sent", 
                 (8.0 * numReqBytesSent) / duration);
+        macBase->recordScalar("Homa Req frames/sec sent", 
+                (1.0 * numReqPktSent)/ duration);
         macBase->recordScalar("Homa Req bits/sec rcvd", 
                 (8.0 * numReqBytesRecvOK) / duration);
+        macBase->recordScalar("Homa Req frames/sec rcvd", 
+                (1.0 * numReqPktRecvOK) / duration);
         macBase->recordScalar("Homa  Grant bits/sec sent", 
                 (8.0 * numGrantBytesSent) / duration);
+        macBase->recordScalar("Homa  Grant frames/sec sent", 
+                (1.0 * numGrantPktSent) / duration);
         macBase->recordScalar("Homa Grant bits/sec rcvd", 
                 (8.0 * numGrantBytesRecvOK) / duration);
+        macBase->recordScalar("Homa Grant frames/sec rcvd", 
+                (1.0 * numGrantPktRecvOK) / duration);
         macBase->recordScalar("Homa Sched bits/sec sent", 
                 (8.0 * numSchedBytesSent) / duration);
+        macBase->recordScalar("Homa Sched frames/sec sent", 
+                (1.0 * numSchedPktSent) / duration);
         macBase->recordScalar("Homa Sched bits/sec rcvd", 
                 (8.0 * numSchedBytesRecvOK) / duration);
+        macBase->recordScalar("Homa Sched frames/sec rcvd", 
+                (1.0 * numSchedPktRecvOK) / duration);
         macBase->recordScalar("Homa Unsched bits/sec sent", 
                 (8.0 * numUnschedBytesSent) / duration);
+        macBase->recordScalar("Homa Unsched frames/sec sent", 
+                (1.0 * numUnschedPktSent) / duration);
         macBase->recordScalar("Homa Unsched bits/sec rcvd", 
                 (8.0 * numUnschedBytesRecvOk) / duration);
-
+        macBase->recordScalar("Homa Unsched frames/sec rcvd", 
+                (1.0 * numUnschedPktRecvOk) / duration);
     }
 
 }

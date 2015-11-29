@@ -612,7 +612,7 @@ def digestTrafficInfo(trafficBytesAndRateDic, title):
 
 def printBytesAndRates(parsedStats, xmlParsedDic):
     printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate', 'cumBytes', 'avgDutyCycle', 'minDutyCycle', 'maxDutyCycle']
-    tw = 20
+    tw = 15
     fw = 10
     lineMax = 100
     title = 'Traffic Characteristic (Rates, Bytes, and DutyCycle)'
@@ -637,14 +637,19 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     nicRxRates = trafficDic.hostsTraffic.nics.rx.rates = []
     nicRxDutyCycles = trafficDic.hostsTraffic.nics.rx.dutyCycles = []
 
+    ethInterArrivalGapBit = 12*8.0
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
         nicSendBytes = hostStats.access('eth[0].mac.txPk:sum(packetBytes).value')
         nicSendRate = hostStats.access('eth[0].mac.\"bits/sec sent\".value')/1e9
+        # Include the 12Bytes ethernet inter arrival gap in the bit rate
+        nicSendRate += (hostStats.access('eth[0].mac.\"frames/sec sent\".value') * ethInterArrivalGapBit / 1e9)
         nicSendDutyCycle = hostStats.access('eth[0].mac.\"tx channel utilization (%)\".value')
         nicRcvBytes = hostStats.access('eth[0].mac.rxPkOk:sum(packetBytes).value')
         nicRcvRate = hostStats.access('eth[0].mac.\"bits/sec rcvd\".value')/1e9
+        # Include the 12Bytes ethernet inter arrival gap in the bit rate
+        nicRcvRate += (hostStats.access('eth[0].mac.\"frames/sec rcvd\".value') * ethInterArrivalGapBit / 1e9)
         nicRcvDutyCycle = hostStats.access('eth[0].mac.\"rx channel utilization (%)\".value')
         nicTxBytes.append(nicSendBytes)
         nicTxRates.append(nicSendRate)
@@ -688,9 +693,13 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
         for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
             nicRecvBytes = tor.access('eth[{0}].mac.rxPkOk:sum(packetBytes).value'.format(ifaceId)) 
             nicRecvRates = tor.access('eth[{0}].mac.\"bits/sec rcvd\".value'.format(ifaceId))/1e9
+            # Include the 12Bytes ethernet inter arrival gap in the bit rate
+            nicRecvRates += (tor.access('eth[{0}].mac.\"frames/sec rcvd\".value'.format(ifaceId)) * ethInterArrivalGapBit / 1e9)
             nicRecvDutyCycle = tor.access('eth[{0}].mac.\"rx channel utilization (%)\".value'.format(ifaceId)) 
             nicSendBytes = tor.access('eth[{0}].mac.txPk:sum(packetBytes).value'.format(ifaceId))
             nicSendRates = tor.access('eth[{0}].mac.\"bits/sec sent\".value'.format(ifaceId))/1e9
+            # Include the 12Bytes ethernet inter arrival gap in the bit rate
+            nicSendRates += (tor.access('eth[{0}].mac.\"frames/sec sent\".value'.format(ifaceId)) * ethInterArrivalGapBit / 1e9)
             nicSendDutyCycle = tor.access('eth[{0}].mac.\"tx channel utilization (%)\".value'.format(ifaceId))
             if ifaceId < numServersPerTor:
                 downNicsRxBytes.append(nicRecvBytes)
@@ -709,9 +718,9 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
 
 
     print("="*lineMax)
-    print("Measurement Point".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw) +
+    print("Measurement".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw) +
              'CumBytes'.center(fw) + 'Avg Duty'.center(fw) + 'Min Duty'.center(fw) + 'Max Duty'.center(fw))
-    print("".ljust(tw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) +
+    print("Point".ljust(tw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) +
             '(MB)'.center(fw) + 'Cycle(%)'.center(fw) + 'Cycle(%)'.center(fw) + 'Cycle(%)'.center(fw))
    
     print("_"*lineMax)
@@ -744,16 +753,18 @@ def digestHomaRates(homaTrafficDic, title):
     trafficDigest = homaTrafficDic.rateDigest
     trafficDigest.title = title 
     if 'rates' in homaTrafficDic.keys():
-        trafficDigest.cumRate = sum(homaTrafficDic.rates)
-        trafficDigest.avgRate = trafficDigest.cumRate/float(len(homaTrafficDic.rates)) 
-        trafficDigest.minRate = min(homaTrafficDic.rates)
-        trafficDigest.maxRate = max(homaTrafficDic.rates)
+        trafficDigest.cumBitRate = sum([rate[0] for rate in homaTrafficDic.rates])
+        trafficDigest.avgBitRate = trafficDigest.cumBitRate/float(len(homaTrafficDic.rates)) 
+        trafficDigest.minBitRate = min([rate[0] for rate in homaTrafficDic.rates])
+        trafficDigest.maxBitRate = max([rate[0] for rate in homaTrafficDic.rates])
+        trafficDigest.cumFrameRate = sum([rate[1] for rate in homaTrafficDic.rates])
+        trafficDigest.avgFrameRate = trafficDigest.cumFrameRate/float(len(homaTrafficDic.rates)) 
 
 def printHomaRates(parsedStats, xmlParsedDic):
-    printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate']
+    printKeys = ['avgFrameRate', 'cumFrameRate', 'avgBitRate', 'cumBitRate', 'minBitRate', 'maxBitRate']
     tw = 25
-    fw = 13
-    lineMax = 75
+    fw = 11
+    lineMax = 90
     title = 'Homa Packets Traffic Rates'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
@@ -764,13 +775,34 @@ def printHomaRates(parsedStats, xmlParsedDic):
     sxHostsNicSchedRates = trafficDic.sxHostsTraffic.nics.sx.schedPkts.rates = []
     rxHostsNicGrantRates = trafficDic.rxHostsTraffic.nics.sx.grantPkts.rates = []
 
+    ethInterArrivalGapBit = 12*8.0
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
-        nicSendUnschedRate = hostStats.access('eth[0].mac.\"Homa Unsched bits/sec sent\".value')/1e6
-        nicSendSchedRate = hostStats.access('eth[0].mac.\"Homa Sched bits/sec sent\".value')/1e6
-        nicSendReqRate = hostStats.access('eth[0].mac."Homa Req bits/sec sent".value')/1e6
-        nicSendGrantRate = hostStats.access('eth[0].mac.\"Homa  Grant bits/sec sent\".value')/1e6
+        simTime = hostStats.access('eth[0].mac.\"simulated time\".value')
+        nicSxUnschedBitRate = hostStats.access('eth[0].mac.\"Homa Unsched bits/sec sent\".value')
+        nicSxUnschedFrameRate = hostStats.access('eth[0].mac.\"Homa Unsched frames/sec sent\".value')
+        # Include the  12Bytes ethernet inter arrival gap in the bit rate
+        nicSxUnschedBitRate += (nicSxUnschedFrameRate * ethInterArrivalGapBit)
+        nicSendUnschedRate = (nicSxUnschedBitRate/1e6, nicSxUnschedFrameRate/1e3)
+
+        nicSxSchedBitRate = hostStats.access('eth[0].mac.\"Homa Sched bits/sec sent\".value')
+        nicSxSchedFrameRate = hostStats.access('eth[0].mac.\"Homa Sched frames/sec sent\".value')
+        # Include the  12Bytes ethernet inter arrival gap in the bit rate
+        nicSxSchedBitRate += (nicSxSchedFrameRate * ethInterArrivalGapBit)
+        nicSendSchedRate = (nicSxSchedBitRate/1e6, nicSxSchedFrameRate/1e3)
+
+        nicSxReqBitRate = hostStats.access('eth[0].mac.\"Homa Req bits/sec sent\".value')
+        nicSxReqFrameRate = hostStats.access('eth[0].mac.\"Homa Req frames/sec sent\".value')
+        # Include the  12Bytes ethernet inter arrival gap in the bit rate
+        nicSxReqBitRate += (nicSxReqFrameRate * ethInterArrivalGapBit)
+        nicSendReqRate = (nicSxReqBitRate/1e6, nicSxReqFrameRate/1e3)
+
+        nicSxGrantBitRate = hostStats.access('eth[0].mac.\"Homa  Grant bits/sec sent\".value')
+        nicSxGrantFrameRate = hostStats.access('eth[0].mac.\"Homa  Grant frames/sec sent\".value')
+        # Include the  12Bytes ethernet inter arrival gap in the bit rate
+        nicSxGrantBitRate += (nicSxGrantFrameRate * ethInterArrivalGapBit)
+        nicSendGrantRate = (nicSxGrantBitRate/1e6, nicSxGrantFrameRate/1e3)
 
         if hostId in xmlParsedDic.senderIds:
             sxHostsNicUnschedRates.append(nicSendUnschedRate)
@@ -781,8 +813,10 @@ def printHomaRates(parsedStats, xmlParsedDic):
             rxHostsNicGrantRates.append(nicSendGrantRate)
 
     print("="*lineMax)
-    print("Homa Packet Type".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw))
-    print("".ljust(tw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw))
+    print("Homa Packet Type".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'AvgRate'.center(fw) +
+        'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw))
+    print("".ljust(tw) + '(kPkt/s)'.center(fw)+ '(kPkt/s)'.center(fw)  + '(Mb/s)'.center(fw) +
+        '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw) + '(Mb/s)'.center(fw))
 
     print("_"*lineMax)
     digestHomaRates(trafficDic.sxHostsTraffic.nics.sx.reqPkts, 'SX NICs Req. SxRate:')

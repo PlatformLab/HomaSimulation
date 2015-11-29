@@ -194,14 +194,22 @@ class INET_API EtherMACBase : public MACBase
         
       public:
         unsigned long numReqBytesSent;
+        unsigned long numReqPktSent;
         unsigned long numGrantBytesSent;
+        unsigned long numGrantPktSent;
         unsigned long numSchedBytesSent;
+        unsigned long numSchedPktSent;
         unsigned long numUnschedBytesSent;
+        unsigned long numUnschedPktSent;
 
         unsigned long numReqBytesRecvOK;
+        unsigned long numReqPktRecvOK;
         unsigned long numGrantBytesRecvOK;
+        unsigned long numGrantPktRecvOK;
         unsigned long numSchedBytesRecvOK;
+        unsigned long numSchedPktRecvOK;
         unsigned long numUnschedBytesRecvOk;
+        unsigned long numUnschedPktRecvOk;
 
     };
 

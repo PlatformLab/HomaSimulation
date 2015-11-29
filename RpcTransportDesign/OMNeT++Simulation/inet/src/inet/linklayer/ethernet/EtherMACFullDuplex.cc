@@ -410,29 +410,37 @@ EtherMACFullDuplex::countHomaPktBytes(EtherFrame* curFrame, bool isSent)
             case PktType::REQUEST:
                 if (isSent) {
                     homaBytesCounter.numReqBytesSent += curFrame->getByteLength();
+                    homaBytesCounter.numReqPktSent++;
                 } else {
                     homaBytesCounter.numReqBytesRecvOK += curFrame->getByteLength();
+                    homaBytesCounter.numReqPktRecvOK++;
                 }
                 break;
             case PktType::GRANT:
                 if (isSent) {
                     homaBytesCounter.numGrantBytesSent += curFrame->getByteLength();
+                    homaBytesCounter.numGrantPktSent++;
                 } else {
                     homaBytesCounter.numGrantBytesRecvOK += curFrame->getByteLength();
+                    homaBytesCounter.numGrantPktRecvOK++;
                 }
                 break;
             case PktType::SCHED_DATA:
                 if (isSent) {
                     homaBytesCounter.numSchedBytesSent += curFrame->getByteLength();
+                    homaBytesCounter.numSchedPktSent++;
                 } else {
                     homaBytesCounter.numSchedBytesRecvOK += curFrame->getByteLength();
+                    homaBytesCounter.numSchedPktRecvOK++;
                 }
                 break;
             case PktType::UNSCHED_DATA:
                 if (isSent) {
                     homaBytesCounter.numUnschedBytesSent += curFrame->getByteLength();
+                    homaBytesCounter.numUnschedPktSent++;
                 } else {
                     homaBytesCounter.numUnschedBytesRecvOk += curFrame->getByteLength();
+                    homaBytesCounter.numUnschedPktRecvOk++;
                 }
                 break;
             default:
