@@ -410,24 +410,28 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
     double stretchFactor =
             (idealDelay == 0.0 ? 1.0 : completionTime.dbl()/idealDelay);
 
-    size_t i;
-    for (i = 0; i < msgSizeRangeUpperBounds.size(); i++) {
-        if (msgByteLen <= msgSizeRangeUpperBounds[i]) {
-            emit(msgE2ELatencySignalVec[i], completionTime);
-            emit(msgE2EStretchSignalVec[i], stretchFactor);
-            emit(msgQueueDelaySignalVec[i], queuingDelay);
-            break;
-        }
-    }
-
-    // if messages size doesn't fit in any bins, then it should be assigned to
-    // the last overflow (HugeSize) bin
-    if (i == msgSizeRangeUpperBounds.size()) {
+    if (msgByteLen > msgSizeRangeUpperBounds.back())  {
+        // if messages size doesn't fit in any bins, then it should be assigned
+        // to the last overflow (HugeSize) bin
         emit(msgE2ELatencySignalVec.back(), completionTime);
         emit(msgE2EStretchSignalVec.back(), stretchFactor);
         emit(msgQueueDelaySignalVec.back(), queuingDelay);
+    } else {
+        size_t mid, high, low;
+        high = msgSizeRangeUpperBounds.size() - 1;
+        low = 0;
+        while(low < high) {
+            mid = (high + low) / 2;
+            if (msgByteLen <= msgSizeRangeUpperBounds[mid]) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+        emit(msgE2ELatencySignalVec[high], completionTime);
+        emit(msgE2EStretchSignalVec[high], stretchFactor);
+        emit(msgQueueDelaySignalVec[high], queuingDelay);
     }
-
     delete rcvdMsg;
     numReceived++;
 }
