@@ -28,7 +28,7 @@ def roundLoadFactor(loadFactor):
     loadFacInd = [i for i,j in enumerate(loadDiff) if j == minDiff][0]
     return allLoads[loadFacInd]
 
-def prepE2EStretchVsUnsched(resultDir = ''):
+def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
     """
     Parses the stretch data and generates colomnized text data of stretch versus
     the Unsched bytes for homatransport.
@@ -37,8 +37,9 @@ def prepE2EStretchVsUnsched(resultDir = ''):
     f = open(os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/stretchVsUnsched.txt", 'w')
     tw_h = 40
     tw_l = 15 
-    f.write('LoadFactor'.center(tw_l) + 'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) + 'UnschedBytes'.center(tw_l) + 
-            'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) + '99PercentStretch'.center(tw_l) + '\n')
+    f.write('LoadFactor'.center(tw_l) + 'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) + 'SizeCntPercent'.center(tw_l) +
+            'UnschedBytes'.center(tw_l) + 'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
+            '99PercentStretch'.center(tw_l) + '\n')
     for filename in glob(os.path.join(resultDir, '*.sca')):
         parsedStats = AttrDict()
         parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
@@ -58,22 +59,23 @@ def prepE2EStretchVsUnsched(resultDir = ''):
         UnschedBytes = int(parsedStats.generalInfo.defaultReqBytes) + int(parsedStats.generalInfo.defaultUnschedBytes)
         for elem in e2eStretchAndDelayDigest.stretch:
             sizeUpBound = elem.sizeUpBound
+            sizeProbability = elem.cntPercent
             meanStretch = float(elem.mean)
             medianStretch = float(elem.median)
             tailStretch = float(elem.ninety9Percentile)
             avgStretch += meanStretch * float(elem.cntPercent) / 100
             f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(meanStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '\n')
+                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(meanStretch).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
             f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) + '{0}'.format(medianStretch).center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '\n')
+                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format(medianStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
             f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format(tailStretch).center(tw_l) + '\n')
+                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format(tailStretch).center(tw_l) + '\n')
         f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format('OverAllSizes').center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l)  + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '\n')
+                '{0}'.format(1.00).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l)  + 
+                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
     f.close()
 
 if __name__ == '__main__':
@@ -93,6 +95,10 @@ if __name__ == '__main__':
     if plotType == '':
         sys.exit("--plotType is mandatory argument.")
     elif plotType == 'StretchVsUnsched':
-        prepE2EStretchVsUnsched(resultDir) 
+        prepE2EStretchVsSizeAndUnsched(resultDir) 
         plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"
         print subprocess.Popen('cd {0}; Rscript PlotStretchVsUnsched.r'.format(plotPath), shell=True, stdout=subprocess.PIPE).stdout.read()
+    elif plotType == 'StretchVsSize':
+        prepE2EStretchVsSizeAndUnsched(resultDir) 
+        plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"
+        print subprocess.Popen('cd {0}; Rscript PlotStretchVsSize.r'.format(plotPath), shell=True, stdout=subprocess.PIPE).stdout.read()
