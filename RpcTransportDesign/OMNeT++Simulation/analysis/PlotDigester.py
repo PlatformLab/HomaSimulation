@@ -93,7 +93,8 @@ if __name__ == '__main__':
     resultDir = options.resultDir 
     plotType = options.plotType 
     if plotType == '':
-        sys.exit("--plotType is mandatory argument.")
+        print("--plotType argument not provided.")
+        sys.exit(prepE2EStretchVsSizeAndUnsched(resultDir))
     elif plotType == 'StretchVsUnsched':
         prepE2EStretchVsSizeAndUnsched(resultDir) 
         plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"

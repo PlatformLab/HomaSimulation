@@ -29,7 +29,8 @@ tailStretchVsSize <- subset(stretchVsSize,
 tailStretchVsSize <- ddply(tailStretchVsSize, .(LoadFactor, WorkLoad, UnschedBytes), transform, SizeCumPercent = round(cumsum(SizeCntPercent), 2))
 tailStretchVsSize$MsgSizeRange <- as.numeric(as.character(tailStretchVsSize$MsgSizeRange))
 
-textSize = 35
+textSize <- 35
+yLimit <- 5
 for (unsched in unique(stretchVsSize$UnschedBytes)) {
     avgStretchPlot = list()
     i <- 0
@@ -50,6 +51,7 @@ for (unsched in unique(stretchVsSize$UnschedBytes)) {
                     axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
+                coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MeanStretch, na.rm=TRUE)))) +
                 labs(title = sprintf("MeanStrech VS. Cummulative Msg Size Percent, loadfactor:%s, workload:%s, unsched:%d", rho, workload, unsched),
                     x = "Cumulative Msg Size Percent")
         }
@@ -77,6 +79,7 @@ for (unsched in unique(stretchVsSize$UnschedBytes)) {
                     axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
+                coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MedianStretch, na.rm=TRUE)))) +
                 labs(title = sprintf("MedianStrech VS. Cummulative Msg Size Percent, loadfactor:%s, workload:%s, unsched:%d", rho, workload, unsched),
                     x = "Cumulative Msg Size Percent")
         }
@@ -104,6 +107,7 @@ for (unsched in unique(stretchVsSize$UnschedBytes)) {
                     axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
+                coord_cartesian(ylim=c(0, min(yLimit, max(tmp$TailStretch, na.rm=TRUE)))) +
                 labs(title = sprintf("TailStrech VS. Cummulative Msg Size Percent, loadfactor:%s, workload:%s, unsched:%d", rho, workload, unsched),
                     x = "Cumulative Msg Size Percent")
         }
