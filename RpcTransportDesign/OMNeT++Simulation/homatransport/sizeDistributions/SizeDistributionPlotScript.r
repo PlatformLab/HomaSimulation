@@ -61,6 +61,8 @@ predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
 
 cdfFrame$WorkLoad <- factor(cdfFrame$WorkLoad)
+RTT <- 7.75e-6 #seconds
+C <- 1e10 #Gb/s
 
 cdfCbf = list()
 cdfCbf[[1]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CDF)) +
@@ -75,13 +77,13 @@ cdfCbf[[1]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CDF)) +
             legend.text=element_text(size=30),
             legend.title=element_text(size=20, face="bold"),
             legend.position="top",
-            plot.title = element_text(size=20, face="bold")) +
+        plot.title = element_text(size=20, face="bold")) +
         scale_x_log10("Message Sizes (Bytes)")+
         scale_y_continuous(breaks = round(seq(min(cdfFrame$CDF), max(cdfFrame$CDF), by = 0.1),1))
 
 cdfCbf[[2]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CBF)) +
         geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
-        labs(title = "Message Size Distribution Used In Simulation") +
+        labs(title = "Message Byte Distribution Used In Simulation") +
         theme(axis.text=element_text(size=30),
             axis.title=element_text(size=30, face="bold"),
             panel.grid.major = 
@@ -91,10 +93,26 @@ cdfCbf[[2]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CBF)) +
             legend.text=element_text(size=30),
             legend.title=element_text(size=20, face="bold"),
             legend.position="top",
-            plot.title = element_text(size=20, face="bold")) +
+        plot.title = element_text(size=20, face="bold")) +
         scale_x_log10("Message Sizes (Bytes)")+
         scale_y_continuous(breaks = round(seq(min(cdfFrame$CBF), max(cdfFrame$CBF), by = 0.1),1))
 
-png(file='WorkloadCDFsCBFs.png', width=2400, height=2000)
+cdfCbf[[3]] <- ggplot(cdfFrame, aes(x=MessageSize,y=C*RTT*(1-CBF)/8)) +
+        geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
+        labs(title = "Upper bound for unsched bytes") +
+        theme(axis.text=element_text(size=30),
+            axis.title=element_text(size=30, face="bold"),
+            panel.grid.major =
+                element_line(size = 0.75, linetype = 'solid', colour = "black"),
+            panel.grid.minor =
+                element_line(size = 0.5, linetype = 'solid', colour = "gray"),
+            legend.text=element_text(size=30),
+            legend.title=element_text(size=20, face="bold"),
+            legend.position="top",
+        plot.title = element_text(size=20, face="bold")) +
+        scale_x_log10("Message Sizes (Bytes)")+
+        scale_y_continuous(breaks = seq(0, C*RTT/8, by = 0.1*C*RTT/8))
+
+png(file='WorkloadCDFsCBFs.png', width=2400, height=3000)
 do.call(grid.arrange, cdfCbf)
 dev.off()

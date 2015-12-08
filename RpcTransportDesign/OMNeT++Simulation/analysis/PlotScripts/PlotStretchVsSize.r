@@ -31,10 +31,10 @@ tailStretchVsSize$MsgSizeRange <- as.numeric(as.character(tailStretchVsSize$MsgS
 
 textSize <- 35
 yLimit <- 5
-for (unsched in unique(stretchVsSize$UnschedBytes)) {
+for (workload in levels(avgStretchVsSize$WorkLoad)) {
     avgStretchPlot = list()
     i <- 0
-    for (workload in levels(avgStretchVsSize$WorkLoad)) {
+    for (unsched in sort(unique(stretchVsSize$UnschedBytes))) {
         for (rho in unique(avgStretchVsSize$LoadFactor)) {
             i <- i+1
             tmp <- subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes==unsched, 
@@ -56,13 +56,14 @@ for (unsched in unique(stretchVsSize$UnschedBytes)) {
                     x = "Cumulative Msg Size Percent")
         }
     }
-    pdf(sprintf("MeanStretchVsSize_Unsched%dB.pdf", unsched), width=150, height=50)
-    do.call(grid.arrange, avgStretchPlot)
+    pdf(sprintf("plots/MeanStretchVsSize_Workload%s.pdf", workload), width=150, height=200)
+    args.list <- c(avgStretchPlot, list(ncol=3))
+    do.call(grid.arrange, args.list)
     dev.off()
 
     medianStretchPlot = list()
     i <- 0
-    for (workload in levels(medianStretchVsSize$WorkLoad)) {
+    for (unsched in unique(sort(stretchVsSize$UnschedBytes))) {
         for (rho in unique(medianStretchVsSize$LoadFactor)) {
             i <- i+1
             tmp <- subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes==unsched, 
@@ -84,13 +85,14 @@ for (unsched in unique(stretchVsSize$UnschedBytes)) {
                     x = "Cumulative Msg Size Percent")
         }
     }
-    pdf(sprintf("MedianStretchVsSize_Unsched%dB.pdf", unsched), width=150, height=50)
-    do.call(grid.arrange, medianStretchPlot)
+    pdf(sprintf("plots/MedianStretchVsSize_Workload%s.pdf", workload), width=150, height=200)
+    args.list <- c(medianStretchPlot, list(ncol=3))
+    do.call(grid.arrange, args.list)
     dev.off()
 
     tailStretchPlot = list()
     i <- 0
-    for (workload in levels(tailStretchVsSize$WorkLoad)) {
+    for (unsched in sort(unique(stretchVsSize$UnschedBytes))) {
         for (rho in unique(tailStretchVsSize$LoadFactor)) {
             i <- i+1
             tmp <- subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes==unsched, 
@@ -112,8 +114,9 @@ for (unsched in unique(stretchVsSize$UnschedBytes)) {
                     x = "Cumulative Msg Size Percent")
         }
     }
-    pdf(sprintf("TailStretchVsSize_Unsched%dB.pdf", unsched), width=150, height=50)
-    do.call(grid.arrange, tailStretchPlot)
+    pdf(sprintf("plots/TailStretchVsSize_Workload%s.pdf", workload), width=150, height=200)
+    args.list <- c(tailStretchPlot, list(ncol=3))
+    do.call(grid.arrange, args.list)
     dev.off()
 }
 
