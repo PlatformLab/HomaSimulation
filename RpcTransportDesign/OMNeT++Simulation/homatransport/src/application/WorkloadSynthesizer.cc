@@ -92,6 +92,21 @@ WorkloadSynthesizer::registerTemplatedStats(const char* msgSizeRanges)
                 "msgRangesE2EStretch");
         ev.addResultRecorders(this, stretchSignal, stretchStatsName,
                 statisticTemplate);
+
+        char transportSchedDelaySignalName[50];
+        sprintf(transportSchedDelaySignalName, "msg%sTransportSchedDelay",
+            sizeUpperBound.c_str());
+        simsignal_t transportSchedDelaySignal = 
+            registerSignal(transportSchedDelaySignalName);
+        msgTransprotSchedDelaySignalVec.push_back(transportSchedDelaySignal);
+        char transportSchedDelayStatsName[50];
+        sprintf(transportSchedDelayStatsName, "msg%sTransportSchedDelay",
+            sizeUpperBound.c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+                "msgRangesTransportSchedDelay");
+        ev.addResultRecorders(this, transportSchedDelaySignal,
+            transportSchedDelayStatsName, statisticTemplate);
+
     }
 }
 
@@ -322,6 +337,7 @@ WorkloadSynthesizer::sendMsg()
     appMessage->setDestAddr(destAddrs);
     appMessage->setSrcAddr(srcAddress);
     appMessage->setMsgCreationTime(appMessage->getCreationTime());
+    appMessage->setTransportSchedDelay(appMessage->getCreationTime());
     emit(sentMsgSignal, appMessage);
     send(appMessage, "transportOut");
     numSent++;
@@ -416,6 +432,8 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
         emit(msgE2ELatencySignalVec.back(), completionTime);
         emit(msgE2EStretchSignalVec.back(), stretchFactor);
         emit(msgQueueDelaySignalVec.back(), queuingDelay);
+        emit(msgTransprotSchedDelaySignalVec.back(),
+            rcvdMsg->getTransportSchedDelay());
     } else {
         size_t mid, high, low;
         high = msgSizeRangeUpperBounds.size() - 1;
@@ -431,6 +449,8 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
         emit(msgE2ELatencySignalVec[high], completionTime);
         emit(msgE2EStretchSignalVec[high], stretchFactor);
         emit(msgQueueDelaySignalVec[high], queuingDelay);
+        emit(msgTransprotSchedDelaySignalVec[high],
+            rcvdMsg->getTransportSchedDelay());
     }
     delete rcvdMsg;
     numReceived++;

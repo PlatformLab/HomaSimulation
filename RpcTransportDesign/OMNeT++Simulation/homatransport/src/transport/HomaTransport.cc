@@ -542,11 +542,7 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
         ASSERT(inboundMsg->bytesToGrant == 0);
 
         // this message is complete, so send it to the application
-        AppMessage* rxMsg = new AppMessage();
-        rxMsg->setDestAddr(rxPkt->getDestAddr());
-        rxMsg->setSrcAddr(rxPkt->getSrcAddr());
-        rxMsg->setMsgCreationTime(rxPkt->getReqFields().msgCreationTime);
-        rxMsg->setByteLength(inboundMsg->msgSize);
+        AppMessage* rxMsg = inboundMsg->prepareRxMsgForApp();
         transport->send(rxMsg, "appOut", 0);
 
         // remove this message from the incompleteRxMsgs
@@ -641,8 +637,6 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
                 pktUnschedBytes, PktType::UNSCHED_DATA));
     }
 
-
-
     // Append the unsched data to the inboundMsg
     inboundMsg->fillinRxBytes(rxPkt->getUnschedDataFields().firstByte,
             rxPkt->getUnschedDataFields().lastByte);
@@ -651,11 +645,7 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
         ASSERT(inboundMsg->bytesToGrant == 0);
 
         // this message is complete, so send it to the application
-        AppMessage* rxMsg = new AppMessage();
-        rxMsg->setDestAddr(rxPkt->getDestAddr());
-        rxMsg->setSrcAddr(rxPkt->getSrcAddr());
-        rxMsg->setMsgCreationTime(rxPkt->getUnschedDataFields().msgCreationTime);
-        rxMsg->setByteLength(inboundMsg->msgSize);
+        AppMessage* rxMsg = inboundMsg->prepareRxMsgForApp();
         transport->send(rxMsg, "appOut", 0);
 
         // remove this message from the incompleteRxMsgs
@@ -711,11 +701,7 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
     if (inboundMsg->bytesToReceive <= 0) {
 
         // send message to app
-        AppMessage* rxMsg = new AppMessage();
-        rxMsg->setDestAddr(inboundMsg->destAddr);
-        rxMsg->setSrcAddr(inboundMsg->srcAddr);
-        rxMsg->setMsgCreationTime(inboundMsg->msgCreationTime);
-        rxMsg->setByteLength(inboundMsg->msgSize);
+        AppMessage* rxMsg = inboundMsg->prepareRxMsgForApp();
         transport->send(rxMsg, "appOut", 0);
         EV_INFO << "Finished receiving msgId " << rxPkt->getMsgId()
                 << " with size " << inboundMsg->msgSize
@@ -756,28 +742,17 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
             grantSize, PktType::SCHED_DATA);
     if (trafficPacer->okToGrant(currentTime, schedBytesOneWire)) {
 
-        // prepare a grant and send out
-        HomaPkt* grantPkt = new(HomaPkt);
-        grantPkt->setPktType(PktType::GRANT);
-        GrantFields grantFields;
-        grantFields.grantBytes = grantSize;
-        grantPkt->setGrantFields(grantFields);
-        grantPkt->setDestAddr(highPrioMsg->srcAddr);
-        grantPkt->setSrcAddr(highPrioMsg->destAddr);
-        grantPkt->setMsgId(highPrioMsg->msgIdAtSender);
-        grantPkt->setByteLength(grantPkt->headerSize());
-        grantPkt->setPriority(0);
+        // prepare a grant and update highPrioMsg internal datasend the
+        // the grant out.
+        HomaPkt* grantPkt = highPrioMsg->prepareGrant(grantSize);
         transport->sendPacket(grantPkt);
-
         transport->outstandingGrantBytes += schedBytesOneWire;
-        transport->emit(outstandingGrantBytesSignal, transport->outstandingGrantBytes);
+        transport->emit(outstandingGrantBytesSignal,
+            transport->outstandingGrantBytes);
 
         // set the grantTimer for the next grant
         transport->scheduleAt(trafficPacer->grantSent(
                schedBytesOneWire, currentTime), grantTimer);
-
-        // update highPrioMsg and msgQueue
-        highPrioMsg->bytesToGrant -= grantSize;
 
         // Pop the highPrioMsg and push it back if it still needs grant.
         // (This process is necessary for round robin scheduling and doesn't
@@ -880,6 +855,8 @@ HomaTransport::InboundMessage::InboundMessage()
     , bytesInReq(0)  
     , totalUnschedBytes(0)
     , msgCreationTime(SIMTIME_ZERO)
+    , reqArrivalTime(simTime())
+    , lastGrantTime(simTime())
 {}
 
 HomaTransport::InboundMessage::~InboundMessage()
@@ -902,6 +879,8 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , bytesInReq(0)  
     , totalUnschedBytes(0)
     , msgCreationTime(SIMTIME_ZERO)
+    , reqArrivalTime(simTime())
+    , lastGrantTime(simTime())
 {
     switch (rxPkt->getPktType()) {
         case PktType::REQUEST:
@@ -938,6 +917,73 @@ HomaTransport::InboundMessage::fillinRxBytes(uint32_t byteStart,
             << " for msgId " << msgIdAtSender << " (" << bytesToReceive << 
             " bytes left to receive)" << endl;
 
+}
+
+
+HomaPkt*
+HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize)
+{
+
+    // prepare a grant
+    HomaPkt* grantPkt = new(HomaPkt);
+    grantPkt->setPktType(PktType::GRANT);
+    GrantFields grantFields;
+    grantFields.grantBytes = grantSize;
+    grantPkt->setGrantFields(grantFields);
+    grantPkt->setDestAddr(this->srcAddr);
+    grantPkt->setSrcAddr(this->destAddr);
+    grantPkt->setMsgId(this->msgIdAtSender);
+    grantPkt->setByteLength(grantPkt->headerSize());
+    grantPkt->setPriority(0);
+
+    // update internal structure
+    this->bytesToGrant -= grantSize;
+    this->lastGrantTime = simTime();
+    return grantPkt;
+}
+
+AppMessage*
+HomaTransport::InboundMessage::prepareRxMsgForApp()
+{
+    AppMessage* rxMsg = new AppMessage();
+    rxMsg->setDestAddr(this->destAddr);
+    rxMsg->setSrcAddr(this->srcAddr);
+    rxMsg->setByteLength(this->msgSize);
+    rxMsg->setMsgCreationTime(this->msgCreationTime);
+    
+    // calculate scheduling delay
+    if (totalUnschedBytes >= msgSize) {
+        // no grant was expected for this message
+        ASSERT(reqArrivalTime == lastGrantTime && bytesToGrant == 0 &&
+            bytesToReceive == 0);
+        rxMsg->setTransportSchedDelay(SIMTIME_ZERO);
+    } else {
+        ASSERT(reqArrivalTime <= lastGrantTime && bytesToGrant == 0 &&
+            bytesToReceive == 0);
+        simtime_t totalSchedTime = lastGrantTime - reqArrivalTime;
+        simtime_t minPossibleSchedTime;
+        uint32_t bytesGranted = msgSize - totalUnschedBytes; 
+        uint32_t bytesGrantedOnWire = 
+            rxScheduler->transport->getBytesOnWire(bytesGranted,
+            PktType::SCHED_DATA);
+        uint32_t maxPktSizeOnWire = ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
+            MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE + INTER_PKT_GAP;
+
+        if (bytesGrantedOnWire <= maxPktSizeOnWire) {
+            minPossibleSchedTime = SIMTIME_ZERO;
+        } else {
+            uint32_t lastPktSize = bytesGrantedOnWire % maxPktSizeOnWire;
+            if (lastPktSize == 0) {
+                lastPktSize = maxPktSizeOnWire;
+            }
+            minPossibleSchedTime = 
+                SimTime(1e-9 * (bytesGrantedOnWire-lastPktSize) * 8.0 /
+                rxScheduler->transport->nicLinkSpeed) ;
+        }
+        simtime_t schedDelay = totalSchedTime - minPossibleSchedTime;
+        rxMsg->setTransportSchedDelay(schedDelay);
+    }
+    return rxMsg;
 }
 
 void

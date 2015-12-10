@@ -576,6 +576,56 @@ def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, e2eStretchAndDelayDiges
 
     return e2eStretchAndDelayDigest
 
+def printTransportSchedDelay(transportSchedDelayDigest, unit):
+    printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
+    tw = 19
+    fw = 10 
+    lineMax = 105
+    title = 'Receiver Scheduler Overhead For Different Ranges of Message Sizes'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+
+    print("="*lineMax)
+    print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) +
+            'max'.center(fw) + 'count'.center(fw) + 'count'.center(fw))
+    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
+    print("_"*lineMax)
+
+    delays = transportSchedDelayDigest.delay
+    sizeLowBound = ['0'] + [delay.sizeUpBound for delay in delays[0:len(delays)-1]]
+    for i, delay in enumerate(delays):
+        printStatsLine(delay, '({0}, {1}]'.format(sizeLowBound[i], delay.sizeUpBound), tw, fw, 'us', printKeys)
+
+
+def transportSchedDelay(hosts, generalInfo, xmlParsedDic, transportSchedDelayDigest):
+    receiverHostIds = xmlParsedDic.receiverIds 
+    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:] 
+    sizes.append('Huge')
+    transportSchedDelayDigest.delay = []
+
+    for size in sizes:
+        delayList = list()
+        for id in receiverHostIds:
+            delayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:histogram.bins'.format(id, size)
+            delayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:stats'.format(id, size)
+            delayForSize = AttrDict()
+            delayForSize = getInterestingModuleStats(hosts, delayStatsKey, delayHistogramKey)
+            delayList.append(delayForSize)
+
+        delayDigest = AttrDict()
+        delayDigest = digestModulesStats(delayList)
+        delayDigest.sizeUpBound = '{0}'.format(size)
+        transportSchedDelayDigest.delay.append(delayDigest)
+
+    totalDelayCnt = sum([delay.count for delay in transportSchedDelayDigest.delay])
+    for sizedDelay in transportSchedDelayDigest.delay:
+        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt 
+
+    return transportSchedDelayDigest 
+
 def printGenralInfo(xmlParsedDic, generalInfo):
     tw = 20
     fw = 12 
@@ -1100,6 +1150,9 @@ def main():
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
+    transportSchedDelayDigest = AttrDict()
+    transportSchedDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, transportSchedDelayDigest)
+    printTransportSchedDelay(transportSchedDelayDigest, 'us')
     e2eStretchAndDelayDigest = AttrDict()
     e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, e2eStretchAndDelayDigest)
     printE2EStretchAndDelay(e2eStretchAndDelayDigest, 'us')

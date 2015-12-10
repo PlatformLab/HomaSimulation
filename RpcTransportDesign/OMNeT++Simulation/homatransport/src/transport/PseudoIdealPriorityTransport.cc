@@ -196,6 +196,7 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
         rxMsg->setDestAddr(inboundRxMsg->destAddr);
         rxMsg->setSrcAddr(inboundRxMsg->srcAddr);
         rxMsg->setMsgCreationTime(inboundRxMsg->msgCreationTime);
+        rxMsg->setTransportSchedDelay(SIMTIME_ZERO);
         rxMsg->setByteLength(inboundRxMsg->msgByteLen);
         send(rxMsg, "appOut", 0);
         delete inboundRxMsg; 

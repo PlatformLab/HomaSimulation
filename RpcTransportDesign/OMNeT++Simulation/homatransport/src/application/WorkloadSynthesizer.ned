@@ -61,10 +61,12 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @signal[msg*E2EDelay](type=simtime_t);
         @signal[msg*E2EStretch](type=double);
         @signal[msg*QueuingDelay](type=simtime_t);
+        @signal[msg*TransportSchedDelay](type=simtime_t);
 
         @statisticTemplate[msgRangesE2EDelay](title="msg lifetime"; unit=s; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesE2EStretch](title="msg stretch"; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesQueuingDelay](title="msg queuing delay";unit=s; record=count,stats,histogram; interpolationmode=none);
+        @statisticTemplate[msgRangesTransportSchedDelay](title="transport scheduling delay";unit=s; record=count,stats,histogram; interpolationmode=none);
 
     gates:
         input transportIn @label(AppMessage/up);

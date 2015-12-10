@@ -93,6 +93,7 @@ class WorkloadSynthesizer : public cSimpleModule
     std::vector<simsignal_t> msgE2ELatencySignalVec;
     std::vector<simsignal_t> msgE2EStretchSignalVec;
     std::vector<simsignal_t> msgQueueDelaySignalVec;
+    std::vector<simsignal_t> msgTransprotSchedDelaySignalVec;
 
 
   protected:

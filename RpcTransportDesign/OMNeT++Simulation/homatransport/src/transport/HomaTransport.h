@@ -221,19 +221,33 @@ class HomaTransport : public cSimpleModule
         // Number of data bytes carried over in the req. packets.
         uint16_t bytesInReq;
 
-        // All unscheduled bytes that follow the request packet in one of more
+        // All unscheduled bytes that comes in req. pkts and following unsched.
         // packets for this message.
         uint16_t totalUnschedBytes;
 
         // simulation time at which this message was created in the sender side.
         // Used to calculate the end to end latency of this message.
         simtime_t msgCreationTime;
+
+        // simulation time at which the first packet (req. pkt) of this inbound
+        // message arrived at receiver. Used only for statistics recording
+        // purpose.
+        simtime_t reqArrivalTime;
+
+        // When the last grant for this message was scheduled. Used only for
+        // statistics recording purpose. Initialized in the constructor and must
+        // only be updated by the prepareGrant() method.
+        simtime_t lastGrantTime;
+
         friend class CompareInboundMsg;
         friend class ReceiveScheduler;
 
       protected:
         void copy(const InboundMessage& other);
         void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd);
+        HomaPkt* prepareGrant(uint32_t grantSize);
+        AppMessage* prepareRxMsgForApp();
+        
     };
  
     /**
