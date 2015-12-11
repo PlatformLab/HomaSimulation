@@ -97,7 +97,7 @@ cdfCbf[[2]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CBF)) +
         scale_x_log10("Message Sizes (Bytes)")+
         scale_y_continuous(breaks = round(seq(min(cdfFrame$CBF), max(cdfFrame$CBF), by = 0.1),1))
 
-cdfCbf[[3]] <- ggplot(cdfFrame, aes(x=MessageSize,y=C*RTT*(1-CBF)/8)) +
+cdfCbf[[3]] <- ggplot(cdfFrame, aes(x=MessageSize, y=pmin(C*RTT*(1-CBF)/8, MessageSize))) +
         geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
         labs(title = "Upper bound for unsched bytes") +
         theme(axis.text=element_text(size=30),

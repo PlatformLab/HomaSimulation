@@ -48,15 +48,19 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         xmlParsedDic = parseXmlFile(xmlConfigFile)
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, e2eStretchAndDelayDigest)
-        if parsedStats.generalInfo.transportSchemeType != 'HomaTransport':
-            continue
         loadFactor = float(parsedStats.generalInfo.loadFactor) * len(xmlParsedDic.senderIds)
         if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
             loadFactor = loadFactor/0.75
         loadFactor = roundLoadFactor(loadFactor)
         workLoad = parsedStats.generalInfo.workloadType
         avgStretch = 0.0
-        UnschedBytes = int(parsedStats.generalInfo.defaultReqBytes) + int(parsedStats.generalInfo.defaultUnschedBytes)
+
+        try:
+            UnschedBytes = int(parsedStats.generalInfo.defaultReqBytes) + int(parsedStats.generalInfo.defaultUnschedBytes)
+        except Exception as e:
+            print('No Unsched bytes in file: %s' % (filename))
+            UnschedBytes = 'NA'
+
         for elem in e2eStretchAndDelayDigest.stretch:
             sizeUpBound = elem.sizeUpBound
             sizeProbability = elem.cntPercent

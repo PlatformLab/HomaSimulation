@@ -34,10 +34,10 @@ yLimit <- 5
 for (workload in levels(avgStretchVsSize$WorkLoad)) {
     avgStretchPlot = list()
     i <- 0
-    for (unsched in sort(unique(stretchVsSize$UnschedBytes))) {
+    for (unsched in sort(unique(stretchVsSize$UnschedBytes), na.last=TRUE)) {
         for (rho in unique(avgStretchVsSize$LoadFactor)) {
             i <- i+1
-            tmp <- subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes==unsched, 
+            tmp <- subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes %in% c(unsched), 
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent', 'UnschedBytes', 'MeanStretch'))
 
             # You might ask why I'm using "x=SizeCumPercent-SizeCntPercent/200" in the plot. The reason is that ggplot geom_bar is so 
@@ -56,17 +56,19 @@ for (workload in levels(avgStretchVsSize$WorkLoad)) {
                     x = "Cumulative Msg Size Percent")
         }
     }
-    pdf(sprintf("plots/MeanStretchVsSize_Workload%s.pdf", workload), width=150, height=200)
-    args.list <- c(avgStretchPlot, list(ncol=3))
+    pdf(sprintf("plots/MeanStretchVsSize_Workload%s.pdf", workload),
+        width=50*length(unique(avgStretchVsSize$LoadFactor)),
+        height=10*length(unique(stretchVsSize$UnschedBytes)))
+    args.list <- c(avgStretchPlot, list(ncol=length(unique(avgStretchVsSize$LoadFactor))))
     do.call(grid.arrange, args.list)
     dev.off()
 
     medianStretchPlot = list()
     i <- 0
-    for (unsched in unique(sort(stretchVsSize$UnschedBytes))) {
+    for (unsched in unique(sort(stretchVsSize$UnschedBytes, na.last=TRUE))) {
         for (rho in unique(medianStretchVsSize$LoadFactor)) {
             i <- i+1
-            tmp <- subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes==unsched, 
+            tmp <- subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes %in% c(unsched), 
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent', 'UnschedBytes', 'MedianStretch'))
 
             # You might ask why I'm using "x=SizeCumPercent-SizeCntPercent/200" in the plot. The reason is that ggplot geom_bar is so 
@@ -85,17 +87,19 @@ for (workload in levels(avgStretchVsSize$WorkLoad)) {
                     x = "Cumulative Msg Size Percent")
         }
     }
-    pdf(sprintf("plots/MedianStretchVsSize_Workload%s.pdf", workload), width=150, height=200)
-    args.list <- c(medianStretchPlot, list(ncol=3))
+    pdf(sprintf("plots/MedianStretchVsSize_Workload%s.pdf", workload),
+        width=50*length(unique(medianStretchVsSize$LoadFactor)),
+        height=10*length(unique(stretchVsSize$UnschedBytes)))
+    args.list <- c(medianStretchPlot, list(ncol=length(unique(medianStretchVsSize$LoadFactor))))
     do.call(grid.arrange, args.list)
     dev.off()
 
     tailStretchPlot = list()
     i <- 0
-    for (unsched in sort(unique(stretchVsSize$UnschedBytes))) {
+    for (unsched in sort(unique(stretchVsSize$UnschedBytes), na.last=TRUE)) {
         for (rho in unique(tailStretchVsSize$LoadFactor)) {
             i <- i+1
-            tmp <- subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes==unsched, 
+            tmp <- subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & UnschedBytes %in% c(unsched), 
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent', 'UnschedBytes', 'TailStretch'))
 
             # You might ask why I'm using "x=SizeCumPercent-SizeCntPercent/200" in the plot. The reason is that ggplot geom_bar is so 
@@ -114,8 +118,10 @@ for (workload in levels(avgStretchVsSize$WorkLoad)) {
                     x = "Cumulative Msg Size Percent")
         }
     }
-    pdf(sprintf("plots/TailStretchVsSize_Workload%s.pdf", workload), width=150, height=200)
-    args.list <- c(tailStretchPlot, list(ncol=3))
+    pdf(sprintf("plots/TailStretchVsSize_Workload%s.pdf", workload),
+        width=50*length(unique(tailStretchVsSize$LoadFactor)),
+        height=10*length(unique(stretchVsSize$UnschedBytes)))
+    args.list <- c(tailStretchPlot, list(ncol=length(unique(tailStretchVsSize$LoadFactor))))
     do.call(grid.arrange, args.list)
     dev.off()
 }
