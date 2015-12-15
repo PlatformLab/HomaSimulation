@@ -170,6 +170,13 @@ WorkloadSynthesizer::initialize()
                 FACEBOOK_HADOOP_ALL;
         distFileName = std::string("../../sizeDistributions/"
                 "Facebook_HadoopDist_All.txt");
+    } else if (strcmp(workLoadType, "FABRICATED_HEAVY_MIDDLE")
+            == 0) {
+        distSelector =
+                MsgSizeDistributions::DistributionChoice::
+                FABRICATED_HEAVY_MIDDLE;
+        distFileName = std::string("../../sizeDistributions/"
+                "Fabricated_Heavy_Middle.txt");
     } else if (strcmp(workLoadType, "PRESET_IN_FILE") == 0){
         distSelector =
                 MsgSizeDistributions::DistributionChoice::SIZE_IN_FILE;

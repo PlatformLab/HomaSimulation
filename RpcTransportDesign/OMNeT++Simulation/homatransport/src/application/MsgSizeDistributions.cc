@@ -100,6 +100,7 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
         case DistributionChoice::FACEBOOK_WEB_SERVER_INTRACLUSTER:
         case DistributionChoice::FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER:
         case DistributionChoice::FACEBOOK_HADOOP_ALL:
+        case DistributionChoice::FABRICATED_HEAVY_MIDDLE:
         case DistributionChoice::TEST_DIST:
             getInterarrivalSizeFromVec(msgSize, nextInterarrivalTime);
             return;
@@ -136,7 +137,8 @@ MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize,
 
 /*
  * Internal method for DCTCP, TestDist, FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER,
- * FACEBOOK_WEB_SERVER_INTRACLUSTER, and FACEBOOK_HADOOP_ALL
+ * FACEBOOK_WEB_SERVER_INTRACLUSTER, FACEBOOK_HADOOP_ALL, and
+ * FABRICATED_HEAVY_MIDDLE
  */
 void
 MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
@@ -144,15 +146,18 @@ MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
 {
     
     double prob = uniform(0.0, 1.0);
-    int size = 0;
-    for (size_t i = 0; i < msgSizeProbDistVector.size(); ++i)
-    {
-        if (msgSizeProbDistVector[i].second >= prob){
-            size = msgSizeProbDistVector[i].first;
-            break;
+    size_t mid, high, low;
+    high = msgSizeProbDistVector.size() - 1;
+    low = 0;
+    while(low < high) {
+        mid = (high + low) / 2;
+        if (prob <= msgSizeProbDistVector[mid].second) {
+            high = mid;
+        } else {
+            low = mid + 1;
         }
     }
-    msgSize = size;
+    msgSize = msgSizeProbDistVector[high].first;
     
     if (sizeDistSelector == DistributionChoice::DCTCP){
         msgSize *= maxDataBytesPerPkt;

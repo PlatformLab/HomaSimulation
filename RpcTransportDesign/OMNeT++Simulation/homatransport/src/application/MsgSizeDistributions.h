@@ -26,6 +26,7 @@ class MsgSizeDistributions {
         FACEBOOK_WEB_SERVER_INTRACLUSTER,
         FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER,
         FACEBOOK_HADOOP_ALL,
+        FABRICATED_HEAVY_MIDDLE,
         TEST_DIST,
         NO_SIZE_DIST_SPECIFIED //Should always remain the last 
 
