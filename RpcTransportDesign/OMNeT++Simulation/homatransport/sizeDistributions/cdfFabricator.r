@@ -8,12 +8,12 @@
 # and cbf vectors.
 
 # monotonically increasing vector of msg sizes
-sizeIntervals <- c(50, 1000, 7200, 10^4.8, 10^5.5) 
+sizeIntervals <- c(50, 1400, 10000, 70000, 400000) 
 
 # monotonically increaing cbf (cumulative byte function) vector. First element
 # is always 0 and last element is always one. Each cbf value in this vector
 # corresponds to a size in the sizeIntervals vector.
-cbf <- c(0, 0.05, 0.2, 0.9, 1)
+cbf <- c(0, 0.1, 0.85, 0.95, 1)
 
 multipLiers <- (cbf[2:length(cbf)] - cbf[1:length(cbf)-1]) *
     (1/sizeIntervals[1:length(cbf)-1] - 1/sizeIntervals[2:length(cbf)]) /
@@ -22,9 +22,19 @@ avgSize <- log(10)/sum(multipLiers)
 cdfRanges <- cumsum(multipLiers)/sum(multipLiers)
 cdfConsts <- c(0, cdfRanges[1:length(cdfRanges)-1])
 
+
 #create cdf sample vector and find the corresponding sizes.
-#cdf sample vector must be sorted 
-cdf <- seq(0.001, 1, 0.001)
+#cdf sample vector must be sorted: cdf <- seq(0.001, 1, 0.001)
+cdf <- c()
+cdfBounds <- c(0, cdfRanges)
+for (ind in seq(1, length(cdfRanges)))
+{
+    cdf <- c(cdf, seq(cdfBounds[ind], cdfBounds[ind+1], (cdfBounds[ind+1] - cdfBounds[ind])/50))
+}
+cdf <- sort(unique(cdf))
+
+
+#Corresponding sizes for cdf values
 sizes <- c()
 for (cdfVal in cdf)
 {
@@ -46,7 +56,7 @@ sizes <- sizes[ind]
 pdf <- cdf - c(0, cdf[1:length(cdf)-1])
 avgSize <- sum(pdf*sizes)
 
-filename = "Fabricated_Heavy_Middle.txt"
+filename = "Fabricated_Heavy_Head.txt"
 write(avgSize, file=filename)
 df <- data.frame(sizes, cdf)
 write.table(df, file=filename, row.names=FALSE, col.names=FALSE, append=TRUE)

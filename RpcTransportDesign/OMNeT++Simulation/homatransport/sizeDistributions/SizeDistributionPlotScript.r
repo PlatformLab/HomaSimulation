@@ -70,6 +70,17 @@ cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
 
+predefProb <- read.table("Fabricated_Heavy_Head.txt",
+        col.names=c('MessageSize', 'CDF'), skip=1)
+predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+predefProb$WorkLoad <- "Fabricated Heavy Head"
+prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+byteFrac = prob * predefProb$MessageSize
+cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+predefProb$CBF <- cumBytes
+cdfFrame <- rbind(predefProb, cdfFrame)
+
+
 
 cdfFrame$WorkLoad <- factor(cdfFrame$WorkLoad)
 RTT <- 7.75e-6 #seconds
