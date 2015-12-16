@@ -101,6 +101,7 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
         case DistributionChoice::FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER:
         case DistributionChoice::FACEBOOK_HADOOP_ALL:
         case DistributionChoice::FABRICATED_HEAVY_MIDDLE:
+        case DistributionChoice::FABRICATED_HEAVY_HEAD:
         case DistributionChoice::TEST_DIST:
             getInterarrivalSizeFromVec(msgSize, nextInterarrivalTime);
             return;
@@ -137,8 +138,8 @@ MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize,
 
 /*
  * Internal method for DCTCP, TestDist, FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER,
- * FACEBOOK_WEB_SERVER_INTRACLUSTER, FACEBOOK_HADOOP_ALL, and
- * FABRICATED_HEAVY_MIDDLE
+ * FACEBOOK_WEB_SERVER_INTRACLUSTER, FACEBOOK_HADOOP_ALL,
+ * FABRICATED_HEAVY_MIDDLE, and FABRICATED_HEAVY_HEAD
  */
 void
 MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
