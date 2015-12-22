@@ -34,9 +34,10 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
     the Unsched bytes for homatransport.
     """
 
-    f = open(os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/stretchVsUnsched.txt", 'w')
+    f = open(os.environ['HOME'] + "/Research/RpcTransportDesign"+
+        "/OMNeT++Simulation/analysis/PlotScripts/stretchVsUnsched.txt", 'w')
     tw_h = 40
-    tw_l = 15 
+    tw_l = 15
     f.write('LoadFactor'.center(tw_l) + 'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) + 'SizeCntPercent'.center(tw_l) +
             'UnschedBytes'.center(tw_l) + 'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
             '99PercentStretch'.center(tw_l) + '\n')
@@ -68,18 +69,84 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
             medianStretch = float(elem.median)
             tailStretch = float(elem.ninety9Percentile)
             avgStretch += meanStretch * float(elem.cntPercent) / 100
-            f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(meanStretch).center(tw_l) +
+            f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
+                '{0}'.format(sizeUpBound).center(tw_l) + '{0}'.format(sizeProbability).center(tw_l) +
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(meanStretch).center(tw_l) +
                 '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
-            f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+            f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
+                '{0}'.format(sizeUpBound).center(tw_l) + '{0}'.format(sizeProbability).center(tw_l) +
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
                 '{0}'.format(medianStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
-            f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+            f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
+                '{0}'.format(sizeUpBound).center(tw_l) + '{0}'.format(sizeProbability).center(tw_l) +
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
                 '{0}'.format('NA').center(tw_l) + '{0}'.format(tailStretch).center(tw_l) + '\n')
-        f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) + '{0}'.format('OverAllSizes').center(tw_l) +
-                '{0}'.format(1.00).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l)  + 
-                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
+        f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
+            '{0}'.format('overallsizes').center(tw_l) + '{0}'.format(1.00).center(tw_l) +
+            '{0}'.format(unschedbytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l) +
+            '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
+    f.close()
+
+def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
+    f = open(os.environ['HOME'] +
+        "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/" +
+        "stretchVsTransport.txt", 'w')
+    tw_h = 40
+    tw_l = 15
+    f.write('TransportType'.center(tw_l) + 'LoadFactor'.center(tw_l) +
+        'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) +
+        'SizeCntPercent'.center(tw_l) + 'UnschedBytes'.center(tw_l) +
+        'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
+        '99PercentStretch'.center(tw_l) + '\n')
+    for dirFile in resultFiles:
+        match = re.match('(\S+)/(\S+)', dirFile)
+        transport = match.group(1)
+        filename = resultDir + '/' + dirFile
+        parsedStats = AttrDict()
+        parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
+        xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
+        xmlParsedDic = AttrDict()
+        xmlParsedDic = parseXmlFile(xmlConfigFile)
+        e2eStretchAndDelayDigest = AttrDict()
+        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, e2eStretchAndDelayDigest)
+        loadFactor = float(parsedStats.generalInfo.loadFactor) * len(xmlParsedDic.senderIds)
+        if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
+            loadFactor = loadFactor/0.75
+        loadFactor = roundLoadFactor(loadFactor)
+        workLoad = parsedStats.generalInfo.workloadType
+        avgStretch = 0.0
+        try:
+            UnschedBytes = int(parsedStats.generalInfo.defaultReqBytes) + int(parsedStats.generalInfo.defaultUnschedBytes)
+        except Exception as e:
+            print('No Unsched bytes in file: %s' % (filename))
+            UnschedBytes = 'NA'
+        for elem in e2eStretchAndDelayDigest.stretch:
+            sizeUpBound = elem.sizeUpBound
+            sizeProbability = elem.cntPercent
+            meanStretch = float(elem.mean)
+            medianStretch = float(elem.median)
+            tailStretch = float(elem.ninety9Percentile)
+            avgStretch += meanStretch * float(elem.cntPercent) / 100
+            f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
+                '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
+                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format(meanStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '\n')
+            f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
+                '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
+                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format(medianStretch).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '\n')
+            f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
+                '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
+                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format(tailStretch).center(tw_l) + '\n')
+        f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
+                '{0}'.format(workLoad).center(tw_h) + '{0}'.format('OverAllSizes').center(tw_l) +
+                '{0}'.format(1.00).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format(avgStretch).center(tw_l)  + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '\n')
     f.close()
 
 if __name__ == '__main__':
@@ -94,16 +161,35 @@ if __name__ == '__main__':
             dest='plotType',
             help='Mandatory argument. Types are: StretchVsUnsched')
     options, args = parser.parse_args()
-    resultDir = options.resultDir 
-    plotType = options.plotType 
+    resultDir = options.resultDir
+    plotType = options.plotType
     if plotType == '':
         print("--plotType argument not provided.")
         sys.exit(prepE2EStretchVsSizeAndUnsched(resultDir))
     elif plotType == 'StretchVsUnsched':
-        prepE2EStretchVsSizeAndUnsched(resultDir) 
+        prepE2EStretchVsSizeAndUnsched(resultDir)
         plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"
-        print subprocess.Popen('cd {0}; Rscript PlotStretchVsUnsched.r'.format(plotPath), shell=True, stdout=subprocess.PIPE).stdout.read()
+        print subprocess.Popen('cd {0}; Rscript PlotStretchVsUnsched.r'.format(plotPath),
+            shell=True, stdout=subprocess.PIPE).stdout.read()
     elif plotType == 'StretchVsSize':
-        prepE2EStretchVsSizeAndUnsched(resultDir) 
+        prepE2EStretchVsSizeAndUnsched(resultDir)
         plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"
-        print subprocess.Popen('cd {0}; Rscript PlotStretchVsSize.r'.format(plotPath), shell=True, stdout=subprocess.PIPE).stdout.read()
+        print subprocess.Popen('cd {0}; Rscript PlotStretchVsSize.r'.format(plotPath),
+            shell=True, stdout=subprocess.PIPE).stdout.read()
+    elif plotType == 'StretchVsTransport':
+        resultFiles=["1pktReq3PrioMidPrioForLessThanRTT/WorkloadKeyValue-46.sca",
+            "1pktReq3PrioMidPrioForLessThanRTT/WorkloadFabricatedHeavyHead-46.sca",
+            "1pktReq3PrioMidPrioForLessThanRTT/WorkloadFabricatedHeavyMiddle-46.sca",
+            "3PrioDividedForBytes/WorkloadKeyValue-46.sca",
+            "3PrioDividedForBytes/WorkloadFabricatedHeavyHead-46.sca",
+            "3PrioDividedForBytes/WorkloadFabricatedHeavyMiddle-46.sca",
+            "450BytesReq3PrioMidPrioForLessThanRTT/WorkloadKeyValue-46.sca",
+            "450BytesReq3PrioMidPrioForLessThanRTT/WorkloadFabricatedHeavyHead-46.sca",
+            "450BytesReq3PrioMidPrioForLessThanRTT/WorkloadFabricatedHeavyMiddle-46.sca",
+            "pseudoIdeal_RawData/WorkloadKeyValue-2.sca",
+            "pseudoIdeal_RawData/WorkloadFabricatedHeavyHead-2.sca",
+            "pseudoIdeal_RawData/WorkloadFabricatedHeavyMiddle-2.sca"]
+        prepE2EStretchVsTransport(resultDir, resultFiles)
+        plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"
+        print subprocess.Popen('cd {0}; Rscript PlotStretchVsTransport.r'.format(plotPath),
+            shell=True, stdout=subprocess.PIPE).stdout.read()
