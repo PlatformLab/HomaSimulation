@@ -26,6 +26,8 @@
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
 #include "transport/UnschedByteAllocator.h"
+#include "transport/PriorityResolver.h"
+#include "transport/WorkloadEstimator.h"
 
 class TrafficPacer;
 
@@ -100,6 +102,9 @@ class HomaTransport : public cSimpleModule
         // the purpose of easy external tracking of this message.
         uint64_t msgId;
 
+        // Total byte size of the message received from application
+        uint32_t msgSize;
+
         // Total num bytes remained to be sent for this msg.
         uint32_t bytesLeft;
 
@@ -141,7 +146,8 @@ class HomaTransport : public cSimpleModule
         SendController(HomaTransport* transport);
         ~SendController();
         void initSendController(uint32_t defaultReqBytes,
-                uint32_t defaultUnschedBytes);
+                uint32_t defaultUnschedBytes, PriorityResolver* prioResolver,
+                PriorityResolver::PrioResolutionMode unschedPrioResMode);
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
 
@@ -163,6 +169,12 @@ class HomaTransport : public cSimpleModule
         // For each distinct receiver, allocates the number of request and
         // unsched bytes for various sizes of message.
         UnschedByteAllocator* unschedByteAllocator;
+
+        // Determine priority of packets that are to be sent
+        PriorityResolver *prioResolver;
+
+        // Priority resolution mode parameter used for unsched
+        PriorityResolver::PrioResolutionMode unschedPrioResMode;
         friend class OutboundMessage;
     };
 
@@ -281,7 +293,6 @@ class HomaTransport : public cSimpleModule
     class ReceiveScheduler
     {
       public:
-
         enum QueueType
         {
             PRIO_QUEUE = 0,
@@ -321,7 +332,8 @@ class HomaTransport : public cSimpleModule
         void sendAndScheduleGrant();
         void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed,
             uint16_t allPrio, uint16_t schedPrio, cMessage* grantTimer,
-            QueueType queueType, const char* prioAssignMode);
+            QueueType queueType, const char* schedPrioAssignMode,
+            PriorityResolver* prioResolver);
 
       protected:
         HomaTransport* transport;
@@ -360,6 +372,13 @@ class HomaTransport : public cSimpleModule
 
     // Manages the reception of all inbound messages.
     ReceiveScheduler rxScheduler;
+
+    // Determine priority of packets that are to be sent
+    PriorityResolver *prioResolver;
+
+    // Keeps track of the message size distribution that this transport is
+    // seeing.
+    WorkloadEstimator *distEstimator;
 
     // UDP socket through which this transport send and receive packets.
     inet::UDPSocket socket;

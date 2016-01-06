@@ -14,20 +14,23 @@
 #include <utility>
 #include "transport/HomaPkt.h"
 #include "transport/HomaTransport.h"
+#include "transport/PriorityResolver.h"
 
 class TrafficPacer
 {
   public:
     enum PrioPaceMode {
-        NO_OVER_COMMIT = 0,
-        LOWEST_PRIO_POSSIBLE,
-        PRIO_FROM_CBF,
+        FIXED = 0,
+        ADAPTIVE_LOWEST_PRIO_POSSIBLE,
+        STATIC_FROM_CBF,
+        STATIC_FROM_CDF,
         INVALIDE_MODE //Always the last one
     };
 
-    TrafficPacer(double nominalLinkSpeed, uint16_t allPrio, uint16_t schedPrio,
-        uint32_t grantMaxBytes, uint32_t maxAllowedInFlightBytes = 10000,
-        const char* prioPaceMode = "NO_OVER_COMMIT");
+    TrafficPacer(PriorityResolver* prioRes, double nominalLinkSpeed,
+        uint16_t allPrio, uint16_t schedPrio, uint32_t grantMaxBytes,
+        uint32_t maxAllowedInFlightBytes = 10000,
+        const char* prioPaceMode = "FIXED");
     ~TrafficPacer();
     static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1.0;
 
@@ -65,9 +68,11 @@ class TrafficPacer
         }
     };
     typedef std::map<InboundMessage*, uint32_t, InbndMesgCompare>
-        OrderedInbndMsgMap;
+        InbndMsgOrderedMap;
     simtime_t getNextGrantTime(simtime_t currentTime,
         uint32_t grantedPktSizeOnWire);
+    PriorityResolver::PrioResolutionMode prioPace2PrioResolution(
+        PrioPaceMode prioPaceMode);
 
   public:
     void bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
@@ -90,6 +95,7 @@ class TrafficPacer
     }
 
   private:
+    PriorityResolver* prioResolver;
     double actualLinkSpeed;
     simtime_t nextGrantTime;
     uint32_t maxAllowedInFlightBytes;
@@ -97,8 +103,8 @@ class TrafficPacer
     // The upper bound on the number of grant data byte carried sent in
     // individual grant packets .
     uint32_t grantMaxBytes;
-    std::vector<OrderedInbndMsgMap> inflightUnschedPerPrio;
-    std::vector<OrderedInbndMsgMap> inflightSchedPerPrio;
+    std::vector<InbndMsgOrderedMap> inflightUnschedPerPrio;
+    std::vector<InbndMsgOrderedMap> inflightSchedPerPrio;
     int totalOutstandingBytes;
     int unschedInflightBytes;
     PrioPaceMode paceMode;

@@ -165,7 +165,7 @@ HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
 
 /**
  *
- * For a message fo size numDataBytes comprised of packets of type homaPktType,
+ * For a message of size numDataBytes comprised of packets of type homaPktType,
  * this function returns the actual bytes transmitted on the wire.
  *
  * NOTE: calling this function with numDataBytes=0 assumes that you are sending

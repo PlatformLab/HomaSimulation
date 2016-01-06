@@ -32,11 +32,21 @@ simple HomaTransport like ITransportScheme
         bool isRoundRobinScheduler = default(false);
         int localPort = default(-1);
         int destPort;
+
+        // number of available priorities
         int prioLevels;
         int schedPrioLevels;
+        int prioResolverPrioLevels;
 
         // Could be any of PrioPaceMode values defined in TrafficPacer.h
-        string prioAssignMode = default("NO_OVER_COMMIT");
+        string schedPrioAssignMode = default("NO_OVER_COMMIT");
+        // Coulde be any of PrioResolutionMode values in PriorityResolver.h
+        string unschedPrioResolutionMode;
+
+        // Only for simulation puspose, we allow the transport to be aware of
+        // workload type. The value must be similar to WorkloadSynthesizer 
+        // workloadType.
+        string workloadType = default("");
 
         @signal[msgsLeftToSend](type=long);
         @signal[bytesLeftToSend](type=long);

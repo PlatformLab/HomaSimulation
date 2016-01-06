@@ -40,6 +40,8 @@ simsignal_t HomaTransport::totalOutstandingBytesSignal =
 HomaTransport::HomaTransport()
     : sxController(this)
     , rxScheduler(this)
+    , prioResolver(NULL)
+    , distEstimator(NULL)
     , socket()
     , selfMsg(NULL)
 {}
@@ -48,7 +50,10 @@ HomaTransport::HomaTransport()
  * Destructor of HomaTransport.
  */
 HomaTransport::~HomaTransport()
-{}
+{
+    delete prioResolver;
+    delete distEstimator;
+}
 
 /**
  *
@@ -63,13 +68,13 @@ HomaTransport::initialize()
     uint32_t grantMaxBytes = (uint32_t) par("grantMaxBytes");
     uint16_t allPrio = (uint16_t)par("prioLevels");
     uint16_t schedPrioLevels = (uint16_t)par("schedPrioLevels");
-    sxController.initSendController((uint32_t) par("defaultReqBytes"),
-            (uint32_t) par("defaultUnschedBytes"));
-    const char* prioAssignMode = par("prioAssignMode");
+    uint16_t prioResolverPrioLevels = (uint16_t)par("prioResolverPrioLevels");
+    const char* schedPrioAssignMode = par("schedPrioAssignMode");
+    const char* unschedPrioResolutionMode = par("unschedPrioResolutionMode");
     HomaPkt dataPkt = HomaPkt();
     dataPkt.setPktType(PktType::SCHED_DATA);
     uint32_t maxDataBytes = MAX_ETHERNET_PAYLOAD_BYTES -
-            IP_HEADER_SIZE - UDP_HEADER_SIZE - dataPkt.headerSize();
+        IP_HEADER_SIZE - UDP_HEADER_SIZE - dataPkt.headerSize();
     if (grantMaxBytes > maxDataBytes) {
         grantMaxBytes = maxDataBytes;
     }
@@ -80,15 +85,23 @@ HomaTransport::initialize()
     HomaTransport::ReceiveScheduler::QueueType rxInboundQueueType;
     if (par("isRoundRobinScheduler").boolValue()) {
         rxInboundQueueType =
-                HomaTransport::ReceiveScheduler::QueueType::FIFO_QUEUE;
+            HomaTransport::ReceiveScheduler::QueueType::FIFO_QUEUE;
     } else {
         rxInboundQueueType =
-                HomaTransport::ReceiveScheduler::QueueType::PRIO_QUEUE;
+            HomaTransport::ReceiveScheduler::QueueType::PRIO_QUEUE;
     }
+
+    distEstimator = new WorkloadEstimator(par("workloadType").stringValue());
+    prioResolver = new PriorityResolver(prioResolverPrioLevels, distEstimator);
     rxScheduler.initialize(grantMaxBytes, nicLinkSpeed, allPrio,
-        schedPrioLevels, selfMsg, rxInboundQueueType, prioAssignMode);
+        schedPrioLevels, selfMsg, rxInboundQueueType, schedPrioAssignMode,
+        prioResolver);
+    sxController.initSendController((uint32_t) par("defaultReqBytes"),
+            (uint32_t) par("defaultUnschedBytes"), prioResolver,
+            prioResolver->strPrioModeToInt(unschedPrioResolutionMode));
     scheduleAt(simTime(), selfMsg);
     outstandingGrantBytes = 0;
+
 }
 
 void
@@ -121,7 +134,7 @@ HomaTransport::handleMessage(cMessage *msg)
     } else {
         if (msg->arrivedOn("appIn")) {
             sxController.processSendMsgFromApp(
-                    check_and_cast<AppMessage*>(msg));
+                check_and_cast<AppMessage*>(msg));
 
         } else if (msg->arrivedOn("udpIn")) {
             HomaPkt* rxPkt = check_and_cast<HomaPkt*>(msg);
@@ -173,12 +186,17 @@ HomaTransport::SendController::SendController(HomaTransport* transport)
     , msgId(0)
     , outboundMsgMap()
     , unschedByteAllocator(NULL)
+    , prioResolver(NULL)
+    , unschedPrioResMode()
 {}
 
 void
 HomaTransport::SendController::initSendController(uint32_t defaultReqBytes,
-        uint32_t defaultUnschedBytes)
+    uint32_t defaultUnschedBytes, PriorityResolver* prioResolver,
+    PriorityResolver::PrioResolutionMode unschedPrioResMode)
 {
+    this->prioResolver = prioResolver;
+    this->unschedPrioResMode = unschedPrioResMode;
     bytesLeftToSend = 0;
     std::random_device rd;
     std::mt19937_64 merceneRand(rd());
@@ -251,6 +269,7 @@ HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
         uint32_t unschedDataBytes)
     : sxController(sxController)
     , msgId(msgId)
+    , msgSize(outMsg->getByteLength())
     , bytesLeft(outMsg->getByteLength())
     , nextByteToSend(0)
     , dataBytesInReq(dataBytesInReq)
@@ -263,6 +282,7 @@ HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
 HomaTransport::OutboundMessage::OutboundMessage()
     : sxController(NULL)
     , msgId(0)
+    , msgSize(0)
     , bytesLeft(0)
     , nextByteToSend(0)
     , dataBytesInReq(0)
@@ -293,6 +313,7 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
 {
     this->sxController = other.sxController;
     this->msgId = other.msgId;
+    this->msgSize = other.msgSize;
     this->bytesLeft = other.bytesLeft;
     this->nextByteToSend = other.nextByteToSend;
     this->dataBytesInReq = other.dataBytesInReq;
@@ -309,8 +330,11 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
     reqPkt->setPktType(PktType::REQUEST);
 
     // find reqPkt and unschedPkt priority
-    uint16_t reqPrio = 0;
-    uint16_t unschedPrio = 0;
+    uint16_t reqPrio = sxController->prioResolver->getPrioForPkt(
+        sxController->unschedPrioResMode, msgSize, PktType::REQUEST);
+
+    uint16_t unschedPrio = sxController->prioResolver->getPrioForPkt(
+        sxController->unschedPrioResMode, msgSize, PktType::UNSCHED_DATA);
 
     // create request fields and append the data
     RequestFields reqFields;
@@ -432,10 +456,10 @@ void
 HomaTransport::ReceiveScheduler::initialize(uint32_t grantMaxBytes,
     uint32_t nicLinkSpeed, uint16_t allPrio, uint16_t schedPrioLevels,
     cMessage* grantTimer, HomaTransport::ReceiveScheduler::QueueType queueType,
-    const char* prioAssignMode)
+    const char* prioAssignMode, PriorityResolver* prioResolver)
 {
-    this->trafficPacer = new(this->trafficPacer) TrafficPacer(nicLinkSpeed,
-        allPrio, schedPrioLevels, grantMaxBytes,
+    this->trafficPacer = new(this->trafficPacer) TrafficPacer(prioResolver,
+        nicLinkSpeed, allPrio, schedPrioLevels, grantMaxBytes,
         transport->maxOutstandingRecvBytes, prioAssignMode);
     this->grantTimer = grantTimer;
     inboundMsgQueue.initialize(queueType);

@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 #include <algorithm>
 #include <random>
@@ -23,9 +23,9 @@ Define_Module(PseudoIdealPriorityTransport);
 /**
 * Registering all of the statistics collection signals.
 */
-simsignal_t PseudoIdealPriorityTransport::msgsLeftToSendSignal = 
+simsignal_t PseudoIdealPriorityTransport::msgsLeftToSendSignal =
         registerSignal("msgsLeftToSend");
-simsignal_t PseudoIdealPriorityTransport::bytesLeftToSendSignal = 
+simsignal_t PseudoIdealPriorityTransport::bytesLeftToSendSignal =
         registerSignal("bytesLeftToSend");
 
 PseudoIdealPriorityTransport::PseudoIdealPriorityTransport()
@@ -55,7 +55,7 @@ PseudoIdealPriorityTransport::~PseudoIdealPriorityTransport()
         std::list<InboundMsg*> &rxMsgList = incompMsgIter->second;
         for (auto inbndIter = rxMsgList.begin(); inbndIter != rxMsgList.end();
                 ++inbndIter) {
-            InboundMsg* incompleteRxMsg = *inbndIter; 
+            InboundMsg* incompleteRxMsg = *inbndIter;
             delete incompleteRxMsg;
         }
     }
@@ -106,7 +106,7 @@ PseudoIdealPriorityTransport::handleMessage(cMessage *msg)
         }
     } else {
         if (msg->arrivedOn("appIn")) {
-            processMsgFromApp(check_and_cast<AppMessage*>(msg)); 
+            processMsgFromApp(check_and_cast<AppMessage*>(msg));
         } else if (msg->arrivedOn("udpIn")) {
             processRcvdPkt(check_and_cast<HomaPkt*>(msg));
         }
@@ -120,7 +120,7 @@ PseudoIdealPriorityTransport::processMsgFromApp(AppMessage* sendMsg)
     emit(bytesLeftToSendSignal, sendMsg->getByteLength());
     uint32_t msgByteLen = sendMsg->getByteLength();
     simtime_t msgCreationTime = sendMsg->getMsgCreationTime();
-    inet::L3Address destAddr = sendMsg->getDestAddr();      
+    inet::L3Address destAddr = sendMsg->getDestAddr();
     inet::L3Address srcAddr = sendMsg->getSrcAddr();
     uint32_t firstByte = 0;
     uint32_t lastByte = 0;
@@ -151,7 +151,7 @@ PseudoIdealPriorityTransport::processMsgFromApp(AppMessage* sendMsg)
         sxPkt->setByteLength(pktDataBytes + sxPkt->headerSize());
 
         // Send the packet out
-        socket.sendTo(sxPkt, sxPkt->getDestAddr(), destPort);    
+        socket.sendTo(sxPkt, sxPkt->getDestAddr(), destPort);
     } while(bytesToSend > 0);
     delete sendMsg;
     ++msgId;
@@ -168,7 +168,7 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
     std::list<InboundMsg*> &rxMsgList = incompleteRxMsgsMap[msgId];
     for (auto inbndIter = rxMsgList.begin(); inbndIter != rxMsgList.end();
             ++inbndIter) {
-        InboundMsg* incompleteRxMsg = *inbndIter; 
+        InboundMsg* incompleteRxMsg = *inbndIter;
         ASSERT(incompleteRxMsg->msgIdAtSender == msgId);
         if (incompleteRxMsg->srcAddr == srcAddr) {
             inboundRxMsg = incompleteRxMsg;
@@ -178,19 +178,19 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
 
     // This rxPkt doesn't belong to any InboundMsg in the incompleteRxMsgsMap,
     // so we will create an InboundMsg for this rxPkt and push it to the
-    // incompleteRxMsgsMap. 
+    // incompleteRxMsgsMap.
     if (!inboundRxMsg) {
         inboundRxMsg = new InboundMsg(rxPkt);
         rxMsgList.push_front(inboundRxMsg);
     }
-    
+
     // Append the data to the inboundRxMsg and if the msg is complete, remove it
     // from the list of outstanding messages in the map, and send the complete
     // message to the application.
     if (inboundRxMsg->appendPktData(rxPkt)) {
         rxMsgList.remove(inboundRxMsg);
         if (rxMsgList.empty()) {
-            incompleteRxMsgsMap.erase(msgId); 
+            incompleteRxMsgsMap.erase(msgId);
         }
         AppMessage* rxMsg = new AppMessage();
         rxMsg->setDestAddr(inboundRxMsg->destAddr);
@@ -199,7 +199,7 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
         rxMsg->setTransportSchedDelay(SIMTIME_ZERO);
         rxMsg->setByteLength(inboundRxMsg->msgByteLen);
         send(rxMsg, "appOut", 0);
-        delete inboundRxMsg; 
+        delete inboundRxMsg;
     }
     delete rxPkt;
 }
@@ -229,7 +229,7 @@ PseudoIdealPriorityTransport::InboundMsg::InboundMsg(HomaPkt* rxPkt)
 }
 
 PseudoIdealPriorityTransport::InboundMsg::~InboundMsg()
-{} 
+{}
 
 bool
 PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
@@ -238,7 +238,7 @@ PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
     ASSERT((rxPkt->getPktType() == PktType::UNSCHED_DATA) &&
             (unschedFields.msgCreationTime == msgCreationTime) &&
             (unschedFields.msgByteLen == msgByteLen));
-    ASSERT((rxPkt->getSrcAddr() == srcAddr) && 
+    ASSERT((rxPkt->getSrcAddr() == srcAddr) &&
             (rxPkt->getDestAddr() == destAddr) &&
             (rxPkt->getMsgId() == msgIdAtSender));
 
@@ -246,15 +246,15 @@ PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
     if (msgByteLen == 0) {
         return true;
     }
-   
+
     // append the data and return
-    uint32_t dataBytesInPkt = 
+    uint32_t dataBytesInPkt =
             unschedFields.lastByte - unschedFields.firstByte + 1;
     numBytesToRecv -= dataBytesInPkt;
     if (numBytesToRecv < 0) {
         cRuntimeError("Remaining bytes to receive for an inbound msg can't be"
                 " negative.");
-    } 
+    }
 
     if (numBytesToRecv == 0) {
         return true;

@@ -8,10 +8,11 @@
 #include <omnetpp.h>
 #include "TrafficPacer.h"
 
-TrafficPacer::TrafficPacer(double nominalLinkSpeed, uint16_t allPrio,
-        uint16_t schedPrio, uint32_t grantMaxBytes,
+TrafficPacer::TrafficPacer(PriorityResolver* prioRes, double nominalLinkSpeed,
+        uint16_t allPrio, uint16_t schedPrio, uint32_t grantMaxBytes,
         uint32_t maxAllowedInFlightBytes, const char* prioPaceMode)
-    : actualLinkSpeed(nominalLinkSpeed * ACTUAL_TO_NOMINAL_RATE_RATIO)
+    : prioResolver(prioRes)
+    , actualLinkSpeed(nominalLinkSpeed * ACTUAL_TO_NOMINAL_RATE_RATIO)
     , nextGrantTime(SIMTIME_ZERO)
     , maxAllowedInFlightBytes(maxAllowedInFlightBytes)
     , grantMaxBytes(grantMaxBytes)
@@ -57,7 +58,9 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
         HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
 
     switch (paceMode) {
-        case PrioPaceMode::NO_OVER_COMMIT:
+        case PrioPaceMode::FIXED:
+        case PrioPaceMode::STATIC_FROM_CBF:
+        case PrioPaceMode::STATIC_FROM_CDF:
             if ((totalOutstandingBytes + (int)grantedPktSizeOnWire) >
                     (int)maxAllowedInFlightBytes) {
                 return NULL;
@@ -66,9 +69,11 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             // We can prepare and return a grant
             nextTimeToGrant = getNextGrantTime(currentTime, grantedPktSizeOnWire);
             totalOutstandingBytes += grantedPktSizeOnWire;
+            prio = prioResolver->getPrioForPkt(prioPace2PrioResolution(paceMode),
+                msgToGrant->msgSize, PktType::SCHED_DATA);
             return msgToGrant->prepareGrant(grantSize, prio);
 
-        case PrioPaceMode::LOWEST_PRIO_POSSIBLE: {
+        case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE: {
             ASSERT(msgToGrant >= 0);
             int schedByteCap = maxAllowedInFlightBytes - (int)unschedInflightBytes
                 - (int)(HomaPkt::getBytesOnWire(msgToGrant->schedBytesInFlight(),
@@ -93,7 +98,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
 
                     // We can send a grant here.
                     // First find this message in scheduled mapped messages of
-                    // this module and remove it from the map. 
+                    // this module and remove it from the map.
                     auto inbndMsgOutbytesIter = vecIter->find(msgToGrant);
                     uint32_t outBytes = 0;
                     if (inbndMsgOutbytesIter != vecIter->end()) {
@@ -106,7 +111,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     // based on the bytesToGrant, we also need to update that
                     // struct if necessary.
                     std::vector<std::pair<uint16, uint32_t>>prioUnschedVec = {};
-                    for (auto unschVecIter = inflightUnschedPerPrio.begin(); 
+                    for (auto unschVecIter = inflightUnschedPerPrio.begin();
                             unschVecIter != inflightUnschedPerPrio.end();
                             ++unschVecIter) {
                         inbndMsgOutbytesIter = unschVecIter->find(msgToGrant);
@@ -125,7 +130,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                         getNextGrantTime(currentTime, grantedPktSizeOnWire);
                     HomaPkt* grantPkt =
                         msgToGrant->prepareGrant(grantSize, prio);
-                    
+
                     // inserted the updated msgToGrant into the scheduled
                     // message map struct of this module.
                     auto retVal =
@@ -139,7 +144,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                             std::make_pair(msgToGrant, elem.second));
                         ASSERT(retVal.second == true);
                     }
-                    
+
                     totalOutstandingBytes += grantedPktSizeOnWire;
                     return grantPkt;
                 }
@@ -152,11 +157,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             }
             return NULL;
         }
-        case PrioPaceMode::PRIO_FROM_CBF:
-            // TODO: Fill this block
-            return NULL;
-
         default:
+            cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
             return NULL;
     }
 
@@ -169,47 +171,54 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
     uint32_t arrivedBytesOnWire = HomaPkt::getBytesOnWire(arrivedBytes,
         recvPktType);
     totalOutstandingBytes -= arrivedBytesOnWire;
-    if (paceMode == PrioPaceMode::NO_OVER_COMMIT) {
-        switch (recvPktType) {
-            case PktType::REQUEST:
-            case PktType::UNSCHED_DATA:
-                unschedInflightBytes -= arrivedBytesOnWire;
-                break; 
-            default:
-                break;
-        }
-        return;
-    }
-
-    switch (recvPktType) {
-        case PktType::REQUEST:
-        case PktType::UNSCHED_DATA: {
-            unschedInflightBytes -= arrivedBytesOnWire;
-            auto& inbndMap = inflightUnschedPerPrio[prio];
-            auto msgOutbytesIter = inbndMap.find(inbndMsg);
-            ASSERT ((msgOutbytesIter != inbndMap.end() &&
-                msgOutbytesIter->second >= arrivedBytesOnWire));
-            if ((msgOutbytesIter->second -= arrivedBytesOnWire) == 0) {
-                inbndMap.erase(msgOutbytesIter);
+    switch (paceMode) {
+        case PrioPaceMode::FIXED:
+        case PrioPaceMode::STATIC_FROM_CBF:
+        case PrioPaceMode::STATIC_FROM_CDF:
+            switch (recvPktType) {
+                case PktType::REQUEST:
+                case PktType::UNSCHED_DATA:
+                    unschedInflightBytes -= arrivedBytesOnWire;
+                    break;
+                default:
+                    break;
             }
-            break;
-        }
+            return;
 
-        case PktType::SCHED_DATA: {
-            auto& inbndMap = inflightSchedPerPrio[prio + schedPrio - allPrio];
-            auto msgOutbytesIter = inbndMap.find(inbndMsg);
-            ASSERT(msgOutbytesIter != inbndMap.end() &&
-                msgOutbytesIter->second >= arrivedBytesOnWire);
-            if ((msgOutbytesIter->second -= arrivedBytesOnWire) == 0) {
-                inbndMap.erase(msgOutbytesIter);
+        case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
+            switch (recvPktType) {
+                case PktType::REQUEST:
+                case PktType::UNSCHED_DATA: {
+                    unschedInflightBytes -= arrivedBytesOnWire;
+                    auto& inbndMap = inflightUnschedPerPrio[prio];
+                    auto msgOutbytesIter = inbndMap.find(inbndMsg);
+                    ASSERT ((msgOutbytesIter != inbndMap.end() &&
+                        msgOutbytesIter->second >= arrivedBytesOnWire));
+                    if ((msgOutbytesIter->second -= arrivedBytesOnWire) == 0) {
+                        inbndMap.erase(msgOutbytesIter);
+                    }
+                    break;
+                }
+
+                case PktType::SCHED_DATA: {
+                    auto& inbndMap =
+                        inflightSchedPerPrio[prio + schedPrio - allPrio];
+                    auto msgOutbytesIter = inbndMap.find(inbndMsg);
+                    ASSERT(msgOutbytesIter != inbndMap.end() &&
+                        msgOutbytesIter->second >= arrivedBytesOnWire);
+                    if ((msgOutbytesIter->second -= arrivedBytesOnWire) == 0) {
+                        inbndMap.erase(msgOutbytesIter);
+                    }
+                    break;
+                }
+
+                default:
+                    cRuntimeError("PktType %d: Invalid type of arrived bytes.",
+                        recvPktType);
+                    break;
             }
-            break;
-        }
-
         default:
-            cRuntimeError("PktType %d: Invalid type of arrived bytes.",
-                recvPktType);
-            break;
+            cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
     }
 }
 
@@ -221,40 +230,67 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
         HomaPkt::getBytesOnWire(committedBytes, pendingPktType);
     totalOutstandingBytes += committedBytesOnWire;
     unschedInflightBytes += committedBytesOnWire;
-    if (paceMode == PrioPaceMode::NO_OVER_COMMIT)
-        return;
+    switch (paceMode) {
+        case PrioPaceMode::FIXED:
+        case PrioPaceMode::STATIC_FROM_CBF:
+        case PrioPaceMode::STATIC_FROM_CDF:
+            return;
 
-    switch (pendingPktType) {
-        case PktType::REQUEST:
-        case PktType::UNSCHED_DATA: {
-            auto& inbndMsgMap = inflightUnschedPerPrio[prio];
-            auto msgOutbytesIter = inbndMsgMap.find(inbndMsg);
-            uint32_t outBytes = 0;
-            if (msgOutbytesIter != inbndMsgMap.end()) {
-                outBytes += msgOutbytesIter->second;
-                inbndMsgMap.erase(msgOutbytesIter);
+        case PrioPaceMode:: ADAPTIVE_LOWEST_PRIO_POSSIBLE:
+            switch (pendingPktType) {
+                case PktType::REQUEST:
+                case PktType::UNSCHED_DATA: {
+                    auto& inbndMsgMap = inflightUnschedPerPrio[prio];
+                    auto msgOutbytesIter = inbndMsgMap.find(inbndMsg);
+                    uint32_t outBytes = 0;
+                    if (msgOutbytesIter != inbndMsgMap.end()) {
+                        outBytes += msgOutbytesIter->second;
+                        inbndMsgMap.erase(msgOutbytesIter);
+                    }
+                    outBytes += committedBytesOnWire;
+                    auto retVal =
+                        inbndMsgMap.insert(std::make_pair(inbndMsg,outBytes));
+                    ASSERT(retVal.second == true);
+                    break;
+                }
+                default:
+                    cRuntimeError("PktType %d: Invalid type of incomping pkt",
+                        pendingPktType);
             }
-            outBytes += committedBytesOnWire;
-            auto retVal = inbndMsgMap.insert(std::make_pair(inbndMsg,outBytes));
-            ASSERT(retVal.second == true);
-            break;
-        }
         default:
-            cRuntimeError("PktType %d: Invalid type of incomping pkt",
-                pendingPktType);
+            cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
     }
 }
 
 TrafficPacer::PrioPaceMode
 TrafficPacer::strPrioPaceModeToEnum(const char* prioPaceMode)
 {
-    if (strcmp(prioPaceMode, "NO_OVER_COMMIT") == 0) {
-        return PrioPaceMode::NO_OVER_COMMIT;
-    } else if (strcmp(prioPaceMode, "LOWEST_PRIO_POSSIBLE") == 0) {
-        return PrioPaceMode::LOWEST_PRIO_POSSIBLE;
-    } else if (strcmp(prioPaceMode, "PRIO_FROM_CBF") == 0) {
-        return PrioPaceMode::PRIO_FROM_CBF;
+    if (strcmp(prioPaceMode, "FIXED") == 0) {
+        return PrioPaceMode::FIXED;
+    } else if (strcmp(prioPaceMode, "ADAPTIVE_LOWEST_PRIO_POSSIBLE") == 0) {
+        return PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE;
+    } else if (strcmp(prioPaceMode, "STATIC_FROM_CBF") == 0) {
+        return PrioPaceMode::STATIC_FROM_CBF;
+    } else if (strcmp(prioPaceMode, "STATIC_FROM_CDF") == 0) {
+        return PrioPaceMode::STATIC_FROM_CDF;
     }
     cRuntimeError("Unknown value for paceMode: %s", prioPaceMode);
-    return PrioPaceMode::INVALIDE_MODE; 
+    return PrioPaceMode::INVALIDE_MODE;
+}
+
+PriorityResolver::PrioResolutionMode
+TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
+{
+    switch (prioPaceMode) {
+        case PrioPaceMode::FIXED:
+            return PriorityResolver::PrioResolutionMode::FIXED_SCHED;
+        case PrioPaceMode::STATIC_FROM_CBF:
+            return PriorityResolver::PrioResolutionMode::STATIC_FROM_CBF;
+        case PrioPaceMode::STATIC_FROM_CDF:
+            return PriorityResolver::PrioResolutionMode::STATIC_FROM_CDF;
+        default:
+            cRuntimeError( "PrioPaceMode %d has no match in PrioResolutionMode",
+                prioPaceMode);
+    }
+    return PriorityResolver::PrioResolutionMode::INVALID_PRIO_MODE;
 }
