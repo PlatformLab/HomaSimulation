@@ -14,9 +14,12 @@
 // 
 
 cplusplus {{
+#include <vector>
 #include "inet/networklayer/common/L3Address.h"
+typedef std::vector<uint32_t> UnsignedVec;
 }}
 class noncobject inet::L3Address;
+class noncobject UnsignedVec;
 
 enum PktType
 {
@@ -67,6 +70,13 @@ struct UnschedDataFields
 struct GrantFields
 {
     uint32_t grantBytes;
+    uint16_t schedPrio;
+
+    // [(uint32_t size_upper_bound, uint16_t req_byte, uint16_t prio)]
+    UnsignedVec reqBytesPrio;
+
+    // [(uint32_t size_upper_bound, uint16_t unsched_byte, uint16_t prio)]
+    UnsignedVec unschedBytesPrio; 
 };
 
 struct SchedDataFields

@@ -17,6 +17,7 @@
 #include <random>
 #include <cmath>
 #include "HomaTransport.h"
+#include "transport/HomaPkt.h"
 
 Define_Module(HomaTransport);
 
@@ -144,50 +145,6 @@ HomaTransport::handleMessage(cMessage *msg)
             }
         }
     }
-}
-
-/**
- * NOTE: calling this function with numDataBytes=0 assumes that you are sending
- * a packet with no data on the wire and you want to see how many bytes an empty
- * packet is on the wire.
- */
-uint32_t
-HomaTransport::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
-{
-
-    HomaPkt homaPkt = HomaPkt();
-    homaPkt.setPktType(homaPktType);
-    uint32_t homaPktHdrSize = homaPkt.headerSize();
-
-    uint32_t bytesOnWire = 0;
-
-    uint32_t maxDataInHomaPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE
-            - UDP_HEADER_SIZE - homaPktHdrSize; 
-    
-    uint32_t numFullPkts = numDataBytes / maxDataInHomaPkt;
-    bytesOnWire += numFullPkts * (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE
-            + ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP);
-
-    uint32_t numPartialBytes = numDataBytes - numFullPkts * maxDataInHomaPkt; 
-
-    // if all numDataBytes fit in full pkts, we should return at this point
-    if (numFullPkts > 0 && numPartialBytes == 0) {
-        return bytesOnWire;
-    }
-
-    numPartialBytes += homaPktHdrSize + IP_HEADER_SIZE +
-            UDP_HEADER_SIZE;
-
-    if (numPartialBytes < MIN_ETHERNET_PAYLOAD_BYTES) {
-        numPartialBytes = MIN_ETHERNET_PAYLOAD_BYTES;
-    }
-    
-    uint32_t numPartialBytesOnWire = numPartialBytes + ETHERNET_HDR_SIZE +
-            ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
-    
-    bytesOnWire += numPartialBytesOnWire;
-
-    return bytesOnWire;
 }
 
 void
@@ -515,7 +472,7 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
         // the flight to the receiver must be accounted in the future grants we
         // will send as they might interfer with sched data.
         if (unschedBytesToArrive > 0) {
-            uint32_t unschedBytesOnWire = transport->getBytesOnWire(
+            uint32_t unschedBytesOnWire = HomaPkt::getBytesOnWire(
                     unschedBytesToArrive, PktType::UNSCHED_DATA); 
             trafficPacer->unschedPendingBytes(unschedBytesOnWire);
             transport->emit(totalOutstandingBytesSignal,
@@ -527,7 +484,7 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
         // and now we need to return them to the pacer
         transport->emit(totalOutstandingBytesSignal, 
                 trafficPacer->getOutstandingBytes());
-        trafficPacer->bytesArrived(transport->getBytesOnWire(numBytesInReqPkt,
+        trafficPacer->bytesArrived(HomaPkt::getBytesOnWire(numBytesInReqPkt,
                 PktType::REQUEST));
 
     }
@@ -613,13 +570,13 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
         // trafficPacer.
         uint32_t unschedBytesOnWire = 0;
         uint32_t reqPktDataBytes = rxPkt->getUnschedDataFields().numReqBytes;
-        unschedBytesOnWire += transport->getBytesOnWire(reqPktDataBytes,
+        unschedBytesOnWire += HomaPkt::getBytesOnWire(reqPktDataBytes,
                 PktType::REQUEST);
         uint32_t unschedBytesToArrive = 
                 rxPkt->getUnschedDataFields().totalUnschedBytes -
                 reqPktDataBytes - pktUnschedBytes;
         if (unschedBytesToArrive > 0) {
-            unschedBytesOnWire += transport->getBytesOnWire(
+            unschedBytesOnWire += HomaPkt::getBytesOnWire(
                     unschedBytesToArrive, PktType::UNSCHED_DATA);
         }
 
@@ -633,7 +590,7 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
 
         transport->emit(totalOutstandingBytesSignal, 
                 trafficPacer->getOutstandingBytes());
-        trafficPacer->bytesArrived(transport->getBytesOnWire(
+        trafficPacer->bytesArrived(HomaPkt::getBytesOnWire(
                 pktUnschedBytes, PktType::UNSCHED_DATA));
     }
 
@@ -682,7 +639,7 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
     // agrant for it. Now the grant for this packet must be returned to the
     // pacer.
     uint32_t totalOnwireBytesReceived =
-            transport->getBytesOnWire(bytesReceived, PktType::SCHED_DATA);
+            HomaPkt::getBytesOnWire(bytesReceived, PktType::SCHED_DATA);
     transport->outstandingGrantBytes -= totalOnwireBytesReceived;
     transport->emit(totalOutstandingBytesSignal, trafficPacer->getOutstandingBytes());
     trafficPacer->bytesArrived(totalOnwireBytesReceived);
@@ -738,7 +695,7 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
             std::min(highPrioMsg->bytesToGrant, grantMaxBytes);
 
     // The size of scheduled data bytes on wire.
-    uint32_t schedBytesOneWire = transport->getBytesOnWire(
+    uint32_t schedBytesOneWire = HomaPkt::getBytesOnWire(
             grantSize, PktType::SCHED_DATA);
     if (trafficPacer->okToGrant(currentTime, schedBytesOneWire)) {
 
@@ -963,8 +920,7 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
         simtime_t totalSchedTime = lastGrantTime - reqArrivalTime;
         simtime_t minPossibleSchedTime;
         uint32_t bytesGranted = msgSize - totalUnschedBytes; 
-        uint32_t bytesGrantedOnWire = 
-            rxScheduler->transport->getBytesOnWire(bytesGranted,
+        uint32_t bytesGrantedOnWire = HomaPkt::getBytesOnWire(bytesGranted,
             PktType::SCHED_DATA);
         uint32_t maxPktSizeOnWire = ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
             MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE + INTER_PKT_GAP;

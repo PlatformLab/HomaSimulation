@@ -39,19 +39,6 @@ class HomaTransport : public cSimpleModule
 {
   public:
     /**
-     * All of the constants packet and header byte sizes for different types of
-     * datagrams.
-     */
-    static const uint32_t ETHERNET_PREAMBLE_SIZE = 8;
-    static const uint32_t ETHERNET_HDR_SIZE = 14; 
-    static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
-    static const uint32_t MIN_ETHERNET_PAYLOAD_BYTES = 46;
-    static const uint32_t IP_HEADER_SIZE = 20;
-    static const uint32_t UDP_HEADER_SIZE = 8;
-    static const uint32_t ETHERNET_CRC_SIZE = 4;
-    static const uint32_t INTER_PKT_GAP = 12; 
-
-    /**
      * A self message essentially models a timer for this transport and can have
      * one the below types.
      */
@@ -360,7 +347,6 @@ class HomaTransport : public cSimpleModule
     void sendPacket(HomaPkt* sxPkt);
     void processStart();
     void processGrantTimer();
-    uint32_t getBytesOnWire(uint32_t numDataBytes, PktType homaPktType);
 
   protected:
 

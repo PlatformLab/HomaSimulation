@@ -60,8 +60,14 @@ HomaPkt::headerSize()
                     sizeof(getUnschedDataFields().lastByte));
             break;
         case PktType::GRANT:
-            size += sizeof(getGrantFields().grantBytes);
-            
+            size += (sizeof(getGrantFields().grantBytes) +
+                sizeof(getGrantFields().schedPrio) +
+                getGrantFields().reqBytesPrio.size() *
+                sizeof(decltype (getGrantFields().reqBytesPrio)::value_type) + 
+                getGrantFields().unschedBytesPrio.size() * 
+                sizeof(decltype (getGrantFields().unschedBytesPrio)::value_type)
+                );
+            break; 
         case PktType::SCHED_DATA:
             size += (sizeof(getSchedDataFields().firstByte) + 
                     sizeof(getSchedDataFields().lastByte));
@@ -152,4 +158,52 @@ HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
         return 0;
     }
     return 1; 
+}
+
+/**
+ *
+ * For a message fo size numDataBytes comprised of packets of type homaPktType,
+ * this function returns the actual bytes transmitted on the wire. 
+ *
+ * NOTE: calling this function with numDataBytes=0 assumes that you are sending
+ * a packet with no data on the wire and you want to see how many bytes an empty
+ * packet is on the wire.
+ */
+uint32_t
+HomaPkt::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
+{
+
+    HomaPkt homaPkt = HomaPkt();
+    homaPkt.setPktType(homaPktType);
+    uint32_t homaPktHdrSize = homaPkt.headerSize();
+
+    uint32_t bytesOnWire = 0;
+
+    uint32_t maxDataInHomaPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE
+            - UDP_HEADER_SIZE - homaPktHdrSize; 
+    
+    uint32_t numFullPkts = numDataBytes / maxDataInHomaPkt;
+    bytesOnWire += numFullPkts * (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE
+            + ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP);
+
+    uint32_t numPartialBytes = numDataBytes - numFullPkts * maxDataInHomaPkt; 
+
+    // if all numDataBytes fit in full pkts, we should return at this point
+    if (numFullPkts > 0 && numPartialBytes == 0) {
+        return bytesOnWire;
+    }
+
+    numPartialBytes += homaPktHdrSize + IP_HEADER_SIZE +
+            UDP_HEADER_SIZE;
+
+    if (numPartialBytes < MIN_ETHERNET_PAYLOAD_BYTES) {
+        numPartialBytes = MIN_ETHERNET_PAYLOAD_BYTES;
+    }
+    
+    uint32_t numPartialBytesOnWire = numPartialBytes + ETHERNET_HDR_SIZE +
+            ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP;
+    
+    bytesOnWire += numPartialBytesOnWire;
+
+    return bytesOnWire;
 }

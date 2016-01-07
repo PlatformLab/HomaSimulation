@@ -36,20 +36,6 @@
 class PseudoIdealPriorityTransport : public cSimpleModule
 {
   public:
-
-    /**
-     * Constant packet and header byte sizes for the common datagram types that
-     * we use in our simulations.
-     */
-    static const uint32_t ETHERNET_PREAMBLE_SIZE = 8;
-    static const uint32_t ETHERNET_HDR_SIZE = 14; 
-    static const uint32_t MAX_ETHERNET_PAYLOAD_BYTES = 1500;
-    static const uint32_t MIN_ETHERNET_PAYLOAD_BYTES = 46;
-    static const uint32_t IP_HEADER_SIZE = 20;
-    static const uint32_t UDP_HEADER_SIZE = 8;
-    static const uint32_t ETHERNET_CRC_SIZE = 4;
-    static const uint32_t INTER_PKT_GAP = 12; 
-
     // Signal definitions for statistics gathering
     static simsignal_t msgsLeftToSendSignal;
     static simsignal_t bytesLeftToSendSignal;
