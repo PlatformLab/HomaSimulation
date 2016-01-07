@@ -33,6 +33,7 @@ tailStretchVsSize$MsgSizeRange <- as.numeric(as.character(tailStretchVsSize$MsgS
 textSize <- 35
 yLimit <- 5
 
+hasPseudoIdeal = !empty(subset(stretchVsSize, TransportType %in% c('PseudoIdeal')))
 for (rho in unique(avgStretchVsSize$LoadFactor)) {
     i <- 0
     avgStretchPlot = list()
@@ -42,6 +43,25 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
             tmp <- subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType==transport,
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent',
                 'TransportType', 'MeanStretch', 'UnschedBytes'))
+            if (hasPseudoIdeal) {
+                pseudoIdealDF = subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
+                    select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent', 'TransportType',
+                    'MeanStretch', 'UnschedBytes'))
+                if (transport != 'PseudoIdeal') {
+                    tmp$MeanStretch <- tmp$MeanStretch / pseudoIdealDF$MeanStretch
+                    plotTitle = sprintf("Normalized MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                        loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                    yLab = 'MeanStretch (Normalized to PseudoIdeal)'
+                } else {
+                    plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                        loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                    yLab = 'MeanStretch'
+                }
+            } else {
+                plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                    loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                yLab = 'MeanStretch'
+            }
 
             # You might ask why I'm using "x=SizeCumPercent-SizeCntPercent/200" in the plot. The reason is that ggplot geom_bar is so
             # dumb and I was not able to shift the bars to the write while setting the width of each bar to be equal to it's size
@@ -55,14 +75,12 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MeanStretch, na.rm=TRUE)))) +
-                labs(title = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload),
-                    x = "Cumulative Msg Size Percent")
+                labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
         }
     }
     pdf(sprintf("plots/MeanStretchVsTransport_rho%s.pdf", rho),
         width=50*length(unique(avgStretchVsSize$WorkLoad)),
-        height=10*length(unique(stretchVsSize$TransportType)))
+        height=15*length(unique(stretchVsSize$TransportType)))
     args.list <- c(avgStretchPlot, list(ncol=length(unique(avgStretchVsSize$WorkLoad))))
     do.call(grid.arrange, args.list)
     dev.off()
@@ -78,6 +96,26 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent',
                 'TransportType', 'MedianStretch', 'UnschedBytes'))
 
+            if (hasPseudoIdeal) {
+                pseudoIdealDF = subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
+                    select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent', 'TransportType',
+                    'MedianStretch', 'UnschedBytes'))
+                if (transport != 'PseudoIdeal') {
+                    tmp$MedianStretch <- tmp$MedianStretch / pseudoIdealDF$MedianStretch
+                    plotTitle = sprintf("Normalized MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                        loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                    yLab = 'MedianStretch (Normalized to PseudoIdeal)'
+                } else {
+                    plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                        loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                    yLab = 'MedianStretch'
+                }
+            } else {
+                plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                    loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                yLab = 'MedianStretch'
+            }
+
             # You might ask why I'm using "x=SizeCumPercent-SizeCntPercent/200" in the plot. The reason is that ggplot geom_bar is so
             # dumb and I was not able to shift the bars to the write while setting the width of each bar to be equal to it's size
             # probability. So I ended up manaully shift the bars to the the left for half of the probability and setting the width
@@ -90,14 +128,12 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MedianStretch, na.rm=TRUE)))) +
-                labs(title = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload),
-                    x = "Cumulative Msg Size Percent")
+                labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
         }
     }
     pdf(sprintf("plots/MedianStretchVsTransport_rho%s.pdf", rho),
         width=50*length(unique(medianStretchVsSize$WorkLoad)),
-        height=10*length(unique(stretchVsSize$TransportType)))
+        height=15*length(unique(stretchVsSize$TransportType)))
     args.list <- c(medianStretchPlot, list(ncol=length(unique(medianStretchVsSize$WorkLoad))))
     do.call(grid.arrange, args.list)
     dev.off()
@@ -113,6 +149,26 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent',
                 'TransportType', 'TailStretch', 'UnschedBytes'))
 
+            if (hasPseudoIdeal) {
+                pseudoIdealDF = subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
+                    select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'SizeCntPercent', 'SizeCumPercent', 'TransportType',
+                    'TailStretch', 'UnschedBytes'))
+                if (transport != 'PseudoIdeal') {
+                    tmp$TailStretch <- tmp$TailStretch / pseudoIdealDF$TailStretch
+                    plotTitle = sprintf("Normalized TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                        loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                    yLab = 'TailStretch (Normalized to PseudoIdeal)'
+                } else {
+                    plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                        loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                    yLab = 'TailStretch'
+                }
+            } else {
+                plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
+                    loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                yLab = 'TailStretch'
+            }
+
             # You might ask why I'm using "x=SizeCumPercent-SizeCntPercent/200" in the plot. The reason is that ggplot geom_bar is so
             # dumb and I was not able to shift the bars to the write while setting the width of each bar to be equal to it's size
             # probability. So I ended up manaully shift the bars to the the left for half of the probability and setting the width
@@ -125,16 +181,13 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$TailStretch, na.rm=TRUE)))) +
-                labs(title = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload),
-                    x = "Cumulative Msg Size Percent")
+                labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
         }
     }
     pdf(sprintf("plots/TailStretchVsTransport_rho%s.pdf", rho),
         width=50*length(unique(tailStretchVsSize$WorkLoad)),
-        height=10*length(unique(stretchVsSize$TransportType)))
+        height=15*length(unique(stretchVsSize$TransportType)))
     args.list <- c(tailStretchPlot, list(ncol=length(unique(tailStretchVsSize$WorkLoad))))
     do.call(grid.arrange, args.list)
     dev.off()
 }
-

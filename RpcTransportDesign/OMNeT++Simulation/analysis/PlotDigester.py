@@ -177,6 +177,10 @@ if __name__ == '__main__':
         print subprocess.Popen('cd {0}; Rscript PlotStretchVsSize.r'.format(plotPath),
             shell=True, stdout=subprocess.PIPE).stdout.read()
     elif plotType == 'StretchVsTransport':
+        f = open(resultDir + '/fileList.txt')
+        resultFiles = [line.rstrip('\n') for line in f]
+        f.close()
+        """
         resultFiles=["1pktReq3PrioMidPrioForLessThanRTT/WorkloadKeyValue-46.sca",
             "1pktReq3PrioMidPrioForLessThanRTT/WorkloadFabricatedHeavyHead-46.sca",
             "1pktReq3PrioMidPrioForLessThanRTT/WorkloadFabricatedHeavyMiddle-46.sca",
@@ -189,6 +193,7 @@ if __name__ == '__main__':
             "pseudoIdeal_RawData/WorkloadKeyValue-2.sca",
             "pseudoIdeal_RawData/WorkloadFabricatedHeavyHead-2.sca",
             "pseudoIdeal_RawData/WorkloadFabricatedHeavyMiddle-2.sca"]
+        """
         prepE2EStretchVsTransport(resultDir, resultFiles)
         plotPath = os.environ['HOME'] + "/Research/RpcTransportDesign/OMNeT++Simulation/analysis/PlotScripts/"
         print subprocess.Popen('cd {0}; Rscript PlotStretchVsTransport.r'.format(plotPath),
