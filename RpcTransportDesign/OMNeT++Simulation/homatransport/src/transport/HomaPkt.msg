@@ -43,6 +43,9 @@ struct RequestFields
     // in the reqPkt (ie. numReqBytes) plus the pure unsched. bytes that are
     // sent in unsched packets.
     uint16_t totalUnschedBytes;
+
+    // Priority of unsched packets that will arrive after this req. packet.
+    uint16_t unschedPrio;
 };
 
 struct UnschedDataFields
@@ -55,6 +58,7 @@ struct UnschedDataFields
     // num bytes of data that are piggybacked on this request. The index of
     // these bytes always start at zero.
     uint16_t numReqBytes;
+    uint16_t reqPrio;
 
     // Total number of unscheduled bytes sent for this message. This bytes sent
     // in the reqPkt (ie. numReqBytes) plus the pure unsched. bytes that are
@@ -76,7 +80,7 @@ struct GrantFields
     UnsignedVec reqBytesPrio;
 
     // [(uint32_t size_upper_bound, uint16_t unsched_byte, uint16_t prio)]
-    UnsignedVec unschedBytesPrio; 
+    UnsignedVec unschedBytesPrio;
 };
 
 struct SchedDataFields

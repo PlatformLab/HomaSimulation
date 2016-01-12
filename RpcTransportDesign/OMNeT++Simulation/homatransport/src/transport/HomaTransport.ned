@@ -32,6 +32,8 @@ simple HomaTransport like ITransportScheme
         bool isRoundRobinScheduler = default(false);
         int localPort = default(-1);
         int destPort;
+        int prioLevels;
+        int schedPrioLevels;
 
         @signal[msgsLeftToSend](type=long);
         @signal[bytesLeftToSend](type=long);

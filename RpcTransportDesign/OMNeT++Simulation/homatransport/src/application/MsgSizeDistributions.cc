@@ -29,18 +29,18 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
     std::ifstream distFileStream;
     distFileStream.open(distFileName);
     if (distFileStream.fail()) {
-        char buf[100]; 
+        char buf[100];
         snprintf(buf, 100, "%s: Failed to open file.", distFileName);
         throw MsgSizeDistException(buf);
         distFileStream.close();
     }
 
-    if (sizeDistSelector >= DistributionChoice::NO_SIZE_DIST_SPECIFIED || 
+    if (sizeDistSelector >= DistributionChoice::NO_SIZE_DIST_SPECIFIED ||
             sizeDistSelector < 0) {
         throw MsgSizeDistException("Invalide MsgSize Distribution Selected.");
 
     }
-    
+
     if (interArrivalDist >= InterArrivalDist::NO_INTERARRIAVAL_DIST_SPECIFIED ||
             interArrivalDist < 0) {
         throw MsgSizeDistException("Invalid MsgArrival Distribution Selected.");
@@ -49,7 +49,7 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
     if (sizeDistSelector == DistributionChoice::SIZE_IN_FILE){
         ASSERT(interArrivalDist == InterArrivalDist::INTERARRIVAL_IN_FILE);
         double dt = 0.0;
-        std::string hostIdSizeInterarrivalLine; 
+        std::string hostIdSizeInterarrivalLine;
         int hostId;
         int msgSize;
         double deltaTime;
@@ -58,11 +58,11 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
                     &hostId, &msgSize, &deltaTime);
             dt += deltaTime;
             if (hostId == callerHostId) {
-                msgSizeInterarrivalQueue.push(std::make_pair(msgSize, dt));  
+                msgSizeInterarrivalQueue.push(std::make_pair(msgSize, dt));
                 dt = 0.0;
             }
-        } 
-         
+        }
+
     } else {
         ASSERT(interArrivalDist != InterArrivalDist::INTERARRIVAL_IN_FILE);
         std::string avgMsgSizeStr;
@@ -70,19 +70,19 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
 
         // The first line of distFileName is the average message size of the
         // distribution.
-        getline(distFileStream, avgMsgSizeStr); 
+        getline(distFileStream, avgMsgSizeStr);
         sscanf(avgMsgSizeStr.c_str(), "%lf", &avgMsgSize);
         if (sizeDistSelector == DistributionChoice::DCTCP) {
             avgMsgSize *= maxDataBytesPerPkt; // AvgSize in terms of bytes
         }
-        
+
         avgInterArrivalTime = 1e-9 * avgMsgSize * 8  / avgRate;
 
         // reads msgSize<->probabilty pairs from "distFileName" file
         while(getline(distFileStream, sizeProbStr)) {
             int msgSize;
             double prob;
-            sscanf(sizeProbStr.c_str(), "%d %lf", 
+            sscanf(sizeProbStr.c_str(), "%d %lf",
                     &msgSize, &prob);
             msgSizeProbDistVector.push_back(std::make_pair(msgSize, prob));
         }
@@ -105,7 +105,7 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
         case DistributionChoice::TEST_DIST:
             getInterarrivalSizeFromVec(msgSize, nextInterarrivalTime);
             return;
-        case DistributionChoice::FACEBOOK_KEY_VALUE: 
+        case DistributionChoice::FACEBOOK_KEY_VALUE:
             getFacebookSizeInterarrival(msgSize, nextInterarrivalTime);
             return;
         case DistributionChoice::SIZE_IN_FILE:
@@ -145,7 +145,7 @@ void
 MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
         double &nextInterarrivalTime)
 {
-    
+
     double prob = uniform(0.0, 1.0);
     size_t mid, high, low;
     high = msgSizeProbDistVector.size() - 1;
@@ -159,7 +159,7 @@ MsgSizeDistributions::getInterarrivalSizeFromVec(int &msgSize,
         }
     }
     msgSize = msgSizeProbDistVector[high].first;
-    
+
     if (sizeDistSelector == DistributionChoice::DCTCP){
         msgSize *= maxDataBytesPerPkt;
     }
@@ -176,8 +176,8 @@ MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize,
         double &nextInterarrivalTime)
 {
     // Facebook workload constants
-    int sizeOffset = msgSizeProbDistVector.back().first; 
-    double probOffset = msgSizeProbDistVector.back().second; 
+    int sizeOffset = msgSizeProbDistVector.back().first;
+    double probOffset = msgSizeProbDistVector.back().second;
 
     // Generalized pareto distribution parameters
     const double k = 0.348238;
@@ -188,11 +188,11 @@ MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize,
 
     double prob = uniform(0.0, 1.0);
     int size;
-    
+
     if (prob <= msgSizeProbDistVector.back().second) {
         int first = 0;
         int last = msgSizeProbDistVector.size() - 1;
-        
+
         while (first < last) {
             int mid = first + (last - first)/2;
             if (prob <= msgSizeProbDistVector[mid].second) {
@@ -204,15 +204,15 @@ MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize,
         size = msgSizeProbDistVector[first].first;
 
     } else {
-        double msgSizeTemp = 
-            round( sizeOffset + 
+        double msgSizeTemp =
+            round( sizeOffset +
             (pow((1-probOffset)/(1-prob), k) - 1) * sigma / k );
 
-        size =  msgSizeTemp > maxSize ? maxSize : (int)(msgSizeTemp); 
+        size =  msgSizeTemp > maxSize ? maxSize : (int)(msgSizeTemp);
     }
     msgSize = size;
 
-    //generate the interarrival gap 
+    //generate the interarrival gap
     nextInterarrivalTime = getInterarrivalTime();
     return;
 }
@@ -224,10 +224,10 @@ MsgSizeDistributions::facebookParetoInterGap()
     const double k = 0.154971;
     const double sigma = 16.0292e-6;
 
-    // Maximum interarrival gap 
+    // Maximum interarrival gap
     const int maxGap = 1000;
     double prob = uniform(0.0, 1.0);
-    
+
     double gapTime = (pow(1/(1-prob), k) - 1) * sigma / k;
 
     // Capping the gap value at the maxGap
@@ -241,7 +241,7 @@ double
 MsgSizeDistributions::getInterarrivalTime()
 {
     if (interArrivalDist == InterArrivalDist::EXPONENTIAL) {
-        return exponential(avgInterArrivalTime);     
+        return exponential(avgInterArrivalTime);
     } else if (interArrivalDist == InterArrivalDist::FACEBOOK_PARETO) {
         return facebookParetoInterGap();
     } else {

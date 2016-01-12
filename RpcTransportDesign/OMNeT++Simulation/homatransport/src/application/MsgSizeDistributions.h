@@ -29,7 +29,7 @@ class MsgSizeDistributions {
         FABRICATED_HEAVY_MIDDLE,
         FABRICATED_HEAVY_HEAD,
         TEST_DIST,
-        NO_SIZE_DIST_SPECIFIED //Should always remain the last 
+        NO_SIZE_DIST_SPECIFIED //Should always remain the last
 
     };
 
@@ -49,7 +49,7 @@ class MsgSizeDistributions {
             int callerHostId = -1);
     ~MsgSizeDistributions() {};
     void getSizeAndInterarrival(int &nextMsgSize, double &nextInterarrivalTime);
-   
+
   private:
     std::vector<std::pair<int, double>> msgSizeProbDistVector;
     std::queue<std::pair<int, double>> msgSizeInterarrivalQueue;
@@ -60,13 +60,13 @@ class MsgSizeDistributions {
     InterArrivalDist interArrivalDist;
 
     // Average message size from the constructed distribution. This value is
-    // read from the first line of the file 'distFileName'. 
+    // read from the first line of the file 'distFileName'.
     double avgMsgSize;
-    double avgInterArrivalTime; 
+    double avgInterArrivalTime;
 
     // Max number of data bytes that one packet can carry.
     int maxDataBytesPerPkt;
-    
+
   private:
     void getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
     void getFacebookSizeInterarrival(int &msgSize,
@@ -82,10 +82,10 @@ struct MsgSizeDistException : std::exception {
         : msg(msg)
     {
     }
- 
+
     const char* what() const noexcept
     {
-        return msg.c_str(); 
+        return msg.c_str();
     }
 };
 

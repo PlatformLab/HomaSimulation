@@ -23,7 +23,7 @@ UnschedByteAllocator::~UnschedByteAllocator()
 void
 UnschedByteAllocator::initReqBytes(uint32_t rxAddr)
 {
-    rxAddrReqbyteMap[rxAddr].clear();  
+    rxAddrReqbyteMap[rxAddr].clear();
     rxAddrReqbyteMap[rxAddr] = {{UINT32_MAX, defaultReqBytes}};
 }
 
@@ -53,7 +53,7 @@ UnschedByteAllocator::getUnschedBytes(uint32_t rxAddr, uint32_t msgSize)
         initUnschedBytes(rxAddr);
         unschedBytesMap = rxAddrUnschedbyteMap.find(rxAddr);
     }
-    
+
     uint32_t reqDataBytes = getReqDataBytes(rxAddr, msgSize);
     if (msgSize <= reqDataBytes) {
         return 0;

@@ -24,8 +24,8 @@ class UnschedByteAllocator
     void updateUnschedBytes(HomaPkt* grantPkt);
 
   private:
-    void initReqBytes(uint32_t rxAddr); 
-    void initUnschedBytes(uint32_t rxAddr); 
+    void initReqBytes(uint32_t rxAddr);
+    void initUnschedBytes(uint32_t rxAddr);
 
   private:
     std::unordered_map<uint32_t, std::map<uint32_t, uint32_t>>

@@ -96,7 +96,7 @@ WorkloadSynthesizer::registerTemplatedStats(const char* msgSizeRanges)
         char transportSchedDelaySignalName[50];
         sprintf(transportSchedDelaySignalName, "msg%sTransportSchedDelay",
             sizeUpperBound.c_str());
-        simsignal_t transportSchedDelaySignal = 
+        simsignal_t transportSchedDelaySignal =
             registerSignal(transportSchedDelaySignalName);
         msgTransprotSchedDelaySignalVec.push_back(transportSchedDelaySignal);
         char transportSchedDelayStatsName[50];
