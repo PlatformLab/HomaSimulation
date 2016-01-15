@@ -21,12 +21,13 @@ class TrafficPacer
     enum PrioPaceMode {
         NO_OVER_COMMIT = 0,
         LOWEST_PRIO_POSSIBLE,
-        PRIO_FROM_CBF
+        PRIO_FROM_CBF,
+        INVALIDE_MODE //Always the last one
     };
 
     TrafficPacer(double nominalLinkSpeed, uint16_t allPrio, uint16_t schedPrio,
         uint32_t grantMaxBytes, uint32_t maxAllowedInFlightBytes = 10000,
-        PrioPaceMode paceMode = PrioPaceMode::NO_OVER_COMMIT);
+        const char* prioPaceMode = "NO_OVER_COMMIT");
     ~TrafficPacer();
     static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1.0;
 
@@ -65,21 +66,27 @@ class TrafficPacer
     };
     typedef std::map<InboundMessage*, uint32_t, InbndMesgCompare>
         OrderedInbndMsgMap;
+    simtime_t getNextGrantTime(simtime_t currentTime,
+        uint32_t grantedPktSizeOnWire);
 
   public:
-    simtime_t grantSent(simtime_t currentTime, InboundMessage* grantedMsg,
-        uint16_t prio, uint32_t grantSize);
     void bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
         PktType recvPktType, uint16_t prio);
     void unschedPendingBytes(InboundMessage* inbndMsg, uint32_t committedBytes,
         PktType pendingPktType, uint16_t prio);
-    bool okToGrant(simtime_t currentTime, InboundMessage* msgToGrant,
-        uint16_t &prio, uint32_t &grantSize);
+    HomaPkt* getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
+        simtime_t &nextTimeToGrant);
+    PrioPaceMode strPrioPaceModeToEnum(const char* prioPaceMode);
 
     // Only for stats collection and analysis purpose
-    inline uint32_t getOutstandingBytes()
+    inline uint32_t getTotalOutstandingBytes()
     {
         return totalOutstandingBytes;
+    }
+
+    inline uint32_t getUnschedOutstandingBytes()
+    {
+        return unschedInflightBytes;
     }
 
   private:

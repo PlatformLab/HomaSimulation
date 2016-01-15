@@ -35,6 +35,9 @@ simple HomaTransport like ITransportScheme
         int prioLevels;
         int schedPrioLevels;
 
+        // Could be any of PrioPaceMode values defined in TrafficPacer.h
+        string prioAssignMode = default("NO_OVER_COMMIT");
+
         @signal[msgsLeftToSend](type=long);
         @signal[bytesLeftToSend](type=long);
         @signal[totalOutstandingBytes](type=long);

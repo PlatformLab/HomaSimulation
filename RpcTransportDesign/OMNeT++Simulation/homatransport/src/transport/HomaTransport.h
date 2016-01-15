@@ -225,6 +225,10 @@ class HomaTransport : public cSimpleModule
         // send for this message.
         uint32_t bytesToGrant;
 
+        // Tracks the total number of bytes scheduled (granted) for this
+        // messages but has not yet been received.
+        uint32_t bytesGrantedInFlight;
+
         // Tracks the total number of bytes that has not yet been received for
         // this message. The message is complete when this value reaches zero
         // and therefore it can be handed over to the application.
@@ -261,6 +265,8 @@ class HomaTransport : public cSimpleModule
       protected:
         void copy(const InboundMessage& other);
         void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd);
+        uint32_t schedBytesInFlight();
+        uint32_t unschedBytesInFlight();
         HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
         AppMessage* prepareRxMsgForApp();
 
@@ -315,7 +321,7 @@ class HomaTransport : public cSimpleModule
         void sendAndScheduleGrant();
         void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed,
             uint16_t allPrio, uint16_t schedPrio, cMessage* grantTimer,
-            QueueType queueType);
+            QueueType queueType, const char* prioAssignMode);
 
       protected:
         HomaTransport* transport;

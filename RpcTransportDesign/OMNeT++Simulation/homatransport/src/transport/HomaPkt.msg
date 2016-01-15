@@ -29,7 +29,6 @@ enum PktType
     UNSCHED_DATA = 3;
 };
 
-
 struct RequestFields 
 {
     uint32_t msgByteLen;
