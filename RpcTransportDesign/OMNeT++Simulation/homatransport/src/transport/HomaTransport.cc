@@ -33,6 +33,8 @@ simsignal_t HomaTransport::outstandingGrantBytesSignal =
         registerSignal("outstandingGrantBytes");
 simsignal_t HomaTransport::totalOutstandingBytesSignal =
         registerSignal("totalOutstandingBytes");
+simsignal_t HomaTransport::grantPrioritySignal =
+        registerSignal("grantPriority");
 
 /**
  * Contstructor for the HomaTransport.
@@ -727,11 +729,13 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
         transport->sendPacket(grantPkt);
 
         uint32_t grantSize = grantPkt->getGrantFields().grantBytes;
+        uint16_t prio = grantPkt->getGrantFields().schedPrio;
         uint32_t schedBytesOneWire =
             HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
         transport->outstandingGrantBytes += schedBytesOneWire;
         transport->emit(outstandingGrantBytesSignal,
             transport->outstandingGrantBytes);
+        transport->emit(grantPrioritySignal, prio);
 
         // set the grantTimer for the next grant
         transport->scheduleAt(nextTimeToGrant, grantTimer);

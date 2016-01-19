@@ -71,6 +71,10 @@ class HomaTransport : public cSimpleModule
     // unscheduled packets.
     static simsignal_t totalOutstandingBytesSignal;
 
+    // Signal for tracking the priority of a grant being sent. Useful for the
+    // times we get priorities from adaptive priority allocation. 
+    static simsignal_t grantPrioritySignal;
+
     class SendController;
     class ReceiveScheduler;
 
