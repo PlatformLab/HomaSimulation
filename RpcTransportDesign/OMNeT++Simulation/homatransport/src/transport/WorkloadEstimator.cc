@@ -79,9 +79,8 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
                     &msgSize, &prob);
             cdfFromFile.push_back(std::make_pair(msgSize, prob));
 
-            avgSizeOnWire += HomaPkt::getBytesOnWire(
-                msgSize, PktType::REQUEST) * prob-prevProb;
-                ;
+            avgSizeOnWire += HomaPkt::getBytesOnWire(msgSize, PktType::REQUEST)
+                * (prob-prevProb);
             prevProb = prob;
         }
         distFileStream.close();
@@ -100,7 +99,7 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
             const double maxProb = 0.999;
             double probIncr = (maxProb - probOffset) / 1000;
             double probInit = probOffset + probIncr;
-            uint32_t size;
+            uint32_t size = 0;
             for (prob = probInit; prob <= maxProb; prob += probIncr) {
                 size = (uint32_t)(round(sizeOffset +
                     (pow((1-probOffset)/(1-prob), k) - 1) * sigma / k));
@@ -109,13 +108,13 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
                 } else {
                     cdfFromFile.back().second = prob;
                 }
-                avgSizeOnWire += HomaPkt::getBytesOnWire(
-                    size, PktType::REQUEST) * (prob-prevProb);
+                avgSizeOnWire += HomaPkt::getBytesOnWire(size, PktType::REQUEST)
+                    * (prob-prevProb);
                 prevProb = prob;
             }
             cdfFromFile.back().second = 1.0;
-            avgSizeOnWire += (HomaPkt::getBytesOnWire(size, PktType::REQUEST) *
-                (1.0-prevProb));
+            avgSizeOnWire += HomaPkt::getBytesOnWire(size, PktType::REQUEST) *
+                (1.0-prevProb);
         }
 
         // compute cbf from cdf and store it in the cbfFromFile
@@ -124,10 +123,14 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
         for (auto& sizeProbPair : cdfFromFile) {
             prob = sizeProbPair.second - prevProb;
             prevProb = sizeProbPair.second;
-            cumBytes += (prob *
-                HomaPkt::getBytesOnWire(sizeProbPair.first, PktType::REQUEST));
+            cumBytes += HomaPkt::getBytesOnWire(sizeProbPair.first,
+                PktType::REQUEST) * prob;
             cbfFromFile.push_back(std::make_pair(sizeProbPair.first,
                 cumBytes/avgSizeOnWire));
+        }
+
+        if (cbfFromFile.back().second >= 0.99999) {
+            cbfFromFile.back().second = 1.0;
         }
     }
 }
