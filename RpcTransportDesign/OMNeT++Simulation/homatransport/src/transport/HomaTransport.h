@@ -285,7 +285,6 @@ class HomaTransport : public cSimpleModule
         uint32_t unschedBytesInFlight();
         HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
         AppMessage* prepareRxMsgForApp();
-
     };
 
     /**
@@ -325,6 +324,21 @@ class HomaTransport : public cSimpleModule
             QueueType queueType;
         };
 
+        class UnschedRateComputer {
+          public:
+            UnschedRateComputer(uint32_t nicLinkSpeed,
+                bool computeAvgUnschRate = false, double minAvgTimeWindow = .1);
+            double getAvgUnschRate(simtime_t currentTime);
+            void updateUnschRate(simtime_t arrivalTime, uint32_t bytesRecvd);
+
+          public:
+            bool computeAvgUnschRate;
+            std::vector<std::pair<uint32_t, double>> bytesRecvTime;
+            uint64_t sumBytes;
+            double minAvgTimeWindow; // in seconds
+            uint32_t nicLinkSpeed; // In Gb/s
+        };
+
         typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
             InboundMsgsMap;
 
@@ -343,6 +357,7 @@ class HomaTransport : public cSimpleModule
         HomaTransport* transport;
         cMessage* grantTimer;
         TrafficPacer* trafficPacer;
+        UnschedRateComputer* unschRateComp;
 
         // A container for incomplete messages that are sorted based on the
         // remaining bytes to grant.

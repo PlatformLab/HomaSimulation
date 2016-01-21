@@ -448,6 +448,7 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     : transport(transport)
     , grantTimer(NULL)
     , trafficPacer(NULL)
+    , unschRateComp(NULL)
     , inboundMsgQueue()
     , incompleteRxMsgs()
 {
@@ -460,8 +461,11 @@ HomaTransport::ReceiveScheduler::initialize(uint32_t grantMaxBytes,
     cMessage* grantTimer, HomaTransport::ReceiveScheduler::QueueType queueType,
     const char* prioAssignMode, PriorityResolver* prioResolver)
 {
+    this->unschRateComp = new UnschedRateComputer(nicLinkSpeed,
+        transport->par("useUnschRateInScheduler").boolValue(), 0.1);
+
     this->trafficPacer = new(this->trafficPacer) TrafficPacer(prioResolver,
-        nicLinkSpeed, allPrio, schedPrioLevels, grantMaxBytes,
+        unschRateComp, nicLinkSpeed, allPrio, schedPrioLevels, grantMaxBytes,
         transport->maxOutstandingRecvBytes, prioAssignMode);
     this->grantTimer = grantTimer;
     inboundMsgQueue.initialize(queueType);
@@ -480,6 +484,7 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
         }
     }
     delete trafficPacer;
+    delete unschRateComp;
 }
 
 void
@@ -490,6 +495,8 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
             << " for " << rxPkt->getReqFields().msgByteLen << " bytes." << endl;
 
     uint32_t numBytesInReqPkt = rxPkt->getReqFields().numReqBytes;
+    unschRateComp->updateUnschRate(simTime(),
+        HomaPkt::getBytesOnWire(numBytesInReqPkt, PktType::REQUEST));
 
     // Check if this message already added to incompleteRxMsg. if not create new
     // inbound message in both the msgQueue and incomplete messages.
@@ -582,6 +589,8 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
 
     uint32_t pktUnschedBytes = rxPkt->getUnschedDataFields().lastByte -
             rxPkt->getUnschedDataFields().firstByte + 1;
+    unschRateComp->updateUnschRate(simTime(),
+        HomaPkt::getBytesOnWire(pktUnschedBytes, PktType::UNSCHED_DATA));
 
     if (pktUnschedBytes == 0) {
         cRuntimeError("Unsched pkt with no data byte in it is not allowed.");
@@ -753,6 +762,72 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
                 << " at host " << highPrioMsg->srcAddr.str() << " for "
                 << grantSize << " Bytes." << "(" << highPrioMsg->bytesToGrant
                 << " Bytes left to grant.)" << endl;
+    }
+}
+
+
+HomaTransport::ReceiveScheduler::UnschedRateComputer::UnschedRateComputer(
+        uint32_t nicLinkSpeed, bool computeAvgUnschRate,
+        double minAvgTimeWindow)
+    : computeAvgUnschRate(computeAvgUnschRate)
+    , bytesRecvTime()
+    , sumBytes(0)
+    , minAvgTimeWindow(minAvgTimeWindow)
+    , nicLinkSpeed(nicLinkSpeed)
+{
+
+}
+
+
+/**
+ * Returns the fraction of bw used by the unsched (eg. average unsched rate 
+ * divided by nic link speed.)
+ */
+double
+HomaTransport::ReceiveScheduler::UnschedRateComputer::getAvgUnschRate(
+    simtime_t currentTime)
+{
+    if (!computeAvgUnschRate) {
+        return 0;
+    }
+
+    if (bytesRecvTime.size() == 0) {
+        return 0.0;
+    }
+    double timeDuration = currentTime.dbl() - bytesRecvTime.front().second;
+    if (timeDuration <= minAvgTimeWindow/100)  {
+        return 0.0;
+    }
+    double avgUnschFractionRate =
+        ((double)sumBytes*8/timeDuration)*1e-9/nicLinkSpeed;
+    ASSERT(avgUnschFractionRate < 1.0);
+    return avgUnschFractionRate;
+}
+
+void
+HomaTransport::ReceiveScheduler::UnschedRateComputer::updateUnschRate(
+    simtime_t arrivalTime, uint32_t bytesRecvd)
+{
+    if (!computeAvgUnschRate) {
+        return;
+    }
+
+    bytesRecvTime.push_back(std::make_pair(bytesRecvd, arrivalTime.dbl()));
+    sumBytes += bytesRecvd;
+    for (auto bytesTimePair = bytesRecvTime.begin();
+            bytesTimePair != bytesRecvTime.end();)
+    {
+        double deltaTime = arrivalTime.dbl() - bytesTimePair->second;
+        if (deltaTime < minAvgTimeWindow) {
+            return;
+        }
+
+        if (deltaTime > 2*minAvgTimeWindow) {
+            sumBytes -= bytesTimePair->first;
+            bytesTimePair = bytesRecvTime.erase(bytesTimePair);
+        } else {
+            ++bytesTimePair;
+        }
     }
 }
 

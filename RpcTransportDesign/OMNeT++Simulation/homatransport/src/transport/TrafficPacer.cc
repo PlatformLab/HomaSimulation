@@ -8,10 +8,12 @@
 #include <omnetpp.h>
 #include "TrafficPacer.h"
 
-TrafficPacer::TrafficPacer(PriorityResolver* prioRes, double nominalLinkSpeed,
+TrafficPacer::TrafficPacer(PriorityResolver* prioRes,
+        UnschedRateComputer* unschRateComp, double nominalLinkSpeed,
         uint16_t allPrio, uint16_t schedPrio, uint32_t grantMaxBytes,
         uint32_t maxAllowedInFlightBytes, const char* prioPaceMode)
     : prioResolver(prioRes)
+    , unschRateComp(unschRateComp)
     , actualLinkSpeed(nominalLinkSpeed * ACTUAL_TO_NOMINAL_RATE_RATIO)
     , nextGrantTime(SIMTIME_ZERO)
     , maxAllowedInFlightBytes(maxAllowedInFlightBytes)
@@ -56,15 +58,18 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
     uint32_t grantSize = std::min(msgToGrant->bytesToGrant, grantMaxBytes);
     uint32_t grantedPktSizeOnWire =
         HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
+    int schedInflightByteCap = (int)(maxAllowedInFlightBytes *
+        (1-unschRateComp->getAvgUnschRate(currentTime)));
 
     switch (paceMode) {
         case PrioPaceMode::FIXED:
         case PrioPaceMode::STATIC_FROM_CBF:
-        case PrioPaceMode::STATIC_FROM_CDF:
+        case PrioPaceMode::STATIC_FROM_CDF: {
             if ((totalOutstandingBytes + (int)grantedPktSizeOnWire) >
-                    (int)maxAllowedInFlightBytes) {
+                    schedInflightByteCap) {
                 return NULL;
             }
+        }
 
             // We can prepare and return a grant
             nextTimeToGrant = getNextGrantTime(currentTime, grantedPktSizeOnWire);
@@ -76,7 +81,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE: {
             ASSERT(msgToGrant->bytesToGrant >= 0);
             int schedByteCap =
-                (int)maxAllowedInFlightBytes - (int)totalOutstandingBytes;
+                schedInflightByteCap - (int)totalOutstandingBytes;
 
             prio = allPrio - 1;
             for (auto vecIter = inflightSchedPerPrio.rbegin();
@@ -329,3 +334,4 @@ TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
     }
     return PriorityResolver::PrioResolutionMode::INVALID_PRIO_MODE;
 }
+

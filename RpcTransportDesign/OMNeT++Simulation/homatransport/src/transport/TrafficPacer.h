@@ -19,6 +19,10 @@
 class TrafficPacer
 {
   public:
+    typedef HomaTransport::InboundMessage InboundMessage;
+    typedef HomaTransport::ReceiveScheduler::UnschedRateComputer
+        UnschedRateComputer;
+
     enum PrioPaceMode {
         FIXED = 0,
         ADAPTIVE_LOWEST_PRIO_POSSIBLE,
@@ -27,15 +31,14 @@ class TrafficPacer
         INVALIDE_MODE //Always the last one
     };
 
-    TrafficPacer(PriorityResolver* prioRes, double nominalLinkSpeed,
-        uint16_t allPrio, uint16_t schedPrio, uint32_t grantMaxBytes,
-        uint32_t maxAllowedInFlightBytes = 10000,
+    TrafficPacer(PriorityResolver* prioRes, UnschedRateComputer* unschRateComp,
+        double nominalLinkSpeed, uint16_t allPrio, uint16_t schedPrio,
+        uint32_t grantMaxBytes, uint32_t maxAllowedInFlightBytes = 10000,
         const char* prioPaceMode = "FIXED");
     ~TrafficPacer();
     static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1.0;
 
   private:
-    typedef HomaTransport::InboundMessage InboundMessage;
     class InbndMesgCompare {
       public:
         InbndMesgCompare(){}
@@ -96,6 +99,7 @@ class TrafficPacer
 
   private:
     PriorityResolver* prioResolver;
+    UnschedRateComputer* unschRateComp;
     double actualLinkSpeed;
     simtime_t nextGrantTime;
     uint32_t maxAllowedInFlightBytes;

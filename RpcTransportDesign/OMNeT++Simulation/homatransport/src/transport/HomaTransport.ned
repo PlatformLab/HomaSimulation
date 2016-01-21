@@ -32,6 +32,7 @@ simple HomaTransport like ITransportScheme
         bool isRoundRobinScheduler = default(false);
         int localPort = default(-1);
         int destPort;
+        bool useUnschRateInScheduler = default(false);
 
         // number of available priorities
         int prioLevels;
