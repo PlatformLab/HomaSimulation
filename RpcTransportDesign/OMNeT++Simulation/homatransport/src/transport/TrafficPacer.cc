@@ -74,38 +74,42 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             return msgToGrant->prepareGrant(grantSize, prio);
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE: {
-            ASSERT(msgToGrant >= 0);
-            int schedByteCap = maxAllowedInFlightBytes - (int)unschedInflightBytes
-                - (int)(HomaPkt::getBytesOnWire(msgToGrant->schedBytesInFlight(),
-                PktType::SCHED_DATA));
-            if ((int)grantedPktSizeOnWire > schedByteCap) {
-                return NULL;
-            }
+            ASSERT(msgToGrant->bytesToGrant >= 0);
+            int schedByteCap =
+                (int)maxAllowedInFlightBytes - (int)totalOutstandingBytes;
 
             prio = allPrio - 1;
             for (auto vecIter = inflightSchedPerPrio.rbegin();
                     vecIter != inflightSchedPerPrio.rend(); ++vecIter) {
-                int sumPrioInflightBytes = 0;
-                for (auto mapIter = vecIter->begin(); mapIter != vecIter->end();
-                        ++mapIter) {
-                    if (mapIter->first != msgToGrant) {
-                        sumPrioInflightBytes += mapIter->second;
-                    }
-                }
 
-                if (sumPrioInflightBytes + (int)grantedPktSizeOnWire <=
-                        schedByteCap) {
-
-                    // We can send a grant here.
-                    // First find this message in scheduled mapped messages of
-                    // this module and remove it from the map.
+                if ((int)grantedPktSizeOnWire <= schedByteCap) {
+                    // We can send a grant here at the current prio.
+                    // First find this current message in scheduled mapped
+                    // messages of this module and remove it from all maps but
+                    // keep track of the maps.
+                    std::vector<std::pair<uint16, uint32_t>>prioSchedVec = {};
                     auto inbndMsgOutbytesIter = vecIter->find(msgToGrant);
-                    uint32_t outBytes = 0;
-                    if (inbndMsgOutbytesIter != vecIter->end()) {
-                        outBytes += inbndMsgOutbytesIter->second;
+                    if (inbndMsgOutbytesIter == vecIter->end()) {
+                        prioSchedVec.push_back(std::make_pair(
+                            prio + schedPrio - allPrio, grantedPktSizeOnWire));
+                    } else {
+                        prioSchedVec.push_back(std::make_pair(
+                            prio + schedPrio - allPrio,
+                            inbndMsgOutbytesIter->second+grantedPktSizeOnWire));
                         vecIter->erase(inbndMsgOutbytesIter);
                     }
-                    outBytes += grantedPktSizeOnWire;
+
+                    for (auto schVecIter = inflightSchedPerPrio.begin();
+                            schVecIter != inflightSchedPerPrio.end();
+                            ++schVecIter) {
+                        inbndMsgOutbytesIter = schVecIter->find(msgToGrant);
+                        if (inbndMsgOutbytesIter != schVecIter->end()) {
+                            prioSchedVec.push_back(std::make_pair(
+                                schVecIter - inflightSchedPerPrio.begin(),
+                                inbndMsgOutbytesIter->second));
+                            schVecIter->erase(inbndMsgOutbytesIter);
+                        }
+                    }
 
                     // Since the unsched mapped message struct is also sorted
                     // based on the bytesToGrant, we also need to update that
@@ -116,8 +120,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                             ++unschVecIter) {
                         inbndMsgOutbytesIter = unschVecIter->find(msgToGrant);
                         if (inbndMsgOutbytesIter != unschVecIter->end()) {
-                            prioUnschedVec.push_back(
-                                std::make_pair(
+                            prioUnschedVec.push_back(std::make_pair(
                                 unschVecIter - inflightUnschedPerPrio.begin(),
                                 inbndMsgOutbytesIter->second));
                             unschVecIter->erase(inbndMsgOutbytesIter);
@@ -133,14 +136,17 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
 
                     // inserted the updated msgToGrant into the scheduled
                     // message map struct of this module.
-                    auto retVal =
-                        vecIter->insert(std::make_pair(msgToGrant, outBytes));
-                    ASSERT(retVal.second == true);
+                    ASSERT(!prioSchedVec.empty());
+                    for (auto elem : prioSchedVec) {
+                        auto retVal = inflightSchedPerPrio[elem.first].insert(
+                            std::make_pair(msgToGrant, elem.second));
+                        ASSERT(retVal.second == true);
+                    }
 
                     // inserted the updated msgToGrant into the unscheduled
                     // message map struct of this module.
                     for (auto elem : prioUnschedVec) {
-                        retVal = inflightUnschedPerPrio[elem.first].insert(
+                        auto retVal = inflightUnschedPerPrio[elem.first].insert(
                             std::make_pair(msgToGrant, elem.second));
                         ASSERT(retVal.second == true);
                     }
@@ -149,11 +155,40 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     return grantPkt;
                 }
 
-                auto headMsg = vecIter->begin();
-                if (headMsg->first->bytesToGrant <= msgToGrant->bytesToGrant) {
-                    return NULL;
+                auto headSchedMsg = vecIter->begin();
+                if (headSchedMsg != vecIter->end()) {
+                    if ((headSchedMsg->first->bytesToGrant <
+                        msgToGrant->bytesToGrant) ||
+                        (headSchedMsg->first->bytesToGrant ==
+                        msgToGrant->bytesToGrant &&
+                        headSchedMsg->first->msgSize <= msgToGrant->msgSize)) {
+                        return NULL;
+                    }
+                }
+
+                auto headUnschedMsg = inflightUnschedPerPrio[prio].begin();
+                if (headUnschedMsg != inflightUnschedPerPrio[prio].end()) {
+                    if ((headUnschedMsg->first->bytesToGrant <
+                        msgToGrant->bytesToGrant) ||
+                        (headUnschedMsg->first->bytesToGrant ==
+                        msgToGrant->bytesToGrant &&
+                        headUnschedMsg->first->msgSize <= msgToGrant->msgSize)) {
+                        return NULL;
+                    }
+                }
+
+                int sumPrioInflightBytes = 0;
+                for (auto mapIter = vecIter->begin(); mapIter != vecIter->end();
+                        ++mapIter) {
+                    sumPrioInflightBytes += mapIter->second;
+                }
+                for (auto unschedMapIter = inflightUnschedPerPrio[prio].begin();
+                        unschedMapIter != inflightUnschedPerPrio[prio].end();
+                        ++unschedMapIter) {
+                    sumPrioInflightBytes += unschedMapIter->second;
                 }
                 --prio;
+                schedByteCap += sumPrioInflightBytes;
             }
             return NULL;
         }
