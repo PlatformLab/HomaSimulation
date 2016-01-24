@@ -72,7 +72,7 @@ class HomaTransport : public cSimpleModule
     static simsignal_t totalOutstandingBytesSignal;
 
     // Signal for tracking the priority of a grant being sent. Useful for the
-    // times we get priorities from adaptive priority allocation. 
+    // times we get priorities from adaptive priority allocation.
     static simsignal_t grantPrioritySignal;
 
     class SendController;
@@ -269,10 +269,36 @@ class HomaTransport : public cSimpleModule
         // purpose.
         simtime_t reqArrivalTime;
 
-        // When the last grant for this message was scheduled. Used only for
-        // statistics recording purpose. Initialized in the constructor and must
-        // only be updated by the prepareGrant() method.
+        //****************************************************************//
+        //*****Below variables are for statistic collection purpose.******//
+        //****************************************************************//
+        // When the last grant for this message was scheduled. Initialized in
+        // the constructor and must only be updated by the prepareGrant()
+        // method.
         simtime_t lastGrantTime;
+
+        // Tracks the amoung of time this message has been delayed because of
+        // other high priority grants or unsched bytes that preempted this
+        // message.
+        double highPrioSchedDelayBytes;
+
+        //***************************************************************//
+        //****Below variables are snapshots, first after construction****//
+        //****and then at grant times, of the corresponding variables****//
+        //****defined in ReceiveScheduler.                           ****//
+        //***************************************************************//
+        std::vector<uint64_t> bytesRecvdPerPrio;
+        std::vector<uint64_t> scheduledBytesPerPrio;
+        std::vector<uint64_t> unschedToReceivePerPrio;
+
+        //***************************************************************//
+        //****Below variables are snapshots, first after construction****//
+        //****and then at grant times, of the corresponding variables****//
+        //****defined in TrafficPacer.                               ****//
+        //***************************************************************//
+        std::vector<uint32_t> sumInflightUnschedPerPrio;
+        std::vector<uint32_t> sumInflightSchedPerPrio;
+
 
         friend class CompareBytesToGrant;
         friend class ReceiveScheduler;
@@ -285,6 +311,7 @@ class HomaTransport : public cSimpleModule
         uint32_t unschedBytesInFlight();
         HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
         AppMessage* prepareRxMsgForApp();
+        void updatePerPrioStats();
     };
 
     /**
@@ -342,7 +369,7 @@ class HomaTransport : public cSimpleModule
         typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
             InboundMsgsMap;
 
-        ReceiveScheduler(HomaTransport* transport);
+        explicit ReceiveScheduler(HomaTransport* transport);
         ~ReceiveScheduler();
         void processReceivedRequest(HomaPkt* rxPkt);
         void processReceivedSchedData(HomaPkt* rxPkt);
@@ -368,7 +395,42 @@ class HomaTransport : public cSimpleModule
         // different senders.
         InboundMsgsMap incompleteRxMsgs;
 
+        //*******************************************************//
+        //*****Below variables are for statistic collection******//
+        //*******************************************************//
+        // The vector below is of size allPrio and each element of the vector is
+        // a monotoically increasing number that tracks total number of bytes
+        // received on that priority through out the simulation.  Used for
+        // statistics collection.
+        std::vector<uint64_t> bytesRecvdPerPrio;
+
+        // The vector below is of size allPrio and each element of the vector is
+        // a monotoically increasing number that tracks total number of bytes
+        // granted on that priority through out the simulation.  Used for
+        // statistics collection.
+        std::vector<uint64_t> scheduledBytesPerPrio;
+
+        // The vector below is of size allPrio and each element of the vector is
+        // a monotoically increasing number that tracks total number of unsched
+        // bytes that are expected to be received on that priority through out
+        // the simulation. Used for statistics collection.
+        std::vector<uint64_t> unschedToReceivePerPrio;
+
+        // A monotonically increasing number that tracks total number of bytes
+        // received throughout the simulation. Used for statistics collection.
+        uint64_t allBytesRecvd;
+
+        // A monotonically increasing number that tracks total number of unsched
+        // bytes to be received throughout the simulation. Used for statistics
+        // collection.
+        uint64_t unschedBytesToRecv;
+
       protected:
+        void addArrivedBytes(PktType pktType, uint16_t prio,
+            uint32_t dataBytes);
+        void addSentGrantBytes(uint16_t prio, uint32_t grantedBytes);
+        void addPendingUnschedBytes(PktType pktType, uint16_t prio,
+            uint32_t bytesToArrive);
         InboundMessage* lookupIncompleteRxMsg(HomaPkt* rxPkt);
         friend class HomaTransport;
         friend class InboundMessage;

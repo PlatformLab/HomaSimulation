@@ -20,6 +20,8 @@ TrafficPacer::TrafficPacer(PriorityResolver* prioRes,
     , grantMaxBytes(grantMaxBytes)
     , inflightUnschedPerPrio()
     , inflightSchedPerPrio()
+    , sumInflightUnschedPerPrio()
+    , sumInflightSchedPerPrio()
     , totalOutstandingBytes(0)
     , unschedInflightBytes(0)
     , paceMode(strPrioPaceModeToEnum(prioPaceMode))
@@ -28,6 +30,10 @@ TrafficPacer::TrafficPacer(PriorityResolver* prioRes,
 {
     inflightUnschedPerPrio.resize(allPrio);
     inflightSchedPerPrio.resize(schedPrio);
+    sumInflightUnschedPerPrio.resize(allPrio);
+    std::fill(sumInflightUnschedPerPrio.begin(), sumInflightUnschedPerPrio.end(), 0);
+    sumInflightSchedPerPrio.resize(allPrio);
+    std::fill(sumInflightSchedPerPrio.begin(), sumInflightSchedPerPrio.end(), 0);
 }
 
 TrafficPacer::~TrafficPacer()
@@ -76,6 +82,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             totalOutstandingBytes += grantedPktSizeOnWire;
             prio = prioResolver->getPrioForPkt(prioPace2PrioResolution(paceMode),
                 msgToGrant->msgSize, PktType::SCHED_DATA);
+            sumInflightSchedPerPrio[prio] +=
+                grantedPktSizeOnWire;
             return msgToGrant->prepareGrant(grantSize, prio);
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE: {
@@ -157,6 +165,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     }
 
                     totalOutstandingBytes += grantedPktSizeOnWire;
+                    sumInflightSchedPerPrio[prio] +=
+                        grantedPktSizeOnWire;
                     return grantPkt;
                 }
 
@@ -219,7 +229,11 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA:
                     unschedInflightBytes -= arrivedBytesOnWire;
+                    sumInflightUnschedPerPrio[prio] -= arrivedBytesOnWire;
                     break;
+                case PktType::SCHED_DATA:
+                    sumInflightSchedPerPrio[prio] -=
+                        arrivedBytesOnWire;
                 default:
                     break;
             }
@@ -230,6 +244,7 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
                     unschedInflightBytes -= arrivedBytesOnWire;
+                    sumInflightUnschedPerPrio[prio] -= arrivedBytesOnWire;
                     auto& inbndMap = inflightUnschedPerPrio[prio];
                     auto msgOutbytesIter = inbndMap.find(inbndMsg);
                     ASSERT ((msgOutbytesIter != inbndMap.end() &&
@@ -241,6 +256,8 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
                 }
 
                 case PktType::SCHED_DATA: {
+                    sumInflightSchedPerPrio[prio] -=
+                        arrivedBytesOnWire;
                     auto& inbndMap =
                         inflightSchedPerPrio[prio + schedPrio - allPrio];
                     auto msgOutbytesIter = inbndMap.find(inbndMsg);
@@ -270,6 +287,7 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
         HomaPkt::getBytesOnWire(committedBytes, pendingPktType);
     totalOutstandingBytes += committedBytesOnWire;
     unschedInflightBytes += committedBytesOnWire;
+    sumInflightUnschedPerPrio[prio] += committedBytesOnWire;
     switch (paceMode) {
         case PrioPaceMode::FIXED:
         case PrioPaceMode::STATIC_FROM_CBF:

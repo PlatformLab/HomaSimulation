@@ -451,6 +451,12 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     , unschRateComp(NULL)
     , inboundMsgQueue()
     , incompleteRxMsgs()
+    , bytesRecvdPerPrio()
+    , scheduledBytesPerPrio()
+    , unschedToReceivePerPrio()
+    , allBytesRecvd(0)
+    , unschedBytesToRecv(0)
+
 {
     trafficPacer = (TrafficPacer*) ::operator new (sizeof(TrafficPacer));
 }
@@ -469,6 +475,12 @@ HomaTransport::ReceiveScheduler::initialize(uint32_t grantMaxBytes,
         transport->maxOutstandingRecvBytes, prioAssignMode);
     this->grantTimer = grantTimer;
     inboundMsgQueue.initialize(queueType);
+    bytesRecvdPerPrio.resize(allPrio);
+    scheduledBytesPerPrio.resize(allPrio);
+    unschedToReceivePerPrio.resize(allPrio);
+    std::fill(bytesRecvdPerPrio.begin(), bytesRecvdPerPrio.end(), 0);
+    std::fill(scheduledBytesPerPrio.begin(), scheduledBytesPerPrio.end(), 0);
+    std::fill(unschedToReceivePerPrio.begin(), unschedToReceivePerPrio.end(), 0);
 }
 
 HomaTransport::ReceiveScheduler::~ReceiveScheduler()
@@ -497,6 +509,7 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
     uint32_t numBytesInReqPkt = rxPkt->getReqFields().numReqBytes;
     unschRateComp->updateUnschRate(simTime(),
         HomaPkt::getBytesOnWire(numBytesInReqPkt, PktType::REQUEST));
+    addArrivedBytes(PktType::REQUEST, rxPkt->getPriority(), numBytesInReqPkt);
 
     // Check if this message already added to incompleteRxMsg. if not create new
     // inbound message in both the msgQueue and incomplete messages.
@@ -509,7 +522,6 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
         }
         incompleteRxMsgs[rxPkt->getMsgId()].push_front(inboundMsg);
 
-
         uint32_t unschedBytesToArrive = rxPkt->getReqFields().totalUnschedBytes -
                 numBytesInReqPkt;
         // for any new request, the trailing unsched bytes (IF ANY) that are in
@@ -520,7 +532,10 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
                 PktType::UNSCHED_DATA, rxPkt->getReqFields().unschedPrio);
             transport->emit(totalOutstandingBytesSignal,
                     trafficPacer->getTotalOutstandingBytes());
+            addPendingUnschedBytes(PktType::UNSCHED_DATA,
+                rxPkt->getReqFields().unschedPrio, unschedBytesToArrive);
         }
+        inboundMsg->updatePerPrioStats();
     } else {
 
         // this request bytes were previously accounted for in the trafficPacer
@@ -591,6 +606,7 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
             rxPkt->getUnschedDataFields().firstByte + 1;
     unschRateComp->updateUnschRate(simTime(),
         HomaPkt::getBytesOnWire(pktUnschedBytes, PktType::UNSCHED_DATA));
+    addArrivedBytes(PktType::UNSCHED_DATA, rxPkt->getPriority(), pktUnschedBytes);
 
     if (pktUnschedBytes == 0) {
         cRuntimeError("Unsched pkt with no data byte in it is not allowed.");
@@ -615,15 +631,21 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
         uint32_t reqPktDataBytes = rxPkt->getUnschedDataFields().numReqBytes;
         trafficPacer->unschedPendingBytes(inboundMsg, reqPktDataBytes,
             PktType::REQUEST, rxPkt->getUnschedDataFields().reqPrio);
+        addPendingUnschedBytes(PktType::REQUEST,
+            rxPkt->getUnschedDataFields().reqPrio, reqPktDataBytes);
+
         uint32_t unschedBytesToArrive =
                 rxPkt->getUnschedDataFields().totalUnschedBytes -
                 reqPktDataBytes - pktUnschedBytes;
         if (unschedBytesToArrive > 0) {
             trafficPacer->unschedPendingBytes(inboundMsg, unschedBytesToArrive,
                 PktType::UNSCHED_DATA, rxPkt->getPriority());
+            addPendingUnschedBytes(PktType::UNSCHED_DATA,
+                rxPkt->getPriority(), unschedBytesToArrive);
         }
         transport->emit(totalOutstandingBytesSignal,
                 trafficPacer->getTotalOutstandingBytes());
+        inboundMsg->updatePerPrioStats();
     } else {
         // this is a packet that we expected to receive and have previously
         // accounted for in the trafficPacer. Now we need to return it to the
@@ -674,6 +696,7 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
 
     uint32_t bytesReceived = (rxPkt->getSchedDataFields().lastByte
             - rxPkt->getSchedDataFields().firstByte + 1);
+    addArrivedBytes(PktType::SCHED_DATA, rxPkt->getPriority(), bytesReceived);
     ASSERT(bytesReceived > 0);
     inboundMsg->bytesGrantedInFlight -= bytesReceived;
     inboundMsg->fillinRxBytes(rxPkt->getSchedDataFields().firstByte,
@@ -734,17 +757,24 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
     HomaPkt* grantPkt =
         trafficPacer->getGrant(currentTime, highPrioMsg, nextTimeToGrant);
     if (grantPkt) {
-        // send the grant out and schedule time for next time to grant.
-        transport->sendPacket(grantPkt);
 
+        // update stats
         uint32_t grantSize = grantPkt->getGrantFields().grantBytes;
         uint16_t prio = grantPkt->getGrantFields().schedPrio;
-        uint32_t schedBytesOneWire =
+        addSentGrantBytes(prio, grantSize);
+
+        // update perPrioStats for the highPrioMsg after calling
+        // addSentGrantBytes
+        highPrioMsg->updatePerPrioStats();
+        uint32_t schedBytesOnWire =
             HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
-        transport->outstandingGrantBytes += schedBytesOneWire;
+        transport->outstandingGrantBytes += schedBytesOnWire;
         transport->emit(outstandingGrantBytesSignal,
             transport->outstandingGrantBytes);
         transport->emit(grantPrioritySignal, prio);
+
+        // send the grant out
+        transport->sendPacket(grantPkt);
 
         // set the grantTimer for the next grant
         transport->scheduleAt(nextTimeToGrant, grantTimer);
@@ -764,7 +794,6 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
                 << " Bytes left to grant.)" << endl;
     }
 }
-
 
 HomaTransport::ReceiveScheduler::UnschedRateComputer::UnschedRateComputer(
         uint32_t nicLinkSpeed, bool computeAvgUnschRate,
@@ -829,6 +858,33 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::updateUnschRate(
             ++bytesTimePair;
         }
     }
+}
+
+void
+HomaTransport::ReceiveScheduler::addArrivedBytes(PktType pktType, uint16_t prio,
+    uint32_t dataBytesInPkt)
+{
+    uint32_t arrivedBytesOnWire = HomaPkt::getBytesOnWire(dataBytesInPkt, pktType);
+    allBytesRecvd += arrivedBytesOnWire;
+    bytesRecvdPerPrio.at(prio) += arrivedBytesOnWire;
+}
+
+void
+HomaTransport::ReceiveScheduler::addSentGrantBytes(uint16_t prio,
+    uint32_t grantedBytes)
+{
+    uint32_t schedBytesOnWire =
+        HomaPkt::getBytesOnWire(grantedBytes, PktType::SCHED_DATA);
+    scheduledBytesPerPrio.at(prio) += schedBytesOnWire;
+}
+
+void
+HomaTransport::ReceiveScheduler::addPendingUnschedBytes(PktType pktType,
+    uint16_t prio, uint32_t bytesToArrive)
+{
+    uint32_t unschedBytesOnWire =
+        HomaPkt::getBytesOnWire(bytesToArrive, pktType);
+    unschedToReceivePerPrio.at(prio) += unschedBytesOnWire;
 }
 
 HomaTransport::ReceiveScheduler::InboundMsgQueue::InboundMsgQueue()
@@ -919,6 +975,10 @@ HomaTransport::InboundMessage::InboundMessage()
     , msgCreationTime(SIMTIME_ZERO)
     , reqArrivalTime(simTime())
     , lastGrantTime(simTime())
+    , highPrioSchedDelayBytes(0)
+    , bytesRecvdPerPrio()
+    , scheduledBytesPerPrio()
+    , unschedToReceivePerPrio()
 {}
 
 HomaTransport::InboundMessage::~InboundMessage()
@@ -944,6 +1004,10 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , msgCreationTime(SIMTIME_ZERO)
     , reqArrivalTime(simTime())
     , lastGrantTime(simTime())
+    , highPrioSchedDelayBytes(0)
+    , bytesRecvdPerPrio()
+    , scheduledBytesPerPrio()
+    , unschedToReceivePerPrio()
 {
     switch (rxPkt->getPktType()) {
         case PktType::REQUEST:
@@ -1000,10 +1064,39 @@ HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize, uint16_t schedPr
     grantPkt->setByteLength(grantPkt->headerSize());
     grantPkt->setPriority(0);
 
+    int allHighPrioInflightBytes = 0;
+    // Calculate the high priority sched. delay
+    if (bytesToGrant == msgSize-totalUnschedBytes) {
+
+        // This is the first grant we're sending for this message. If the
+        // outstanding bytes at req. arrival has been more than
+        // maxOutstandingRecvBytes, then the receiver obviously has delayed the
+        // grant for this message. So we need to account how much of that delay
+        // has been because of high prio messages.
+        for (size_t i = 0; i <= schedPrio; i++) {
+            allHighPrioInflightBytes += sumInflightUnschedPerPrio[i];
+            allHighPrioInflightBytes += sumInflightSchedPerPrio[i];
+        }
+
+        if (allHighPrioInflightBytes >
+                rxScheduler->transport->maxOutstandingRecvBytes) {
+            highPrioSchedDelayBytes += (allHighPrioInflightBytes -
+                rxScheduler->transport->maxOutstandingRecvBytes);
+        }
+    }
+
+    for (size_t i = 0; i <= schedPrio; i++) {
+        allHighPrioInflightBytes += (rxScheduler->scheduledBytesPerPrio[i] -
+            this->scheduledBytesPerPrio[i]);
+        allHighPrioInflightBytes += (rxScheduler->unschedToReceivePerPrio[i] -
+            this->unschedToReceivePerPrio[i]);
+    }
+
     // update internal structure
     this->bytesToGrant -= grantSize;
     this->bytesGrantedInFlight += grantSize;
     this->lastGrantTime = simTime();
+
     return grantPkt;
 }
 
@@ -1046,8 +1139,22 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
         }
         simtime_t schedDelay = totalSchedTime - minPossibleSchedTime;
         rxMsg->setTransportSchedDelay(schedDelay);
+        rxMsg->setTransportSchedPreemptionLag(schedDelay.dbl() -
+            highPrioSchedDelayBytes*8*1e-9/rxScheduler->transport->nicLinkSpeed);
     }
     return rxMsg;
+}
+
+void
+HomaTransport::InboundMessage::updatePerPrioStats()
+{
+    this->bytesRecvdPerPrio = rxScheduler->bytesRecvdPerPrio;
+    this->scheduledBytesPerPrio = rxScheduler->scheduledBytesPerPrio;
+    this->unschedToReceivePerPrio = rxScheduler->unschedToReceivePerPrio;
+    this->sumInflightUnschedPerPrio =
+        rxScheduler->trafficPacer->getSumInflightUnschedPerPrio();
+    this->sumInflightSchedPerPrio =
+        rxScheduler->trafficPacer->getSumInflightSchedPerPrio();
 }
 
 uint32_t

@@ -27,4 +27,5 @@ packet AppMessage {
      inet::L3Address srcAddr;
      simtime_t msgCreationTime;
      simtime_t transportSchedDelay;
+     simtime_t transportSchedPreemptionLag;
 }

@@ -97,6 +97,17 @@ class TrafficPacer
         return unschedInflightBytes;
     }
 
+    inline const std::vector<uint32_t>& getSumInflightUnschedPerPrio()
+    {
+        return sumInflightUnschedPerPrio;
+    }
+
+    inline const std::vector<uint32_t>& getSumInflightSchedPerPrio()
+    {
+        return sumInflightSchedPerPrio;
+    }
+
+
   private:
     PriorityResolver* prioResolver;
     UnschedRateComputer* unschRateComp;
@@ -109,6 +120,8 @@ class TrafficPacer
     uint32_t grantMaxBytes;
     std::vector<InbndMsgOrderedMap> inflightUnschedPerPrio;
     std::vector<InbndMsgOrderedMap> inflightSchedPerPrio;
+    std::vector<uint32_t> sumInflightUnschedPerPrio;
+    std::vector<uint32_t> sumInflightSchedPerPrio;
     int totalOutstandingBytes;
     int unschedInflightBytes;
     PrioPaceMode paceMode;

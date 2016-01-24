@@ -61,7 +61,7 @@ def parse(f):
     Scan a result file containing scalar statistics for omnetsimulation, and
     returns a list of AttrDicts, one containing the metrics for each server.
     """
-    hosts = AttrDict() 
+    hosts = AttrDict()
     tors = AttrDict()
     aggrs = AttrDict()
     cores = AttrDict()
@@ -99,19 +99,19 @@ def parse(f):
                 currDict.assign(var+'.bins', [])
             elif entryType == 'scalar':
                 var = match.group(2)+'.'+match.group(4)
-                subVar = var + '.value' 
+                subVar = var + '.value'
                 value = float(match.group(5))
                 currDict.assign(subVar, value)
             else:
                 raise Exception, '{0}: not defined for this parser'.format(match.group(1))
             continue
-        match = re.match('(\S+)\s+(".+"|\S+)\s+(".+"|\S+)', line)        
+        match = re.match('(\S+)\s+(".+"|\S+)\s+(".+"|\S+)', line)
         if not match and not line.isspace():
-            warnings.warn('Parser cant find a match for line: {0}'.format(line), RuntimeWarning) 
+            warnings.warn('Parser cant find a match for line: {0}'.format(line), RuntimeWarning)
         if currDict:
             entryType = match.group(1)
             subVar = var + '.' + match.group(2)
-            value = match.group(3) 
+            value = match.group(3)
             if entryType == 'field':
                 currDict.assign(subVar, float(value))
             elif entryType == 'attr':
@@ -121,7 +121,7 @@ def parse(f):
                 valuePair = (float(match.group(2)), float(match.group(3)))
                 currDict.access(subVar).append(valuePair)
             else:
-                warnings.warn('Entry type not known to parser: {0}'.format(entryType), RuntimeWarning) 
+                warnings.warn('Entry type not known to parser: {0}'.format(entryType), RuntimeWarning)
     f.close()
     return hosts, tors, aggrs, cores, generalInfo
 
@@ -163,34 +163,34 @@ def getInterestingModuleStats(moduleDic, statsKey, histogramKey):
 def digestModulesStats(modulesStatsList):
     statsDigest = AttrDict()
     if len(modulesStatsList) > 0:
-        statsDigest = statsDigest.fromkeys(modulesStatsList[0].keys(), 0.0) 
+        statsDigest = statsDigest.fromkeys(modulesStatsList[0].keys(), 0.0)
         statsDigest.min = inf
         for targetStat in modulesStatsList:
-            statsDigest.count += targetStat.count 
+            statsDigest.count += targetStat.count
             statsDigest.min = min(targetStat.min, statsDigest.min)
             statsDigest.max = max(targetStat.max, statsDigest.max)
-            statsDigest.mean += targetStat.mean * targetStat.count 
-            statsDigest.stddev += targetStat.stddev * targetStat.count 
+            statsDigest.mean += targetStat.mean * targetStat.count
+            statsDigest.stddev += targetStat.stddev * targetStat.count
             statsDigest.median += targetStat.median * targetStat.count
-            statsDigest.threeQuartile += targetStat.threeQuartile  * targetStat.count 
-            statsDigest.ninety9Percentile += targetStat.ninety9Percentile  * targetStat.count 
-        
-        divideNoneZero = lambda stats, count: stats * 1.0/count if count !=0 else 0.0  
+            statsDigest.threeQuartile += targetStat.threeQuartile  * targetStat.count
+            statsDigest.ninety9Percentile += targetStat.ninety9Percentile  * targetStat.count
+
+        divideNoneZero = lambda stats, count: stats * 1.0/count if count !=0 else 0.0
         statsDigest.mean = divideNoneZero(statsDigest.mean, statsDigest.count)
-        statsDigest.stddev = divideNoneZero(statsDigest.stddev, statsDigest.count) 
-        statsDigest.median = divideNoneZero(statsDigest.median, statsDigest.count) 
-        statsDigest.threeQuartile = divideNoneZero(statsDigest.threeQuartile, statsDigest.count) 
-        statsDigest.ninety9Percentile = divideNoneZero(statsDigest.ninety9Percentile, statsDigest.count) 
+        statsDigest.stddev = divideNoneZero(statsDigest.stddev, statsDigest.count)
+        statsDigest.median = divideNoneZero(statsDigest.median, statsDigest.count)
+        statsDigest.threeQuartile = divideNoneZero(statsDigest.threeQuartile, statsDigest.count)
+        statsDigest.ninety9Percentile = divideNoneZero(statsDigest.ninety9Percentile, statsDigest.count)
     else:
-        statsDigest.count = 0  
-        statsDigest.min = inf  
-        statsDigest.max = 0 
-        statsDigest.mean = 0 
-        statsDigest.stddev = 0 
-        statsDigest.median = 0 
-        statsDigest.threeQuartile = 0 
+        statsDigest.count = 0
+        statsDigest.min = inf
+        statsDigest.max = 0
+        statsDigest.mean = 0
+        statsDigest.stddev = 0
+        statsDigest.median = 0
+        statsDigest.threeQuartile = 0
         statsDigest.ninety9Percentile = 0
-        
+
 
     return statsDigest
 
@@ -254,10 +254,10 @@ def torsQueueWaitTime(tors, generalInfo, xmlParsedDic, reportDigest):
                 queuingTimeHistogramKey = 'eth[{0}].queue.dataQueue.{1}:histogram.bins'.format(ifaceId, keyString)
                 queuingTimeStatsKey = 'eth[{0}].queue.dataQueue.{1}:stats'.format(ifaceId, keyString)
                 if keyString != 'queueingTime' or (keyString == 'queueingTime' and (torId, ifaceId) in receiverTorIdsIfaces):
-                    torDownwardStat = AttrDict() 
+                    torDownwardStat = AttrDict()
                     torDownwardStat = getInterestingModuleStats(tor, queuingTimeStatsKey, queuingTimeHistogramKey)
                     torsDownwardQueuingTimeStats.append(torDownwardStat)
-       
+
         torsUpwardQueuingTimeDigest = AttrDict()
         torsUpwardQueuingTimeDigest = digestModulesStats(torsUpwardQueuingTimeStats)
         reportDigest.assign('queueWaitTime.tors.upward.{0}'.format(keyString), torsUpwardQueuingTimeDigest)
@@ -278,8 +278,8 @@ def aggrsQueueWaitTime(aggrs, generalInfo, xmlParsedDic, reportDigest):
                 aggrsStats = AttrDict()
                 aggrsStats = getInterestingModuleStats(aggrs, queuingTimeStatsKey, queuingTimeHistogramKey)
                 aggrsQueuingTimeStats.append(aggrsStats)
-        
-        aggrsQueuingTimeDigest = AttrDict() 
+
+        aggrsQueuingTimeDigest = AttrDict()
         aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
         reportDigest.assign('queueWaitTime.aggrs.{0}'.format(keyString), aggrsQueuingTimeDigest)
 
@@ -293,27 +293,27 @@ def parseXmlFile(xmlConfigFile):
     for hostConfig in xmlConfig.getElementsByTagName('hostConfig'):
         isSender = hostConfig.getElementsByTagName('isSender')[0]
         if isSender.childNodes[0].data == 'true':
-            senderIds.append(int(hostConfig.getAttribute('id'))) 
+            senderIds.append(int(hostConfig.getAttribute('id')))
             if allHostsReceive is False:
                 destIdsNode = hostConfig.getElementsByTagName('destIds')[0]
                 destIds = list()
                 if destIdsNode.firstChild != None:
                     destIds = [int(destId) for destId in destIdsNode.firstChild.data.split()]
                 if destIds == []:
-                    allHostsReceive = True     
+                    allHostsReceive = True
                 else:
                     receiverIds += destIds
     xmlParsedDic.senderIds = senderIds
-    if allHostsReceive is True: 
+    if allHostsReceive is True:
         receiverIds = range(0, numTors*numServersPerTor)
     xmlParsedDic.receiverIds = [elem for elem in set(receiverIds)]
     return xmlParsedDic
 
 def printStatsLine(statsDic, rowTitle, tw, fw, unit, printKeys):
     if unit == 'us':
-        scaleFac = 1e6 
+        scaleFac = 1e6
     elif unit == 'KB':
-        scaleFac = 2**-10 
+        scaleFac = 2**-10
     elif unit == '':
         scaleFac = 1
 
@@ -334,11 +334,11 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
 
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count']
     tw = 20
-    fw = 9 
+    fw = 9
     lineMax = 100
     title = 'Queue Wait Time Stats'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+            '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print('\n' + "Packet Type: Requst".center(lineMax,' ') + '\n' + "="*lineMax)
     print("Queue Location".ljust(tw) + 'mean'.format(unit).center(fw) + 'mean'.center(fw) + 'stddev'.format(unit).center(fw) +
@@ -467,11 +467,11 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
     tw = 19
-    fw = 10 
+    fw = 10
     lineMax = 105
     title = 'End To End Message Latency For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+            '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
@@ -482,7 +482,7 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
             '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
 
     print("_"*lineMax)
-    
+
     end2EndDelayDigest = e2eStretchAndDelayDigest.latency
     sizeLowBound = ['0'] + [e2eSizedDelay.sizeUpBound for e2eSizedDelay in end2EndDelayDigest[0:len(end2EndDelayDigest)-1]]
     for i, e2eSizedDelay in enumerate(end2EndDelayDigest):
@@ -490,7 +490,7 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
 
     title = 'Total Queue Delay (ie. real_e2e_latency - ideal_e2e_latency) For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+            '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
@@ -501,7 +501,7 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
             '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
 
     print("_"*lineMax)
-    
+
     queuingDelayDigest = e2eStretchAndDelayDigest.delay
     sizeLowBound = ['0'] + [queuingSizedDelay.sizeUpBound for queuingSizedDelay in queuingDelayDigest[0:len(queuingDelayDigest)-1]]
     for i, queuingSizedDelay in enumerate(queuingDelayDigest):
@@ -509,13 +509,13 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
 
     title = 'End To End Message Stretch For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+            '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
             'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) + 'max'.center(fw) + 'count'.center(fw) + 'count%'.center(fw))
     print("_"*lineMax)
-    
+
     end2EndStretchDigest = e2eStretchAndDelayDigest.stretch
     sizeLowBound = ['0'] + [e2eSizedStretch.sizeUpBound for e2eSizedStretch in end2EndStretchDigest[0:len(end2EndStretchDigest)-1]]
     for i, e2eSizedStretch in enumerate(end2EndStretchDigest):
@@ -523,9 +523,9 @@ def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
 
 def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, e2eStretchAndDelayDigest):
     # For the hosts that are receivers, find the stretch and endToend stats and
-    # return them. 
-    receiverHostIds = xmlParsedDic.receiverIds 
-    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:] 
+    # return them.
+    receiverHostIds = xmlParsedDic.receiverIds
+    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:]
     sizes.append('Huge')
 
     e2eStretchAndDelayDigest.delay = []
@@ -570,20 +570,20 @@ def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, e2eStretchAndDelayDiges
     totalStretchCnt = sum([stretch.count for stretch in e2eStretchAndDelayDigest.stretch])
     totalLatencyCnt = sum([latency.count for latency in e2eStretchAndDelayDigest.latency])
     for sizedDelay, sizedStretch, sizedLatency in zip(e2eStretchAndDelayDigest.delay, e2eStretchAndDelayDigest.stretch, e2eStretchAndDelayDigest.latency):
-        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt 
-        sizedStretch.cntPercent = sizedStretch.count * 100.0 / totalStretchCnt 
-        sizedLatency.cntPercent = sizedLatency.count * 100.0 / totalLatencyCnt 
+        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt
+        sizedStretch.cntPercent = sizedStretch.count * 100.0 / totalStretchCnt
+        sizedLatency.cntPercent = sizedLatency.count * 100.0 / totalLatencyCnt
 
     return e2eStretchAndDelayDigest
 
 def printTransportSchedDelay(transportSchedDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
     tw = 19
-    fw = 10 
+    fw = 10
     lineMax = 105
     title = 'Receiver Scheduler Overhead For Different Ranges of Message Sizes'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' ')) 
+            '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print("="*lineMax)
     print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
@@ -594,20 +594,42 @@ def printTransportSchedDelay(transportSchedDelayDigest, unit):
             '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
     print("_"*lineMax)
 
-    delays = transportSchedDelayDigest.delay
+    delays = transportSchedDelayDigest.totalDelay
     sizeLowBound = ['0'] + [delay.sizeUpBound for delay in delays[0:len(delays)-1]]
     for i, delay in enumerate(delays):
         printStatsLine(delay, '({0}, {1}]'.format(sizeLowBound[i], delay.sizeUpBound), tw, fw, 'us', printKeys)
 
 
+    title = 'Receiver Scheduler Preemption Lag For Different Ranges of Message Sizes'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+
+    print("="*lineMax)
+    print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
+            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) +
+            'max'.center(fw) + 'count'.center(fw) + 'count'.center(fw))
+    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
+            '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw))
+    print("_"*lineMax)
+
+    delays = transportSchedDelayDigest.preemptionLag
+    sizeLowBound = ['0'] + [delay.sizeUpBound for delay in delays[0:len(delays)-1]]
+    for i, delay in enumerate(delays):
+        printStatsLine(delay, '({0}, {1}]'.format(sizeLowBound[i], delay.sizeUpBound), tw, fw, 'us', printKeys)
+
+
+
 def transportSchedDelay(hosts, generalInfo, xmlParsedDic, transportSchedDelayDigest):
-    receiverHostIds = xmlParsedDic.receiverIds 
-    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:] 
+    receiverHostIds = xmlParsedDic.receiverIds
+    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:]
     sizes.append('Huge')
-    transportSchedDelayDigest.delay = []
+    transportSchedDelayDigest.totalDelay = []
+    transportSchedDelayDigest.preemptionLag = []
 
     for size in sizes:
         delayList = list()
+        lagList = list()
         for id in receiverHostIds:
             delayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:histogram.bins'.format(id, size)
             delayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:stats'.format(id, size)
@@ -615,48 +637,64 @@ def transportSchedDelay(hosts, generalInfo, xmlParsedDic, transportSchedDelayDig
             delayForSize = getInterestingModuleStats(hosts, delayStatsKey, delayHistogramKey)
             delayList.append(delayForSize)
 
+            preemptLagHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedPreemptionLag:histogram.bins'.format(id, size)
+            preemptLagStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedPreemptionLag:stats'.format(id, size)
+            preemptLagForSize = AttrDict()
+            preemptLagForSize = getInterestingModuleStats(hosts, preemptLagStatsKey, preemptLagHistogramKey)
+            lagList.append(preemptLagForSize)
+
         delayDigest = AttrDict()
         delayDigest = digestModulesStats(delayList)
         delayDigest.sizeUpBound = '{0}'.format(size)
-        transportSchedDelayDigest.delay.append(delayDigest)
+        transportSchedDelayDigest.totalDelay.append(delayDigest)
 
-    totalDelayCnt = sum([delay.count for delay in transportSchedDelayDigest.delay])
-    for sizedDelay in transportSchedDelayDigest.delay:
-        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt 
+        lagDigest = AttrDict()
+        lagDigest = digestModulesStats(lagList)
+        lagDigest.sizeUpBound = '{0}'.format(size)
+        transportSchedDelayDigest.preemptionLag.append(lagDigest)
 
-    return transportSchedDelayDigest 
+
+    totalDelayCnt = sum([delay.count for delay in transportSchedDelayDigest.totalDelay])
+    totalLagCnt = sum([delay.count for delay in transportSchedDelayDigest.preemptionLag])
+    for sizedDelay in transportSchedDelayDigest.totalDelay:
+        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt
+    for sizedLag in transportSchedDelayDigest.preemptionLag:
+        sizedLag.cntPercent = sizedLag.count * 100.0 / totalLagCnt
+
+    return transportSchedDelayDigest
 
 def printGenralInfo(xmlParsedDic, generalInfo):
     tw = 20
-    fw = 12 
+    fw = 12
     lineMax = 100
     title = 'General Simulation Information'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' ')) 
-    print('Servers Per TOR:'.ljust(tw) + '{0}'.format(generalInfo.numServersPerTor).center(fw) + 'Sender Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.senderIds)).center(fw)
-        + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.loadFactor)*100))).center(fw))
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+    print('Servers Per TOR:'.ljust(tw) + '{0}'.format(generalInfo.numServersPerTor).center(fw) + 'Sender Hosts:'.ljust(tw) +
+        '{0}'.format(len(xmlParsedDic.senderIds)).center(fw) + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.loadFactor)*100))).center(fw))
     print('TORs:'.ljust(tw) + '{0}'.format(generalInfo.numTors).center(fw) + 'Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw)
         + 'Start Time:'.ljust(tw) + '{0}'.format(generalInfo.startTime).center(fw))
-    print('Host Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.nicLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) + '{0}'.format(generalInfo.interArrivalDist).center(fw)
-        + 'Stop Time:'.ljust(tw) + '{0}'.format(generalInfo.stopTime).center(fw))
-    print('Fabric Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.fabricLinkSpeed).center(fw) + 'Edge Link Delay'.ljust(tw) + '{0}'.format(generalInfo.edgeLinkDelay).center(fw)
-        + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(generalInfo.switchFixDelay).center(fw))
-    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(generalInfo.fabricLinkDelay).center(fw) + 'SW Turnaround Time:'.ljust(tw) + '{0}'.format(generalInfo.hostSwTurnAroundTime).center(fw)
-        + 'NIC Sx ThinkTime:'.ljust(tw) + '{0}'.format(generalInfo.hostNicSxThinkTime).center(fw))
-    print('TransportScheme:'.ljust(tw) + '{0} '.format(generalInfo.transportSchemeType).center(fw) + 'Workload Type:'.ljust(tw) + '{0}'.format(generalInfo.workloadType).center(fw))
+    print('Host Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.nicLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) +
+        '{0}'.format(generalInfo.interArrivalDist).center(fw) + 'Stop Time:'.ljust(tw) + '{0}'.format(generalInfo.stopTime).center(fw))
+    print('Fabric Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.fabricLinkSpeed).center(fw) + 'Edge Link Delay'.ljust(tw) +
+        '{0}'.format(generalInfo.edgeLinkDelay).center(fw) + 'Switch Fix Delay:'.ljust(tw) + '{0}'.format(generalInfo.switchFixDelay).center(fw))
+    print('Fabric Link Delay'.ljust(tw) + '{0}'.format(generalInfo.fabricLinkDelay).center(fw) + 'SW Turnaround Time:'.ljust(tw) +
+        '{0}'.format(generalInfo.hostSwTurnAroundTime).center(fw) + 'NIC Sx ThinkTime:'.ljust(tw) + '{0}'.format(generalInfo.hostNicSxThinkTime).center(fw))
+    print('TransportScheme:'.ljust(tw) + '{0} '.format(generalInfo.transportSchemeType).center(fw) + 'Workload Type:'.ljust(tw) +
+        '{0}'.format(generalInfo.workloadType).center(fw))
 
 def digestTrafficInfo(trafficBytesAndRateDic, title):
     trafficDigest = trafficBytesAndRateDic.trafficDigest
-    trafficDigest.title = title 
+    trafficDigest.title = title
     if 'bytes' in trafficBytesAndRateDic.keys() and len(trafficBytesAndRateDic.bytes) > 0:
         trafficDigest.cumBytes = sum(trafficBytesAndRateDic.bytes)/1e6
     if 'rates' in trafficBytesAndRateDic.keys() and len(trafficBytesAndRateDic.rates) > 0:
         trafficDigest.cumRate = sum(trafficBytesAndRateDic.rates)
-        trafficDigest.avgRate = trafficDigest.cumRate/float(len(trafficBytesAndRateDic.rates)) 
+        trafficDigest.avgRate = trafficDigest.cumRate/float(len(trafficBytesAndRateDic.rates))
         trafficDigest.minRate = min(trafficBytesAndRateDic.rates)
         trafficDigest.maxRate = max(trafficBytesAndRateDic.rates)
     if 'dutyCycles' in trafficBytesAndRateDic.keys() and len(trafficBytesAndRateDic.dutyCycles) > 0:
-        trafficDigest.avgDutyCycle = sum(trafficBytesAndRateDic.dutyCycles)/float(len(trafficBytesAndRateDic.dutyCycles)) 
+        trafficDigest.avgDutyCycle = sum(trafficBytesAndRateDic.dutyCycles)/float(len(trafficBytesAndRateDic.dutyCycles))
         trafficDigest.minDutyCycle = min(trafficBytesAndRateDic.dutyCycles)
         trafficDigest.maxDutyCycle = max(trafficBytesAndRateDic.dutyCycles)
 
@@ -741,11 +779,11 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     for torKey in parsedStats.tors.keys():
         tor = parsedStats.tors[torKey]
         for ifaceId in range(0, numServersPerTor + numTorUplinkNics):
-            nicRecvBytes = tor.access('eth[{0}].mac.rxPkOk:sum(packetBytes).value'.format(ifaceId)) 
+            nicRecvBytes = tor.access('eth[{0}].mac.rxPkOk:sum(packetBytes).value'.format(ifaceId))
             nicRecvRates = tor.access('eth[{0}].mac.\"bits/sec rcvd\".value'.format(ifaceId))/1e9
             # Include the 12Bytes ethernet inter arrival gap in the bit rate
             nicRecvRates += (tor.access('eth[{0}].mac.\"frames/sec rcvd\".value'.format(ifaceId)) * ethInterArrivalGapBit / 1e9)
-            nicRecvDutyCycle = tor.access('eth[{0}].mac.\"rx channel utilization (%)\".value'.format(ifaceId)) 
+            nicRecvDutyCycle = tor.access('eth[{0}].mac.\"rx channel utilization (%)\".value'.format(ifaceId))
             nicSendBytes = tor.access('eth[{0}].mac.txPk:sum(packetBytes).value'.format(ifaceId))
             nicSendRates = tor.access('eth[{0}].mac.\"bits/sec sent\".value'.format(ifaceId))/1e9
             # Include the 12Bytes ethernet inter arrival gap in the bit rate
@@ -772,7 +810,7 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
              'CumBytes'.center(fw) + 'Avg Duty'.center(fw) + 'Min Duty'.center(fw) + 'Max Duty'.center(fw))
     print("Point".ljust(tw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) + '(Gb/s)'.center(fw) +
             '(MB)'.center(fw) + 'Cycle(%)'.center(fw) + 'Cycle(%)'.center(fw) + 'Cycle(%)'.center(fw))
-   
+
     print("_"*lineMax)
     digestTrafficInfo(trafficDic.sxHostsTraffic.apps.sx, 'SX Apps Send:')
     printStatsLine(trafficDic.sxHostsTraffic.apps.sx.trafficDigest, trafficDic.sxHostsTraffic.apps.sx.trafficDigest.title, tw, fw, '', printKeys)
@@ -783,13 +821,13 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
 
 
     digestTrafficInfo(trafficDic.torsTraffic.downNics.rx, 'TORs Down Recv:')
-    printStatsLine(trafficDic.torsTraffic.downNics.rx.trafficDigest, trafficDic.torsTraffic.downNics.rx.trafficDigest.title, tw, fw, '', printKeys)   
+    printStatsLine(trafficDic.torsTraffic.downNics.rx.trafficDigest, trafficDic.torsTraffic.downNics.rx.trafficDigest.title, tw, fw, '', printKeys)
     digestTrafficInfo(trafficDic.torsTraffic.upNics.sx, 'TORs Up Send:')
-    printStatsLine(trafficDic.torsTraffic.upNics.sx.trafficDigest, trafficDic.torsTraffic.upNics.sx.trafficDigest.title, tw, fw, '', printKeys)   
+    printStatsLine(trafficDic.torsTraffic.upNics.sx.trafficDigest, trafficDic.torsTraffic.upNics.sx.trafficDigest.title, tw, fw, '', printKeys)
     digestTrafficInfo(trafficDic.torsTraffic.upNics.rx, 'TORs Up Recv:')
-    printStatsLine(trafficDic.torsTraffic.upNics.rx.trafficDigest, trafficDic.torsTraffic.upNics.rx.trafficDigest.title, tw, fw, '', printKeys)   
+    printStatsLine(trafficDic.torsTraffic.upNics.rx.trafficDigest, trafficDic.torsTraffic.upNics.rx.trafficDigest.title, tw, fw, '', printKeys)
     digestTrafficInfo(trafficDic.torsTraffic.downNics.sx, 'TORs Down Send:')
-    printStatsLine(trafficDic.torsTraffic.downNics.sx.trafficDigest, trafficDic.torsTraffic.downNics.sx.trafficDigest.title, tw, fw, '', printKeys)   
+    printStatsLine(trafficDic.torsTraffic.downNics.sx.trafficDigest, trafficDic.torsTraffic.downNics.sx.trafficDigest.title, tw, fw, '', printKeys)
 
 
     digestTrafficInfo(trafficDic.hostsTraffic.nics.rx, 'ALL NICs Recv:')
@@ -801,14 +839,14 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
 
 def digestHomaRates(homaTrafficDic, title):
     trafficDigest = homaTrafficDic.rateDigest
-    trafficDigest.title = title 
+    trafficDigest.title = title
     if 'rates' in homaTrafficDic.keys():
         trafficDigest.cumBitRate = sum([rate[0] for rate in homaTrafficDic.rates])
-        trafficDigest.avgBitRate = trafficDigest.cumBitRate/float(len(homaTrafficDic.rates)) 
+        trafficDigest.avgBitRate = trafficDigest.cumBitRate/float(len(homaTrafficDic.rates))
         trafficDigest.minBitRate = min([rate[0] for rate in homaTrafficDic.rates])
         trafficDigest.maxBitRate = max([rate[0] for rate in homaTrafficDic.rates])
         trafficDigest.cumFrameRate = sum([rate[1] for rate in homaTrafficDic.rates])
-        trafficDigest.avgFrameRate = trafficDigest.cumFrameRate/float(len(homaTrafficDic.rates)) 
+        trafficDigest.avgFrameRate = trafficDigest.cumFrameRate/float(len(homaTrafficDic.rates))
 
 def printHomaRates(parsedStats, xmlParsedDic):
     printKeys = ['avgFrameRate', 'cumFrameRate', 'avgBitRate', 'cumBitRate', 'minBitRate', 'maxBitRate']
@@ -933,13 +971,13 @@ def digestQueueLenInfo(queueLenDic, title):
                     queueLenDigest[key] += queueLenDic.access(key)[i] * cnt
 
         for key in queueLenDigest.keys():
-                queueLenDigest[key] /= totalCount 
+                queueLenDigest[key] /= totalCount
 
     for key in queueLenDic.keys():
         if len(queueLenDic[key]) == 0 and key in keyList:
-            queueLenDigest[key] = nan 
+            queueLenDigest[key] = nan
 
-    queueLenDigest.title = title 
+    queueLenDigest.title = title
     if len(queueLenDic.minCnt) > 0:
         queueLenDigest.minCnt = min(queueLenDic.minCnt)
         queueLenDigest.minBytes = min(queueLenDic.minBytes)
@@ -949,9 +987,9 @@ def digestQueueLenInfo(queueLenDic, title):
 
 def printQueueLength(parsedStats, xmlParsedDic):
     printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
-    tw = 15 
-    fw = 9 
-    lineMax = 105 
+    tw = 15
+    fw = 9
+    lineMax = 105
     title = 'Queue Length (Stats Collected At Pkt Arrivals)'
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
@@ -961,7 +999,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
     print("".ljust(tw) + '(Pkts)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(KB)'.center(fw) +
              '%'.center(fw) + '%'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw))
     print("_"*lineMax)
-    
+
     queueLen = AttrDict()
     keysAll = printKeys[:]
     keysAll.append('count')
@@ -973,7 +1011,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
         queueLen.sxTors.up.nic[key] = []
         queueLen.tors.down.nic[key] = []
         queueLen.rxTors.down.nic[key] = []
-    
+
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
@@ -986,7 +1024,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
         transQueueBytesMax = hostStats.access('transportScheme.bytesLeftToSend:stats.max')/2**10
         transQueueBytesMean = hostStats.access('transportScheme.bytesLeftToSend:stats.mean')/2**10
         transQueueBytesStddev = hostStats.access('transportScheme.bytesLeftToSend:stats.stddev')/2**10
-        
+
         nicQueueLenCnt = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.count')
         nicQueueLenMin = hostStats.access('eth[0].queue.dataQueue.queueLength:stats.min')
         nicQueueLenEmpty = hostStats.access('eth[0].queue.dataQueue.\"queue empty (%)\".value')
@@ -1020,7 +1058,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
             queueLen.sxHosts.transport.maxBytes.append(transQueueBytesMax)
             queueLen.sxHosts.transport.meanBytes.append(transQueueBytesMean)
             queueLen.sxHosts.transport.stddevBytes.append(transQueueBytesStddev)
-            
+
             queueLen.sxHosts.nic.minCnt.append(nicQueueLenMin)
             queueLen.sxHosts.nic.count.append(nicQueueLenCnt)
             queueLen.sxHosts.nic.empty.append(nicQueueLenEmpty)
@@ -1125,7 +1163,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
     digestQueueLenInfo(queueLen.tors.down.nic, 'All TORs Down')
     printStatsLine(queueLen.tors.down.nic.queueLenDigest, queueLen.tors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
 
-   
+
 def main():
     parser = OptionParser()
     options, args = parser.parse_args()
@@ -1134,10 +1172,10 @@ def main():
     else:
         scalarResultFile = 'homatransport/src/dcntopo/results/RecordAllStats-0.sca'
 
-    xmlConfigFile = 'homatransport/src/dcntopo/config.xml' 
+    xmlConfigFile = 'homatransport/src/dcntopo/config.xml'
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile)
-    parsedStats = AttrDict() 
+    parsedStats = AttrDict()
     parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(scalarResultFile))
     queueWaitTimeDigest = AttrDict()
     hostQueueWaitTimes(parsedStats.hosts, xmlParsedDic, queueWaitTimeDigest)
