@@ -78,7 +78,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
         }
 
             // We can prepare and return a grant
-            nextTimeToGrant = getNextGrantTime(currentTime, grantedPktSizeOnWire);
+            nextTimeToGrant =
+                getNextGrantTime(currentTime, grantedPktSizeOnWire);
             totalOutstandingBytes += grantedPktSizeOnWire;
             prio = prioResolver->getPrioForPkt(prioPace2PrioResolution(paceMode),
                 msgToGrant->msgSize, PktType::SCHED_DATA);

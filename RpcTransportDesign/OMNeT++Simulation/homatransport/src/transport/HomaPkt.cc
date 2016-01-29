@@ -7,14 +7,17 @@
 
 
 #include "HomaPkt.h"
+#include "transport/HomaTransport.h"
 
 Register_Class(HomaPkt);
 
 
 
-HomaPkt::HomaPkt(const char *name, int kind)
+HomaPkt::HomaPkt(HomaTransport* ownerTransport, const char *name, int kind)
     : HomaPkt_Base(name,kind)
-{}
+{
+    this->ownerTransport = ownerTransport;
+}
 
 HomaPkt::HomaPkt(const HomaPkt& other)
     : HomaPkt_Base(other)
@@ -33,7 +36,9 @@ HomaPkt::operator=(const HomaPkt& other)
 
 void
 HomaPkt::copy(const HomaPkt& other)
-{}
+{
+    this->ownerTransport = other.ownerTransport;
+}
 
 HomaPkt*
 HomaPkt::dup() const
@@ -79,6 +84,26 @@ HomaPkt::headerSize()
             break;
     }
     return size;
+}
+
+uint32_t
+HomaPkt::getDataBytes()
+{
+    switch (this->getPktType()) {
+        case PktType::REQUEST:
+            return this->getReqFields().numReqBytes;
+        case PktType::UNSCHED_DATA:
+            return this->getUnschedDataFields().lastByte - 
+                this->getUnschedDataFields().firstByte + 1;
+        case PktType::SCHED_DATA:
+            return this->getSchedDataFields().lastByte - 
+                this->getSchedDataFields().firstByte + 1;
+        case PktType::GRANT:
+            return 0;
+        default:
+            cRuntimeError("PktType %d not defined", this->getPktType());
+    }
+    return 0;
 }
 
 cPacket*

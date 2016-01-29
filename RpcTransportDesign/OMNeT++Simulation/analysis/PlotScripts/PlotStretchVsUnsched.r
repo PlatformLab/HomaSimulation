@@ -13,7 +13,7 @@ medianStretchVsUnsched <- subset(stretchVsUnsched, !is.na(MedianStretch), select
 tailStretchVsUnsched <- subset(stretchVsUnsched, !is.na(TailStretch), select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'UnschedBytes', 'TailStretch'))
 nCols = length(unique(stretchVsUnsched$WorkLoad))
 pdf("MeanStretchVsUnsched.pdf", width=90, height=20*length(unique(stretchVsUnsched$MsgSizeRange)))
-ggplot(avgStretchVsUnsched, aes(x=UnschedBytes, y=MeanStretch)) + 
+ggplot(avgStretchVsUnsched, aes(x=UnschedBytes, y=MeanStretch)) +
     geom_line(aes(color=LoadFactor, size = 3, alpha = 0.8)) +
     facet_wrap(MsgSizeRange~WorkLoad, scales="free_y", ncol=nCols) +
     theme(text = element_text(size=60, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
@@ -24,7 +24,7 @@ ggplot(avgStretchVsUnsched, aes(x=UnschedBytes, y=MeanStretch)) +
 dev.off()
 
 pdf("MedianStretchVsUnsched.pdf", width=90, height=20*length(unique(stretchVsUnsched$MsgSizeRange)))
-ggplot(medianStretchVsUnsched, aes(x=UnschedBytes, y=MedianStretch)) + 
+ggplot(medianStretchVsUnsched, aes(x=UnschedBytes, y=MedianStretch)) +
     geom_line(aes(color=LoadFactor, size = 3, alpha = 0.8)) +
     facet_wrap(MsgSizeRange~WorkLoad, scales="free_y", ncol=nCols) +
     theme(text = element_text(size=60, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
@@ -35,11 +35,11 @@ ggplot(medianStretchVsUnsched, aes(x=UnschedBytes, y=MedianStretch)) +
 dev.off()
 
 pdf("TailStretchVsUnsched.pdf", width=90, height=20*length(unique(stretchVsUnsched$MsgSizeRange)))
-ggplot(tailStretchVsUnsched, aes(x=UnschedBytes, y=TailStretch)) + 
+ggplot(tailStretchVsUnsched, aes(x=UnschedBytes, y=TailStretch)) +
     geom_line(aes(color=LoadFactor, size = 3, alpha = 0.8)) +
     facet_wrap(MsgSizeRange~WorkLoad, scales="free_y", ncol=nCols) +
     theme(text = element_text(size=60, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
-        strip.text.x = element_text(size = 50), strip.text.y = element_text(size = 50)) + 
+        strip.text.x = element_text(size = 50), strip.text.y = element_text(size = 50)) +
     scale_x_continuous(breaks = unique(stretchVsUnsched$UnschedBytes)) +
     scale_y_continuous(limits = c(0, NA)) +
     aes(ymin=0, xmin=0)

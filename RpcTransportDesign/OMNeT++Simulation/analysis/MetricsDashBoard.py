@@ -464,6 +464,67 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
+def printPrioUsageStats(prioUsageStatsDigest):
+    printKeys = ['msgMinSize', 'msgMaxSize', 'totalBytesPerc', 'unschedBytesPerc', 'totalPktsPerc', 'unschedPktsPerc']
+    tw = 12
+    fw = 12
+    lineMax = 85
+    title = 'Bytes and Packets Received On Different Priority Levels'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+
+    print("="*lineMax)
+    print("Priority".ljust(tw) + 'Min Mesg'.center(fw) + 'Max Mesg'.center(fw) + 'TotalBytes'.center(fw) +
+            'UnschedByte'.center(fw) + 'TotalPkts'.center(fw) + 'UnschedPkts'.center(fw))
+    print(''.ljust(tw) + 'Size(B)'.center(fw) + 'Size(B)'.center(fw) + '%'.center(fw) +
+            '% In Prio'.center(fw) + '%'.center(fw) + '% In Prio'.center(fw))
+    print("_"*lineMax)
+
+    for prioStats in prioUsageStatsDigest:
+        printStatsLine(prioStats, 'prio {0}'.format(prioStats.priority), tw, fw, '', printKeys)
+
+    return
+
+def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
+    receiverIds = xmlParsedDic.receiverIds
+    numPrioLevels = int(generalInfo.prioLevels)
+    totalBytes = 0
+    totalPkts = 0
+    for prio in range(numPrioLevels):
+        prioUsageStats = AttrDict()
+        prioUsageStats.priority = prio
+        prioUsageStats.msgMinSize = inf
+        prioUsageStats.msgMaxSize = 0
+        prioUsageStats.totalBytes = 0
+        prioUsageStats.totalPkts = 0
+        prioUsageStats.unschedBytes = 0
+        prioUsageStats.unschedBytesPerc = 0
+        prioUsageStats.unschedPkts = 0
+        prioUsageStats.unschedPktsPerc = 0
+        for i in receiverIds:
+            msgSizeStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaMsgSize)'.format(i, prio)
+            pktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaPktBytes)'.format(i, prio)
+            unschedPktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaUnschedPktBytes)'.format(i, prio)
+            msgSizeStats = hosts.access(msgSizeStatsKey)
+            prioUsageStats.msgMinSize = min(prioUsageStats.msgMinSize, msgSizeStats.min)
+            prioUsageStats.msgMaxSize = max(prioUsageStats.msgMaxSize, msgSizeStats.max)
+            pktByteStats = hosts.access(pktBytesStatsKey)
+            prioUsageStats.totalBytes += pktByteStats.sum
+            totalBytes += pktByteStats.sum
+            prioUsageStats.totalPkts += pktByteStats.count
+            totalPkts += pktByteStats.count
+            unschedPktByteStats = hosts.access(unschedPktBytesStatsKey)
+            prioUsageStats.unschedBytes += unschedPktByteStats.sum
+            prioUsageStats.unschedPkts += unschedPktByteStats.count
+        prioUsageStats.unschedBytesPerc = 100*prioUsageStats.unschedBytes/prioUsageStats.totalBytes
+        prioUsageStats.unschedPktsPerc = 100*prioUsageStats.unschedPkts/prioUsageStats.totalPkts
+        prioUsageStatsDigest.append(prioUsageStats)
+
+    for prioUsageStats in prioUsageStatsDigest:
+        prioUsageStats.totalBytesPerc = 100*prioUsageStats.totalBytes/totalBytes
+        prioUsageStats.totalPktsPerc = 100*prioUsageStats.totalPkts/totalPkts
+    return
+
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent']
     tw = 19
@@ -1188,6 +1249,9 @@ def main():
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
+    prioUsageStatsDigest = list()
+    getPrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
+    printPrioUsageStats(prioUsageStatsDigest)
     transportSchedDelayDigest = AttrDict()
     transportSchedDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, transportSchedDelayDigest)
     printTransportSchedDelay(transportSchedDelayDigest, 'us')

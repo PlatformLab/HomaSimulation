@@ -24,14 +24,22 @@ static const uint32_t UDP_HEADER_SIZE = 8;
 static const uint32_t ETHERNET_CRC_SIZE = 4;
 static const uint32_t INTER_PKT_GAP = 12;
 
+class HomaTransport;
 class HomaPkt : public HomaPkt_Base
 {
+  public:
+    // Points to the transport that owned this packet last time this packet was
+    // in an end host. This is only used for statistics collection.
+    // This value is assigned when the packet is constructed and is updated by
+    // homatransport as soon as it arrives at the transport.
+    HomaTransport* ownerTransport;
 
   private:
     void copy(const HomaPkt& other);
 
   public:
-    HomaPkt(const char *name=NULL, int kind=0);
+    HomaPkt(HomaTransport* ownerTransport = NULL, const char *name=NULL,
+        int kind=0);
     HomaPkt(const HomaPkt& other);
     HomaPkt& operator=(const HomaPkt& other);
 
@@ -44,6 +52,11 @@ class HomaPkt : public HomaPkt_Base
      * returns the header size of this packet.
      */
     uint32_t headerSize();
+
+    /**
+     * returns number of data bytes carried in the packet (if any)
+     */
+    uint32_t getDataBytes();
 
     /**
      * This function checks if there is a HomaPkt packet encapsulated in the messages

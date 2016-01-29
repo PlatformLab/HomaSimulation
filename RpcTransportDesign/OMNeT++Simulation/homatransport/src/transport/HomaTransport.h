@@ -28,6 +28,7 @@
 #include "transport/UnschedByteAllocator.h"
 #include "transport/PriorityResolver.h"
 #include "transport/WorkloadEstimator.h"
+#include "common/Util.h"
 
 class TrafficPacer;
 
@@ -41,39 +42,8 @@ class TrafficPacer;
 class HomaTransport : public cSimpleModule
 {
   public:
-    /**
-     * A self message essentially models a timer for this transport and can have
-     * one the below types.
-     */
-    enum SelfMsgKind
-    {
-        START = 1,  // Timer type when the transport is in initialization phase.
-        GRANT = 2,  // Timer type in normal working state of transport.
-        STOP  = 3   // Timer type when the transport is in cleaning phase.
-    };
-
     HomaTransport();
     ~HomaTransport();
-
-    /**
-     * C++ declration of signals defined in .ned file.
-     */
-    // Signal for number of incomplete TX msgs received from the application.
-    static simsignal_t msgsLeftToSendSignal;
-
-    // Signal for total numbet of msg bytes remained to send for all msgs.
-    static simsignal_t bytesLeftToSendSignal;
-
-    // Signal for total number of in flight grant bytes.
-    static simsignal_t outstandingGrantBytesSignal;
-
-    // Signal for total number of in flight bytes including both grants and
-    // unscheduled packets.
-    static simsignal_t totalOutstandingBytesSignal;
-
-    // Signal for tracking the priority of a grant being sent. Useful for the
-    // times we get priorities from adaptive priority allocation.
-    static simsignal_t grantPrioritySignal;
 
     class SendController;
     class ReceiveScheduler;
@@ -96,6 +66,7 @@ class HomaTransport : public cSimpleModule
         OutboundMessage& operator=(const OutboundMessage& other);
         void sendRequestAndUnsched();
         int sendSchedBytes(uint32_t numBytes, uint16_t schedPrio);
+        const uint32_t& getMsgSize() { return msgSize; }
 
       protected:
 
@@ -103,7 +74,7 @@ class HomaTransport : public cSimpleModule
         SendController* sxController;
 
         // Unique identification number assigned by in the construction time for
-        // the purpose of easy external tracking of this message.
+        // the purpose of easy external access to this message.
         uint64_t msgId;
 
         // Total byte size of the message received from application
@@ -147,6 +118,7 @@ class HomaTransport : public cSimpleModule
     class SendController
     {
       public:
+        typedef std::unordered_map<uint64_t, OutboundMessage> OutboundMsgMap;
         SendController(HomaTransport* transport);
         ~SendController();
         void initSendController(uint32_t defaultReqBytes,
@@ -154,6 +126,7 @@ class HomaTransport : public cSimpleModule
                 PriorityResolver::PrioResolutionMode unschedPrioResMode);
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
+        OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
 
       protected:
 
@@ -168,7 +141,7 @@ class HomaTransport : public cSimpleModule
         uint64_t msgId;
 
         // The hash map from the msgId to outstanding messages.
-        std::unordered_map<uint64_t, OutboundMessage> outboundMsgMap;
+        OutboundMsgMap outboundMsgMap;
 
         // For each distinct receiver, allocates the number of request and
         // unsched bytes for various sizes of message.
@@ -220,6 +193,7 @@ class HomaTransport : public cSimpleModule
                 return msg1->bytesToGrant > msg2->bytesToGrant;
             }
         };
+        const uint32_t& getMsgSize() { return msgSize; }
 
       protected:
         // The ReceiveScheduler that manages the reception of this message.
@@ -379,6 +353,7 @@ class HomaTransport : public cSimpleModule
             uint16_t allPrio, uint16_t schedPrio, cMessage* grantTimer,
             QueueType queueType, const char* schedPrioAssignMode,
             PriorityResolver* prioResolver);
+        InboundMessage* lookupIncompleteRxMsg(HomaPkt* rxPkt);
 
       protected:
         HomaTransport* transport;
@@ -431,21 +406,49 @@ class HomaTransport : public cSimpleModule
         void addSentGrantBytes(uint16_t prio, uint32_t grantedBytes);
         void addPendingUnschedBytes(PktType pktType, uint16_t prio,
             uint32_t bytesToArrive);
-        InboundMessage* lookupIncompleteRxMsg(HomaPkt* rxPkt);
         friend class HomaTransport;
         friend class InboundMessage;
     };
 
-  protected:
+  public:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
-
     void sendPacket(HomaPkt* sxPkt);
     void processStart();
     void processGrantTimer();
+    void registerTemplatedStats(uint16_t numPrio);
+    const inet::L3Address& getLocalAddr() {return localAddr;}
 
-  protected:
+    /**
+     * A self message essentially models a timer for this transport and can have
+     * one the below types.
+     */
+    enum SelfMsgKind
+    {
+        START = 1,  // Timer type when the transport is in initialization phase.
+        GRANT = 2,  // Timer type in normal working state of transport.
+        STOP  = 3   // Timer type when the transport is in cleaning phase.
+    };
+
+    /**
+     * C++ declration of signals defined in .ned file.
+     */
+    // Signal for number of incomplete TX msgs received from the application.
+    static simsignal_t msgsLeftToSendSignal;
+
+    // Signal for total numbet of msg bytes remained to send for all msgs.
+    static simsignal_t bytesLeftToSendSignal;
+
+    // Signal for total number of in flight grant bytes.
+    static simsignal_t outstandingGrantBytesSignal;
+
+    // Signal for total number of in flight bytes including both grants and
+    // unscheduled packets.
+    static simsignal_t totalOutstandingBytesSignal;
+
+    // Signal for tracking the statistics on how priorities are being used. 
+    std::vector<simsignal_t> priorityStatsSignals;
 
     // Handles the transmission of outbound messages based on the logic of
     // HomaProtocol.
@@ -454,6 +457,7 @@ class HomaTransport : public cSimpleModule
     // Manages the reception of all inbound messages.
     ReceiveScheduler rxScheduler;
 
+  protected:
     // Determine priority of packets that are to be sent
     PriorityResolver *prioResolver;
 
@@ -464,6 +468,11 @@ class HomaTransport : public cSimpleModule
     // UDP socket through which this transport send and receive packets.
     inet::UDPSocket socket;
 
+    // IpAddress of sender host (local host). This parameter is lazily
+    // intialized first time an outbound message is arrvied from application or 
+    // a packet has arrived from outside world.
+    inet::L3Address localAddr;
+
     // Timer object for this transport. Will be used for implementing timely
     // scheduled
     cMessage* selfMsg;
@@ -471,6 +480,7 @@ class HomaTransport : public cSimpleModule
     // udp ports assigned to this transprt
     int localPort;
     int destPort;
+
 
     // NIC link speed (in Gb/s) connected to this host. This parameter will be
     // read from the omnetpp.ini config file.

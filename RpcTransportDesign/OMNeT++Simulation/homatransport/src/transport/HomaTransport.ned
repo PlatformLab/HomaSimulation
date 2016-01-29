@@ -53,12 +53,13 @@ simple HomaTransport like ITransportScheme
         @signal[bytesLeftToSend](type=long);
         @signal[totalOutstandingBytes](type=long);
         @signal[outstandingGrantBytes](type=long);
-        @signal[grantPriority](type=long);
+        @singal[homaPktPrio*Signal](type=HomaPkt);
+
         @statistic[msgsLeftToSend](title="num msgs left to send"; source=msgsLeftToSend; record=stats, histogram; interpolationmode=none);
         @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);
         @statistic[totalOutstandingBytes](title="total bytes in flight"; source=totalOutstandingBytes; record=stats, histogram; interpolationmode=none);
         @statistic[outstandingGrantBytes](title="num total bytes left to send"; source=outstandingGrantBytes; record=stats, histogram; interpolationmode=none);
-        @statistic[grantPriority](title="Priority at which grant is being sent"; source=grantPriority; record=stats, histogram; interpolationmode=none);
+        @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes); interpolationmode=none);
 
     gates:
         input appIn[] @labels(AppMessage/down);
