@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 cplusplus {{
 #include <vector>
@@ -29,7 +29,7 @@ enum PktType
     UNSCHED_DATA = 3;
 };
 
-struct RequestFields 
+struct RequestFields
 {
     uint32_t msgByteLen;
     simtime_t msgCreationTime;
@@ -96,12 +96,12 @@ struct SchedDataFields
 packet HomaPkt {
     @customize(true);
 
-    inet::L3Address srcAddr; 
+    inet::L3Address srcAddr;
     inet::L3Address destAddr;
     uint64_t msgId;
     uint32_t priority = 1;
-    int pktType @enum(PktType);   
-    
+    int pktType @enum(PktType);
+
     // depending on the pktType, only one of the three following struct are
     // relevant in the context of a HomaPkt.
     RequestFields reqFields;

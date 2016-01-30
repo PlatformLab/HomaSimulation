@@ -111,6 +111,9 @@ HomaTransport::initialize()
 
     distEstimator = new WorkloadEstimator(par("workloadType").stringValue());
     prioResolver = new PriorityResolver(prioResolverPrioLevels, distEstimator);
+    uint32_t cbfCapMsgSize =
+        std::stoul(par("cbfCapMsgSize").stdstringValue(), nullptr, 16);
+    prioResolver->recomputeCbf(cbfCapMsgSize);
     rxScheduler.initialize(grantMaxBytes, nicLinkSpeed, allPrio,
         schedPrioLevels, selfMsg, rxInboundQueueType, schedPrioAssignMode,
         prioResolver);

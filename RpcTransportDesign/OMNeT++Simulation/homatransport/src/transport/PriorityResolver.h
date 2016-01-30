@@ -22,19 +22,24 @@ class PriorityResolver
         INVALID_PRIO_MODE        // Always the last value
     };
     explicit PriorityResolver(const uint32_t numPrios,
-        const WorkloadEstimator* distEstimator);
+        WorkloadEstimator* distEstimator);
     uint16_t getPrioForPkt(PrioResolutionMode prioMode, const uint32_t msgSize,
         const PktType pktType);
-    void setPrioCutOffs();
+    void setCdfPrioCutOffs();
+    void setCbfPrioCutOffs();
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
   private:
     uint32_t numPrios;
+    uint32_t lastCbfCapMsgSize;
     const WorkloadEstimator::CdfVector* cdf;
     const WorkloadEstimator::CdfVector* cbf;
-    const WorkloadEstimator* distEstimator;
+    WorkloadEstimator* distEstimator;
     std::vector<uint32_t> prioCutOffsFromCdf;
     std::vector<uint32_t> prioCutOffsFromCbf;
 
+  protected:
+    void recomputeCbf(uint32_t cbfCapMsgSize);
+    friend class HomaTransport;
 };
 #endif /* PRIORITYRESOLVER_H_ */

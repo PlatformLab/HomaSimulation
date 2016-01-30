@@ -447,7 +447,7 @@ class HomaTransport : public cSimpleModule
     // unscheduled packets.
     static simsignal_t totalOutstandingBytesSignal;
 
-    // Signal for tracking the statistics on how priorities are being used. 
+    // Signal for tracking the statistics on how priorities are being used.
     std::vector<simsignal_t> priorityStatsSignals;
 
     // Handles the transmission of outbound messages based on the logic of
@@ -469,7 +469,7 @@ class HomaTransport : public cSimpleModule
     inet::UDPSocket socket;
 
     // IpAddress of sender host (local host). This parameter is lazily
-    // intialized first time an outbound message is arrvied from application or 
+    // intialized first time an outbound message is arrvied from application or
     // a packet has arrived from outside world.
     inet::L3Address localAddr;
 

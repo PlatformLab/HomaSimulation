@@ -93,10 +93,10 @@ HomaPkt::getDataBytes()
         case PktType::REQUEST:
             return this->getReqFields().numReqBytes;
         case PktType::UNSCHED_DATA:
-            return this->getUnschedDataFields().lastByte - 
+            return this->getUnschedDataFields().lastByte -
                 this->getUnschedDataFields().firstByte + 1;
         case PktType::SCHED_DATA:
-            return this->getSchedDataFields().lastByte - 
+            return this->getSchedDataFields().lastByte -
                 this->getSchedDataFields().firstByte + 1;
         case PktType::GRANT:
             return 0;

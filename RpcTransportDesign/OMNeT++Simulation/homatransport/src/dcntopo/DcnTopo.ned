@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 package homatransport.dcntopo;
 
@@ -32,7 +32,7 @@ network DcnTopo
         int nicLinkSpeed @unit(Gbps);
 
         int numTors;
-        
+
         // models the fabrciLinkDealy plus the intrinsic switching delay
         double fabricLinkDelay @unit(us) = default(0.0us);
 
@@ -44,10 +44,10 @@ network DcnTopo
         // or when the pkt is send in software until it's received at the NIC.
         double hostSwTurnAroundTime @unit(us);
 
-        // when non-zero, it models the intrinsic fixed switching delay 
-        // on the output ports of the routers 
-        double switchFixDelay @unit(us);         
-        
+        // when non-zero, it models the intrinsic fixed switching delay
+        // on the output ports of the routers
+        double switchFixDelay @unit(us);
+
         // models NIC send think time in host nics.
         double hostNicSxThinkTime @unit(us);
 
@@ -57,7 +57,7 @@ network DcnTopo
         // Enables the cut-through switching wherever possible
         bool isFabricCutThrough = default(false);
 
-        int numAggSwitches = (numServersPerTor * nicLinkSpeed) / 
+        int numAggSwitches = (numServersPerTor * nicLinkSpeed) /
                 (overSubFactor * fabricLinkSpeed);
         int numHosts = numServersPerTor * numTors;
 
@@ -110,12 +110,12 @@ network DcnTopo
             nicLinkSpeed = nicLinkSpeed;
             fabricLinkSpeed = fabricLinkSpeed;
             edgeLinkDelay = edgeLinkDelay;
-            fabricLinkDelay = fabricLinkDelay;  
+            fabricLinkDelay = fabricLinkDelay;
             hostSwTurnAroundTime = hostSwTurnAroundTime;
             hostNicSxThinkTime = hostNicSxThinkTime;
             switchFixDelay = switchFixDelay;
-            trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough; 
-            trafficGeneratorApp[*].isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed); 
+            trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough;
+            trafficGeneratorApp[*].isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
         }
 
         configurator: IPv4NetworkConfigurator {
@@ -129,7 +129,7 @@ network DcnTopo
             tor[i].ethg$o++ --> EdgeChannel{delay=(edgeLinkDelay+switchFixDelay);} --> host[i * numServersPerTor + j].ethg$i++;
             tor[i].ethg$i++ <-- EdgeChannel{delay=(edgeLinkDelay+hostNicSxThinkTime);} <-- host[i * numServersPerTor + j].ethg$o++;
         }
-        
+
         for i=0..numAggSwitches-1, for j=0..numTors-1 {
             aggRouter[i].ethg++ <--> FabricChannel{delay=(fabricLinkDelay+switchFixDelay);} <--> tor[j].ethg++ ;
         }

@@ -19,6 +19,7 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
     , rxCdfComputed()
     , sxCdfComputed()
     , loadFactor(0.0)
+    , lastCbfCapMsgSize(0)
 {
     if (workloadType != NULL) {
         std::string distFileName;
@@ -70,18 +71,12 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
         }
 
         // reads msgSize<->probabilty pairs from "distFileName" file
-        double avgSizeOnWire = 0.0;
-        double prevProb = 0.0;
         double prob;
         while(getline(distFileStream, sizeProbStr)) {
             int msgSize;
             sscanf(sizeProbStr.c_str(), "%d %lf",
                     &msgSize, &prob);
             cdfFromFile.push_back(std::make_pair(msgSize, prob));
-
-            avgSizeOnWire += HomaPkt::getBytesOnWire(msgSize, PktType::REQUEST)
-                * (prob-prevProb);
-            prevProb = prob;
         }
         distFileStream.close();
 
@@ -108,29 +103,33 @@ WorkloadEstimator::WorkloadEstimator(const char* workloadType)
                 } else {
                     cdfFromFile.back().second = prob;
                 }
-                avgSizeOnWire += HomaPkt::getBytesOnWire(size, PktType::REQUEST)
-                    * (prob-prevProb);
-                prevProb = prob;
             }
             cdfFromFile.back().second = 1.0;
-            avgSizeOnWire += HomaPkt::getBytesOnWire(size, PktType::REQUEST) *
-                (1.0-prevProb);
         }
+        getCbfFromCdf(cdfFromFile, UINT32_MAX);
+    }
+}
 
+void
+WorkloadEstimator::getCbfFromCdf(CdfVector& cdf, uint32_t cbfCapMsgSize)
+{
+    if (cbfCapMsgSize != lastCbfCapMsgSize) {
+        lastCbfCapMsgSize = cbfCapMsgSize;
         // compute cbf from cdf and store it in the cbfFromFile
-        prevProb = 0.0;
+        double prevProb = 0.0;
         double cumBytes = 0.0;
+        cbfFromFile.clear();
         for (auto& sizeProbPair : cdfFromFile) {
-            prob = sizeProbPair.second - prevProb;
+            double prob = sizeProbPair.second - prevProb;
             prevProb = sizeProbPair.second;
-            cumBytes += HomaPkt::getBytesOnWire(sizeProbPair.first,
-                PktType::REQUEST) * prob;
+            cumBytes += HomaPkt::getBytesOnWire(
+                std::min(sizeProbPair.first, cbfCapMsgSize), PktType::REQUEST) * prob;
             cbfFromFile.push_back(std::make_pair(sizeProbPair.first,
-                cumBytes/avgSizeOnWire));
+                cumBytes));
         }
 
-        if (cbfFromFile.back().second >= 0.99999) {
-            cbfFromFile.back().second = 1.0;
+        for (auto& sizeProbPair : cbfFromFile) {
+            sizeProbPair.second /= cbfFromFile.back().second;
         }
     }
 }

@@ -23,16 +23,16 @@
     </IPv4Configurator>
 
     <!--id attribute is the index of this host in the topology's hosts vector-->
-    <hostConfig id="0"> 
+    <hostConfig id="0">
         <transportConfig>
         </transportConfig>
         <appConfig>
             <!--if true, this host app will send messages as well-->
-            <isSender>false</isSender> 
+            <isSender>false</isSender>
             <!--the space separated ids of the hosts that this app will send
                  messages to. If empty, it means the sender will send randomly
                  to every other host in the topology. -->
-            <destIds></destIds> 
+            <destIds></destIds>
         </appConfig>
     </hostConfig>
 

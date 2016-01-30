@@ -8,15 +8,17 @@
 #include "PriorityResolver.h"
 
 PriorityResolver::PriorityResolver(const uint32_t numPrios,
-        const WorkloadEstimator* distEstimator)
+        WorkloadEstimator* distEstimator)
     : numPrios(numPrios)
+    , lastCbfCapMsgSize(UINT32_MAX)
     , cdf(&distEstimator->cdfFromFile)
     , cbf(&distEstimator->cbfFromFile)
     , distEstimator(distEstimator)
     , prioCutOffsFromCdf()
     , prioCutOffsFromCbf()
 {
-    setPrioCutOffs();
+    setCdfPrioCutOffs();
+    setCbfPrioCutOffs();
 }
 
 uint16_t
@@ -68,16 +70,26 @@ PriorityResolver::getPrioForPkt(PrioResolutionMode prioMode,
 }
 
 void
-PriorityResolver::setPrioCutOffs()
+PriorityResolver::recomputeCbf(uint32_t cbfCapMsgSize)
 {
+    if (cbfCapMsgSize != lastCbfCapMsgSize) {
+        distEstimator->getCbfFromCdf(distEstimator->cdfFromFile,
+            cbfCapMsgSize);
+        setCbfPrioCutOffs();
+        lastCbfCapMsgSize = cbfCapMsgSize;
+    }
+}
+
+void
+PriorityResolver::setCdfPrioCutOffs()
+{
+    prioCutOffsFromCdf.clear();
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
     double probStep = probMax/numPrios;
     size_t i = 0;
-    size_t j = 0;
     uint32_t prevCutOffCdfSize = 0;
-    uint32_t prevCutOffCbfSize = 0;
     for (double prob = probStep; prob < probMax; prob += probStep) {
         for (; i < cdf->size(); i++) {
             if (cdf->at(i).first == prevCutOffCdfSize) {
@@ -91,8 +103,24 @@ PriorityResolver::setPrioCutOffs()
             }
         }
 
+    }
+    prioCutOffsFromCdf.push_back(UINT32_MAX);
+}
+
+void
+PriorityResolver::setCbfPrioCutOffs()
+{
+    prioCutOffsFromCbf.clear();
+    ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
+        && cbf->at(cbf->size() - 1).second == 1.00);
+    double probMax = 1.0;
+    double probStep = probMax/numPrios;
+    size_t j = 0;
+    uint32_t prevCutOffCbfSize = 0;
+    for (double prob = probStep; prob < probMax; prob += probStep) {
         for (; j < cbf->size(); j++) {
             if (cbf->at(j).first == prevCutOffCbfSize) {
+                // Do not add duplicate sizes to cutOffSizes vector
                 continue;
             }
             if (cbf->at(j).second >= prob) {
@@ -102,9 +130,10 @@ PriorityResolver::setPrioCutOffs()
             }
         }
     }
-    prioCutOffsFromCdf.push_back(UINT32_MAX);
     prioCutOffsFromCbf.push_back(UINT32_MAX);
 }
+
+
 
 PriorityResolver::PrioResolutionMode
 PriorityResolver::strPrioModeToInt(const char* prioResMode)

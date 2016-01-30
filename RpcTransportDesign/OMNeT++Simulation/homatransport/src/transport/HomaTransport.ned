@@ -3,21 +3,21 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 package homatransport.transport;
 import homatransport.transport.ITransportScheme;
 
 //
-// defines a credit based receiver side driven transport protocol 
+// defines a credit based receiver side driven transport protocol
 //
 simple HomaTransport like ITransportScheme
 {
@@ -43,9 +43,14 @@ simple HomaTransport like ITransportScheme
         string schedPrioAssignMode = default("NO_OVER_COMMIT");
         // Coulde be any of PrioResolutionMode values in PriorityResolver.h
         string unschedPrioResolutionMode;
+        // Specifies that only first cbfCapMsgSize bytes of a message must
+        // be used in computing the cbf function. This value is supposed to be uint32_t
+        // type, but since NED don't support 'unsigned int',
+        // we enter integers in the string form.
+        string cbfCapMsgSize = default("0xFFFFFFFF");
 
         // Only for simulation puspose, we allow the transport to be aware of
-        // workload type. The value must be similar to WorkloadSynthesizer 
+        // workload type. The value must be similar to WorkloadSynthesizer
         // workloadType.
         string workloadType = default("");
 

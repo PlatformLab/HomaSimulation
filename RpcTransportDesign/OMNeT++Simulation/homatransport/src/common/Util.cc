@@ -33,14 +33,14 @@ HomaMsgSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
             HomaTransport::InboundMessage* inbndMsg;
             HomaTransport::OutboundMessage* outMsg;
             HomaTransport* transport = homaPkt->ownerTransport;
-            if ((inbndMsg = 
+            if ((inbndMsg =
                     transport->rxScheduler.lookupIncompleteRxMsg(homaPkt))) {
                 msgSize = inbndMsg->getMsgSize();
             } else {
                 outMsg = &(transport->sxController.getOutboundMsgMap()->at(
                     homaPkt->getMsgId()));
                 ASSERT((transport->getLocalAddr() == homaPkt->getDestAddr()
-                    && pktType == PktType::GRANT) || 
+                    && pktType == PktType::GRANT) ||
                     (transport->getLocalAddr() == homaPkt->getSrcAddr()
                     && pktType == PktType::SCHED_DATA));
                 msgSize = outMsg->getMsgSize();

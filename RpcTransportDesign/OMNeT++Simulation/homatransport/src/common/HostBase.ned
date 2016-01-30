@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 package homatransport.common;
 
@@ -39,20 +39,20 @@ module HostBase extends NodeBase
         int numTrafficGeneratorApp = default(0);
         // no of TCP apps. Specify the app types in INI file with
         // tcpApp[0..1].typename="TCPEchoApp" syntax
-        int numTcpApps = default(0);  
+        int numTcpApps = default(0);
 
-        // no of UDP apps. Specify the app types in INI file with 
+        // no of UDP apps. Specify the app types in INI file with
         // udpApp[0..1].typename="UDPVideoStreamCli" syntax
-        int numUdpApps = default(0);  
+        int numUdpApps = default(0);
         bool hasTransportScheme = default(numTrafficGeneratorApp>0);
         bool hasTcp = default(numTcpApps>0);
         bool hasUdp = default((numUdpApps>0) || (numTrafficGeneratorApp>0));
 
         // tcp implementation (e.g. ~TCP, ~TCP_lwIP, ~TCP_NSC) or ~TCPSpoof
-        string tcpType = 
-            default(firstAvailable("TCP", "TCP_lwIP", "TCP_NSC", "TCP_None"));  
+        string tcpType =
+            default(firstAvailable("TCP", "TCP_lwIP", "TCP_NSC", "TCP_None"));
         string udpType = default(firstAvailable("UDP","UDP_None"));
-        string transportSchemeType = 
+        string transportSchemeType =
                 default(firstAvailable("HomaTransport", "TransportSchemeNone"));
         forwarding = default(false);  // disable routing by default
         networkLayer.proxyARP = default(false);
@@ -71,7 +71,7 @@ module HostBase extends NodeBase
                 nicLinkSpeed = nicLinkSpeed;
                 fabricLinkSpeed = fabricLinkSpeed;
                 edgeLinkDelay = edgeLinkDelay;
-                fabricLinkDelay = fabricLinkDelay;  
+                fabricLinkDelay = fabricLinkDelay;
 
                 hostSwTurnAroundTime = hostSwTurnAroundTime;
                 hostNicSxThinkTime = hostNicSxThinkTime;

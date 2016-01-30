@@ -3,15 +3,15 @@
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 package homatransport.application;
 import homatransport.application.ITrafficGeneratorApp;
 
@@ -20,12 +20,12 @@ import homatransport.application.ITrafficGeneratorApp;
 // or Facebook key-value workload and passes the generated messages to the
 // transport layer to the transport protocol.
 //
-simple WorkloadSynthesizer like ITrafficGeneratorApp 
+simple WorkloadSynthesizer like ITrafficGeneratorApp
 {
     parameters:
-        xml appConfig = default(xml("<isSender/>true<destIds/><destIds></destIds>")); 
+        xml appConfig = default(xml("<isSender/>true<destIds/><destIds></destIds>"));
         string interfaceTableModule;   // The path to the InterfaceTable module
-        
+
         // a space sperated list of msg sizes in bytes in a string like "100 1000 10000 100000"
         // that creates bins of msg size renges. each number in this string is an upper bound in the range;
         // Any msgeSize that doesn't fit in any bins sepcified in the string, will be placed in an additional distinct bin.
