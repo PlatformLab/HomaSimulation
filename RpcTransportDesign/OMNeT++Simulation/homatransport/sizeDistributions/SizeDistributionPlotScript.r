@@ -7,6 +7,47 @@ library(ggplot2)
 library(gridExtra)
 RTT <- 7.75e-6 #seconds
 C <- 1e10 #Gb/s
+
+
+
+ETHERNET_PREAMBLE_SIZE <- 8
+ETHERNET_HDR_SIZE <- 14
+MAX_ETHERNET_PAYLOAD_BYTES <- 1500
+MIN_ETHERNET_PAYLOAD_BYTES <- 46
+IP_HEADER_SIZE <- 20
+UDP_HEADER_SIZE <- 8
+ETHERNET_CRC_SIZE <- 4
+INTER_PKT_GAP <- 12
+HOMA_HDR_SIZE <- 16
+ 
+msgSizeOnWire <- function(msgDataBytes)
+{
+    bytesOnWire <- 0
+    maxDataInHomaPkt <- MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE
+            - UDP_HEADER_SIZE - HOMA_HDR_SIZE
+
+    numFullPkts <- msgDataBytes %/%  maxDataInHomaPkt
+    bytesOnWire <- bytesOnWire + numFullPkts * (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE
+            + ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP)
+    numPartialBytes <- msgDataBytes - numFullPkts * maxDataInHomaPkt
+
+    ## if all msgDataBytes fit in full pkts, we should return at this point
+    if ((numFullPkts > 0) & (numPartialBytes == 0)) {
+        return (bytesOnWire)
+    }
+    numPartialBytes <- numPartialBytes +  HOMA_HDR_SIZE + IP_HEADER_SIZE +
+            UDP_HEADER_SIZE
+
+    if (numPartialBytes < MIN_ETHERNET_PAYLOAD_BYTES) {
+        numPartialBytes <- MIN_ETHERNET_PAYLOAD_BYTES
+    }
+    numPartialBytesOnWire <- numPartialBytes + ETHERNET_HDR_SIZE +
+            ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP
+
+    bytesOnWire <- bytesOnWire + numPartialBytesOnWire
+    return (bytesOnWire)
+}
+
 maxUnsched <- RTT*C/8
 unschedVec <- seq(0, 2*maxUnsched, maxUnsched/1000)
 
@@ -14,9 +55,9 @@ getUnschedFrac <- function(prob, msgSizes)
 {
     unschedFrac <- c()
     for (unsched in unschedVec) {
-        unschedFrac <- c(unschedFrac, sum(prob*pmin(unsched, msgSizes)))
+        unschedFrac <- c(unschedFrac, sum(prob*sapply(pmin(unsched, msgSizes), msgSizeOnWire)))
     }
-    unschedFrac <- unschedFrac / sum(prob*msgSizes)
+    unschedFrac <- unschedFrac / sum(prob*sapply(msgSizes, msgSizeOnWire))
     return(unschedFrac)
 }
 unschedFracFrame <- data.frame(Unsched=c(), CumUnschedFrac=c(), Workload=c())
@@ -31,7 +72,7 @@ y<-(1-(1+k*(x-x0)/sigma)^(-1/k))*(1-y0)+y0
 value <- c(predefProb$msgSize,x)
 cumProb <- c(predefProb$CDF, y)
 prob = cumProb-c(0,cumProb[1:length(cumProb)-1])
-byteFrac = prob*value
+byteFrac = prob*sapply(value, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 cdfFrame <- data.frame(MessageSize=value, CDF=cumProb, CBF=cumBytes,
         WorkLoad="Facebook KeyValue-Servers")
@@ -45,7 +86,7 @@ predefProb$MessageSize <-  predefProb$MessageSize*1500
 predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
 predefProb$WorkLoad <- "Web Search"
 prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * predefProb$MessageSize
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
@@ -59,7 +100,7 @@ predefProb <- read.table("Facebook_CacheFollowerDist_IntraCluster.txt",
 predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
 predefProb$WorkLoad <- "Facebook Cache-Servers"
 prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * predefProb$MessageSize
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
@@ -73,7 +114,7 @@ predefProb <- read.table("Facebook_WebServerDist_IntraCluster.txt",
 predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
 predefProb$WorkLoad <- "Facebook Web-Servers"
 prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * predefProb$MessageSize
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
@@ -87,7 +128,7 @@ predefProb <- read.table("Facebook_HadoopDist_All.txt",
 predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
 predefProb$WorkLoad <- "Facebook Hadoop-Servers"
 prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * predefProb$MessageSize
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
@@ -101,7 +142,7 @@ predefProb <- read.table("Fabricated_Heavy_Middle.txt",
 predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
 predefProb$WorkLoad <- "Fabricated Heavy Middle"
 prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * predefProb$MessageSize
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
@@ -115,7 +156,7 @@ predefProb <- read.table("Fabricated_Heavy_Head.txt",
 predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
 predefProb$WorkLoad <- "Fabricated Heavy Head"
 prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * predefProb$MessageSize
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
 cumBytes <- cumsum(byteFrac)/sum(byteFrac)
 predefProb$CBF <- cumBytes
 cdfFrame <- rbind(predefProb, cdfFrame)
