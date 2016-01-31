@@ -127,5 +127,6 @@ class TrafficPacer
     PrioPaceMode paceMode;
     uint16_t allPrio;
     uint16_t schedPrio;
+    uint16_t lastGrantPrio;
 };
 #endif /* TRAFFICPACER_H_ */

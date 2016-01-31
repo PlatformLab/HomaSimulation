@@ -753,7 +753,8 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
         rxPkt->getSchedDataFields().lastByte);
 
     transport->outstandingGrantBytes -= totalOnwireBytesReceived;
-    transport->emit(totalOutstandingBytesSignal, trafficPacer->getTotalOutstandingBytes());
+    transport->emit(totalOutstandingBytesSignal,
+        trafficPacer->getTotalOutstandingBytes());
     trafficPacer->bytesArrived(inboundMsg, bytesReceived, PktType::SCHED_DATA,
         rxPkt->getPriority());
     EV_INFO << "Received " << bytesReceived << " bytes from "
@@ -821,6 +822,9 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
         transport->sendPacket(grantPkt);
 
         // set the grantTimer for the next grant
+        if (grantTimer->isScheduled()) {
+            transport->cancelEvent(grantTimer);
+        }
         transport->scheduleAt(nextTimeToGrant, grantTimer);
 
         // Pop the highPrioMsg from msgQueue and push it back if it still needs

@@ -519,7 +519,6 @@ def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
             unschedPktByteStats = hosts.access(unschedPktBytesStatsKey)
             prioUsageStats.unschedBytes += unschedPktByteStats.sum
             prioUsageStats.unschedPkts += unschedPktByteStats.count
-
         prioUsageStats.unschedBytesPerc = 100 * divide(prioUsageStats.unschedBytes, prioUsageStats.totalBytes)
         prioUsageStats.unschedPktsPerc = 100 * divide(prioUsageStats.unschedPkts, prioUsageStats.totalPkts)
         prioUsageStatsDigest.append(prioUsageStats)

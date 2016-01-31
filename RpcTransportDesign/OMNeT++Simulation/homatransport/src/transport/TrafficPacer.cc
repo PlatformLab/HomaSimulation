@@ -27,6 +27,7 @@ TrafficPacer::TrafficPacer(PriorityResolver* prioRes,
     , paceMode(strPrioPaceModeToEnum(prioPaceMode))
     , allPrio(allPrio)
     , schedPrio(schedPrio)
+    , lastGrantPrio(allPrio)
 {
     inflightUnschedPerPrio.resize(allPrio);
     inflightSchedPerPrio.resize(schedPrio);
@@ -57,10 +58,6 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
     simtime_t &nextTimeToGrant)
 {
     uint16_t prio = 0;
-    if (nextGrantTime > currentTime) {
-        return NULL;
-    }
-
     uint32_t grantSize = std::min(msgToGrant->bytesToGrant, grantMaxBytes);
     uint32_t grantedPktSizeOnWire =
         HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
@@ -71,13 +68,17 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
         case PrioPaceMode::FIXED:
         case PrioPaceMode::STATIC_FROM_CBF:
         case PrioPaceMode::STATIC_FROM_CDF: {
+            if (nextGrantTime > currentTime) {
+                return NULL;
+            }
+
             if ((totalOutstandingBytes + (int)grantedPktSizeOnWire) >
                     schedInflightByteCap) {
                 return NULL;
             }
-        }
 
             // We can prepare and return a grant
+            lastGrantPrio = prio;
             nextTimeToGrant =
                 getNextGrantTime(currentTime, grantedPktSizeOnWire);
             totalOutstandingBytes += grantedPktSizeOnWire;
@@ -86,6 +87,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             sumInflightSchedPerPrio[prio] +=
                 grantedPktSizeOnWire;
             return msgToGrant->prepareGrant(grantSize, prio);
+        }
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE: {
             ASSERT(msgToGrant->bytesToGrant >= 0);
@@ -97,7 +99,15 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     vecIter != inflightSchedPerPrio.rend(); ++vecIter) {
 
                 if ((int)grantedPktSizeOnWire <= schedByteCap) {
-                    // We can send a grant here at the current prio.
+                    // If the privious grant was sent on same or higher (lower
+                    // value) priority, the we should check that we've passed
+                    // nextGrantTime
+                    if (prio >= lastGrantPrio && nextGrantTime > currentTime) {
+                        return NULL;
+                    }
+                    lastGrantPrio = prio;
+
+                    // We can now send a grant here at the current prio.
                     // First find this current message in scheduled mapped
                     // messages of this module and remove it from all maps but
                     // keep track of the maps.
