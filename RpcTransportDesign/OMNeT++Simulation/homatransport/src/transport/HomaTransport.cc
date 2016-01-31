@@ -818,11 +818,11 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::updateUnschRate(
             bytesTimePair != bytesRecvTime.end();)
     {
         double deltaTime = arrivalTime.dbl() - bytesTimePair->second;
-        if (deltaTime < minAvgTimeWindow) {
+        if (deltaTime <= minAvgTimeWindow) {
             return;
         }
 
-        if (deltaTime > 2*minAvgTimeWindow) {
+        if (deltaTime > minAvgTimeWindow) {
             sumBytes -= bytesTimePair->first;
             bytesTimePair = bytesRecvTime.erase(bytesTimePair);
         } else {
