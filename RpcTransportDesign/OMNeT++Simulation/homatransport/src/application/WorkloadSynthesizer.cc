@@ -108,19 +108,34 @@ WorkloadSynthesizer::registerTemplatedStats(const char* msgSizeRanges)
             transportSchedDelayStatsName, statisticTemplate);
 
         char transportSchedPreemptionLagSignalName[50];
-        sprintf(transportSchedPreemptionLagSignalName, "msg%sTransportSchedPreemptionLag",
-            sizeUpperBound.c_str());
+        sprintf(transportSchedPreemptionLagSignalName,
+            "msg%sTransportSchedPreemptionLag", sizeUpperBound.c_str());
         simsignal_t transportSchedPreemptionLagSignal =
             registerSignal(transportSchedPreemptionLagSignalName);
-        msgTransprotSchedPreemptionLagSignalVec.push_back(transportSchedPreemptionLagSignal);
+        msgTransprotSchedPreemptionLagSignalVec.push_back(
+            transportSchedPreemptionLagSignal);
         char transportSchedPreemptionLagStatsName[50];
-        sprintf(transportSchedPreemptionLagStatsName, "msg%sTransportSchedPreemptionLag",
-            sizeUpperBound.c_str());
+        sprintf(transportSchedPreemptionLagStatsName,
+            "msg%sTransportSchedPreemptionLag", sizeUpperBound.c_str());
         statisticTemplate = getProperties()->get("statisticTemplate",
                 "msgRangesTransportSchedPreemptionLag");
         ev.addResultRecorders(this, transportSchedPreemptionLagSignal,
             transportSchedPreemptionLagStatsName, statisticTemplate);
 
+        char msgBytesOnWireSignalName[50];
+        sprintf(msgBytesOnWireSignalName,
+            "msg%sBytesOnWire", sizeUpperBound.c_str());
+        simsignal_t msgBytesOnWireSignal =
+            registerSignal(msgBytesOnWireSignalName);
+        msgBytesOnWireSignalVec.push_back(
+            msgBytesOnWireSignal);
+        char msgBytesOnWireStatsName[50];
+        sprintf(msgBytesOnWireStatsName,
+            "msg%sBytesOnWire", sizeUpperBound.c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+                "msgRangesBytesOnWire");
+        ev.addResultRecorders(this, msgBytesOnWireSignal,
+            msgBytesOnWireStatsName, statisticTemplate);
     }
 }
 
@@ -465,6 +480,9 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
             rcvdMsg->getTransportSchedDelay());
         emit(msgTransprotSchedPreemptionLagSignalVec.back(),
             rcvdMsg->getTransportSchedPreemptionLag());
+        emit(msgBytesOnWireSignalVec.back(),
+            rcvdMsg->getMsgBytesOnWire());
+
     } else {
         size_t mid, high, low;
         high = msgSizeRangeUpperBounds.size() - 1;
@@ -484,7 +502,8 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
             rcvdMsg->getTransportSchedDelay());
         emit(msgTransprotSchedPreemptionLagSignalVec[high],
             rcvdMsg->getTransportSchedPreemptionLag());
-
+        emit(msgBytesOnWireSignalVec[high],
+            rcvdMsg->getMsgBytesOnWire());
     }
     delete rcvdMsg;
     numReceived++;

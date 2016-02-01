@@ -227,6 +227,9 @@ class HomaTransport : public cSimpleModule
         // The total size of the message as indicated in the req. packet.
         uint32_t msgSize;
 
+        // Total bytes transmitted on wire for this message
+        uint32_t totalBytesOnWire;
+
         // Number of data bytes carried over in the req. packets.
         uint16_t bytesInReq;
 

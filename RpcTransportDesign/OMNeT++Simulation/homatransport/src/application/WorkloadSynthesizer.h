@@ -80,6 +80,7 @@ class WorkloadSynthesizer : public cSimpleModule
     // keep pairs of upper bound message size range and its corresponding
     // signal id.
     std::vector<uint64_t> msgSizeRangeUpperBounds;
+    std::vector<uint64_t> msgBytesOnWireSignalVec;
     std::vector<simsignal_t> msgE2ELatencySignalVec;
     std::vector<simsignal_t> msgE2EStretchSignalVec;
     std::vector<simsignal_t> msgQueueDelaySignalVec;

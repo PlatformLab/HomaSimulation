@@ -540,8 +540,9 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
             << " for " << rxPkt->getReqFields().msgByteLen << " bytes." << endl;
 
     uint32_t numBytesInReqPkt = rxPkt->getReqFields().numReqBytes;
-    unschRateComp->updateUnschRate(simTime(),
-        HomaPkt::getBytesOnWire(numBytesInReqPkt, PktType::REQUEST));
+    uint32_t reqBytesOnWire =
+        HomaPkt::getBytesOnWire(numBytesInReqPkt, PktType::REQUEST);
+    unschRateComp->updateUnschRate(simTime(), reqBytesOnWire);
     addArrivedBytes(PktType::REQUEST, rxPkt->getPriority(), numBytesInReqPkt);
 
     // Check if this message already added to incompleteRxMsg. if not create new
@@ -583,6 +584,9 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
     if (numBytesInReqPkt > 0) {
         inboundMsg->fillinRxBytes(0, numBytesInReqPkt - 1);
     }
+
+    // Add the bytes on wire to the inbound message
+    inboundMsg->totalBytesOnWire += reqBytesOnWire;
 
     if (inboundMsg->bytesToReceive <= 0) {
         ASSERT(inboundMsg->bytesToGrant == 0);
@@ -635,9 +639,10 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
             rxPkt->getUnschedDataFields().msgByteLen << " bytes." << endl;
 
     uint32_t pktUnschedBytes = rxPkt->getUnschedDataFields().lastByte -
-            rxPkt->getUnschedDataFields().firstByte + 1;
-    unschRateComp->updateUnschRate(simTime(),
-        HomaPkt::getBytesOnWire(pktUnschedBytes, PktType::UNSCHED_DATA));
+        rxPkt->getUnschedDataFields().firstByte + 1;
+    uint32_t unschedBytesOnWire =
+        HomaPkt::getBytesOnWire(pktUnschedBytes, PktType::UNSCHED_DATA);
+    unschRateComp->updateUnschRate(simTime(), unschedBytesOnWire);
     addArrivedBytes(PktType::UNSCHED_DATA, rxPkt->getPriority(),
         pktUnschedBytes);
 
@@ -694,6 +699,9 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
     inboundMsg->fillinRxBytes(rxPkt->getUnschedDataFields().firstByte,
             rxPkt->getUnschedDataFields().lastByte);
 
+    // Add the bytes on wire to the inbound message
+    inboundMsg->totalBytesOnWire += unschedBytesOnWire;
+
     if (inboundMsg->bytesToReceive <= 0) {
         ASSERT(inboundMsg->bytesToGrant == 0);
 
@@ -729,17 +737,21 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
 
     uint32_t bytesReceived = (rxPkt->getSchedDataFields().lastByte
             - rxPkt->getSchedDataFields().firstByte + 1);
-    addArrivedBytes(PktType::SCHED_DATA, rxPkt->getPriority(), bytesReceived);
-    ASSERT(bytesReceived > 0);
-    inboundMsg->bytesGrantedInFlight -= bytesReceived;
-    inboundMsg->fillinRxBytes(rxPkt->getSchedDataFields().firstByte,
-        rxPkt->getSchedDataFields().lastByte);
 
     // this is a packet we have already committed in the trafficPacer by sending
     // agrant for it. Now the grant for this packet must be returned to the
     // pacer.
     uint32_t totalOnwireBytesReceived = HomaPkt::getBytesOnWire(bytesReceived,
         PktType::SCHED_DATA);
+    // Add the bytes on wire to the inbound message
+    inboundMsg->totalBytesOnWire += totalOnwireBytesReceived;
+
+    addArrivedBytes(PktType::SCHED_DATA, rxPkt->getPriority(), bytesReceived);
+    ASSERT(bytesReceived > 0);
+    inboundMsg->bytesGrantedInFlight -= bytesReceived;
+    inboundMsg->fillinRxBytes(rxPkt->getSchedDataFields().firstByte,
+        rxPkt->getSchedDataFields().lastByte);
+
     transport->outstandingGrantBytes -= totalOnwireBytesReceived;
     transport->emit(totalOutstandingBytesSignal, trafficPacer->getTotalOutstandingBytes());
     trafficPacer->bytesArrived(inboundMsg, bytesReceived, PktType::SCHED_DATA,
@@ -1002,6 +1014,7 @@ HomaTransport::InboundMessage::InboundMessage()
     , bytesGrantedInFlight(0)
     , bytesToReceive(0)
     , msgSize(0)
+    , totalBytesOnWire(0)
     , bytesInReq(0)
     , totalUnschedBytes(0)
     , msgCreationTime(SIMTIME_ZERO)
@@ -1031,6 +1044,7 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , bytesGrantedInFlight(0)
     , bytesToReceive(0)
     , msgSize(0)
+    , totalBytesOnWire(0)
     , bytesInReq(0)
     , totalUnschedBytes(0)
     , msgCreationTime(SIMTIME_ZERO)
@@ -1140,6 +1154,7 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
     rxMsg->setSrcAddr(this->srcAddr);
     rxMsg->setByteLength(this->msgSize);
     rxMsg->setMsgCreationTime(this->msgCreationTime);
+    rxMsg->setMsgBytesOnWire(this->totalBytesOnWire);
 
     // calculate scheduling delay
     if (totalUnschedBytes >= msgSize) {

@@ -28,4 +28,5 @@ packet AppMessage {
      simtime_t msgCreationTime;
      simtime_t transportSchedDelay;
      simtime_t transportSchedPreemptionLag;
+     long msgBytesOnWire;
 }
