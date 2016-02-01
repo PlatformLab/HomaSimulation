@@ -38,17 +38,21 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         "/OMNeT++Simulation/analysis/PlotScripts/stretchVsUnsched.txt", 'w')
     tw_h = 40
     tw_l = 15
-    f.write('LoadFactor'.center(tw_l) + 'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) + 'SizeCntPercent'.center(tw_l) +
-            'UnschedBytes'.center(tw_l) + 'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
-            '99PercentStretch'.center(tw_l) + '\n')
+    f.write('LoadFactor'.center(tw_l) + 'WorkLoad'.center(tw_h) +
+        'MsgSizeRange'.center(tw_l) + 'SizeCntPercent'.center(tw_l) +
+        'BytesPercent'.center(tw_l) + 'UnschedBytes'.center(tw_l) +
+        'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
+        '99PercentStretch'.center(tw_l) + '\n')
     for filename in glob(os.path.join(resultDir, '*.sca')):
         parsedStats = AttrDict()
         parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
         xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
         xmlParsedDic = AttrDict()
         xmlParsedDic = parseXmlFile(xmlConfigFile)
+        msgBytesOnWireDigest = AttrDict()
+        msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
-        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, e2eStretchAndDelayDigest)
+        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
         loadFactor = float(parsedStats.generalInfo.loadFactor) * len(xmlParsedDic.senderIds)
         if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
             loadFactor = loadFactor/0.75
@@ -70,26 +74,31 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         for elem in e2eStretchAndDelayDigest.stretch:
             sizeUpBound = elem.sizeUpBound
             sizeProbability = elem.cntPercent
+            bytesPercent = elem.bytesPercent
             meanStretch = float(elem.mean)
             medianStretch = float(elem.median)
             tailStretch = float(elem.ninety9Percentile)
             avgStretch += meanStretch * float(elem.cntPercent) / 100
             f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
-                '{0}'.format(sizeUpBound).center(tw_l) + '{0}'.format(sizeProbability).center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(meanStretch).center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
+                '{0}'.format(sizeUpBound).center(tw_l) + '{0:.5f}'.format(sizeProbability).center(tw_l) +
+                '{0:.5f}'.format(bytesPercent).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format(meanStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '\n')
             f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
-                '{0}'.format(sizeUpBound).center(tw_l) + '{0}'.format(sizeProbability).center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format(medianStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
+                '{0}'.format(sizeUpBound).center(tw_l) + '{0:.5f}'.format(sizeProbability).center(tw_l) +
+                '{0:.5f}'.format(bytesPercent).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format(medianStretch).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '\n')
             f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
-                '{0}'.format(sizeUpBound).center(tw_l) + '{0}'.format(sizeProbability).center(tw_l) +
-                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '{0}'.format(tailStretch).center(tw_l) + '\n')
+                '{0}'.format(sizeUpBound).center(tw_l) + '{0:.5f}'.format(sizeProbability).center(tw_l) +
+                '{0:.5f}'.format(bytesPercent).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format(tailStretch).center(tw_l) + '\n')
         f.write('{0}'.format(loadFactor).center(tw_l) + '{0}'.format(workLoad).center(tw_h) +
             '{0}'.format('overallsizes').center(tw_l) + '{0}'.format(1.00).center(tw_l) +
-            '{0}'.format(unschedbytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l) +
-            '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
+            '{0}'.format(100).center(tw_l) + '{0}'.format(unschedbytes).center(tw_l) +
+            '{0}'.format(avgStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+            '{0}'.format('NA').center(tw_l) + '\n')
     f.close()
 
 def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
@@ -100,9 +109,9 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
     tw_l = 15
     f.write('TransportType'.center(tw_l) + 'LoadFactor'.center(tw_l) +
         'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) +
-        'SizeCntPercent'.center(tw_l) + 'UnschedBytes'.center(tw_l) +
-        'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
-        '99PercentStretch'.center(tw_l) + '\n')
+        'SizeCntPercent'.center(tw_l) + 'BytesPercent'.center(tw_l) + 
+        'UnschedBytes'.center(tw_l) + 'MeanStretch'.center(tw_l) +
+        'MedianStretch'.center(tw_l) + '99PercentStretch'.center(tw_l) + '\n')
     for dirFile in resultFiles:
         match = re.match('(\S+)/(\S+)', dirFile)
         transport = match.group(1)
@@ -112,8 +121,11 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
         xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
         xmlParsedDic = AttrDict()
         xmlParsedDic = parseXmlFile(xmlConfigFile)
+        msgBytesOnWireDigest = AttrDict()
+        msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
-        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, e2eStretchAndDelayDigest)
+        e2eStretchAndDelayDigest = AttrDict()
+        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
         loadFactor = float(parsedStats.generalInfo.loadFactor) * len(xmlParsedDic.senderIds)
         if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
             loadFactor = loadFactor/0.75
@@ -133,30 +145,31 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
         for elem in e2eStretchAndDelayDigest.stretch:
             sizeUpBound = elem.sizeUpBound
             sizeProbability = elem.cntPercent
+            bytesPercent = elem.bytesPercent
             meanStretch = float(elem.mean)
             medianStretch = float(elem.median)
             tailStretch = float(elem.ninety9Percentile)
             avgStretch += meanStretch * float(elem.cntPercent) / 100
             f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
                 '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
-                '{0}'.format(meanStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '\n')
+                '{0:.5f}'.format(sizeProbability).center(tw_l) + '{0:.5f}'.format(bytesPercent).center(tw_l) +
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(meanStretch).center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
             f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
                 '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '{0}'.format(medianStretch).center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '\n')
+                '{0:.5f}'.format(sizeProbability).center(tw_l) + '{0:.5f}'.format(bytesPercent).center(tw_l) +
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format(medianStretch).center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
             f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
                 '{0}'.format(workLoad).center(tw_h) + '{0}'.format(sizeUpBound).center(tw_l) +
-                '{0}'.format(sizeProbability).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format(tailStretch).center(tw_l) + '\n')
+                '{0:.5f}'.format(sizeProbability).center(tw_l) + '{0:.5f}'.format(bytesPercent).center(tw_l) +
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format('NA').center(tw_l) +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format(tailStretch).center(tw_l) + '\n')
         f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
                 '{0}'.format(workLoad).center(tw_h) + '{0}'.format('OverAllSizes').center(tw_l) +
-                '{0}'.format(1.00).center(tw_l) + '{0}'.format(UnschedBytes).center(tw_l) +
-                '{0}'.format(avgStretch).center(tw_l)  + '{0}'.format('NA').center(tw_l) +
-                '{0}'.format('NA').center(tw_l) + '\n')
+                '{0}'.format(1.00).center(tw_l) + '{0}'.format(100).center(tw_l) + 
+                '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l)  +
+                '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
     f.close()
 
 if __name__ == '__main__':

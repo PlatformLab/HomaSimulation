@@ -143,7 +143,7 @@ def killAll():
         workerName = worker[0]
         killCmd = ("kill -9 \$(ps aux | grep runCmdsMultiProc | grep worker |"
             " grep -v grep | awk '{print \$2}') > /dev/null 2>&1;"
-            " kill -9 \$(pidof homatransport) > /dev/null 2>&1 &")
+            " kill -2 \$(pidof homatransport) > /dev/null 2>&1 &")
         sshKillCmd = ('ssh -n -f %s "%s"'
             % (workerName, killCmd,))
         try:
