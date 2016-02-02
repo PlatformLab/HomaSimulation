@@ -74,6 +74,7 @@ class PseudoIdealPriorityTransport : public cSimpleModule
       public:
         int numBytesToRecv;
         uint32_t msgByteLen;
+        uint32_t totalBytesOnWire;
         inet::L3Address srcAddr;
         inet::L3Address destAddr;
         uint64_t msgIdAtSender;

@@ -198,6 +198,7 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
         rxMsg->setMsgCreationTime(inboundRxMsg->msgCreationTime);
         rxMsg->setTransportSchedDelay(SIMTIME_ZERO);
         rxMsg->setByteLength(inboundRxMsg->msgByteLen);
+        rxMsg->setMsgBytesOnWire(inboundRxMsg->totalBytesOnWire);
         send(rxMsg, "appOut", 0);
         delete inboundRxMsg;
     }
@@ -208,6 +209,7 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
 PseudoIdealPriorityTransport::InboundMsg::InboundMsg()
     : numBytesToRecv(0)
     , msgByteLen(0)
+    , totalBytesOnWire(0)
     , srcAddr()
     , destAddr()
     , msgIdAtSender(0)
@@ -217,6 +219,7 @@ PseudoIdealPriorityTransport::InboundMsg::InboundMsg()
 PseudoIdealPriorityTransport::InboundMsg::InboundMsg(HomaPkt* rxPkt)
     : numBytesToRecv(0)
     , msgByteLen(0)
+    , totalBytesOnWire(0)
     , srcAddr(rxPkt->getSrcAddr())
     , destAddr(rxPkt->getDestAddr())
     , msgIdAtSender(rxPkt->getMsgId())
@@ -244,12 +247,17 @@ PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
 
     // Return true if rxPkt is the sole packet of a size zero message
     if (msgByteLen == 0) {
+        totalBytesOnWire +=
+            HomaPkt::getBytesOnWire(0, (PktType)rxPkt->getPktType());
         return true;
     }
 
     // append the data and return
     uint32_t dataBytesInPkt =
-            unschedFields.lastByte - unschedFields.firstByte + 1;
+        unschedFields.lastByte - unschedFields.firstByte + 1;
+    totalBytesOnWire +=
+        HomaPkt::getBytesOnWire(dataBytesInPkt, (PktType)rxPkt->getPktType());
+
     numBytesToRecv -= dataBytesInPkt;
     if (numBytesToRecv < 0) {
         cRuntimeError("Remaining bytes to receive for an inbound msg can't be"
