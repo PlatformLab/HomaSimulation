@@ -16,9 +16,13 @@ PriorityResolver::PriorityResolver(const uint32_t numPrios,
     , distEstimator(distEstimator)
     , prioCutOffsFromCdf()
     , prioCutOffsFromCbf()
+    , prioCutOffsExpCbf()
+    , prioCutOffsExpCdf()
 {
     setCdfPrioCutOffs();
     setCbfPrioCutOffs();
+    setExpFromCdfPrioCutOffs();
+    setExpFromCbfPrioCutOffs();
 }
 
 uint16_t
@@ -51,6 +55,12 @@ PriorityResolver::getPrioForPkt(PrioResolutionMode prioMode,
         case PrioResolutionMode::STATIC_FROM_CBF:
             cutOffVec = &prioCutOffsFromCbf;
             break;
+        case PrioResolutionMode::STATIC_EXP_CDF:
+            cutOffVec = &prioCutOffsExpCdf;
+            break;
+        case PrioResolutionMode::STATIC_EXP_CBF:
+            cutOffVec = &prioCutOffsExpCbf;
+            break;
         default:
             cRuntimeError("Invalid priority mode: prioMode(%d)", prioMode);
     }
@@ -76,6 +86,7 @@ PriorityResolver::recomputeCbf(uint32_t cbfCapMsgSize)
         distEstimator->getCbfFromCdf(distEstimator->cdfFromFile,
             cbfCapMsgSize);
         setCbfPrioCutOffs();
+        setExpFromCbfPrioCutOffs();
         lastCbfCapMsgSize = cbfCapMsgSize;
     }
 }
@@ -89,7 +100,7 @@ PriorityResolver::setCdfPrioCutOffs()
     double probMax = 1.0;
     double probStep = probMax/numPrios;
     size_t i = 0;
-    uint32_t prevCutOffCdfSize = 0;
+    uint32_t prevCutOffCdfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
         for (; i < cdf->size(); i++) {
             if (cdf->at(i).first == prevCutOffCdfSize) {
@@ -108,6 +119,33 @@ PriorityResolver::setCdfPrioCutOffs()
 }
 
 void
+PriorityResolver::setExpFromCdfPrioCutOffs()
+{
+    prioCutOffsExpCdf.clear();
+    ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
+        && cbf->at(cbf->size() - 1).second == 1.00);
+    double probMax = 1.0;
+    double probStep = ((1 << (numPrios-1)) * probMax) / ((1 << numPrios) - 1);
+    size_t i = 0;
+    uint32_t prevCutOffExpCdfSize = UINT32_MAX;
+    for (double prob = probStep; prob < probMax; prob += probStep) {
+        probStep /= 2.0;
+        for (; i < cdf->size(); i++) {
+            if (cdf->at(i).first == prevCutOffExpCdfSize) {
+                // Do not add duplicate sizes to cutOffSizes vector
+                continue;
+            }
+            if (cdf->at(i).second >= prob) {
+                prioCutOffsExpCdf.push_back(cdf->at(i).first);
+                prevCutOffExpCdfSize = cdf->at(i).first;
+                break;
+            }
+        }
+    }
+    prioCutOffsExpCdf.push_back(UINT32_MAX);
+}
+
+void
 PriorityResolver::setCbfPrioCutOffs()
 {
     prioCutOffsFromCbf.clear();
@@ -116,7 +154,7 @@ PriorityResolver::setCbfPrioCutOffs()
     double probMax = 1.0;
     double probStep = probMax/numPrios;
     size_t j = 0;
-    uint32_t prevCutOffCbfSize = 0;
+    uint32_t prevCutOffCbfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
         for (; j < cbf->size(); j++) {
             if (cbf->at(j).first == prevCutOffCbfSize) {
@@ -133,6 +171,33 @@ PriorityResolver::setCbfPrioCutOffs()
     prioCutOffsFromCbf.push_back(UINT32_MAX);
 }
 
+void
+PriorityResolver::setExpFromCbfPrioCutOffs()
+{
+    prioCutOffsExpCbf.clear();
+    ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
+        && cbf->at(cbf->size() - 1).second == 1.00);
+    double probMax = 1.0;
+    double probStep = ((1 << (numPrios-1)) * probMax) / ((1 << numPrios) - 1);
+    size_t i = 0;
+    uint32_t prevCutOffExpCbfSize = UINT32_MAX;
+    for (double prob = probStep; prob < probMax; prob += probStep) {
+        probStep /= 2.0;
+        for (; i < cbf->size(); i++) {
+            if (cbf->at(i).first == prevCutOffExpCbfSize) {
+                // Do not add duplicate sizes to cutOffSizes vector
+                continue;
+            }
+            if (cbf->at(i).second >= prob) {
+                prioCutOffsExpCbf.push_back(cbf->at(i).first);
+                prevCutOffExpCbfSize = cbf->at(i).first;
+                break;
+            }
+        }
+    }
+    prioCutOffsExpCbf.push_back(UINT32_MAX);
+
+}
 
 
 PriorityResolver::PrioResolutionMode
@@ -146,6 +211,10 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
         return PrioResolutionMode::FIXED_UNSCHED;
     } else if (strcmp(prioResMode, "FIXED_SCHED") == 0) {
         return PrioResolutionMode::FIXED_SCHED;
+    } else if (strcmp(prioResMode, "STATIC_EXP_CDF") == 0) {
+        return PrioResolutionMode::STATIC_EXP_CDF;
+    } else if (strcmp(prioResMode, "STATIC_EXP_CBF") == 0) {
+        return PrioResolutionMode::STATIC_EXP_CBF;
     } else {
         return PrioResolutionMode::INVALID_PRIO_MODE;
     }

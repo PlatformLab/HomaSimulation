@@ -17,6 +17,8 @@ class PriorityResolver
     enum PrioResolutionMode {
         STATIC_FROM_CDF = 0,
         STATIC_FROM_CBF,
+        STATIC_EXP_CDF,
+        STATIC_EXP_CBF,
         FIXED_UNSCHED,
         FIXED_SCHED,
         INVALID_PRIO_MODE        // Always the last value
@@ -27,6 +29,8 @@ class PriorityResolver
         const PktType pktType);
     void setCdfPrioCutOffs();
     void setCbfPrioCutOffs();
+    void setExpFromCdfPrioCutOffs();
+    void setExpFromCbfPrioCutOffs();
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
   private:
@@ -37,6 +41,8 @@ class PriorityResolver
     WorkloadEstimator* distEstimator;
     std::vector<uint32_t> prioCutOffsFromCdf;
     std::vector<uint32_t> prioCutOffsFromCbf;
+    std::vector<uint32_t> prioCutOffsExpCbf;
+    std::vector<uint32_t> prioCutOffsExpCdf;
 
   protected:
     void recomputeCbf(uint32_t cbfCapMsgSize);
