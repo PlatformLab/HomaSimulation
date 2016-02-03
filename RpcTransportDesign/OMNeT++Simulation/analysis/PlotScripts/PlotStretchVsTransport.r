@@ -34,6 +34,7 @@ tailStretchVsSize <- ddply(tailStretchVsSize, .(TransportType, LoadFactor, WorkL
 tailStretchVsSize$MsgSizeRange <- as.numeric(as.character(tailStretchVsSize$MsgSizeRange))
 
 textSize <- 35
+titleSize <- 30
 yLimit <- 5
 hasPseudoIdeal = !empty(subset(stretchVsSize, TransportType %in% c('PseudoIdeal')))
 normalizedGraph = FALSE
@@ -84,10 +85,11 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
                         aes(x=SizeCumPercent, y=MeanStretch, width=SizeCntPercent), direction='vh', color='red', size=2)
             }
 
+            plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='') 
             avgStretchPlot[[i]] <- avgStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"),
-                    axis.text.x = element_text(angle=75, vjust=0.5),
-                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
+                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+                    plot.title = element_text(size = titleSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MeanStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
@@ -131,10 +133,11 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
                         aes(x=BytesCumPercent, y=MeanStretch, width=BytesPercent), direction='vh', color='red', size=2)
             }
 
+            plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='') 
             avgStretchPlot[[i]] <- avgStretchPlot[[i]] +
-            theme(text = element_text(size=textSize, face="bold"),
-                axis.text.x = element_text(angle=75, vjust=0.5),
-                strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
+            theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+                plot.title = element_text(size = titleSize)) +
             scale_x_continuous(breaks = tmp$BytesCumPercent) +
             coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MeanStretch, na.rm=TRUE)))) +
             labs(title = plotTitle, x = "Cumulative Bytes Percent", y = yLab)
@@ -199,10 +202,11 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
 
             }
 
+            plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='') 
             medianStretchPlot[[i]] <- medianStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"),
-                    axis.text.x = element_text(angle=75, vjust=0.5),
-                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
+                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+                    plot.title = element_text(size = titleSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MedianStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
@@ -247,10 +251,11 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
 
             }
 
+            plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='') 
             medianStretchPlot[[i]] <- medianStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"),
-                    axis.text.x = element_text(angle=75, vjust=0.5),
-                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
+                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+                    plot.title = element_text(size = titleSize)) +
                 scale_x_continuous(breaks = tmp$BytesCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MedianStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Bytes Percent", y = yLab)
@@ -313,9 +318,9 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
             }
 
             tailStretchPlot[[i]] <- tailStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"),
-                    axis.text.x = element_text(angle=75, vjust=0.5),
-                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
+                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+                    plot.title = element_text(size = titleSize)) +
                 scale_x_continuous(breaks = tmp$SizeCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$TailStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
@@ -326,6 +331,7 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
                 select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'BytesPercent', 'BytesCumPercent',
                 'TransportType', 'TailStretch', 'UnschedBytes'))
 
+            plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='') 
             if (hasPseudoIdeal && normalizedGraph) {
                 pseudoIdealDF = subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
                     select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'BytesPercent', 'BytesCumPercent', 'TransportType',
@@ -359,10 +365,11 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
                         aes(x=BytesCumPercent, y=TailStretch, width=BytesPercent), direction='vh', color='red', size=2)
             }
 
+            plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='') 
             tailStretchPlot[[i]] <- tailStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"),
-                    axis.text.x = element_text(angle=75, vjust=0.5),
-                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize)) +
+                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                    strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+                    plot.title = element_text(size = titleSize)) +
                 scale_x_continuous(breaks = tmp$BytesCumPercent) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$TailStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Bytes Percent", y = yLab)
