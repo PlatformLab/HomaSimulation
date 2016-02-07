@@ -31,6 +31,7 @@ class PriorityResolver
     void setCbfPrioCutOffs();
     void setExpFromCdfPrioCutOffs();
     void setExpFromCbfPrioCutOffs();
+    static void printCbfCdf(WorkloadEstimator::CdfVector* vec);
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
   private:

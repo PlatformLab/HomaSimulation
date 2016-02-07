@@ -125,7 +125,7 @@ PriorityResolver::setExpFromCdfPrioCutOffs()
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
-    double probStep = ((1 << (numPrios-1)) * probMax) / ((1 << numPrios) - 1);
+    double probStep = probMax / (2 - pow(2.0, 1-(int)(numPrios)));
     size_t i = 0;
     uint32_t prevCutOffExpCdfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
@@ -178,7 +178,7 @@ PriorityResolver::setExpFromCbfPrioCutOffs()
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
-    double probStep = ((1 << (numPrios-1)) * probMax) / ((1 << numPrios) - 1);
+    double probStep = probMax / (2 - pow(2.0, 1-(int)(numPrios)));
     size_t i = 0;
     uint32_t prevCutOffExpCbfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
@@ -217,5 +217,13 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
         return PrioResolutionMode::STATIC_EXP_CBF;
     } else {
         return PrioResolutionMode::INVALID_PRIO_MODE;
+    }
+}
+
+void
+PriorityResolver::printCbfCdf(WorkloadEstimator::CdfVector* vec)
+{
+    for (auto elem:*vec) {
+        std::cout << elem.first << " : " << elem.second << std::endl;
     }
 }
