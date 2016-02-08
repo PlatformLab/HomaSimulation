@@ -18,20 +18,27 @@ echo
 PROJECT_OUTPUT_DIR=out
 CONFIGNAME=gcc-debug
 PROJECTRELATIVE_PATH=src
-O=../../../homatransport/$PROJECT_OUTPUT_DIR/$CONFIGNAME/$PROJECTRELATIVE_PATH
+O=../../../$PROJECT_OUTPUT_DIR/$CONFIGNAME/$PROJECTRELATIVE_PATH
 
 # Object files for HomaTransport .cc and .msg files
 OBJS=\
 "$O/application/MsgSizeDistributions.o "\
 "$O/application/WorkloadSynthesizer.o "\
+"$O/common/Lagger.o "\
+"$O/common/Util.o "\
+"$O/transport/HomaPkt.o "\
+"$O/transport/HomaTransport.o "\
+"$O/transport/PriorityResolver.o "\
+"$O/transport/PseudoIdealPriorityTransport.o "\
 "$O/transport/TrafficPacer.o "\
 "$O/transport/UnschedByteAllocator.o "\
-"$O/transport/HomaTransport.o "\
-"$O/transport/HomaPkt.o "\
+"$O/transport/WorkloadEstimator.o "\
 "$O/application/AppMessage_m.o "\
 "$O/transport/HomaPkt_m.o "
 
-(cd work; opp_makemake -f --deep -L../../../inet/src -lINET -P . -I../../../homatransport/src -I./lib -I../../../inet/src $OBJS; $MAKE) || exit 1
+
+
+(cd work; opp_makemake -f --deep -L../../../../inet/src -lINET -P .  -I../../../src -I./lib -I../../../../inet/src $OBJS; $MAKE) || exit 1
 echo
 opp_test run $OPT -v $TESTFILES || exit 1
 echo

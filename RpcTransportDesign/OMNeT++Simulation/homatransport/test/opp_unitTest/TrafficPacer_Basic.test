@@ -1,0 +1,27 @@
+%description:
+Test the constructor and basic grant allocation
+
+%includes:
+#include <stdio.h>
+#include "transport/TrafficPacer.h"
+#include "transport/PriorityResolver.h"
+
+
+%activity:
+PriorityResolver* prioRes = NULL;
+HomaTransport::ReceiveScheduler::UnschedRateComputer* unschRateComp = NULL;
+double nominalLinkSpeed = 10;
+uint16_t allPrio = 16;
+uint16_t schedPrio = 8;
+uint32_t grantMaxBytes = 1450;
+uint32_t maxAllowedBytes = 9700;
+TrafficPacer trafficPacer(prioRes, unschRateComp, nominalLinkSpeed, allPrio,
+    schedPrio, grantMaxBytes, maxAllowedBytes);
+simtime_t nextTimeToGrant = SIMTIME_ZERO;
+HomaTransport::InboundMessage msgToGrant();
+//nextTimeToGrant = trafficPacer.getNextGrantTime(0, grantMaxBytes);
+EV << "nextGrantTime: " << nextTimeToGrant.dbl();
+
+%contains: stdout
+nextGrantTime:
+
