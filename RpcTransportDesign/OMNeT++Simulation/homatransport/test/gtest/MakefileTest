@@ -9,29 +9,23 @@ CFLAGS = -Wall -g -std=c++0x
 BINDIR=obj
 
 ## contains all library paths in -LPATH format
-LFLAGS=-L../../../omnetpp-4.6/lib
+#LFLAGS=
 
 ## library .a or .so file names are added here
 ## drop trailing extension and word "lib" from the begining of file name and 
 ## add -l flag to remaining part
-
-LIBS = -lm -loppcmdenvd -loppcommond -loppenvird \
-	-loppeventlogd -lopplayoutd \
-	-loppnedxmld -loppscaved -loppsimd \
-	-lopptkenvd
-
+LIBS = -lm
 
 ## source directories other than current directory 
-OTHERDIR=../../src/application
+OTHERDIR=../src/application
 
 ## All include directories
 IFLAGS=-I.
-IFLAGS+=-I../../src
-IFLAGS+=-I../../../omnetpp-4.6/include
+IFLAGS+=-I$(OTHERDIR)
 
 ## all source files in ./ directory or other directories
 SOURCE=TestMain.cc
-SOURCE+=../../src/application/MsgSizeDistributions.cc
+SOURCE+=$(OTHERDIR)/MsgSizeDistributions.cc
 
 ## obj directory in the source directory will contain the object files
 OBJS=$(join $(addsuffix obj/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cc=.o)))

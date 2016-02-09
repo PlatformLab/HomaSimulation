@@ -23,5 +23,5 @@ HomaTransport::InboundMessage msgToGrant();
 EV << "nextGrantTime: " << nextTimeToGrant.dbl();
 
 %contains: stdout
-nextGrantTime:
+nextGrantTime: 
 

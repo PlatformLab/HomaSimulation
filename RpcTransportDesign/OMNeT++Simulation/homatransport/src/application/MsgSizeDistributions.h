@@ -8,17 +8,18 @@
 #ifndef MSGSIZEDISTRIBUTIONS_H_
 #define MSGSIZEDISTRIBUTIONS_H_
 
+#include "common/Minimal.h"
+#include <omnetpp.h>
 #include <string>
 #include <vector>
 #include <queue>
 #include <utility>
 #include <random>
 #include <exception>
-#include <omnetpp.h>
 
 class MsgSizeDistributions {
 
-  public:
+  PUBLIC:
     enum DistributionChoice {
         SIZE_IN_FILE = 0,
         DCTCP,
@@ -50,7 +51,7 @@ class MsgSizeDistributions {
     ~MsgSizeDistributions() {};
     void getSizeAndInterarrival(int &nextMsgSize, double &nextInterarrivalTime);
 
-  private:
+  PRIVATE:
     std::vector<std::pair<int, double>> msgSizeProbDistVector;
     std::queue<std::pair<int, double>> msgSizeInterarrivalQueue;
 
@@ -67,7 +68,7 @@ class MsgSizeDistributions {
     // Max number of data bytes that one packet can carry.
     int maxDataBytesPerPkt;
 
-  private:
+  PRIVATE:
     void getInfileSizeInterarrival(int &msgSize, double &nextInterarrivalTime);
     void getFacebookSizeInterarrival(int &msgSize,
             double &nextInterarrivalTime);

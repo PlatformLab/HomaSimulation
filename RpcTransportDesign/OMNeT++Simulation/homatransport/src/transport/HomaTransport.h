@@ -21,7 +21,6 @@
 #include <vector>
 #include <list>
 #include <omnetpp.h>
-
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"

@@ -20,10 +20,10 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "common/Minimal.h"
 #include "application/MsgSizeDistributions.h"
 #include "application/AppMessage_m.h"
 #include "inet/networklayer/common/L3Address.h"
-
 
 /**
  * Mocks message generating behaviour of an application. Given a messge size
@@ -33,12 +33,11 @@
  */
 class WorkloadSynthesizer : public cSimpleModule
 {
-
-  public:
+  PUBLIC:
     WorkloadSynthesizer();
     ~WorkloadSynthesizer();
 
-  protected:
+  PROTECTED:
     enum SelfMsgKinds { START = 1, SEND, STOP };
 
     // generates samples from the a given random distribution
@@ -87,8 +86,7 @@ class WorkloadSynthesizer : public cSimpleModule
     std::vector<simsignal_t> msgTransprotSchedDelaySignalVec;
     std::vector<simsignal_t> msgTransprotSchedPreemptionLagSignalVec;
 
-
-  protected:
+  PROTECTED:
     virtual void initialize();
     virtual void handleMessage(cMessage* msg);
     virtual void finish();
@@ -103,7 +101,6 @@ class WorkloadSynthesizer : public cSimpleModule
     void parseAndProcessXMLConfig();
     void registerTemplatedStats(const char* msgSizeRanges);
     double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
-
 };
 
 #endif //__HOMATRANSPORT_WORKLOADSYNTHESIZER_H_

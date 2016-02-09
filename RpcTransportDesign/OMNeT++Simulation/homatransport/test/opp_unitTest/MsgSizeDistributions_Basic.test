@@ -1,13 +1,18 @@
-#include <fstream>
-#include "application/MsgSizeDistributions.h"
+%description:
+Test the constructor and basic MsgSizeDistributions
 
-int main() {
+%includes:
+    #include <stdio.h>
+    #include <fstream>
+    #include "application/MsgSizeDistributions.h"
+
+%activity:
     MsgSizeDistributions dctcpDist(
-            "../../sizeDistributions/DCTCP_MsgSizeDist.txt",
+            "../../../../sizeDistributions/DCTCP_MsgSizeDist.txt",
             1500, MsgSizeDistributions::InterArrivalDist::EXPONENTIAL,
             MsgSizeDistributions::DistributionChoice::DCTCP);
     MsgSizeDistributions facebookDist(
-            "../../sizeDistributions/FacebookKeyValueMsgSizeDist.txt",
+            "../../../../sizeDistributions/FacebookKeyValueMsgSizeDist.txt",
             1500, MsgSizeDistributions::InterArrivalDist::EXPONENTIAL,
             MsgSizeDistributions::DistributionChoice::FACEBOOK_KEY_VALUE);
     std::ofstream outDctcpStream;
@@ -26,5 +31,4 @@ int main() {
     }
     outDctcpStream.close();
     outFacebookStream.close();
-    return 0;
-}
+
