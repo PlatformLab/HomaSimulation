@@ -1,2 +1,2 @@
-obj/
-.dep/
+work/
+!Makefile

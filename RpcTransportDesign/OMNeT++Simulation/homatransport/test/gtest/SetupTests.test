@@ -1,0 +1,9 @@
+%description:
+Creates an omnet++ environment and runs testMain() function from TestMain.cc
+
+%includes:
+#include "TestUtil.h"
+#include "TestMain.cc"
+
+%activity:
+    testMain(0, NULL);

@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+// *********This file must be included in all files header files********//
 // Unfortunately, unit tests based on gtest can't access private members
 // of classes.  If the following uppercase versions of "private" and
 // "protected" are used instead, it works around the problem:  when

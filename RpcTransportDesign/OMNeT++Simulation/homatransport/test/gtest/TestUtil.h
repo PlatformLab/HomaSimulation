@@ -13,11 +13,19 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <gtest/gtest.h>
-#include "TestUtil.h"
+/**
+ * \file
+ *  Declares various functions that facilitate testing.
+ */
 
-int
-testMain(int argc, char *argv[]) {
-    ::testing::InitGoogleTest(&argc, argv); 
-    return RUN_ALL_TESTS();
-}
+#ifndef TESTUTIL_H_
+#define TESTUTIL_H_
+
+#include <gtest/gtest.h>
+#include <regex.h>
+#include <sstream>
+
+#define EXPOSE_PRIVATES
+#include "common/Minimal.h"
+
+#endif /* TESTUTIL_H_ */
