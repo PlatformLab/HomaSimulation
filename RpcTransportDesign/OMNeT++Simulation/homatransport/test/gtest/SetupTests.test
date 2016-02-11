@@ -2,8 +2,11 @@
 Creates an omnet++ environment and runs testMain() function from TestMain.cc
 
 %includes:
+#include "gtest/gtest.h"
 #include "TestUtil.h"
 #include "TestMain.cc"
 
 %activity:
-    testMain(0, NULL);
+    int argc = 1;
+    char* argv[5] = {"main"};
+    testMain(argc, argv);
