@@ -9,32 +9,28 @@
 #include "TrafficPacer.h"
 
 TrafficPacer::TrafficPacer(PriorityResolver* prioRes,
-        UnschedRateComputer* unschRateComp, double nominalLinkSpeed,
-        uint16_t allPrio, uint16_t schedPrio, uint32_t grantMaxBytes,
-        uint32_t maxAllowedInFlightBytes, const char* prioPaceMode)
+        UnschedRateComputer* unschRateComp, HomaConfigDepot* homaConfig)
     : prioResolver(prioRes)
     , unschRateComp(unschRateComp)
-    , actualLinkSpeed(nominalLinkSpeed * ACTUAL_TO_NOMINAL_RATE_RATIO)
+    , homaConfig(homaConfig)
     , nextGrantTime(SIMTIME_ZERO)
-    , maxAllowedInFlightBytes(maxAllowedInFlightBytes)
-    , grantMaxBytes(grantMaxBytes)
     , inflightUnschedPerPrio()
     , inflightSchedPerPrio()
     , sumInflightUnschedPerPrio()
     , sumInflightSchedPerPrio()
     , totalOutstandingBytes(0)
     , unschedInflightBytes(0)
-    , paceMode(strPrioPaceModeToEnum(prioPaceMode))
-    , allPrio(allPrio)
-    , schedPrio(schedPrio)
-    , lastGrantPrio(allPrio)
+    , paceMode(strPrioPaceModeToEnum(homaConfig->schedPrioAssignMode))
+    , lastGrantPrio(homaConfig->allPrio)
 {
-    inflightUnschedPerPrio.resize(allPrio);
-    inflightSchedPerPrio.resize(schedPrio);
-    sumInflightUnschedPerPrio.resize(allPrio);
-    std::fill(sumInflightUnschedPerPrio.begin(), sumInflightUnschedPerPrio.end(), 0);
-    sumInflightSchedPerPrio.resize(allPrio);
-    std::fill(sumInflightSchedPerPrio.begin(), sumInflightSchedPerPrio.end(), 0);
+    inflightUnschedPerPrio.resize(homaConfig->allPrio);
+    inflightSchedPerPrio.resize(homaConfig->schedPrioLevels);
+    sumInflightUnschedPerPrio.resize(homaConfig->allPrio);
+    std::fill(sumInflightUnschedPerPrio.begin(),
+        sumInflightUnschedPerPrio.end(), 0);
+    sumInflightSchedPerPrio.resize(homaConfig->allPrio);
+    std::fill(sumInflightSchedPerPrio.begin(),
+        sumInflightSchedPerPrio.end(), 0);
 }
 
 TrafficPacer::~TrafficPacer()
@@ -48,8 +44,8 @@ simtime_t
 TrafficPacer::getNextGrantTime(simtime_t currentTime,
     uint32_t grantedPktSizeOnWire)
 {
-    nextGrantTime = SimTime(1e-9 *
-        (grantedPktSizeOnWire * 8.0 / actualLinkSpeed)) + currentTime;
+    nextGrantTime = SimTime(1e-9 * (grantedPktSizeOnWire * 8.0 /
+        homaConfig->nicLinkSpeed)) + currentTime;
     return nextGrantTime;
 }
 
@@ -58,10 +54,11 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
     simtime_t &nextTimeToGrant)
 {
     uint16_t prio = 0;
-    uint32_t grantSize = std::min(msgToGrant->bytesToGrant, grantMaxBytes);
+    uint32_t grantSize =
+        std::min(msgToGrant->bytesToGrant, homaConfig->grantMaxBytes);
     uint32_t grantedPktSizeOnWire =
         HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
-    int schedInflightByteCap = (int)(maxAllowedInFlightBytes *
+    int schedInflightByteCap = (int)(homaConfig->maxOutstandingRecvBytes *
         (1-unschRateComp->getAvgUnschRate(currentTime)));
 
     switch (paceMode) {
@@ -82,8 +79,9 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             nextTimeToGrant =
                 getNextGrantTime(currentTime, grantedPktSizeOnWire);
             totalOutstandingBytes += grantedPktSizeOnWire;
-            prio = prioResolver->getPrioForPkt(prioPace2PrioResolution(paceMode),
-                msgToGrant->msgSize, PktType::SCHED_DATA);
+            prio = prioResolver->getPrioForPkt(
+                prioPace2PrioResolution(paceMode), msgToGrant->msgSize,
+                PktType::SCHED_DATA);
             sumInflightSchedPerPrio[prio] +=
                 grantedPktSizeOnWire;
             return msgToGrant->prepareGrant(grantSize, prio);
@@ -94,7 +92,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             int schedByteCap =
                 schedInflightByteCap - (int)totalOutstandingBytes;
 
-            prio = allPrio - 1;
+            prio = homaConfig->allPrio - 1;
             for (auto vecIter = inflightSchedPerPrio.rbegin();
                     vecIter != inflightSchedPerPrio.rend(); ++vecIter) {
 
@@ -114,13 +112,14 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     std::vector<std::pair<uint16, uint32_t>>prioSchedVec = {};
                     auto inbndMsgOutbytesIter = vecIter->find(msgToGrant);
                     if (inbndMsgOutbytesIter == vecIter->end()) {
-                        prioSchedVec.push_back(std::make_pair(
-                            prio + schedPrio - allPrio, grantedPktSizeOnWire));
+                        prioSchedVec.push_back(std::make_pair(prio +
+                            homaConfig->schedPrioLevels - homaConfig->allPrio,
+                            grantedPktSizeOnWire));
                     } else {
-                        prioSchedVec.push_back(std::make_pair(
-                            prio + schedPrio - allPrio,
+                        prioSchedVec.push_back(std::make_pair( prio +
+                        homaConfig->schedPrioLevels - homaConfig->allPrio,
                             inbndMsgOutbytesIter->second+grantedPktSizeOnWire));
-                        vecIter->erase(inbndMsgOutbytesIter);
+                            vecIter->erase(inbndMsgOutbytesIter);
                     }
 
                     for (auto schVecIter = inflightSchedPerPrio.begin();
@@ -198,7 +197,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                         msgToGrant->bytesToGrant) ||
                         (headUnschedMsg->first->bytesToGrant ==
                         msgToGrant->bytesToGrant &&
-                        headUnschedMsg->first->msgSize <= msgToGrant->msgSize)) {
+                        headUnschedMsg->first->msgSize <= msgToGrant->msgSize))
+                    {
                         return NULL;
                     }
                 }
@@ -269,8 +269,8 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
                 case PktType::SCHED_DATA: {
                     sumInflightSchedPerPrio[prio] -=
                         arrivedBytesOnWire;
-                    auto& inbndMap =
-                        inflightSchedPerPrio[prio + schedPrio - allPrio];
+                    auto& inbndMap = inflightSchedPerPrio[prio +
+                        homaConfig->schedPrioLevels - homaConfig->allPrio];
                     auto msgOutbytesIter = inbndMap.find(inbndMsg);
                     ASSERT(msgOutbytesIter != inbndMap.end() &&
                         msgOutbytesIter->second >= arrivedBytesOnWire);

@@ -8,12 +8,10 @@
 #include <cmath>
 #include "UnschedByteAllocator.h"
 
-UnschedByteAllocator::UnschedByteAllocator(uint32_t defaultReqBytes,
-        uint32_t defaultUnschedBytes)
+UnschedByteAllocator::UnschedByteAllocator(HomaConfigDepot* homaConfig)
     : rxAddrUnschedbyteMap()
     , rxAddrReqbyteMap()
-    , defaultReqBytes(defaultReqBytes)
-    , defaultUnschedBytes(defaultUnschedBytes)
+    , homaConfig(homaConfig)
 
 {}
 
@@ -24,7 +22,7 @@ void
 UnschedByteAllocator::initReqBytes(uint32_t rxAddr)
 {
     rxAddrReqbyteMap[rxAddr].clear();
-    rxAddrReqbyteMap[rxAddr] = {{UINT32_MAX, defaultReqBytes}};
+    rxAddrReqbyteMap[rxAddr] = {{UINT32_MAX, homaConfig->defaultReqBytes}};
 }
 
 uint32_t
@@ -42,7 +40,8 @@ void
 UnschedByteAllocator::initUnschedBytes(uint32_t rxAddr)
 {
     rxAddrUnschedbyteMap[rxAddr].clear();
-    rxAddrUnschedbyteMap[rxAddr] = {{UINT32_MAX, defaultUnschedBytes}};
+    rxAddrUnschedbyteMap[rxAddr] = {{UINT32_MAX,
+        homaConfig->defaultUnschedBytes}};
 }
 
 uint32_t

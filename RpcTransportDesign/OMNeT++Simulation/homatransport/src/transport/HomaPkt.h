@@ -9,6 +9,8 @@
 #define HOMAPKT_H_
 
 #include "transport/HomaPkt_m.h"
+#include "common/Minimal.h"
+#include "transport/HomaConfigDepot.h"
 
 /**
  * All of the constants packet and header byte sizes for different types of
@@ -27,17 +29,17 @@ static const uint32_t INTER_PKT_GAP = 12;
 class HomaTransport;
 class HomaPkt : public HomaPkt_Base
 {
-  public:
+  PUBLIC:
     // Points to the transport that owned this packet last time this packet was
     // in an end host. This is only used for statistics collection.
     // This value is assigned when the packet is constructed and is updated by
     // homatransport as soon as it arrives at the transport.
     HomaTransport* ownerTransport;
 
-  private:
+  PRIVATE:
     void copy(const HomaPkt& other);
 
-  public:
+  PUBLIC:
     HomaPkt(HomaTransport* ownerTransport = NULL, const char *name=NULL,
         int kind=0);
     HomaPkt(const HomaPkt& other);
@@ -46,7 +48,8 @@ class HomaPkt : public HomaPkt_Base
 
     virtual HomaPkt *dup() const;
 
-    // ADD CODE HERE to redefine and implement pure virtual functions from HomaPkt_Base
+    // ADD CODE HERE to redefine and implement pure virtual functions from
+    // HomaPkt_Base
 
     /**
      * returns the header size of this packet.
@@ -59,8 +62,8 @@ class HomaPkt : public HomaPkt_Base
     uint32_t getDataBytes();
 
     /**
-     * This function checks if there is a HomaPkt packet encapsulated in the messages
-     * and returns it. Returns null if no HomaPkt is encapsulated.
+     * This function checks if there is a HomaPkt packet encapsulated in the
+     * messages and returns it. Returns null if no HomaPkt is encapsulated.
      */
     static cPacket* searchEncapHomaPkt(cPacket* msg);
 

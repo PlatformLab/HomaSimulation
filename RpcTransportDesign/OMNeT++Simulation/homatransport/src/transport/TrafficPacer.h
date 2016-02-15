@@ -12,13 +12,14 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include "common/Minimal.h"
 #include "transport/HomaPkt.h"
 #include "transport/HomaTransport.h"
 #include "transport/PriorityResolver.h"
 
 class TrafficPacer
 {
-  public:
+  PUBLIC:
     typedef HomaTransport::InboundMessage InboundMessage;
     typedef HomaTransport::ReceiveScheduler::UnschedRateComputer
         UnschedRateComputer;
@@ -32,15 +33,12 @@ class TrafficPacer
     };
 
     TrafficPacer(PriorityResolver* prioRes, UnschedRateComputer* unschRateComp,
-        double nominalLinkSpeed, uint16_t allPrio, uint16_t schedPrio,
-        uint32_t grantMaxBytes, uint32_t maxAllowedInFlightBytes = 10000,
-        const char* prioPaceMode = "FIXED");
+        HomaConfigDepot* homaConfig);
     ~TrafficPacer();
-    static constexpr double ACTUAL_TO_NOMINAL_RATE_RATIO = 1.0;
 
-  private:
+  PRIVATE:
     class InbndMesgCompare {
-      public:
+      PUBLIC:
         InbndMesgCompare(){}
 
         /**
@@ -77,7 +75,7 @@ class TrafficPacer
     PriorityResolver::PrioResolutionMode prioPace2PrioResolution(
         PrioPaceMode prioPaceMode);
 
-  public:
+  PUBLIC:
     void bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
         PktType recvPktType, uint16_t prio);
     void unschedPendingBytes(InboundMessage* inbndMsg, uint32_t committedBytes,
@@ -108,16 +106,14 @@ class TrafficPacer
     }
 
 
-  private:
+  PRIVATE:
     PriorityResolver* prioResolver;
     UnschedRateComputer* unschRateComp;
-    double actualLinkSpeed;
+    HomaConfigDepot* homaConfig;
     simtime_t nextGrantTime;
-    uint32_t maxAllowedInFlightBytes;
 
     // The upper bound on the number of grant data byte carried sent in
     // individual grant packets .
-    uint32_t grantMaxBytes;
     std::vector<InbndMsgOrderedMap> inflightUnschedPerPrio;
     std::vector<InbndMsgOrderedMap> inflightSchedPerPrio;
     std::vector<uint32_t> sumInflightUnschedPerPrio;
@@ -125,8 +121,6 @@ class TrafficPacer
     int totalOutstandingBytes;
     int unschedInflightBytes;
     PrioPaceMode paceMode;
-    uint16_t allPrio;
-    uint16_t schedPrio;
     uint16_t lastGrantPrio;
 };
 #endif /* TRAFFICPACER_H_ */

@@ -8,7 +8,6 @@
 #ifndef MSGSIZEDISTRIBUTIONS_H_
 #define MSGSIZEDISTRIBUTIONS_H_
 
-#include "common/Minimal.h"
 #include <omnetpp.h>
 #include <string>
 #include <vector>
@@ -16,6 +15,7 @@
 #include <utility>
 #include <random>
 #include <exception>
+#include "common/Minimal.h"
 
 class MsgSizeDistributions {
 

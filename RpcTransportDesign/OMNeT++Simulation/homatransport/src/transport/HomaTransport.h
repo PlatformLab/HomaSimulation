@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <omnetpp.h>
+#include "common/Minimal.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
@@ -28,6 +29,7 @@
 #include "transport/PriorityResolver.h"
 #include "transport/WorkloadEstimator.h"
 #include "common/Util.h"
+#include "transport/HomaConfigDepot.h"
 
 class TrafficPacer;
 
@@ -40,7 +42,7 @@ class TrafficPacer;
  */
 class HomaTransport : public cSimpleModule
 {
-  public:
+  PUBLIC:
     HomaTransport();
     ~HomaTransport();
 
@@ -55,7 +57,7 @@ class HomaTransport : public cSimpleModule
      */
     class OutboundMessage
     {
-      public:
+      PUBLIC:
         explicit OutboundMessage();
         explicit OutboundMessage(AppMessage* outMsg,
                 SendController* sxController, uint64_t msgId,
@@ -67,11 +69,7 @@ class HomaTransport : public cSimpleModule
         int sendSchedBytes(uint32_t numBytes, uint16_t schedPrio);
         const uint32_t& getMsgSize() { return msgSize; }
 
-      protected:
-
-        // The SendController that manages the transmission of this msg.
-        SendController* sxController;
-
+      PROTECTED:
         // Unique identification number assigned by in the construction time for
         // the purpose of easy external access to this message.
         uint64_t msgId;
@@ -102,7 +100,13 @@ class HomaTransport : public cSimpleModule
         // in the application.
         simtime_t msgCreationTime;
 
-      private:
+        // The SendController that manages the transmission of this msg.
+        SendController* sxController;
+
+        // The object that keeps all transport configuration parameters
+        HomaConfigDepot *homaConfig;
+
+      PRIVATE:
         void copy(const OutboundMessage &other);
         friend class SendController;
     };
@@ -116,21 +120,17 @@ class HomaTransport : public cSimpleModule
      */
     class SendController
     {
-      public:
+      PUBLIC:
         typedef std::unordered_map<uint64_t, OutboundMessage> OutboundMsgMap;
         SendController(HomaTransport* transport);
         ~SendController();
-        void initSendController(uint32_t defaultReqBytes,
-                uint32_t defaultUnschedBytes, PriorityResolver* prioResolver,
-                PriorityResolver::PrioResolutionMode unschedPrioResMode);
+        void initSendController(HomaConfigDepot* homaConfig,
+            PriorityResolver* prioResolver);
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
 
-      protected:
-
-        // Transport that owns this SendController.
-        HomaTransport* transport;
+      PROTECTED:
 
         // For the purpose of statistics recording, this variable tracks the
         // total number bytes left to send over all outstanding messages.
@@ -149,8 +149,11 @@ class HomaTransport : public cSimpleModule
         // Determine priority of packets that are to be sent
         PriorityResolver *prioResolver;
 
-        // Priority resolution mode parameter used for unsched
-        PriorityResolver::PrioResolutionMode unschedPrioResMode;
+        // Transport that owns this SendController.
+        HomaTransport* transport;
+
+        // The object that keeps the configuration parameters for the transport
+        HomaConfigDepot *homaConfig;
         friend class OutboundMessage;
     };
 
@@ -159,20 +162,21 @@ class HomaTransport : public cSimpleModule
      * fragments in received packets and keeping track of reception progress.
      */
     class InboundMessage {
-      public:
+      PUBLIC:
         explicit InboundMessage();
         explicit InboundMessage(const InboundMessage& other);
-        explicit InboundMessage(HomaPkt* rxPkt, ReceiveScheduler* rxScheduler);
+        explicit InboundMessage(HomaPkt* rxPkt, ReceiveScheduler* rxScheduler,
+            HomaConfigDepot* homaConfig);
         ~InboundMessage();
 
-      public:
+      PUBLIC:
         /**
          * A predicate functor that compares the remaining required grants
          * to be sent for two inbound message.
          */
         class CompareBytesToGrant
         {
-          public:
+          PUBLIC:
             CompareBytesToGrant()
             {}
 
@@ -194,9 +198,12 @@ class HomaTransport : public cSimpleModule
         };
         const uint32_t& getMsgSize() { return msgSize; }
 
-      protected:
+      PROTECTED:
         // The ReceiveScheduler that manages the reception of this message.
         ReceiveScheduler *rxScheduler;
+
+        // The object that keeps all transport configuration parameters
+        HomaConfigDepot *homaConfig;
 
         // Address of the sender of this message.
         inet::L3Address srcAddr;
@@ -280,7 +287,7 @@ class HomaTransport : public cSimpleModule
         friend class ReceiveScheduler;
         friend class TrafficPacer;
 
-      protected:
+      PROTECTED:
         void copy(const InboundMessage& other);
         void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd);
         uint32_t schedBytesInFlight();
@@ -298,7 +305,7 @@ class HomaTransport : public cSimpleModule
      */
     class ReceiveScheduler
     {
-      public:
+      PUBLIC:
         enum QueueType
         {
             PRIO_QUEUE = 0,
@@ -308,7 +315,7 @@ class HomaTransport : public cSimpleModule
 
         class InboundMsgQueue
         {
-          public:
+          PUBLIC:
             typedef std::priority_queue<InboundMessage*,
                 std::vector<InboundMessage*>,
                 InboundMessage::CompareBytesToGrant> PriorityQueue;
@@ -321,25 +328,25 @@ class HomaTransport : public cSimpleModule
             bool empty();
             size_t size();
 
-          private:
+          PRIVATE:
             PriorityQueue prioQueue;
             std::queue<InboundMessage*> fifoQueue;
             QueueType queueType;
         };
 
         class UnschedRateComputer {
-          public:
-            UnschedRateComputer(uint32_t nicLinkSpeed,
+          PUBLIC:
+            UnschedRateComputer(HomaConfigDepot* homaConfig,
                 bool computeAvgUnschRate = false, double minAvgTimeWindow = .1);
             double getAvgUnschRate(simtime_t currentTime);
             void updateUnschRate(simtime_t arrivalTime, uint32_t bytesRecvd);
 
-          public:
+          PUBLIC:
             bool computeAvgUnschRate;
             std::vector<std::pair<uint32_t, double>> bytesRecvTime;
             uint64_t sumBytes;
             double minAvgTimeWindow; // in seconds
-            uint32_t nicLinkSpeed; // In Gb/s
+            HomaConfigDepot* homaConfig;
         };
 
         typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
@@ -351,14 +358,13 @@ class HomaTransport : public cSimpleModule
         void processReceivedSchedData(HomaPkt* rxPkt);
         void processReceivedUnschedData(HomaPkt* rxPkt);
         void sendAndScheduleGrant();
-        void initialize(uint32_t grantMaxBytes, uint32_t nicLinkSpeed,
-            uint16_t allPrio, uint16_t schedPrio, cMessage* grantTimer,
-            QueueType queueType, const char* schedPrioAssignMode,
+        void initialize(HomaConfigDepot* homaConfig, cMessage* grantTimer,
             PriorityResolver* prioResolver);
         InboundMessage* lookupIncompleteRxMsg(HomaPkt* rxPkt);
 
-      protected:
+      PROTECTED:
         HomaTransport* transport;
+        HomaConfigDepot *homaConfig;
         cMessage* grantTimer;
         TrafficPacer* trafficPacer;
         UnschedRateComputer* unschRateComp;
@@ -402,7 +408,7 @@ class HomaTransport : public cSimpleModule
         // collection.
         uint64_t unschedBytesToRecv;
 
-      protected:
+      PROTECTED:
         void addArrivedBytes(PktType pktType, uint16_t prio,
             uint32_t dataBytes);
         void addSentGrantBytes(uint16_t prio, uint32_t grantedBytes);
@@ -412,7 +418,7 @@ class HomaTransport : public cSimpleModule
         friend class InboundMessage;
     };
 
-  public:
+  PUBLIC:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
@@ -459,13 +465,7 @@ class HomaTransport : public cSimpleModule
     // Manages the reception of all inbound messages.
     ReceiveScheduler rxScheduler;
 
-  protected:
-    // Determine priority of packets that are to be sent
-    PriorityResolver *prioResolver;
-
-    // Keeps track of the message size distribution that this transport is
-    // seeing.
-    WorkloadEstimator *distEstimator;
+  PROTECTED:
 
     // UDP socket through which this transport send and receive packets.
     inet::UDPSocket socket;
@@ -475,24 +475,19 @@ class HomaTransport : public cSimpleModule
     // a packet has arrived from outside world.
     inet::L3Address localAddr;
 
+    // The object that keeps the configuration parameters for this transport
+    HomaConfigDepot *homaConfig;
+
+    // Determine priority of packets that are to be sent
+    PriorityResolver *prioResolver;
+
+    // Keeps track of the message size distribution that this transport is
+    // seeing.
+    WorkloadEstimator *distEstimator;
+
     // Timer object for this transport. Will be used for implementing timely
     // scheduled
     cMessage* selfMsg;
-
-    // udp ports assigned to this transprt
-    int localPort;
-    int destPort;
-
-
-    // NIC link speed (in Gb/s) connected to this host. This parameter will be
-    // read from the omnetpp.ini config file.
-    int nicLinkSpeed;
-
-    // This parameter is read from the omnetpp.ini config file and provides an
-    // upper bound on the total allowed outstanding bytes. It is necessary (BUT
-    // NOT ENOUGH) for the rxScheduler to check that the total outstanding bytes
-    // is smaller than this value every time a new grant is to be sent.
-    int maxOutstandingRecvBytes;
 
     // Tracks the total outstanding grant bytes which will be used for stats
     // collection and recording.

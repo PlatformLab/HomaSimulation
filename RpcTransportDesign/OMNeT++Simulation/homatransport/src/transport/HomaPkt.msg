@@ -45,6 +45,11 @@ struct RequestFields
 
     // Priority of unsched packets that will arrive after this req. packet.
     uint16_t unschedPrio;
+
+    // the vector of [unsched, prio, unsched, prio, ...] pakcets pairs. Each two
+    // respective elements of the vector specifies a priority and unsched bytes
+    // on that priority this packet.
+    UnsignedVec unschedBytesPrio;
 };
 
 struct UnschedDataFields
@@ -68,6 +73,11 @@ struct UnschedDataFields
     // packet.
     uint32_t firstByte;
     uint32_t lastByte;
+
+    // the vector of [unsched, prio, unsched, prio, ...] pakcets pairs. Each two
+    // respective elements of the vector specifies a priority and unsched bytes
+    // on that priority this packet.
+    UnsignedVec unschedBytesPrio;
 };
 
 struct GrantFields
@@ -76,10 +86,10 @@ struct GrantFields
     uint16_t schedPrio;
 
     // [(uint32_t size_upper_bound, uint16_t req_byte, uint16_t prio)]
-    UnsignedVec reqBytesPrio;
+    UnsignedVec sizeReqBytesPrio;
 
     // [(uint32_t size_upper_bound, uint16_t unsched_byte, uint16_t prio)]
-    UnsignedVec unschedBytesPrio;
+    UnsignedVec sizeUnschedBytesPrio;
 };
 
 struct SchedDataFields

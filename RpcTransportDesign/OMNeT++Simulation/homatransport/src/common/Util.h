@@ -9,10 +9,11 @@
 #define UTIL_H_
 
 #include <omnetpp.h>
+#include "common/Minimal.h"
 
 class SIM_API HomaMsgSizeFilter : public cObjectResultFilter
 {
-  public:
+  PUBLIC:
     HomaMsgSizeFilter() {}
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
         cObject *object);
@@ -20,7 +21,7 @@ class SIM_API HomaMsgSizeFilter : public cObjectResultFilter
 
 class SIM_API HomaPktBytesFilter : public cObjectResultFilter
 {
-  public:
+  PUBLIC:
     HomaPktBytesFilter() {}
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
         cObject *object);
@@ -28,7 +29,7 @@ class SIM_API HomaPktBytesFilter : public cObjectResultFilter
 
 class SIM_API HomaUnschedPktBytesFilter : public cObjectResultFilter
 {
-  public:
+  PUBLIC:
     HomaUnschedPktBytesFilter() {}
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
         cObject *object);

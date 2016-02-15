@@ -19,6 +19,7 @@
 #include <omnetpp.h>
 #include <unordered_map>
 #include <list>
+#include "common/Minimal.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
@@ -35,16 +36,16 @@
 
 class PseudoIdealPriorityTransport : public cSimpleModule
 {
-  public:
+  PUBLIC:
     // Signal definitions for statistics gathering
     static simsignal_t msgsLeftToSendSignal;
     static simsignal_t bytesLeftToSendSignal;
 
-  public:
+  PUBLIC:
     PseudoIdealPriorityTransport();
     ~PseudoIdealPriorityTransport();
 
-  protected:
+  PROTECTED:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void processStart();
@@ -65,13 +66,13 @@ class PseudoIdealPriorityTransport : public cSimpleModule
 
     class InboundMsg
     {
-      public:
+      PUBLIC:
         explicit InboundMsg();
         explicit InboundMsg(HomaPkt* rxPkt);
         ~InboundMsg();
         bool appendPktData(HomaPkt* rxPkt);
 
-      public:
+      PUBLIC:
         int numBytesToRecv;
         uint32_t msgByteLen;
         uint32_t totalBytesOnWire;
@@ -81,7 +82,7 @@ class PseudoIdealPriorityTransport : public cSimpleModule
         simtime_t msgCreationTime;
     };
 
-  protected:
+  PROTECTED:
 
     // UDP socket through which this transport send and receive packets.
     inet::UDPSocket socket;

@@ -71,8 +71,8 @@ HomaUnschedPktBytesFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     switch (homaPkt->getPktType()) {
         case PktType::REQUEST:
         case PktType::UNSCHED_DATA:
-            fire(this, t, (double)HomaPkt::getBytesOnWire(homaPkt->getDataBytes(),
-                (PktType)homaPkt->getPktType()));
+            fire(this, t, (double)HomaPkt::getBytesOnWire(
+                homaPkt->getDataBytes(), (PktType)homaPkt->getPktType()));
             return;
         default:
             return;

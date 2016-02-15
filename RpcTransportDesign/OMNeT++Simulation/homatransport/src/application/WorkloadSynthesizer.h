@@ -20,10 +20,11 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "inet/networklayer/common/L3Address.h"
 #include "common/Minimal.h"
 #include "application/MsgSizeDistributions.h"
 #include "application/AppMessage_m.h"
-#include "inet/networklayer/common/L3Address.h"
+#include "transport/HomaConfigDepot.h"
 
 /**
  * Mocks message generating behaviour of an application. Given a messge size

@@ -8,12 +8,14 @@
 #ifndef PRIORITYRESOLVER_H_
 #define PRIORITYRESOLVER_H_
 
-#include <transport/WorkloadEstimator.h>
-#include <transport/HomaPkt.h>
+#include "common/Minimal.h"
+#include "transport/WorkloadEstimator.h"
+#include "transport/HomaPkt.h"
+#include "transport/HomaConfigDepot.h"
 
 class PriorityResolver
 {
-  public:
+  PUBLIC:
     enum PrioResolutionMode {
         STATIC_FROM_CDF = 0,
         STATIC_FROM_CBF,
@@ -21,9 +23,10 @@ class PriorityResolver
         STATIC_EXP_CBF,
         FIXED_UNSCHED,
         FIXED_SCHED,
+        SIMULATED_SRBF,
         INVALID_PRIO_MODE        // Always the last value
     };
-    explicit PriorityResolver(const uint32_t numPrios,
+    explicit PriorityResolver(HomaConfigDepot* homaConfig,
         WorkloadEstimator* distEstimator);
     uint16_t getPrioForPkt(PrioResolutionMode prioMode, const uint32_t msgSize,
         const PktType pktType);
@@ -34,18 +37,18 @@ class PriorityResolver
     static void printCbfCdf(WorkloadEstimator::CdfVector* vec);
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
-  private:
-    uint32_t numPrios;
+  PRIVATE:
     uint32_t lastCbfCapMsgSize;
     const WorkloadEstimator::CdfVector* cdf;
     const WorkloadEstimator::CdfVector* cbf;
-    WorkloadEstimator* distEstimator;
     std::vector<uint32_t> prioCutOffsFromCdf;
     std::vector<uint32_t> prioCutOffsFromCbf;
     std::vector<uint32_t> prioCutOffsExpCbf;
     std::vector<uint32_t> prioCutOffsExpCdf;
+    WorkloadEstimator* distEstimator;
+    HomaConfigDepot* homaConfig;
 
-  protected:
+  PROTECTED:
     void recomputeCbf(uint32_t cbfCapMsgSize);
     friend class HomaTransport;
 };

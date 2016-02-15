@@ -7,17 +7,17 @@
 
 #include "PriorityResolver.h"
 
-PriorityResolver::PriorityResolver(const uint32_t numPrios,
+PriorityResolver::PriorityResolver(HomaConfigDepot* homaConfig,
         WorkloadEstimator* distEstimator)
-    : numPrios(numPrios)
-    , lastCbfCapMsgSize(UINT32_MAX)
+    : lastCbfCapMsgSize(UINT32_MAX)
     , cdf(&distEstimator->cdfFromFile)
     , cbf(&distEstimator->cbfFromFile)
-    , distEstimator(distEstimator)
     , prioCutOffsFromCdf()
     , prioCutOffsFromCbf()
     , prioCutOffsExpCbf()
     , prioCutOffsExpCdf()
+    , distEstimator(distEstimator)
+    , homaConfig(homaConfig)
 {
     setCdfPrioCutOffs();
     setCbfPrioCutOffs();
@@ -40,7 +40,7 @@ PriorityResolver::getPrioForPkt(PrioResolutionMode prioMode,
 
     if (prioMode == PrioResolutionMode::FIXED_SCHED) {
         if (pktType == PktType::SCHED_DATA) {
-            return numPrios - 1;
+            return homaConfig->allPrio-1;
         } else {
             cRuntimeError("Invalid PktType %d for PrioMode %d",
                 pktType, prioMode);
@@ -98,7 +98,7 @@ PriorityResolver::setCdfPrioCutOffs()
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
-    double probStep = probMax/numPrios;
+    double probStep = probMax / homaConfig->prioResolverPrioLevels;
     size_t i = 0;
     uint32_t prevCutOffCdfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
@@ -125,7 +125,8 @@ PriorityResolver::setExpFromCdfPrioCutOffs()
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
-    double probStep = probMax / (2 - pow(2.0, 1-(int)(numPrios)));
+    double probStep =
+        probMax / (2 - pow(2.0, 1-(int)(homaConfig->prioResolverPrioLevels)));
     size_t i = 0;
     uint32_t prevCutOffExpCdfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
@@ -152,7 +153,7 @@ PriorityResolver::setCbfPrioCutOffs()
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
-    double probStep = probMax/numPrios;
+    double probStep = probMax / homaConfig->prioResolverPrioLevels;
     size_t j = 0;
     uint32_t prevCutOffCbfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
@@ -178,7 +179,8 @@ PriorityResolver::setExpFromCbfPrioCutOffs()
     ASSERT(cbf->size() == cdf->size() && cdf->at(cdf->size() - 1).second == 1.00
         && cbf->at(cbf->size() - 1).second == 1.00);
     double probMax = 1.0;
-    double probStep = probMax / (2 - pow(2.0, 1-(int)(numPrios)));
+    double probStep =
+        probMax / (2 - pow(2.0, 1-(int)(homaConfig->prioResolverPrioLevels)));
     size_t i = 0;
     uint32_t prevCutOffExpCbfSize = UINT32_MAX;
     for (double prob = probStep; prob < probMax; prob += probStep) {
@@ -215,6 +217,8 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
         return PrioResolutionMode::STATIC_EXP_CDF;
     } else if (strcmp(prioResMode, "STATIC_EXP_CBF") == 0) {
         return PrioResolutionMode::STATIC_EXP_CBF;
+    } else if (strcmp(prioResMode, "SIMULATED_SRBF") == 0) {
+        return PrioResolutionMode::SIMULATED_SRBF;
     } else {
         return PrioResolutionMode::INVALID_PRIO_MODE;
     }
@@ -223,7 +227,7 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
 void
 PriorityResolver::printCbfCdf(WorkloadEstimator::CdfVector* vec)
 {
-    for (auto elem:*vec) {
+    for (auto& elem:*vec) {
         std::cout << elem.first << " : " << elem.second << std::endl;
     }
 }

@@ -17,6 +17,7 @@
 #define __HOMATRANSPORT_LAGGER_H_
 
 #include <omnetpp.h>
+#include "common/Minimal.h"
 
 /**
  * delays a packet before sending it out. This module is intended for the use
@@ -24,18 +25,18 @@
  */
 class Lagger : public cSimpleModule
 {
-  public:
+  PUBLIC:
     Lagger();
     ~Lagger(){}
 
-  protected:
+  PROTECTED:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void inputHookPktHandler(cMessage* msg);
     virtual void outputHookPktHandler(cMessage* msg);
 
 
-  protected:
+  PROTECTED:
     std::string hookType;
     cPar* delayPar;
     cModule* mac;

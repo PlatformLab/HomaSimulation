@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "common/Minimal.h"
 #include "transport/HomaPkt.h"
+#include "transport/HomaConfigDepot.h"
 
 #ifndef UNSCHEDBYTEALLOCATOR_H_
 #define UNSCHEDBYTEALLOCATOR_H_
@@ -16,8 +17,7 @@
 class UnschedByteAllocator
 {
   PUBLIC:
-    explicit UnschedByteAllocator(uint32_t defaultReqBytes,
-            uint32_t defaultUnschedBytes);
+    explicit UnschedByteAllocator(HomaConfigDepot* homaConfig);
     ~UnschedByteAllocator();
     uint32_t getReqDataBytes(uint32_t rxAddr, uint32_t msgSize);
     uint32_t getUnschedBytes(uint32_t rxAddr, uint32_t msgSize);
@@ -33,7 +33,6 @@ class UnschedByteAllocator
             rxAddrUnschedbyteMap;
     std::unordered_map<uint32_t, std::map<uint32_t, uint32_t>>
             rxAddrReqbyteMap;
-    uint32_t defaultReqBytes;
-    uint32_t defaultUnschedBytes;
+    HomaConfigDepot* homaConfig;
 };
 #endif /* UNSCHEDBYTEALLOCATOR_H_ */

@@ -49,7 +49,7 @@ simple HomaTransport like ITransportScheme
         // we enter integers in the string form.
         string cbfCapMsgSize = default("0xFFFFFFFF");
 
-        // Only for simulation puspose, we allow the transport to be aware of
+        // Only for simulation purpose, we allow the transport to be aware of
         // workload type. The value must be similar to WorkloadSynthesizer
         // workloadType.
         string workloadType = default("");
