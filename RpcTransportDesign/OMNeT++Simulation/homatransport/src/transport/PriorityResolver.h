@@ -12,10 +12,13 @@
 #include "transport/WorkloadEstimator.h"
 #include "transport/HomaPkt.h"
 #include "transport/HomaConfigDepot.h"
+#include "transport/HomaTransport.h"
 
 class PriorityResolver
 {
   PUBLIC:
+    typedef HomaTransport::InboundMessage InboundMessage;
+    typedef HomaTransport::OutboundMessage OutboundMessage;
     enum PrioResolutionMode {
         STATIC_FROM_CDF = 0,
         STATIC_FROM_CBF,
@@ -28,8 +31,10 @@ class PriorityResolver
     };
     explicit PriorityResolver(HomaConfigDepot* homaConfig,
         WorkloadEstimator* distEstimator);
-    uint16_t getPrioForPkt(PrioResolutionMode prioMode, const uint32_t msgSize,
-        const PktType pktType);
+    std::vector<uint16_t> getUnschedPktsPrio(PrioResolutionMode prioMode,
+        const OutboundMessage* outbndMsg);
+    uint16_t getSchedPktPrio(PrioResolutionMode prioMode,
+        const InboundMessage* inbndMsg);
     void setCdfPrioCutOffs();
     void setCbfPrioCutOffs();
     void setExpFromCdfPrioCutOffs();

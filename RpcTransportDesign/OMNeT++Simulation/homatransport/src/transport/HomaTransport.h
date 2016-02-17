@@ -26,12 +26,13 @@
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
 #include "transport/UnschedByteAllocator.h"
-#include "transport/PriorityResolver.h"
 #include "transport/WorkloadEstimator.h"
 #include "common/Util.h"
 #include "transport/HomaConfigDepot.h"
 
+// forward decalration to enable mutual header include
 class TrafficPacer;
+class PriorityResolver;
 
 /**
  * A grant based, receiver driven, congection control transport protocol over
@@ -61,7 +62,7 @@ class HomaTransport : public cSimpleModule
         explicit OutboundMessage();
         explicit OutboundMessage(AppMessage* outMsg,
                 SendController* sxController, uint64_t msgId,
-                uint32_t dataBytesInReq, uint32_t unschedDataBytes);
+                std::vector<uint16_t> reqUnschedDataVec);
         explicit OutboundMessage(const OutboundMessage& outboundMsg);
         ~OutboundMessage();
         OutboundMessage& operator=(const OutboundMessage& other);
@@ -84,11 +85,14 @@ class HomaTransport : public cSimpleModule
         // initialized to zero.
         uint32_t nextByteToSend;
 
-        // number of data bytes pibby backed in the req. pkt.
-        uint32_t dataBytesInReq;
-
-        // number of unsched bytes sent in unsched. pkts following the req pkt.
-        uint32_t unschedDataBytes;
+        // This vector is length of total unsched pkts to be sent for
+        // this message. Element i in this vector is number of data bytes to be
+        // sent by the i'th unsched packet for this message. Note that first
+        // unsched pkt at position zero of this vector is always the request
+        // packet and sum of the elements is the total unsched bytes sent for
+        // this mesage. For every message, there will at least one unsched
+        // packet that is request packet, so this vector is at least size 1.
+        std::vector<uint16_t> reqUnschedDataVec;
 
         // IpAddress of destination host for this outbound msg.
         inet::L3Address destAddr;
@@ -108,7 +112,10 @@ class HomaTransport : public cSimpleModule
 
       PRIVATE:
         void copy(const OutboundMessage &other);
+        std::vector<uint32_t> getUnschedPerPrio(
+            std::vector<uint32_t>& unschedPrioVec);
         friend class SendController;
+        friend class PriorityResolver;
     };
 
     /**
@@ -286,6 +293,7 @@ class HomaTransport : public cSimpleModule
         friend class CompareBytesToGrant;
         friend class ReceiveScheduler;
         friend class TrafficPacer;
+        friend class PriorityResolver;
 
       PROTECTED:
         void copy(const InboundMessage& other);

@@ -18,6 +18,7 @@
 #include <cmath>
 #include "transport/HomaPkt.h"
 #include "transport/TrafficPacer.h"
+#include "transport/PriorityResolver.h"
 #include "HomaTransport.h"
 
 Define_Module(HomaTransport);
@@ -231,14 +232,12 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
     uint32_t destAddr =
             sendMsg->getDestAddr().toIPv4().getInt();
     uint32_t msgSize = sendMsg->getByteLength();
-    uint32_t dataBytesInReq =
-            unschedByteAllocator->getReqDataBytes(destAddr, msgSize);
-    uint32_t unschedDataBytes =
-            unschedByteAllocator->getUnschedBytes(destAddr, msgSize);
+    std::vector<uint16_t> reqUnschedDataVec =
+        unschedByteAllocator->getReqUnschedDataPkts(destAddr, msgSize);
+
     outboundMsgMap.emplace(std::piecewise_construct,
             std::forward_as_tuple(msgId),
-            std::forward_as_tuple(sendMsg, this, msgId, dataBytesInReq,
-            unschedDataBytes));
+            std::forward_as_tuple(sendMsg, this, msgId, reqUnschedDataVec));
     outboundMsgMap.at(msgId).sendRequestAndUnsched();
     if (outboundMsgMap.at(msgId).bytesLeft <= 0) {
         outboundMsgMap.erase(msgId);
@@ -277,14 +276,13 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
  * HomaTransport::OutboundMessage
  */
 HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
-        SendController* sxController, uint64_t msgId, uint32_t dataBytesInReq,
-        uint32_t unschedDataBytes)
+        SendController* sxController, uint64_t msgId,
+        std::vector<uint16_t> reqUnschedDataVec)
     : msgId(msgId)
     , msgSize(outMsg->getByteLength())
     , bytesLeft(outMsg->getByteLength())
     , nextByteToSend(0)
-    , dataBytesInReq(dataBytesInReq)
-    , unschedDataBytes(unschedDataBytes)
+    , reqUnschedDataVec(reqUnschedDataVec)
     , destAddr(outMsg->getDestAddr())
     , srcAddr(outMsg->getSrcAddr())
     , msgCreationTime(outMsg->getMsgCreationTime())
@@ -298,8 +296,7 @@ HomaTransport::OutboundMessage::OutboundMessage()
     , msgSize(0)
     , bytesLeft(0)
     , nextByteToSend(0)
-    , dataBytesInReq(0)
-    , unschedDataBytes(0)
+    , reqUnschedDataVec({0})
     , destAddr()
     , srcAddr()
     , msgCreationTime(SIMTIME_ZERO)
@@ -333,8 +330,7 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
     this->msgSize = other.msgSize;
     this->bytesLeft = other.bytesLeft;
     this->nextByteToSend = other.nextByteToSend;
-    this->dataBytesInReq = other.dataBytesInReq;
-    this->unschedDataBytes = other.unschedDataBytes;
+    this->reqUnschedDataVec = other.reqUnschedDataVec;
     this->destAddr = other.destAddr;
     this->srcAddr = other.srcAddr;
     this->msgCreationTime = other.msgCreationTime;
@@ -343,88 +339,122 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
 void
 HomaTransport::OutboundMessage::sendRequestAndUnsched()
 {
-    HomaPkt* reqPkt = new HomaPkt(sxController->transport);
-    reqPkt->setPktType(PktType::REQUEST);
     PriorityResolver::PrioResolutionMode unschedPrioResMode =
         sxController->prioResolver->strPrioModeToInt(
         homaConfig->unschedPrioResolutionMode);
+    std::vector<uint16_t> unschedPrioVec =
+        sxController->prioResolver->getUnschedPktsPrio(
+        unschedPrioResMode, this);
 
-    // find reqPkt and unschedPkt priority
-    uint16_t reqPrio = sxController->prioResolver->getPrioForPkt(
-        unschedPrioResMode, msgSize, PktType::REQUEST);
-
-    uint16_t unschedPrio = sxController->prioResolver->getPrioForPkt(
-        unschedPrioResMode, msgSize, PktType::UNSCHED_DATA);
-
-    // create request fields and append the data
-    RequestFields reqFields;
-    reqFields.numReqBytes = this->dataBytesInReq;
-    reqFields.totalUnschedBytes = this->dataBytesInReq + this->unschedDataBytes;
-    reqFields.msgByteLen = this->bytesLeft;
-    reqFields.msgCreationTime = msgCreationTime;
-    reqFields.unschedPrio = unschedPrio;
-    reqPkt->setReqFields(reqFields);
-
-    // set homa fields
-    reqPkt->setDestAddr(this->destAddr);
-    reqPkt->setSrcAddr(this->srcAddr);
-    reqPkt->setMsgId(this->msgId);
-    reqPkt->setPriority(reqPrio);
-
-    // set homa pkt length
-    reqPkt->setByteLength(reqPkt->headerSize() + reqFields.numReqBytes);
-
-    sxController->transport->sendPacket(reqPkt);
-    EV_INFO << "Send request with msgId " << this->msgId << " from "
-            << this->srcAddr.str() << " to " << this->destAddr.str() << endl;
-
-    // update the OutboundMsg if necessary
-    this->bytesLeft -= reqFields.numReqBytes;
-    this->nextByteToSend += reqFields.numReqBytes;
-
-    // packetize and send unsched data if there is any
-    uint32_t unschedBytesToSend = this->unschedDataBytes;
-    while (unschedBytesToSend > 0) {
-        HomaPkt* unschedPkt = new HomaPkt(sxController->transport);
-        unschedPkt->setPktType(PktType::UNSCHED_DATA);
-        uint32_t maxDataInPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE -
-                UDP_HEADER_SIZE - unschedPkt->headerSize();
-
-        uint32_t bytesToSend = unschedBytesToSend;
-        if (bytesToSend > maxDataInPkt) {
-            bytesToSend = maxDataInPkt;
+    uint32_t totalUnschedBytes = 0;
+    std::vector<uint32_t> prioUnschedBytes = {};
+    uint32_t prio = UINT16_MAX;
+    for (size_t i = 0; i < this->reqUnschedDataVec.size(); i++) {
+        if (unschedPrioVec[i] != prio) {
+            prio = unschedPrioVec[i];
+            prioUnschedBytes.push_back(prio);
+            prioUnschedBytes.push_back(reqUnschedDataVec[i]);
+        } else {
+            prioUnschedBytes.back() += reqUnschedDataVec[i];
         }
-        unschedBytesToSend -= bytesToSend;
-
-        // fill up unschedFields
-        UnschedDataFields unschedFields;
-        unschedFields.msgByteLen = reqFields.msgByteLen;
-        unschedFields.msgCreationTime = msgCreationTime;
-        unschedFields.numReqBytes = this->dataBytesInReq;
-        unschedFields.reqPrio = reqPrio;
-        unschedFields.totalUnschedBytes =
-                this->dataBytesInReq + this->unschedDataBytes;
-        unschedFields.firstByte = this->nextByteToSend;
-        unschedFields.lastByte = this->nextByteToSend + bytesToSend - 1;
-        unschedPkt->setUnschedDataFields(unschedFields);
-
-        // set homa fields
-        unschedPkt->setDestAddr(this->destAddr);
-        unschedPkt->setSrcAddr(this->srcAddr);
-        unschedPkt->setMsgId(this->msgId);
-        unschedPkt->setPriority(unschedPrio);
-
-        // set homa pkt length
-        unschedPkt->setByteLength(unschedPkt->headerSize() + bytesToSend);
-
-        sxController->transport->sendPacket(unschedPkt);
-        EV_INFO << "Send unsched pkt with msgId " << this->msgId << " from "
-            << this->srcAddr.str() << " to " << this->destAddr.str() << endl;
-
-        // update outboundMsg states and variables
-        this->bytesLeft -= bytesToSend;
-        this->nextByteToSend = unschedFields.lastByte + 1;
+        totalUnschedBytes += reqUnschedDataVec[i];
     }
+
+    size_t i = 0; 
+    do {
+        if (i == 0) {
+            // This the request pkt
+            HomaPkt* reqPkt = new HomaPkt(sxController->transport);
+            reqPkt->setPktType(PktType::REQUEST);
+
+            // set homa fields
+            reqPkt->setDestAddr(this->destAddr);
+            reqPkt->setSrcAddr(this->srcAddr);
+            reqPkt->setMsgId(this->msgId);
+            reqPkt->setPriority(unschedPrioVec[i]);
+
+            // create request fields and append the data
+            RequestFields reqFields;
+            reqFields.msgByteLen = this->msgSize;
+            reqFields.msgCreationTime = msgCreationTime;
+            reqFields.numReqBytes = this->reqUnschedDataVec[i];
+            reqFields.totalUnschedBytes = totalUnschedBytes;
+            reqFields.prioUnschedBytes = prioUnschedBytes;
+            for (size_t j = 0;
+                    j < reqFields.prioUnschedBytes.size(); j += 2) {
+                if (reqFields.prioUnschedBytes[j] == reqPkt->getPriority()) {
+                    // find the two elements in this prioUnschedBytes vec that
+                    // corresponds to the priority of this packet and subtract
+                    // the bytes in this packet from prioUnschedBytes. 
+                    reqFields.prioUnschedBytes[j+1] -= reqFields.numReqBytes;
+                    if (reqFields.prioUnschedBytes[j+1] <= 0) {
+                        // Delete this element if unsched bytes on this prio is
+                        // zero
+                        reqFields.prioUnschedBytes.erase(
+                            reqFields.prioUnschedBytes.begin()+j,
+                            reqFields.prioUnschedBytes.begin()+j+2);
+                    }
+                    break;
+                }
+            }
+            reqPkt->setReqFields(reqFields);
+            reqPkt->setByteLength(reqPkt->headerSize() + reqFields.numReqBytes);
+            sxController->transport->sendPacket(reqPkt);
+            EV_INFO << "Send request with msgId " << this->msgId << " from "
+                    << this->srcAddr.str() << " to " << this->destAddr.str() << endl;
+
+        } else {
+            // This unsched pkt
+            HomaPkt* unschedPkt = new HomaPkt(sxController->transport);
+            unschedPkt->setPktType(PktType::UNSCHED_DATA);
+
+            // set homa fields
+            unschedPkt->setDestAddr(this->destAddr);
+            unschedPkt->setSrcAddr(this->srcAddr);
+            unschedPkt->setMsgId(this->msgId);
+            unschedPkt->setPriority(unschedPrioVec[i]);
+
+            // fill up unschedFields
+            UnschedDataFields unschedFields;
+            unschedFields.msgByteLen = msgSize;
+            unschedFields.msgCreationTime = msgCreationTime;
+            unschedFields.numReqBytes = this->reqUnschedDataVec[0];
+            unschedFields.reqPrio = unschedPrioVec[0];
+            unschedFields.totalUnschedBytes = totalUnschedBytes;
+            unschedFields.firstByte = this->nextByteToSend;
+            unschedFields.lastByte =
+                this->nextByteToSend + this->reqUnschedDataVec[i] - 1;
+            unschedFields.prioUnschedBytes = prioUnschedBytes;
+            for (size_t j = 0;
+                    j < unschedFields.prioUnschedBytes.size(); j += 2) {
+                if (unschedFields.prioUnschedBytes[j] == unschedPkt->getPriority()) {
+                    // find the two elements in this prioUnschedBytes vec that
+                    // corresponds to the priority of this packet and subtract
+                    // the bytes in this packet from prioUnschedBytes. 
+                    unschedFields.prioUnschedBytes[j+1] -= this->reqUnschedDataVec[i];
+                    if (unschedFields.prioUnschedBytes[j+1] <= 0) {
+                        // Delete this element if unsched bytes on this prio is
+                        // zero
+                        unschedFields.prioUnschedBytes.erase(
+                            unschedFields.prioUnschedBytes.begin()+j,
+                            unschedFields.prioUnschedBytes.begin()+j+2);
+                    }
+                    break;
+                }
+            }
+            unschedPkt->setUnschedDataFields(unschedFields);
+            unschedPkt->setByteLength(unschedPkt->headerSize() +
+                this->reqUnschedDataVec[i]);
+            sxController->transport->sendPacket(unschedPkt);
+            EV_INFO << "Send unsched pkt with msgId " << this->msgId << " from "
+                << this->srcAddr.str() << " to " << this->destAddr.str() << endl;
+
+        }
+        // update the OutboundMsg for the bytes sent in this iteration of loop
+        this->bytesLeft -= this->reqUnschedDataVec[i];
+        this->nextByteToSend += this->reqUnschedDataVec[i];
+        i++;
+    } while (i < reqUnschedDataVec.size());
 }
 
 int
@@ -542,23 +572,26 @@ HomaTransport::ReceiveScheduler::processReceivedRequest(HomaPkt* rxPkt)
 
     if (!inboundMsg) {
         inboundMsg = new InboundMessage(rxPkt, this, homaConfig);
+
         if (inboundMsg->bytesToGrant > 0) {
             inboundMsgQueue.push(inboundMsg);
         }
         incompleteRxMsgs[rxPkt->getMsgId()].push_front(inboundMsg);
 
-        uint32_t unschedBytesToArrive =
-            rxPkt->getReqFields().totalUnschedBytes - numBytesInReqPkt;
         // for any new request, the trailing unsched bytes (IF ANY) that are in
         // the flight to the receiver must be accounted in the future grants we
         // will send as they might interfer with sched data.
-        if (unschedBytesToArrive > 0) {
+        std::vector<uint32_t>& prioUnschedBytes =
+            rxPkt->getReqFields().prioUnschedBytes;
+        for (size_t i = 0; i < prioUnschedBytes.size(); i += 2) {
+            uint32_t prio = prioUnschedBytes[i];    
+            uint32_t unschedBytesToArrive = prioUnschedBytes[i+1];    
             trafficPacer->unschedPendingBytes(inboundMsg, unschedBytesToArrive,
-                PktType::UNSCHED_DATA, rxPkt->getReqFields().unschedPrio);
+                PktType::UNSCHED_DATA, prio);
             transport->emit(totalOutstandingBytesSignal,
                     trafficPacer->getTotalOutstandingBytes());
             addPendingUnschedBytes(PktType::UNSCHED_DATA,
-                rxPkt->getReqFields().unschedPrio, unschedBytesToArrive);
+                prio, unschedBytesToArrive);
         }
         inboundMsg->updatePerPrioStats();
     } else {
@@ -653,24 +686,34 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
             inboundMsgQueue.push(inboundMsg);
         }
         incompleteRxMsgs[rxPkt->getMsgId()].push_front(inboundMsg);
-
         // There will be a req. packet and possibly other unsched pkts arriving
         // after this unsched. pkt that we need to account for in the
         // trafficPacer.
+        std::vector<uint32_t>& prioUnschedBytes =
+            rxPkt->getUnschedDataFields().prioUnschedBytes;
         uint32_t reqPktDataBytes = rxPkt->getUnschedDataFields().numReqBytes;
-        trafficPacer->unschedPendingBytes(inboundMsg, reqPktDataBytes,
-            PktType::REQUEST, rxPkt->getUnschedDataFields().reqPrio);
-        addPendingUnschedBytes(PktType::REQUEST,
-            rxPkt->getUnschedDataFields().reqPrio, reqPktDataBytes);
-
-        uint32_t unschedBytesToArrive =
-                rxPkt->getUnschedDataFields().totalUnschedBytes -
-                reqPktDataBytes - pktUnschedBytes;
-        if (unschedBytesToArrive > 0) {
-            trafficPacer->unschedPendingBytes(inboundMsg, unschedBytesToArrive,
-                PktType::UNSCHED_DATA, rxPkt->getPriority());
-            addPendingUnschedBytes(PktType::UNSCHED_DATA,
-                rxPkt->getPriority(), unschedBytesToArrive);
+        uint16_t reqPrio = rxPkt->getUnschedDataFields().reqPrio;
+        for (size_t i = 0; i < prioUnschedBytes.size(); i += 2) {
+            uint32_t prio = prioUnschedBytes[i];
+            uint32_t unschedBytesInPrio = prioUnschedBytes[i+1];
+            if (prio == reqPrio) {
+                trafficPacer->unschedPendingBytes(inboundMsg, reqPktDataBytes,
+                    PktType::REQUEST, prio);
+                addPendingUnschedBytes(PktType::REQUEST,
+                    prio, reqPktDataBytes);
+                if (unschedBytesInPrio > reqPktDataBytes) {
+                    unschedBytesInPrio -= reqPktDataBytes;
+                    trafficPacer->unschedPendingBytes(inboundMsg,
+                        unschedBytesInPrio, PktType::UNSCHED_DATA, prio);
+                    addPendingUnschedBytes(PktType::UNSCHED_DATA, prio,
+                        unschedBytesInPrio);
+                }
+            } else {
+                trafficPacer->unschedPendingBytes(inboundMsg, unschedBytesInPrio,
+                    PktType::UNSCHED_DATA, prio);
+                addPendingUnschedBytes(PktType::UNSCHED_DATA,
+                    prio, unschedBytesInPrio);
+            }
         }
         transport->emit(totalOutstandingBytesSignal,
                 trafficPacer->getTotalOutstandingBytes());

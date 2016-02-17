@@ -19,14 +19,15 @@ class UnschedByteAllocator
   PUBLIC:
     explicit UnschedByteAllocator(HomaConfigDepot* homaConfig);
     ~UnschedByteAllocator();
-    uint32_t getReqDataBytes(uint32_t rxAddr, uint32_t msgSize);
-    uint32_t getUnschedBytes(uint32_t rxAddr, uint32_t msgSize);
+    std::vector<uint16_t> getReqUnschedDataPkts(uint32_t, uint32_t msgSize);
     void updateReqDataBytes(HomaPkt* grantPkt);
     void updateUnschedBytes(HomaPkt* grantPkt);
 
   PRIVATE:
     void initReqBytes(uint32_t rxAddr);
     void initUnschedBytes(uint32_t rxAddr);
+    uint32_t getReqDataBytes(uint32_t rxAddr, uint32_t msgSize);
+    uint32_t getUnschedBytes(uint32_t rxAddr, uint32_t msgSize);
 
   PRIVATE:
     std::unordered_map<uint32_t, std::map<uint32_t, uint32_t>>
@@ -34,5 +35,7 @@ class UnschedByteAllocator
     std::unordered_map<uint32_t, std::map<uint32_t, uint32_t>>
             rxAddrReqbyteMap;
     HomaConfigDepot* homaConfig;
+    uint32_t maxReqPktDataBytes;
+    uint32_t maxUnschedPktDataBytes;
 };
 #endif /* UNSCHEDBYTEALLOCATOR_H_ */

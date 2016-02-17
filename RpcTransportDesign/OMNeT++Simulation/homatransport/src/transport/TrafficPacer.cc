@@ -79,9 +79,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             nextTimeToGrant =
                 getNextGrantTime(currentTime, grantedPktSizeOnWire);
             totalOutstandingBytes += grantedPktSizeOnWire;
-            prio = prioResolver->getPrioForPkt(
-                prioPace2PrioResolution(paceMode), msgToGrant->msgSize,
-                PktType::SCHED_DATA);
+            prio = prioResolver->getSchedPktPrio(
+                prioPace2PrioResolution(paceMode), msgToGrant);
             sumInflightSchedPerPrio[prio] +=
                 grantedPktSizeOnWire;
             return msgToGrant->prepareGrant(grantSize, prio);

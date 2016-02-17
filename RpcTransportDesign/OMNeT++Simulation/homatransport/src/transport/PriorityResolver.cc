@@ -25,30 +25,18 @@ PriorityResolver::PriorityResolver(HomaConfigDepot* homaConfig,
     setExpFromCbfPrioCutOffs();
 }
 
-uint16_t
-PriorityResolver::getPrioForPkt(PrioResolutionMode prioMode,
-    const uint32_t msgSize, const PktType pktType)
+std::vector<uint16_t>
+PriorityResolver::getUnschedPktsPrio(PrioResolutionMode prioMode,
+    const OutboundMessage* outbndMsg)
 {
-    if (prioMode == PrioResolutionMode::FIXED_UNSCHED) {
-        if (pktType == PktType::REQUEST || pktType == PktType::UNSCHED_DATA) {
-            return 0;
-        } else {
-            cRuntimeError("Invalid PktType %d for PrioMode %d",
-                pktType, prioMode);
-        }
-    }
-
-    if (prioMode == PrioResolutionMode::FIXED_SCHED) {
-        if (pktType == PktType::SCHED_DATA) {
-            return homaConfig->allPrio-1;
-        } else {
-            cRuntimeError("Invalid PktType %d for PrioMode %d",
-                pktType, prioMode);
-        }
-    }
-
+    uint32_t msgSize = outbndMsg->msgSize;
     std::vector<uint32_t>* cutOffVec = NULL;
-    switch (prioMode) {
+        switch (prioMode) {
+        case PrioResolutionMode::FIXED_UNSCHED: {
+            std::vector<uint16_t> unschedPktsPrio(
+                outbndMsg->reqUnschedDataVec.size(), 0);
+            return unschedPktsPrio;
+        }
         case PrioResolutionMode::STATIC_FROM_CDF:
             cutOffVec = &prioCutOffsFromCdf;
             break;
@@ -63,6 +51,48 @@ PriorityResolver::getPrioForPkt(PrioResolutionMode prioMode,
             break;
         default:
             cRuntimeError("Invalid priority mode: prioMode(%d)", prioMode);
+    }
+
+    size_t mid, high, low;
+    low = 0;
+    high = cutOffVec->size() - 1;
+    while(low < high) {
+        mid = (high + low) / 2;
+        if (msgSize <= cutOffVec->at(mid)) {
+            high = mid;
+        } else {
+            low = mid + 1;
+        }
+    }
+    std::vector<uint16_t> unschedPktsPrio(
+        outbndMsg->reqUnschedDataVec.size(), (uint16_t)high);
+    return unschedPktsPrio;
+}
+
+uint16_t
+PriorityResolver::getSchedPktPrio(PrioResolutionMode prioMode,
+    const InboundMessage* inbndMsg)
+{
+    uint32_t msgSize = inbndMsg->msgSize;
+    std::vector<uint32_t>* cutOffVec = NULL;
+    switch (prioMode) {
+        case PrioResolutionMode::FIXED_SCHED:
+            return homaConfig->allPrio-1;
+        case PrioResolutionMode::STATIC_FROM_CDF:
+            cutOffVec = &prioCutOffsFromCdf;
+            break;
+        case PrioResolutionMode::STATIC_FROM_CBF:
+            cutOffVec = &prioCutOffsFromCbf;
+            break;
+        case PrioResolutionMode::STATIC_EXP_CDF:
+            cutOffVec = &prioCutOffsExpCdf;
+            break;
+        case PrioResolutionMode::STATIC_EXP_CBF:
+            cutOffVec = &prioCutOffsExpCbf;
+            break;
+        default:
+            cRuntimeError("Invalid priority mode: prioMode(%d) for"
+                " scheduled packets", prioMode);
     }
 
     size_t mid, high, low;

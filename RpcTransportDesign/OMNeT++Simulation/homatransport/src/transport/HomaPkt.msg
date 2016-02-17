@@ -43,13 +43,10 @@ struct RequestFields
     // sent in unsched packets.
     uint16_t totalUnschedBytes;
 
-    // Priority of unsched packets that will arrive after this req. packet.
-    uint16_t unschedPrio;
-
-    // the vector of [unsched, prio, unsched, prio, ...] pakcets pairs. Each two
+    // the vector of [prio, unsched, prio, unsched,...] pakcets pairs. Each two
     // respective elements of the vector specifies a priority and unsched bytes
-    // on that priority this packet.
-    UnsignedVec unschedBytesPrio;
+    // on that priority except the unsched bytes in this packet.
+    UnsignedVec prioUnschedBytes;
 };
 
 struct UnschedDataFields
@@ -59,7 +56,7 @@ struct UnschedDataFields
     uint32_t msgByteLen;
     simtime_t msgCreationTime;
 
-    // num bytes of data that are piggybacked on this request. The index of
+    // num bytes of data that are piggybacked on thes request. The index of
     // these bytes always start at zero.
     uint16_t numReqBytes;
     uint16_t reqPrio;
@@ -74,10 +71,10 @@ struct UnschedDataFields
     uint32_t firstByte;
     uint32_t lastByte;
 
-    // the vector of [unsched, prio, unsched, prio, ...] pakcets pairs. Each two
+    // the vector of [prio, unsched, prio, unsched, ...] pakcets pairs. Each two
     // respective elements of the vector specifies a priority and unsched bytes
-    // on that priority this packet.
-    UnsignedVec unschedBytesPrio;
+    // on that priority except the unsched bytes this packet.
+    UnsignedVec prioUnschedBytes;
 };
 
 struct GrantFields

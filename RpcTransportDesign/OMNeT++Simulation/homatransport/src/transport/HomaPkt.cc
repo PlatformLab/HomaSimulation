@@ -53,18 +53,20 @@ HomaPkt::headerSize()
     switch(getPktType()) {
         case PktType::REQUEST:
             size += sizeof(getReqFields().msgByteLen) +
-                    sizeof(getReqFields().numReqBytes) +
-                    sizeof(getReqFields().totalUnschedBytes) +
-                    sizeof(getReqFields().unschedPrio);
+                sizeof(getReqFields().numReqBytes) +
+                sizeof(getReqFields().totalUnschedBytes) +
+                sizeof(decltype(getReqFields().prioUnschedBytes)::value_type)*2;
             break;
 
         case PktType::UNSCHED_DATA:
             size += (sizeof(getUnschedDataFields().msgByteLen) +
-                    sizeof(getReqFields().numReqBytes) +
-                    sizeof(getReqFields().totalUnschedBytes) +
-                    sizeof(getUnschedDataFields().firstByte) +
-                    sizeof(getUnschedDataFields().lastByte)) +
-                    sizeof(getUnschedDataFields().reqPrio);
+                sizeof(getReqFields().numReqBytes) +
+                sizeof(getUnschedDataFields().reqPrio) + 
+                sizeof(getReqFields().totalUnschedBytes) +
+                sizeof(getUnschedDataFields().firstByte) +
+                sizeof(getUnschedDataFields().lastByte)) +
+                sizeof(decltype(
+                getUnschedDataFields().prioUnschedBytes)::value_type)*2;
             break;
         case PktType::GRANT:
             size += (sizeof(getGrantFields().grantBytes) +
@@ -200,7 +202,6 @@ HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
 uint32_t
 HomaPkt::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
 {
-
     HomaPkt homaPkt = HomaPkt();
     homaPkt.setPktType(homaPktType);
     uint32_t homaPktHdrSize = homaPkt.headerSize();
