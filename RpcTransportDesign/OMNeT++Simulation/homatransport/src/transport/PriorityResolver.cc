@@ -23,6 +23,11 @@ PriorityResolver::PriorityResolver(HomaConfigDepot* homaConfig,
     setCbfPrioCutOffs();
     setExpFromCdfPrioCutOffs();
     setExpFromCbfPrioCutOffs();
+
+    HomaPkt dataPkt = HomaPkt();
+    dataPkt.setPktType(PktType::SCHED_DATA);
+    maxSchedPktDataBytes = MAX_ETHERNET_PAYLOAD_BYTES -
+        IP_HEADER_SIZE - UDP_HEADER_SIZE - dataPkt.headerSize();
 }
 
 std::vector<uint16_t>
@@ -35,6 +40,16 @@ PriorityResolver::getUnschedPktsPrio(PrioResolutionMode prioMode,
         case PrioResolutionMode::FIXED_UNSCHED: {
             std::vector<uint16_t> unschedPktsPrio(
                 outbndMsg->reqUnschedDataVec.size(), 0);
+            return unschedPktsPrio;
+        }
+        case PrioResolutionMode::SIMULATED_SRBF: {
+            std::vector<uint16_t> unschedPktsPrio(
+                outbndMsg->reqUnschedDataVec.size());
+            for (size_t i = 0; i < unschedPktsPrio.size(); i++) {
+                unschedPktsPrio[i] = downCast<uint16_t>(
+                    std::min((int)(unschedPktsPrio.size() - i - 1),
+                    (int)homaConfig->allPrio));
+            }
             return unschedPktsPrio;
         }
         case PrioResolutionMode::STATIC_FROM_CDF:
@@ -78,6 +93,11 @@ PriorityResolver::getSchedPktPrio(PrioResolutionMode prioMode,
     switch (prioMode) {
         case PrioResolutionMode::FIXED_SCHED:
             return homaConfig->allPrio-1;
+        case PrioResolutionMode::SIMULATED_SRBF: {
+            uint32_t numPktsLeft =
+                inbndMsg->bytesToGrant / maxSchedPktDataBytes; 
+            return std::min((int)numPktsLeft, (int)homaConfig->allPrio);
+        }
         case PrioResolutionMode::STATIC_FROM_CDF:
             cutOffVec = &prioCutOffsFromCdf;
             break;

@@ -29,6 +29,7 @@ class TrafficPacer
         ADAPTIVE_LOWEST_PRIO_POSSIBLE,
         STATIC_FROM_CBF,
         STATIC_FROM_CDF,
+        SIMULATED_SRBF,
         INVALIDE_MODE //Always the last one
     };
 

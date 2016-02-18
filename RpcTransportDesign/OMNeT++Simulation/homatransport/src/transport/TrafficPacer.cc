@@ -86,6 +86,11 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             return msgToGrant->prepareGrant(grantSize, prio);
         }
 
+        case PrioPaceMode::SIMULATED_SRBF:
+            if (inflightSchedPerPrio.size() != 
+                    inflightUnschedPerPrio.size()) {
+                inflightSchedPerPrio.resize(inflightUnschedPerPrio.size());
+            }
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE: {
             ASSERT(msgToGrant->bytesToGrant >= 0);
             int schedByteCap =
@@ -96,6 +101,16 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     vecIter != inflightSchedPerPrio.rend(); ++vecIter) {
 
                 if ((int)grantedPktSizeOnWire <= schedByteCap) {
+
+                    if (paceMode == PrioPaceMode::SIMULATED_SRBF &&
+                            msgToGrant->bytesToGrant < 
+                            (uint32_t)homaConfig->maxOutstandingRecvBytes) {
+                        // last 1 RTT remaining bytes will get priority like the
+                        // unscheduled.
+                        uint16_t prioTemp = prioResolver->getSchedPktPrio(
+                            prioPace2PrioResolution(paceMode), msgToGrant);
+                        prio = std::min(prioTemp, prio);
+                    }
                     // If the privious grant was sent on same or higher (lower
                     // value) priority, the we should check that we've passed
                     // nextGrantTime
@@ -109,27 +124,28 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     // messages of this module and remove it from all maps but
                     // keep track of the maps.
                     std::vector<std::pair<uint16, uint32_t>>prioSchedVec = {};
-                    auto inbndMsgOutbytesIter = vecIter->find(msgToGrant);
-                    if (inbndMsgOutbytesIter == vecIter->end()) {
-                        prioSchedVec.push_back(std::make_pair(prio +
-                            homaConfig->schedPrioLevels - homaConfig->allPrio,
-                            grantedPktSizeOnWire));
-                    } else {
-                        prioSchedVec.push_back(std::make_pair( prio +
-                        homaConfig->schedPrioLevels - homaConfig->allPrio,
-                            inbndMsgOutbytesIter->second+grantedPktSizeOnWire));
-                            vecIter->erase(inbndMsgOutbytesIter);
-                    }
-
                     for (auto schVecIter = inflightSchedPerPrio.begin();
                             schVecIter != inflightSchedPerPrio.end();
                             ++schVecIter) {
-                        inbndMsgOutbytesIter = schVecIter->find(msgToGrant);
+                        uint16_t ind =
+                            schVecIter - inflightSchedPerPrio.begin();
+                        uint16_t prioOfInd = ind + inflightUnschedPerPrio.size()
+                            - inflightSchedPerPrio.size();
+                        auto inbndMsgOutbytesIter= schVecIter->find(msgToGrant);
+
                         if (inbndMsgOutbytesIter != schVecIter->end()) {
-                            prioSchedVec.push_back(std::make_pair(
-                                schVecIter - inflightSchedPerPrio.begin(),
-                                inbndMsgOutbytesIter->second));
+                            if (prioOfInd == prio) {
+                                prioSchedVec.push_back(std::make_pair(ind,
+                                    inbndMsgOutbytesIter->second +
+                                    grantedPktSizeOnWire));
+                            } else {
+                                prioSchedVec.push_back(std::make_pair(ind,
+                                    inbndMsgOutbytesIter->second));
+                            }
                             schVecIter->erase(inbndMsgOutbytesIter);
+                        } else if (prioOfInd == prio) {
+                            prioSchedVec.push_back(
+                                std::make_pair(ind, grantedPktSizeOnWire));
                         }
                     }
 
@@ -140,7 +156,8 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     for (auto unschVecIter = inflightUnschedPerPrio.begin();
                             unschVecIter != inflightUnschedPerPrio.end();
                             ++unschVecIter) {
-                        inbndMsgOutbytesIter = unschVecIter->find(msgToGrant);
+                        auto inbndMsgOutbytesIter =
+                            unschVecIter->find(msgToGrant);
                         if (inbndMsgOutbytesIter != unschVecIter->end()) {
                             prioUnschedVec.push_back(std::make_pair(
                                 unschVecIter - inflightUnschedPerPrio.begin(),
@@ -250,6 +267,7 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
             return;
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
+        case PrioPaceMode::SIMULATED_SRBF:
             switch (recvPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -269,7 +287,8 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
                     sumInflightSchedPerPrio[prio] -=
                         arrivedBytesOnWire;
                     auto& inbndMap = inflightSchedPerPrio[prio +
-                        homaConfig->schedPrioLevels - homaConfig->allPrio];
+                        inflightSchedPerPrio.size() -
+                        inflightUnschedPerPrio.size()];
                     auto msgOutbytesIter = inbndMap.find(inbndMsg);
                     ASSERT(msgOutbytesIter != inbndMap.end() &&
                         msgOutbytesIter->second >= arrivedBytesOnWire);
@@ -305,6 +324,7 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
             return;
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
+        case PrioPaceMode::SIMULATED_SRBF:
             switch (pendingPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -342,6 +362,8 @@ TrafficPacer::strPrioPaceModeToEnum(const char* prioPaceMode)
         return PrioPaceMode::STATIC_FROM_CBF;
     } else if (strcmp(prioPaceMode, "STATIC_FROM_CDF") == 0) {
         return PrioPaceMode::STATIC_FROM_CDF;
+    } else if (strcmp(prioPaceMode, "SIMULATED_SRBF") == 0) {
+        return PrioPaceMode::SIMULATED_SRBF;
     }
     throw cRuntimeError("Unknown value for paceMode: %s", prioPaceMode);
     return PrioPaceMode::INVALIDE_MODE;
@@ -357,6 +379,8 @@ TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
             return PriorityResolver::PrioResolutionMode::STATIC_FROM_CBF;
         case PrioPaceMode::STATIC_FROM_CDF:
             return PriorityResolver::PrioResolutionMode::STATIC_FROM_CDF;
+        case PrioPaceMode::SIMULATED_SRBF:
+            return PriorityResolver::PrioResolutionMode::SIMULATED_SRBF;
         default:
             throw cRuntimeError( "PrioPaceMode %d has no match in PrioResolutionMode",
                 prioPaceMode);

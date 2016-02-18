@@ -43,6 +43,7 @@ class PriorityResolver
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
   PRIVATE:
+    uint32_t maxSchedPktDataBytes;
     uint32_t lastCbfCapMsgSize;
     const WorkloadEstimator::CdfVector* cdf;
     const WorkloadEstimator::CdfVector* cbf;
