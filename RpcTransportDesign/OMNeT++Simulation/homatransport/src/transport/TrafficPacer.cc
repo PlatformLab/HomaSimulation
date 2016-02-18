@@ -87,6 +87,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
         }
 
         case PrioPaceMode::SIMULATED_SRBF:
+        case PrioPaceMode::SMF_CBF_BASED:
             if (inflightSchedPerPrio.size() != 
                     inflightUnschedPerPrio.size()) {
                 inflightSchedPerPrio.resize(inflightUnschedPerPrio.size());
@@ -101,9 +102,9 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                     vecIter != inflightSchedPerPrio.rend(); ++vecIter) {
 
                 if ((int)grantedPktSizeOnWire <= schedByteCap) {
-
-                    if (paceMode == PrioPaceMode::SIMULATED_SRBF &&
-                            msgToGrant->bytesToGrant < 
+                    if ((paceMode == PrioPaceMode::SIMULATED_SRBF ||
+                            paceMode == PrioPaceMode::SMF_CBF_BASED) &&
+                            msgToGrant->bytesToGrant <
                             (uint32_t)homaConfig->maxOutstandingRecvBytes) {
                         // last 1 RTT remaining bytes will get priority like the
                         // unscheduled.
@@ -111,6 +112,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
                             prioPace2PrioResolution(paceMode), msgToGrant);
                         prio = std::min(prioTemp, prio);
                     }
+
                     // If the privious grant was sent on same or higher (lower
                     // value) priority, the we should check that we've passed
                     // nextGrantTime
@@ -268,6 +270,7 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
         case PrioPaceMode::SIMULATED_SRBF:
+        case PrioPaceMode::SMF_CBF_BASED:
             switch (recvPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -325,6 +328,7 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
 
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
         case PrioPaceMode::SIMULATED_SRBF:
+        case PrioPaceMode::SMF_CBF_BASED:
             switch (pendingPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -364,6 +368,8 @@ TrafficPacer::strPrioPaceModeToEnum(const char* prioPaceMode)
         return PrioPaceMode::STATIC_FROM_CDF;
     } else if (strcmp(prioPaceMode, "SIMULATED_SRBF") == 0) {
         return PrioPaceMode::SIMULATED_SRBF;
+    } else if (strcmp(prioPaceMode, "SMF_CBF_BASED") == 0) {
+        return PrioPaceMode::SMF_CBF_BASED;
     }
     throw cRuntimeError("Unknown value for paceMode: %s", prioPaceMode);
     return PrioPaceMode::INVALIDE_MODE;
@@ -381,6 +387,8 @@ TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
             return PriorityResolver::PrioResolutionMode::STATIC_FROM_CDF;
         case PrioPaceMode::SIMULATED_SRBF:
             return PriorityResolver::PrioResolutionMode::SIMULATED_SRBF;
+        case PrioPaceMode::SMF_CBF_BASED:
+            return PriorityResolver::PrioResolutionMode::SMF_CBF_BASED;
         default:
             throw cRuntimeError( "PrioPaceMode %d has no match in PrioResolutionMode",
                 prioPaceMode);

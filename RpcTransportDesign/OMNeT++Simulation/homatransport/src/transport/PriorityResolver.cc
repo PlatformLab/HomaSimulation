@@ -48,9 +48,13 @@ PriorityResolver::getUnschedPktsPrio(PrioResolutionMode prioMode,
             for (size_t i = 0; i < unschedPktsPrio.size(); i++) {
                 unschedPktsPrio[i] = downCast<uint16_t>(
                     std::min((int)(unschedPktsPrio.size() - i - 1),
-                    (int)homaConfig->allPrio));
+                    (int)homaConfig->allPrio - 1));
             }
             return unschedPktsPrio;
+        }
+        case PrioResolutionMode::SMF_CBF_BASED: {
+            cutOffVec = &prioCutOffsFromCbf;
+            break;
         }
         case PrioResolutionMode::STATIC_FROM_CDF:
             cutOffVec = &prioCutOffsFromCdf;
@@ -96,8 +100,12 @@ PriorityResolver::getSchedPktPrio(PrioResolutionMode prioMode,
         case PrioResolutionMode::SIMULATED_SRBF: {
             uint32_t numPktsLeft =
                 inbndMsg->bytesToGrant / maxSchedPktDataBytes; 
-            return std::min((int)numPktsLeft, (int)homaConfig->allPrio);
+            return std::min((int)numPktsLeft, (int)homaConfig->allPrio - 1);
         }
+        case PrioResolutionMode::SMF_CBF_BASED:
+            msgSize = inbndMsg->bytesToGrant;
+            cutOffVec = &prioCutOffsFromCbf;
+            break;
         case PrioResolutionMode::STATIC_FROM_CDF:
             cutOffVec = &prioCutOffsFromCdf;
             break;
@@ -269,6 +277,8 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
         return PrioResolutionMode::STATIC_EXP_CBF;
     } else if (strcmp(prioResMode, "SIMULATED_SRBF") == 0) {
         return PrioResolutionMode::SIMULATED_SRBF;
+    } else if (strcmp(prioResMode, "SMF_CBF_BASED") == 0) {
+        return PrioResolutionMode::SMF_CBF_BASED;
     } else {
         return PrioResolutionMode::INVALID_PRIO_MODE;
     }

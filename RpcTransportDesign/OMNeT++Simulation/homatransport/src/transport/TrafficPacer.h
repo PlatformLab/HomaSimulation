@@ -30,6 +30,7 @@ class TrafficPacer
         STATIC_FROM_CBF,
         STATIC_FROM_CDF,
         SIMULATED_SRBF,
+        SMF_CBF_BASED, //shortest msg first based on cbf
         INVALIDE_MODE //Always the last one
     };
 

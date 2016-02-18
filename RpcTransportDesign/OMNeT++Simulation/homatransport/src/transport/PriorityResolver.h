@@ -27,6 +27,7 @@ class PriorityResolver
         FIXED_UNSCHED,
         FIXED_SCHED,
         SIMULATED_SRBF,
+        SMF_CBF_BASED,
         INVALID_PRIO_MODE        // Always the last value
     };
     explicit PriorityResolver(HomaConfigDepot* homaConfig,
