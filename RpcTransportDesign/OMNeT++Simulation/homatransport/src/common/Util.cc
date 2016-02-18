@@ -23,10 +23,8 @@ HomaMsgSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     PktType pktType = (PktType)homaPkt->getPktType();
     switch (pktType) {
         case PktType::REQUEST:
-            msgSize = homaPkt->getReqFields().msgByteLen;
-            break;
         case PktType::UNSCHED_DATA:
-            msgSize = homaPkt->getUnschedDataFields().msgByteLen;
+            msgSize = homaPkt->getUnschedFields().msgByteLen;
             break;
         case PktType::SCHED_DATA:
         case PktType::GRANT: {
@@ -48,7 +46,7 @@ HomaMsgSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
             break;
         }
         default:
-            cRuntimeError("PktType %d is not known!", pktType);
+            throw cRuntimeError("PktType %d is not known!", pktType);
 
     }
     fire(this,  t , (double)msgSize);

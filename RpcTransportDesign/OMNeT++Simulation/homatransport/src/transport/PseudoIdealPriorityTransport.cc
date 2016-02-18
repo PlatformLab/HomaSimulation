@@ -101,7 +101,7 @@ PseudoIdealPriorityTransport::handleMessage(cMessage *msg)
                 processStop();
                 break;
             default:
-                cRuntimeError("Received SelfMsg of type(%d) is not valid.",
+                throw cRuntimeError("Received SelfMsg of type(%d) is not valid.",
                         msg->getKind());
         }
     } else {
@@ -130,13 +130,12 @@ PseudoIdealPriorityTransport::processMsgFromApp(AppMessage* sendMsg)
         // Create an usncheduled pkt and fill it up with the proper parameters
         uint32_t pktDataBytes = std::min(bytesToSend, maxDataBytesInPkt);
         lastByte = firstByte + pktDataBytes - 1;
-        UnschedDataFields unschedDataFields;
-        unschedDataFields.msgByteLen = msgByteLen;
-        unschedDataFields.msgCreationTime = msgCreationTime;
-        unschedDataFields.numReqBytes = 0;
-        unschedDataFields.totalUnschedBytes = pktDataBytes;
-        unschedDataFields.firstByte = firstByte;
-        unschedDataFields.lastByte = lastByte;
+        UnschedFields unschedFields;
+        unschedFields.msgByteLen = msgByteLen;
+        unschedFields.msgCreationTime = msgCreationTime;
+        unschedFields.totalUnschedBytes = pktDataBytes;
+        unschedFields.firstByte = firstByte;
+        unschedFields.lastByte = lastByte;
         bytesToSend -= pktDataBytes;
         firstByte = lastByte + 1;
 
@@ -147,7 +146,7 @@ PseudoIdealPriorityTransport::processMsgFromApp(AppMessage* sendMsg)
         sxPkt->setMsgId(msgId);
         sxPkt->setPriority(bytesToSend);
         sxPkt->setPktType(PktType::UNSCHED_DATA);
-        sxPkt->setUnschedDataFields(unschedDataFields);
+        sxPkt->setUnschedFields(unschedFields);
         sxPkt->setByteLength(pktDataBytes + sxPkt->headerSize());
 
         // Send the packet out
@@ -226,9 +225,9 @@ PseudoIdealPriorityTransport::InboundMsg::InboundMsg(HomaPkt* rxPkt)
     , msgCreationTime(SIMTIME_ZERO)
 {
     ASSERT(rxPkt->getPktType() == PktType::UNSCHED_DATA);
-    numBytesToRecv = rxPkt->getUnschedDataFields().msgByteLen;
+    numBytesToRecv = rxPkt->getUnschedFields().msgByteLen;
     msgByteLen = numBytesToRecv;
-    msgCreationTime = rxPkt->getUnschedDataFields().msgCreationTime;
+    msgCreationTime = rxPkt->getUnschedFields().msgCreationTime;
 }
 
 PseudoIdealPriorityTransport::InboundMsg::~InboundMsg()
@@ -237,7 +236,7 @@ PseudoIdealPriorityTransport::InboundMsg::~InboundMsg()
 bool
 PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
 {
-    UnschedDataFields unschedFields = rxPkt->getUnschedDataFields();
+    UnschedFields unschedFields = rxPkt->getUnschedFields();
     ASSERT((rxPkt->getPktType() == PktType::UNSCHED_DATA) &&
             (unschedFields.msgCreationTime == msgCreationTime) &&
             (unschedFields.msgByteLen == msgByteLen));
@@ -260,7 +259,7 @@ PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
 
     numBytesToRecv -= dataBytesInPkt;
     if (numBytesToRecv < 0) {
-        cRuntimeError("Remaining bytes to receive for an inbound msg can't be"
+        throw cRuntimeError("Remaining bytes to receive for an inbound msg can't be"
                 " negative.");
     }
 

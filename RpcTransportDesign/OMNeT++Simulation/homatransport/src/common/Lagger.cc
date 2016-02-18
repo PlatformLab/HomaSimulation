@@ -36,7 +36,7 @@ Lagger::initialize()
     cModule* parentEthIface = getParentModule();
     mac = parentEthIface->getSubmodule("mac");
     if (parentEthIface->par("macType") == "EtherMACFullDuplex" || !mac) {
-        cRuntimeError("Lagger module must be used in a EthernetInterface with"
+        throw cRuntimeError("Lagger module must be used in a EthernetInterface with"
                 " a FullDuplexMac.");
     }
 }
@@ -52,7 +52,7 @@ Lagger::handleMessage(cMessage *msg)
         } else if (hookType == "OutputHook") {
             outputHookPktHandler(msg);
         } else {
-            cRuntimeError("Lagger type '%s' is not recognized.",
+            throw cRuntimeError("Lagger type '%s' is not recognized.",
                     hookType.c_str());
         }
     }

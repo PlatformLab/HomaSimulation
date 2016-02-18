@@ -218,7 +218,7 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
             return NULL;
         }
         default:
-            cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
+            throw cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
             return NULL;
     }
 
@@ -280,12 +280,12 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
                 }
 
                 default:
-                    cRuntimeError("PktType %d: Invalid type of arrived bytes.",
+                    throw cRuntimeError("PktType %d: Invalid type of arrived bytes.",
                         recvPktType);
-                    break;
             }
+            return;
         default:
-            cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
+            throw cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
     }
 }
 
@@ -304,7 +304,7 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
         case PrioPaceMode::STATIC_FROM_CDF:
             return;
 
-        case PrioPaceMode:: ADAPTIVE_LOWEST_PRIO_POSSIBLE:
+        case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
             switch (pendingPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -322,11 +322,12 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
                     break;
                 }
                 default:
-                    cRuntimeError("PktType %d: Invalid type of incomping pkt",
+                    throw cRuntimeError("PktType %d: Invalid type of incomping pkt",
                         pendingPktType);
             }
+            return;
         default:
-            cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
+            throw cRuntimeError("PrioPaceMode %d: Invalid value.", paceMode);
     }
 }
 
@@ -342,7 +343,7 @@ TrafficPacer::strPrioPaceModeToEnum(const char* prioPaceMode)
     } else if (strcmp(prioPaceMode, "STATIC_FROM_CDF") == 0) {
         return PrioPaceMode::STATIC_FROM_CDF;
     }
-    cRuntimeError("Unknown value for paceMode: %s", prioPaceMode);
+    throw cRuntimeError("Unknown value for paceMode: %s", prioPaceMode);
     return PrioPaceMode::INVALIDE_MODE;
 }
 
@@ -357,7 +358,7 @@ TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
         case PrioPaceMode::STATIC_FROM_CDF:
             return PriorityResolver::PrioResolutionMode::STATIC_FROM_CDF;
         default:
-            cRuntimeError( "PrioPaceMode %d has no match in PrioResolutionMode",
+            throw cRuntimeError( "PrioPaceMode %d has no match in PrioResolutionMode",
                 prioPaceMode);
     }
     return PriorityResolver::PrioResolutionMode::INVALID_PRIO_MODE;

@@ -50,7 +50,7 @@ PriorityResolver::getUnschedPktsPrio(PrioResolutionMode prioMode,
             cutOffVec = &prioCutOffsExpCbf;
             break;
         default:
-            cRuntimeError("Invalid priority mode: prioMode(%d)", prioMode);
+            throw cRuntimeError("Invalid priority mode: prioMode(%d)", prioMode);
     }
 
     size_t mid, high, low;
@@ -91,7 +91,7 @@ PriorityResolver::getSchedPktPrio(PrioResolutionMode prioMode,
             cutOffVec = &prioCutOffsExpCbf;
             break;
         default:
-            cRuntimeError("Invalid priority mode: prioMode(%d) for"
+            throw cRuntimeError("Invalid priority mode: prioMode(%d) for"
                 " scheduled packets", prioMode);
     }
 

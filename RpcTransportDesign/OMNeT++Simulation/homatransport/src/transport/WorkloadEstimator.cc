@@ -124,7 +124,7 @@ WorkloadEstimator::getCbfFromCdf(CdfVector& cdf, uint32_t cbfCapMsgSize)
             double prob = sizeProbPair.second - prevProb;
             prevProb = sizeProbPair.second;
             cumBytes += HomaPkt::getBytesOnWire(std::min(sizeProbPair.first,
-                cbfCapMsgSize), PktType::REQUEST) * prob;
+                cbfCapMsgSize), PktType::UNSCHED_DATA) * prob;
             cbfFromFile.push_back(std::make_pair(sizeProbPair.first,
                 cumBytes));
         }

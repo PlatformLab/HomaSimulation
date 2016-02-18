@@ -32,8 +32,8 @@ void
 UnschedByteAllocator::initReqBytes(uint32_t rxAddr)
 {
     if (homaConfig->defaultReqBytes > maxReqPktDataBytes) {
-        cRuntimeError("Config Param defaultReqBytes set: %u, is larger than"
-            " max possible bytes: %s", homaConfig->defaultReqBytes,
+        throw cRuntimeError("Config Param defaultReqBytes set: %u, is larger than"
+            " max possible bytes: %u", homaConfig->defaultReqBytes,
             maxReqPktDataBytes);
     }
     rxAddrReqbyteMap[rxAddr].clear();

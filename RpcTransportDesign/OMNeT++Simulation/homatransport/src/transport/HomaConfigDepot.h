@@ -25,11 +25,11 @@ class HomaConfigDepot {
   PUBLIC:
     HomaConfigDepot(cComponent* ownerTransport);
     ~HomaConfigDepot(){}
-   
+
   PUBLIC:
     cComponent* ownerTransport;
 
-    // Contains the parameters defined in the xml file config.xml in under 
+    // Contains the parameters defined in the xml file config.xml in under
     // "/topologyConfig/hostConfig[@id=HostId]/transportConfig" section.
     cXMLElement* xmlConfig;
 
@@ -49,7 +49,7 @@ class HomaConfigDepot {
 
     // Maximum possible data bytes allowed in grant
     uint32_t grantMaxBytes;
-    
+
     // Total number of available priorities
     uint16_t allPrio;
 
@@ -57,15 +57,15 @@ class HomaConfigDepot {
     uint16_t schedPrioLevels;
 
     // Total number of priorities that PrioResolver would use to resolve
-    // priorities. 
+    // priorities.
     uint16_t prioResolverPrioLevels;
 
     // Specifies which priority resolution mode should be used for scheduled
-    // packets. The pace modes are defined in TrafficPacer. 
+    // packets. The pace modes are defined in TrafficPacer.
     const char* schedPrioAssignMode;
 
     // Specifies which priority resolution mode should be used for unscheduled
-    // packets. Resolution modes are defined in PrioResolver class. 
+    // packets. Resolution modes are defined in PrioResolver class.
     const char* unschedPrioResolutionMode;
 
     // Specifies the scheduler type. True, means round robin scheduler and false
@@ -75,7 +75,7 @@ class HomaConfigDepot {
     // Specifies that only first cbfCapMsgSize bytes of a message must be used
     // in computing the cbf function.
     uint32_t cbfCapMsgSize;
-    
+
     // Number data bytes to be packed in request packet.
     uint32_t defaultReqBytes;
 

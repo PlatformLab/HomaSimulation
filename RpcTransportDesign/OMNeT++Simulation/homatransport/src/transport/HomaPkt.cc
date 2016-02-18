@@ -52,21 +52,13 @@ HomaPkt::headerSize()
     uint32_t size = sizeof(msgId_var);
     switch(getPktType()) {
         case PktType::REQUEST:
-            size += sizeof(getReqFields().msgByteLen) +
-                sizeof(getReqFields().numReqBytes) +
-                sizeof(getReqFields().totalUnschedBytes) +
-                sizeof(decltype(getReqFields().prioUnschedBytes)::value_type)*2;
-            break;
-
         case PktType::UNSCHED_DATA:
-            size += (sizeof(getUnschedDataFields().msgByteLen) +
-                sizeof(getReqFields().numReqBytes) +
-                sizeof(getUnschedDataFields().reqPrio) + 
-                sizeof(getReqFields().totalUnschedBytes) +
-                sizeof(getUnschedDataFields().firstByte) +
-                sizeof(getUnschedDataFields().lastByte)) +
+            size += (sizeof(getUnschedFields().msgByteLen) +
+                sizeof(getUnschedFields().totalUnschedBytes) +
+                sizeof(getUnschedFields().firstByte) +
+                sizeof(getUnschedFields().lastByte)) +
                 sizeof(decltype(
-                getUnschedDataFields().prioUnschedBytes)::value_type)*2;
+                    getUnschedFields().prioUnschedBytes)::value_type)*2;
             break;
         case PktType::GRANT:
             size += (sizeof(getGrantFields().grantBytes) +
@@ -93,17 +85,16 @@ HomaPkt::getDataBytes()
 {
     switch (this->getPktType()) {
         case PktType::REQUEST:
-            return this->getReqFields().numReqBytes;
         case PktType::UNSCHED_DATA:
-            return this->getUnschedDataFields().lastByte -
-                this->getUnschedDataFields().firstByte + 1;
+            return this->getUnschedFields().lastByte -
+                this->getUnschedFields().firstByte + 1;
         case PktType::SCHED_DATA:
             return this->getSchedDataFields().lastByte -
                 this->getSchedDataFields().firstByte + 1;
         case PktType::GRANT:
             return 0;
         default:
-            cRuntimeError("PktType %d not defined", this->getPktType());
+            throw cRuntimeError("PktType %d not defined", this->getPktType());
     }
     return 0;
 }
@@ -176,8 +167,8 @@ HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
 
     uint32_t prio1 = homaPkt1->getPriority();
     uint32_t prio2 = homaPkt2->getPriority();
-    uint32_t msgByteLen1 = homaPkt1->getUnschedDataFields().msgByteLen;
-    uint32_t msgByteLen2 = homaPkt2->getUnschedDataFields().msgByteLen;
+    uint32_t msgByteLen1 = homaPkt1->getUnschedFields().msgByteLen;
+    uint32_t msgByteLen2 = homaPkt2->getUnschedFields().msgByteLen;
     if (msgByteLen1 < msgByteLen2) {
         return -1;
     }

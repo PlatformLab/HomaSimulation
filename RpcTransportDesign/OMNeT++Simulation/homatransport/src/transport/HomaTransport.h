@@ -243,9 +243,6 @@ class HomaTransport : public cSimpleModule
         // Total bytes transmitted on wire for this message
         uint32_t totalBytesOnWire;
 
-        // Number of data bytes carried over in the req. packets.
-        uint16_t bytesInReq;
-
         // All unscheduled bytes that comes in req. pkts and following unsched.
         // packets for this message.
         uint16_t totalUnschedBytes;
@@ -362,7 +359,6 @@ class HomaTransport : public cSimpleModule
 
         explicit ReceiveScheduler(HomaTransport* transport);
         ~ReceiveScheduler();
-        void processReceivedRequest(HomaPkt* rxPkt);
         void processReceivedSchedData(HomaPkt* rxPkt);
         void processReceivedUnschedData(HomaPkt* rxPkt);
         void sendAndScheduleGrant();

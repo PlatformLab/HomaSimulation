@@ -7,6 +7,7 @@
 
 #include <map>
 #include <unordered_map>
+#include "omnetpp.h"
 #include "common/Minimal.h"
 #include "transport/HomaPkt.h"
 #include "transport/HomaConfigDepot.h"

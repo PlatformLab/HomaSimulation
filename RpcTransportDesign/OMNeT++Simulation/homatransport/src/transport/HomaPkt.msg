@@ -29,41 +29,15 @@ enum PktType
     UNSCHED_DATA = 3;
 };
 
-struct RequestFields
-{
-    uint32_t msgByteLen;
-    simtime_t msgCreationTime;
-
-    // num bytes of data that are piggybacked on this request. The index of
-    // these bytes always start at zero.
-    uint16_t numReqBytes;
-
-    // Total number of unscheduled bytes sent for this message. This bytes sent
-    // in the reqPkt (ie. numReqBytes) plus the pure unsched. bytes that are
-    // sent in unsched packets.
-    uint16_t totalUnschedBytes;
-
-    // the vector of [prio, unsched, prio, unsched,...] pakcets pairs. Each two
-    // respective elements of the vector specifies a priority and unsched bytes
-    // on that priority except the unsched bytes in this packet.
-    UnsignedVec prioUnschedBytes;
-};
-
-struct UnschedDataFields
+struct UnschedFields
 {
     // Unsced pkts contain duplicate information of request pkt plus the range
     // of bytes they carry.
     uint32_t msgByteLen;
     simtime_t msgCreationTime;
 
-    // num bytes of data that are piggybacked on thes request. The index of
-    // these bytes always start at zero.
-    uint16_t numReqBytes;
-    uint16_t reqPrio;
-
-    // Total number of unscheduled bytes sent for this message. This bytes sent
-    // in the reqPkt (ie. numReqBytes) plus the pure unsched. bytes that are
-    // sent in unsched packets.
+    // Total number of unscheduled bytes sent for this message. ie. the bytes
+    // sent in this unsched plus the bytes sent in every other unsched packets.
     uint16_t totalUnschedBytes;
 
     // the index of first and last byte data bytes that trailing this unsched.
@@ -111,8 +85,7 @@ packet HomaPkt {
 
     // depending on the pktType, only one of the three following struct are
     // relevant in the context of a HomaPkt.
-    RequestFields reqFields;
-    UnschedDataFields unschedDataFields;
-    GrantFields grantFields;
-    SchedDataFields schedDataFields;
+    UnschedFields unschedFields;    // Used for both request and unsched
+    GrantFields grantFields;            // Used only for grants
+    SchedDataFields schedDataFields;    // Used only for scheduled data
 }
