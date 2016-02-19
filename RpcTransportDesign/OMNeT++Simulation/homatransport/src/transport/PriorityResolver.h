@@ -28,6 +28,7 @@ class PriorityResolver
         FIXED_SCHED,
         SIMULATED_SRBF,
         SMF_CBF_BASED,
+        SMF_LAST_CAP_CBF,
         INVALID_PRIO_MODE        // Always the last value
     };
     explicit PriorityResolver(HomaConfigDepot* homaConfig,
@@ -40,6 +41,7 @@ class PriorityResolver
     void setCbfPrioCutOffs();
     void setExpFromCdfPrioCutOffs();
     void setExpFromCbfPrioCutOffs();
+    void setLastCapBytesPrioCutOffs();
     static void printCbfCdf(WorkloadEstimator::CdfVector* vec);
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
@@ -48,10 +50,12 @@ class PriorityResolver
     uint32_t lastCbfCapMsgSize;
     const WorkloadEstimator::CdfVector* cdf;
     const WorkloadEstimator::CdfVector* cbf;
+    const WorkloadEstimator::CdfVector* cbfLastCapBytes;
     std::vector<uint32_t> prioCutOffsFromCdf;
     std::vector<uint32_t> prioCutOffsFromCbf;
     std::vector<uint32_t> prioCutOffsExpCbf;
     std::vector<uint32_t> prioCutOffsExpCdf;
+    std::vector<uint32_t> prioCutOffsLastCapBytesCbf;
     WorkloadEstimator* distEstimator;
     HomaConfigDepot* homaConfig;
 

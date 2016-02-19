@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <cstdio>
+#include <algorithm>
 #include <math.h>
 #include <stdio.h>
 #include "WorkloadEstimator.h"
@@ -14,10 +15,11 @@
 
 WorkloadEstimator::WorkloadEstimator(HomaConfigDepot* homaConfig)
     : cdfFromFile()
-    , avgSizeFromFile(0.0)
     , cbfFromFile()
+    , cbfLastCapBytesFromFile()
     , rxCdfComputed()
     , sxCdfComputed()
+    , avgSizeFromFile(0.0)
     , lastCbfCapMsgSize(0)
     , homaConfig(homaConfig)
 {
@@ -119,19 +121,76 @@ WorkloadEstimator::getCbfFromCdf(CdfVector& cdf, uint32_t cbfCapMsgSize)
         // compute cbf from cdf and store it in the cbfFromFile
         double prevProb = 0.0;
         double cumBytes = 0.0;
+        double cumRttBytes = 0.0;
         cbfFromFile.clear();
+        cbfLastCapBytesFromFile.clear();
+        CdfVector tempCbf = CdfVector();
         for (auto& sizeProbPair : cdfFromFile) {
             double prob = sizeProbPair.second - prevProb;
             prevProb = sizeProbPair.second;
+
             cumBytes += HomaPkt::getBytesOnWire(std::min(sizeProbPair.first,
                 cbfCapMsgSize), PktType::UNSCHED_DATA) * prob;
             cbfFromFile.push_back(std::make_pair(sizeProbPair.first,
                 cumBytes));
+
+            
+            double bytesOnSize;
+            if (sizeProbPair.first <= cbfCapMsgSize) {
+                bytesOnSize = HomaPkt::getBytesOnWire(sizeProbPair.first,
+                    PktType::UNSCHED_DATA) * prob;
+                cumRttBytes += bytesOnSize;
+                tempCbf.push_back(
+                    std::make_pair(sizeProbPair.first, bytesOnSize));
+            } else if (sizeProbPair.first < 2 * cbfCapMsgSize) {
+                bytesOnSize = HomaPkt::getBytesOnWire(cbfCapMsgSize,
+                    PktType::UNSCHED_DATA) * prob;
+                tempCbf.push_back(
+                    std::make_pair(sizeProbPair.first, bytesOnSize));
+                cumRttBytes += bytesOnSize;
+
+                uint32_t remainBytes = sizeProbPair.first - cbfCapMsgSize;
+                bytesOnSize = HomaPkt::getBytesOnWire(remainBytes,
+                    PktType::UNSCHED_DATA) * prob;
+                cumRttBytes += bytesOnSize;
+                std::pair<uint32_t, double> pairToInsert =
+                    std::make_pair(remainBytes, bytesOnSize);
+                CdfVector::iterator it = std::lower_bound(
+                    tempCbf.begin(), tempCbf.end(),
+                    pairToInsert, CompCdfPairs());
+                tempCbf.insert(it, pairToInsert);
+            } else {
+                bytesOnSize = HomaPkt::getBytesOnWire(cbfCapMsgSize,
+                    PktType::UNSCHED_DATA) * prob;
+                tempCbf.push_back(
+                    std::make_pair(sizeProbPair.first, bytesOnSize));
+                cumRttBytes += bytesOnSize;
+
+                std::pair<uint32_t, double> pairToInsert =
+                    std::make_pair(cbfCapMsgSize, bytesOnSize);
+                CdfVector::iterator it = std::lower_bound(
+                    tempCbf.begin(), tempCbf.end(),
+                    pairToInsert, CompCdfPairs());
+                if (it->first == cbfCapMsgSize) {
+                    tempCbf[it-tempCbf.begin()].second += bytesOnSize;
+                } else {
+                    tempCbf.insert(it, pairToInsert);
+                }
+                cumRttBytes += bytesOnSize;
+            }
         }
 
         for (auto& sizeProbPair : cbfFromFile) {
             sizeProbPair.second /= cbfFromFile.back().second;
         }
+        
+        double rollingSum = 0;
+        for (auto& sizeProbStr : tempCbf) {
+            rollingSum += sizeProbStr.second;
+            cbfLastCapBytesFromFile.push_back(std::make_pair(sizeProbStr.first,
+                rollingSum/cumRttBytes));
+        }
+        cbfLastCapBytesFromFile.back().second = 1.00;
     }
 }
 

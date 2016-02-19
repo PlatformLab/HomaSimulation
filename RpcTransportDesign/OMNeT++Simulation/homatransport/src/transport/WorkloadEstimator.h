@@ -31,15 +31,25 @@ class WorkloadEstimator
 
   PUBLIC:
     CdfVector cdfFromFile;
-    double avgSizeFromFile;
     CdfVector cbfFromFile;
+    CdfVector cbfLastCapBytesFromFile;
     CdfVector rxCdfComputed;
     CdfVector sxCdfComputed;
+    double avgSizeFromFile;
     uint32_t lastCbfCapMsgSize;
     HomaConfigDepot* homaConfig;
 
   PROTECTED:
     void getCbfFromCdf(CdfVector& cdf, uint32_t cbfCapMsgSize = UINT32_MAX);
+    class CompCdfPairs {
+      PUBLIC:
+        CompCdfPairs() {}
+        bool operator()(const std::pair<uint32_t, double>& pair1,
+                const std::pair<uint32_t, double>& pair2)
+        {
+            return pair1.first < pair2.first;
+        }
+    };
     friend class PriorityResolver;
 
 };
