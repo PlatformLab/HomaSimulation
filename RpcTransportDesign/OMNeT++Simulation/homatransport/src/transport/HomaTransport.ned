@@ -34,10 +34,11 @@ simple HomaTransport like ITransportScheme
         int destPort;
         bool useUnschRateInScheduler = default(false);
 
-        // number of available priorities
-        int prioLevels;
-        int schedPrioLevels;
-        int prioResolverPrioLevels;
+        int prioLevels; // All available prios
+        int adaptiveSchedPrioLevels; // Sched prio levels used for dynamic. scheduling
+                                     // This value must be smaller than schedPrioLevels
+        int prioResolverPrioLevels;  // All available prio levels available for priority
+                                     // resolver
 
         // Could be any of PrioPaceMode values defined in TrafficPacer.h
         string schedPrioAssignMode = default("NO_OVER_COMMIT");

@@ -53,8 +53,9 @@ class HomaConfigDepot {
     // Total number of available priorities
     uint16_t allPrio;
 
-    // Total number of available priorities for the scheduling scheme.
-    uint16_t schedPrioLevels;
+    // Total priority levels available for adaptive scheduling when adaptive
+    // scheduling is enabled.
+    uint16_t adaptiveSchedPrioLevels;
 
     // Total number of priorities that PrioResolver would use to resolve
     // priorities.

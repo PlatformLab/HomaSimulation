@@ -25,7 +25,7 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     maxOutstandingRecvBytes = ownerTransport->par("maxOutstandingRecvBytes");
     grantMaxBytes = (uint32_t) ownerTransport->par("grantMaxBytes");
     allPrio = (uint16_t) ownerTransport->par("prioLevels");
-    schedPrioLevels = (uint16_t) ownerTransport->par("schedPrioLevels");
+    adaptiveSchedPrioLevels = (uint16_t) ownerTransport->par("adaptiveSchedPrioLevels");
     prioResolverPrioLevels =
         (uint16_t) ownerTransport->par("prioResolverPrioLevels");
     schedPrioAssignMode = ownerTransport->par("schedPrioAssignMode");

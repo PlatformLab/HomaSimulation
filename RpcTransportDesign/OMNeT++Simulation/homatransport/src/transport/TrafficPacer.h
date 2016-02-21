@@ -78,6 +78,15 @@ class TrafficPacer
     PriorityResolver::PrioResolutionMode prioPace2PrioResolution(
         PrioPaceMode prioPaceMode);
 
+    // following functions transform respective prio and index for
+    // inflightSchedPerPrio and inflightUnschedPerPrio vectors. The
+    // implementation depends on the vector sizes set at construction time. 
+    uint16_t prioToSchedInd(uint16_t prio) { return prio; }
+    uint16_t prioToUnschedInd(uint16_t prio) { return prio; }
+    uint16_t schedIndToPrio(uint16_t ind) { return ind; }
+    uint16_t unschedIndToPrio(uint16_t ind) { return ind; }
+
+
   PUBLIC:
     void bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
         PktType recvPktType, uint16_t prio);
