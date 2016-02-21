@@ -15,6 +15,7 @@ SOURCE=TestMain.cc \
 	../../src/application/WorkloadSynthesizer.cc \
 	../../src/common/Lagger.cc \
 	../../src/common/Util.cc \
+    ../../src/transport/HomaConfigDepot.cc \
 	../../src/transport/HomaPkt.cc \
 	../../src/transport/HomaTransport.cc \
 	../../src/transport/PriorityResolver.cc \

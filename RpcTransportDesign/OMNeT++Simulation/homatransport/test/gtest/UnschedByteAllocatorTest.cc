@@ -7,7 +7,7 @@ class UnschedByteAllocatorTest : public ::testing::Test {
   public:
     UnschedByteAllocator unschedBytesAllocator;
     UnschedByteAllocatorTest()
-        : unschedBytesAllocator(1000, 9000)
+        : unschedBytesAllocator(NULL)
     {}
 
   private:

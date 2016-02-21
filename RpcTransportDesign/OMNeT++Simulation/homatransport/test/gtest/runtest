@@ -29,6 +29,7 @@ OBJS=\
 "$O/application/WorkloadSynthesizer.o "\
 "$O/common/Lagger.o "\
 "$O/common/Util.o "\
+"$O/transport/HomaConfigDepot.o "\
 "$O/transport/HomaPkt.o "\
 "$O/transport/HomaTransport.o "\
 "$O/transport/PriorityResolver.o "\
