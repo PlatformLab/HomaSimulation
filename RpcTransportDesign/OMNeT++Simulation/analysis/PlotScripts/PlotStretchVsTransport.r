@@ -35,7 +35,8 @@ tailStretchVsSize$MsgSizeRange <- as.numeric(as.character(tailStretchVsSize$MsgS
 
 textSize <- 35
 titleSize <- 30
-yLimit <- 5
+yLimit <- 25
+
 hasPseudoIdeal = !empty(subset(stretchVsSize, TransportType %in% c('PseudoIdeal')))
 normalizedGraph = FALSE
 for (rho in unique(avgStretchVsSize$LoadFactor)) {

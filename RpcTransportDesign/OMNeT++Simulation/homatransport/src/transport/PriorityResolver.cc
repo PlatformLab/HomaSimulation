@@ -50,7 +50,7 @@ PriorityResolver::getUnschedPktsPrio(PrioResolutionMode prioMode,
             for (size_t i = 0; i < unschedPktsPrio.size(); i++) {
                 unschedPktsPrio[i] = downCast<uint16_t>(
                     std::min((int)(unschedPktsPrio.size() - i - 1),
-                    (int)homaConfig->allPrio - 1));
+                    (int)homaConfig->prioResolverPrioLevels - 1));
             }
             return unschedPktsPrio;
         }
@@ -106,7 +106,8 @@ PriorityResolver::getSchedPktPrio(PrioResolutionMode prioMode,
         case PrioResolutionMode::SIMULATED_SRBF: {
             uint32_t numPktsLeft =
                 inbndMsg->bytesToGrant / maxSchedPktDataBytes; 
-            return std::min((int)numPktsLeft, (int)homaConfig->allPrio - 1);
+            return std::min((int)numPktsLeft,
+                (int)homaConfig->prioResolverPrioLevels - 1);
         }
         case PrioResolutionMode::SMF_CBF_BASED:
             msgSize = inbndMsg->bytesToGrant;

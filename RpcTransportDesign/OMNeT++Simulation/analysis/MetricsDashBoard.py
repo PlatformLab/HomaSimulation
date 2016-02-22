@@ -1290,9 +1290,10 @@ def main():
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     msgBytesOnWireDigest = AttrDict()
     msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
-    prioUsageStatsDigest = list()
-    getPrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
-    printPrioUsageStats(prioUsageStatsDigest)
+    if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
+        prioUsageStatsDigest = list()
+        getPrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
+        printPrioUsageStats(prioUsageStatsDigest)
     transportSchedDelayDigest = AttrDict()
     transportSchedDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest)
     printTransportSchedDelay(transportSchedDelayDigest, 'us')
