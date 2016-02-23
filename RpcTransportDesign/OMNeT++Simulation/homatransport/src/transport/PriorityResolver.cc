@@ -17,7 +17,8 @@ PriorityResolver::PriorityResolver(HomaConfigDepot* homaConfig,
     , prioCutOffsFromCbf()
     , prioCutOffsExpCbf()
     , prioCutOffsExpCdf()
-    , prioCutOffsLastCapBytesCbf()
+    , prioCutOffsHeadTailFirst()
+    , prioCutOffsHeadTailFirstExp()
     , distEstimator(distEstimator)
     , homaConfig(homaConfig)
 {
@@ -58,8 +59,20 @@ PriorityResolver::getUnschedPktsPrio(PrioResolutionMode prioMode,
             cutOffVec = &prioCutOffsFromCbf;
             break;
         }
-        case PrioResolutionMode::SMF_LAST_CAP_CBF: {
-            cutOffVec = &prioCutOffsLastCapBytesCbf;
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES: {
+            cutOffVec = &prioCutOffsHeadTailFirst;
+            break;
+        }
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES: {
+            cutOffVec = &prioCutOffsHeadTailFirstExp;
+            break;
+        }
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS: {
+            cutOffVec = &prioCutOffsFromCdf;
+            break;
+        }
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS: {
+            cutOffVec = &prioCutOffsExpCdf;
             break;
         }
         case PrioResolutionMode::STATIC_FROM_CDF:
@@ -113,14 +126,44 @@ PriorityResolver::getSchedPktPrio(PrioResolutionMode prioMode,
             msgSize = inbndMsg->bytesToGrant;
             cutOffVec = &prioCutOffsFromCbf;
             break;
-        case PrioResolutionMode::SMF_LAST_CAP_CBF: {
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES: {
             msgSize = msgSize - inbndMsg->totalUnschedBytes;
             uint32_t bytesTreatedUnsched = homaConfig->cbfCapMsgSize;
             if (msgSize > bytesTreatedUnsched &&
                     inbndMsg->bytesToGrant <= bytesTreatedUnsched) {
                 msgSize = bytesTreatedUnsched;
             }
-            cutOffVec = &prioCutOffsLastCapBytesCbf;
+            cutOffVec = &prioCutOffsHeadTailFirst;
+            break;
+        }
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES: {
+            msgSize = msgSize - inbndMsg->totalUnschedBytes;
+            uint32_t bytesTreatedUnsched = homaConfig->cbfCapMsgSize;
+            if (msgSize > bytesTreatedUnsched &&
+                    inbndMsg->bytesToGrant <= bytesTreatedUnsched) {
+                msgSize = bytesTreatedUnsched;
+            }
+            cutOffVec = &prioCutOffsHeadTailFirstExp;
+            break;
+        }
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS: {
+            msgSize = msgSize - inbndMsg->totalUnschedBytes;
+            uint32_t bytesTreatedUnsched = homaConfig->cbfCapMsgSize;
+            if (msgSize > bytesTreatedUnsched &&
+                    inbndMsg->bytesToGrant <= bytesTreatedUnsched) {
+                msgSize = bytesTreatedUnsched;
+            }
+            cutOffVec = &prioCutOffsFromCdf;
+            break;
+        }
+        case PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS: {
+            msgSize = msgSize - inbndMsg->totalUnschedBytes;
+            uint32_t bytesTreatedUnsched = homaConfig->cbfCapMsgSize;
+            if (msgSize > bytesTreatedUnsched &&
+                    inbndMsg->bytesToGrant <= bytesTreatedUnsched) {
+                msgSize = bytesTreatedUnsched;
+            }
+            cutOffVec = &prioCutOffsExpCdf;
             break;
         }
         case PrioResolutionMode::STATIC_FROM_CDF:
@@ -161,8 +204,9 @@ PriorityResolver::recomputeCbf(uint32_t cbfCapMsgSize)
         distEstimator->getCbfFromCdf(distEstimator->cdfFromFile,
             cbfCapMsgSize);
         setCbfPrioCutOffs();
-        setLastCapBytesPrioCutOffs();
+        setHeadTailFirstPrioCutOffs();
         setExpFromCbfPrioCutOffs();
+        setExpHeadTailFirstPrioCutOffs();
         lastCbfCapMsgSize = cbfCapMsgSize;
     }
 }
@@ -249,31 +293,6 @@ PriorityResolver::setCbfPrioCutOffs()
 }
 
 void
-PriorityResolver::setLastCapBytesPrioCutOffs()
-{
-    prioCutOffsLastCapBytesCbf.clear();
-    ASSERT(cbfLastCapBytes->at(cbfLastCapBytes->size() - 1).second == 1.00);
-    double probMax = 1.0;
-    double probStep = probMax / homaConfig->prioResolverPrioLevels;
-    size_t j = 0;
-    uint32_t prevCutOffCbfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
-        for (; j < cbfLastCapBytes->size(); j++) {
-            if (cbfLastCapBytes->at(j).first == prevCutOffCbfSize) {
-                // Do not add duplicate sizes to cutOffSizes vector
-                continue;
-            }
-            if (cbfLastCapBytes->at(j).second >= prob) {
-                prioCutOffsLastCapBytesCbf.push_back(cbfLastCapBytes->at(j).first);
-                prevCutOffCbfSize = cbfLastCapBytes->at(j).first;
-                break;
-            }
-        }
-    }
-    prioCutOffsLastCapBytesCbf.push_back(UINT32_MAX);
-}
-
-void
 PriorityResolver::setExpFromCbfPrioCutOffs()
 {
     prioCutOffsExpCbf.clear();
@@ -301,6 +320,58 @@ PriorityResolver::setExpFromCbfPrioCutOffs()
     prioCutOffsExpCbf.push_back(UINT32_MAX);
 }
 
+void
+PriorityResolver::setHeadTailFirstPrioCutOffs()
+{
+    prioCutOffsHeadTailFirst.clear();
+    ASSERT(cbfLastCapBytes->at(cbfLastCapBytes->size() - 1).second == 1.00);
+    double probMax = 1.0;
+    double probStep = probMax / homaConfig->prioResolverPrioLevels;
+    size_t j = 0;
+    uint32_t prevCutOffCbfSize = UINT32_MAX;
+    for (double prob = probStep; prob < probMax; prob += probStep) {
+        for (; j < cbfLastCapBytes->size(); j++) {
+            if (cbfLastCapBytes->at(j).first == prevCutOffCbfSize) {
+                // Do not add duplicate sizes to cutOffSizes vector
+                continue;
+            }
+            if (cbfLastCapBytes->at(j).second >= prob) {
+                prioCutOffsHeadTailFirst.push_back(cbfLastCapBytes->at(j).first);
+                prevCutOffCbfSize = cbfLastCapBytes->at(j).first;
+                break;
+            }
+        }
+    }
+    prioCutOffsHeadTailFirst.push_back(UINT32_MAX);
+}
+
+void
+PriorityResolver::setExpHeadTailFirstPrioCutOffs()
+{
+    prioCutOffsHeadTailFirstExp.clear();
+    ASSERT(cbfLastCapBytes->at(cbfLastCapBytes->size() - 1).second == 1.00);
+    double probMax = 1.0;
+    double probStep =
+        probMax / (2 - pow(2.0, 1-(int)(homaConfig->prioResolverPrioLevels)));
+    size_t j = 0;
+    uint32_t prevCutOffExpCbfSize = UINT32_MAX;
+    for (double prob = probStep; prob < probMax; prob += probStep) {
+        probStep /= 2.0;
+        for (; j < cbfLastCapBytes->size(); j++) {
+            if (cbfLastCapBytes->at(j).first == prevCutOffExpCbfSize) {
+                // Do not add duplicate sizes to cutOffSizes vector
+                continue;
+            }
+            if (cbfLastCapBytes->at(j).second >= prob) {
+                prioCutOffsHeadTailFirstExp.push_back(cbfLastCapBytes->at(j).first);
+                prevCutOffExpCbfSize = cbfLastCapBytes->at(j).first;
+                break;
+            }
+        }
+    }
+    prioCutOffsHeadTailFirstExp.push_back(UINT32_MAX);
+}
+
 
 PriorityResolver::PrioResolutionMode
 PriorityResolver::strPrioModeToInt(const char* prioResMode)
@@ -321,8 +392,14 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
         return PrioResolutionMode::SIMULATED_SRBF;
     } else if (strcmp(prioResMode, "SMF_CBF_BASED") == 0) {
         return PrioResolutionMode::SMF_CBF_BASED;
-    } else if (strcmp(prioResMode, "SMF_LAST_CAP_CBF") == 0) {
-        return PrioResolutionMode::SMF_LAST_CAP_CBF;
+    } else if (strcmp(prioResMode, "HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES") == 0) {
+        return PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES;
+    } else if (strcmp(prioResMode, "HEAD_TAIL_BYTES_FIRST_EXP_BYTES") == 0) {
+        return PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES;
+    } else if (strcmp(prioResMode, "HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS") == 0) {
+        return PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS;
+    } else if (strcmp(prioResMode, "HEAD_TAIL_BYTES_FIRST_EXP_COUNTS") == 0) {
+        return PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS;
     } else {
         return PrioResolutionMode::INVALID_PRIO_MODE;
     }

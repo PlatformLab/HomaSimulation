@@ -89,7 +89,10 @@ TrafficPacer::getGrant(simtime_t currentTime, InboundMessage* msgToGrant,
 
         case PrioPaceMode::SIMULATED_SRBF:
         case PrioPaceMode::SMF_CBF_BASED:
-        case PrioPaceMode::SMF_LAST_CAP_CBF:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS:
             if (msgToGrant->bytesToGrant <
                     (uint32_t)homaConfig->cbfCapMsgSize) {
                 adaptivePrioSearchRange = inflightSchedPerPrio.size();
@@ -272,7 +275,10 @@ TrafficPacer::bytesArrived(InboundMessage* inbndMsg, uint32_t arrivedBytes,
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
         case PrioPaceMode::SIMULATED_SRBF:
         case PrioPaceMode::SMF_CBF_BASED:
-        case PrioPaceMode::SMF_LAST_CAP_CBF:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS:
             switch (recvPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -331,7 +337,10 @@ TrafficPacer::unschedPendingBytes(InboundMessage* inbndMsg,
         case PrioPaceMode::ADAPTIVE_LOWEST_PRIO_POSSIBLE:
         case PrioPaceMode::SIMULATED_SRBF:
         case PrioPaceMode::SMF_CBF_BASED:
-        case PrioPaceMode::SMF_LAST_CAP_CBF:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS:
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS:
             switch (pendingPktType) {
                 case PktType::REQUEST:
                 case PktType::UNSCHED_DATA: {
@@ -374,8 +383,14 @@ TrafficPacer::strPrioPaceModeToEnum(const char* prioPaceMode)
         return PrioPaceMode::SIMULATED_SRBF;
     } else if (strcmp(prioPaceMode, "SMF_CBF_BASED") == 0) {
         return PrioPaceMode::SMF_CBF_BASED;
-    } else if (strcmp(prioPaceMode, "SMF_LAST_CAP_CBF") == 0) {
-        return PrioPaceMode::SMF_LAST_CAP_CBF;
+    } else if (strcmp(prioPaceMode, "HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES") == 0) {
+        return PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES;
+    } else if (strcmp(prioPaceMode, "HEAD_TAIL_BYTES_FIRST_EXP_BYTES") == 0) {
+        return PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES;
+    } else if (strcmp(prioPaceMode,"HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS") == 0) {
+        return PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS;
+    } else if (strcmp(prioPaceMode,"HEAD_TAIL_BYTES_FIRST_EXP_COUNTS") == 0) {
+        return PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS;
     }
 
     throw cRuntimeError("Unknown value for paceMode: %s", prioPaceMode);
@@ -396,8 +411,14 @@ TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
             return PriorityResolver::PrioResolutionMode::SIMULATED_SRBF;
         case PrioPaceMode::SMF_CBF_BASED:
             return PriorityResolver::PrioResolutionMode::SMF_CBF_BASED;
-        case PrioPaceMode::SMF_LAST_CAP_CBF:
-            return PriorityResolver::PrioResolutionMode::SMF_LAST_CAP_CBF;
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES:
+            return PriorityResolver::PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES;
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES:
+            return PriorityResolver::PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_BYTES;
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS:
+            return PriorityResolver::PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS;
+        case PrioPaceMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS:
+            return PriorityResolver::PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EXP_COUNTS;
         default:
             throw cRuntimeError( "PrioPaceMode %d has no match in PrioResolutionMode",
                 prioPaceMode);
