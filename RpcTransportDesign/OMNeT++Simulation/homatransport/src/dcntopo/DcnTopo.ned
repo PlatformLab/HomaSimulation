@@ -20,6 +20,7 @@ import inet.node.inet.StandardHost;
 import ned.DatarateChannel;
 import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
 import homatransport.common.HostBase;
+import homatransport.transport.OracleGreedySRPTScheduler;
 
 network DcnTopo
 {
@@ -122,6 +123,11 @@ network DcnTopo
             parameters:
                 config = xmldoc("config.xml", "/topologyConfig/IPv4Configurator/config");
                 @display("p=26,25");
+        }
+
+        oracleSRPTScheduler: OracleGreedySRPTScheduler {
+            parameters:
+                nicLinkSpeed = nicLinkSpeed;
         }
 
     connections allowunconnected:
