@@ -146,7 +146,8 @@ OracleGreedySRPTScheduler::scheduleNewMesg(AppMessage* appMesg)
  *      null, caller is responsible for allocated memory for the returned chunk.
  */
 OracleGreedySRPTScheduler::MesgChunk*
-OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport, uint16_t chunkSize)
+OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport,
+    uint16_t chunkSize)
 {
     InflightMessage* msg = NULL;
     try {
