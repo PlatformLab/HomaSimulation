@@ -35,7 +35,7 @@ class MinimalTransport : public cSimpleModule
     ~MinimalTransport();
     enum SelfMesgKind {
         START  = 1,
-        TRANSMITTING
+        TRANSMITTING = 2
     };
     typedef OracleGreedySRPTScheduler::MesgChunk MesgChunk;
 

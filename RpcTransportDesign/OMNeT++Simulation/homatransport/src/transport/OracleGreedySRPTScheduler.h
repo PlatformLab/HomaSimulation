@@ -102,9 +102,12 @@ class OracleGreedySRPTScheduler : public cSimpleModule
             bool operator()(const InflightMessage* lhs,
                 const InflightMessage* rhs)
             {
-                return lhs->bytesToSend > rhs->bytesToSend ||
+                return lhs->bytesToSend < rhs->bytesToSend ||
                     (lhs->bytesToSend == rhs->bytesToSend && 
-                    lhs->msgByteLen > rhs->msgByteLen); 
+                    lhs->msgByteLen < rhs->msgByteLen) ||
+                    (lhs->bytesToSend == rhs->bytesToSend && 
+                    lhs->msgByteLen == rhs->msgByteLen &&
+                    lhs->msgCreationTime < rhs->msgCreationTime); 
             }
         };
 

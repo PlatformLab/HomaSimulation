@@ -103,8 +103,10 @@ MinimalTransport::handleMessage(cMessage* mesg)
         switch(mesg->getKind()) {
             case SelfMesgKind::START:
                 processStart();
+                break;
             case SelfMesgKind::TRANSMITTING:
                 processTransmitPkt();
+                break;
             default:
                 throw cRuntimeError("Unknown self message type %d",
                     mesg->getKind());
@@ -177,6 +179,7 @@ MinimalTransport::processMsgFromApp(AppMessage* mesg)
     // For every new message that arrives from application, the message needs to
     // be scheduled for transmission by the centralized oracle scheduler.
     oracleScheduler->scheduleNewMesg(mesg);
+    delete mesg;
 }
 
 /**
@@ -246,6 +249,7 @@ MinimalTransport::processRcvdPkt(HomaPkt* rcvdPkt)
         mesgToApp->setMsgBytesOnWire(bytesOnWire);
         send(mesgToApp, "appOut", 0);
     }
+    delete rcvdPkt;
 }
 
 /**

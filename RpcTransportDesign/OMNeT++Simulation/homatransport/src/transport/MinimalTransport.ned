@@ -24,6 +24,7 @@ simple MinimalTransport like ITransportScheme
 {
     parameters:
         xml transportConfig = default(xml("<param/>"));
+        string interfaceTableModule; //path to the host interface table
         int localPort = default(-1);
         int destPort;
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);

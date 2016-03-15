@@ -14,6 +14,7 @@
 //
 
 #include "OracleGreedySRPTScheduler.h"
+#include "transport/MinimalTransport.h"
 
 Define_Module(OracleGreedySRPTScheduler);
 
@@ -88,7 +89,6 @@ OracleGreedySRPTScheduler::addrToTransport(inet::L3Address ipAddr)
  * \param transport
  *      The end transport that is to be added to the scheduling list of this
  *      oracle transport. 
- *      
  * \return
  *      False if transport has been previously subscribed and therefor can't be
  *      subscribed again.
@@ -140,7 +140,6 @@ OracleGreedySRPTScheduler::scheduleNewMesg(AppMessage* appMesg)
  *      transmitted.
  * \param chunkSize
  *      Size of the chunk that sxTransport is requesting for transmit.
- *
  * \return
  *      Pointer to chunk of the scheduled message to be transmitted by
  *      sxTransport. Null means no message scheduled for sxTransport. When not
@@ -193,7 +192,6 @@ OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport, uin
  *
  * \param msgChunk
  *      pointer to the received data chunk.
- *
  * \return
  *      If the received chunk was the last piece of the message and the
  *      message is complete after this message, this method constructs an
@@ -243,6 +241,7 @@ OracleGreedySRPTScheduler::recomputeGlobalSrptSchedule()
     // inpected in the set of all messages for the key transport.
     std::unordered_map<MinimalTransport*, std::pair<InflightMessage*, size_t>>
         sxSchedules;
+    sxSchedules.clear();
 
     // The map below tracks the matches found in the scheduling algorithm. 
     // The key is end host transport at receiver side, the value is a sorted set
@@ -250,10 +249,12 @@ OracleGreedySRPTScheduler::recomputeGlobalSrptSchedule()
     // algorithm until a match is found.
     std::unordered_map<MinimalTransport*, std::set<InflightMessage*,
         InflightMessage::MesgSorter>> rxPotentialSchedules;
+    rxPotentialSchedules.clear();
     
     // For every receiver transport (key), the map will contain the scheduled
     // message (value) for that trasport.
     std::unordered_map<MinimalTransport*, InflightMessage*> rxSchedules;
+    rxSchedules.clear();
 
     do {
         rxPotentialSchedules.clear();
@@ -285,7 +286,7 @@ OracleGreedySRPTScheduler::recomputeGlobalSrptSchedule()
                     mesgToSched++;
                     continue;
                 } else {
-                    rxPotentialSchedules[msgRxTrans].insert(schedMsg);
+                    rxPotentialSchedules[msgRxTrans].insert(*mesgToSched);
                     break;
                 }
             }
@@ -305,6 +306,9 @@ OracleGreedySRPTScheduler::recomputeGlobalSrptSchedule()
     } while (!rxPotentialSchedules.empty());
 
     // set newly found schedule at the senders to transmit corresponding mesgs
+    for (auto schedTxMesg : scheduledMsgs) {
+        schedTxMesg.first->refreshSchedule();
+    }
 }
 
 // -- OracleGreedySRPTScheduler::InflightMessage ---
@@ -374,7 +378,6 @@ OracleGreedySRPTScheduler::InflightMessage::getNextChunkToSend(
  *      msgByteLen-1.
  * \param chunkLen
  *      The byte of length of the data chunk to be appended to this message.
- *
  * \return
  *      If the received chunk was the last piece of the message and the
  *      message is complete after this message, this method returns true.
