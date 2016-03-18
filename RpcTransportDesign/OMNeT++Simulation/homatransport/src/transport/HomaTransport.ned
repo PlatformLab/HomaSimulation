@@ -17,7 +17,12 @@ package homatransport.transport;
 import homatransport.transport.ITransportScheme;
 
 //
-// defines a credit based receiver side driven transport protocol
+// Defines a credit based receiver driven transport protocol for implementing
+// SRPT policy for message transmissions. Transmission of the messages happen
+// based on grants the receiver sends to the sender. In order to account for
+// 1RTT hit scheduling overhead, each message is allowed to send some
+// unscheduled bytes. The transport also makes use of few priority levels to
+// effectively preempt larger messages to benefit the smaller ones.
 //
 simple HomaTransport like ITransportScheme
 {
@@ -68,8 +73,8 @@ simple HomaTransport like ITransportScheme
         @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes); interpolationmode=none);
 
     gates:
-        input appIn[] @labels(AppMessage/down);
+        input rpcHandlerIn @labels(Rpc/down);
         input udpIn @labels(UDPControlInfo/up);
-        output appOut[] @labels(AppMessage/up);
+        output rpcHandlerOut @labels(Rpc/up);
         output udpOut @labels(UDPControlInfo/down);
 }

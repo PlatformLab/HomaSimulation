@@ -21,7 +21,7 @@
 #include <unordered_set>
 #include "common/Minimal.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
-#include "application/AppMessage_m.h"
+#include "application/Rpc_m.h"
 
 
 class MinimalTransport;
@@ -67,10 +67,10 @@ class OracleGreedySRPTScheduler : public cSimpleModule
     ~OracleGreedySRPTScheduler();
     bool subscribeEndhostTransport(MinimalTransport* transport,
         inet::L3Address transportAddr);
-    void scheduleNewMesg(AppMessage* appMesg);
+    void scheduleNewMesg(Rpc* appMesg);
     MesgChunk* getNextChunkToSend(MinimalTransport* sxTransport,
         uint16_t chunkSize);
-    AppMessage* appendRecvdChunk(MesgChunk* msgChunk);
+    Rpc* appendRecvdChunk(MesgChunk* msgChunk);
 
 
   PROTECTED:
@@ -87,7 +87,7 @@ class OracleGreedySRPTScheduler : public cSimpleModule
     class InflightMessage
     {
       PUBLIC:
-        explicit InflightMessage(AppMessage* msgToSend,
+        explicit InflightMessage(Rpc* msgToSend,
             OracleGreedySRPTScheduler *oracleScheduler);
         ~InflightMessage();
 

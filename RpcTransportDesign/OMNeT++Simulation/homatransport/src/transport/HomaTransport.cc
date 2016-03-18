@@ -131,15 +131,15 @@ HomaTransport::handleMessage(cMessage *msg)
                 break;
         }
     } else {
-        if (msg->arrivedOn("appIn")) {
-            AppMessage* outMsg = check_and_cast<AppMessage*>(msg);
+        if (msg->arrivedOn("rpcHandlerIn")) {
+            Rpc* outMsg = check_and_cast<Rpc*>(msg);
             // check and set the localAddr
             if (localAddr == inet::L3Address()) {
                 localAddr = outMsg->getSrcAddr();
             } else {
                 ASSERT(localAddr == outMsg->getSrcAddr());
             }
-            sxController.processSendMsgFromApp(outMsg);
+            sxController.processSendRpc(outMsg);
 
         } else if (msg->arrivedOn("udpIn")) {
             HomaPkt* rxPkt = check_and_cast<HomaPkt*>(msg);
@@ -222,7 +222,7 @@ HomaTransport::SendController::~SendController()
 }
 
 void
-HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
+HomaTransport::SendController::processSendRpc(Rpc* sendMsg)
 {
     transport->emit(msgsLeftToSendSignal, outboundMsgMap.size());
     transport->emit(bytesLeftToSendSignal, bytesLeftToSend);
@@ -272,7 +272,7 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
 /**
  * HomaTransport::OutboundMessage
  */
-HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
+HomaTransport::OutboundMessage::OutboundMessage(Rpc* outMsg,
         SendController* sxController, uint64_t msgId,
         std::vector<uint16_t> reqUnschedDataVec)
     : msgId(msgId)
@@ -547,8 +547,8 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
     }
 
     // Check if this message already added to incompleteRxMsg. if not create new
-    // inbound message in both the msgQueue and incomplete messages.
-    // In the common case, req. pkt is arrived before any other unsched packets but we
+    // inbound message in both the msgQueue and incomplete messages.  In the
+    // common case, req. pkt is arrived before any other unsched packets but we
     // need to account for the rare case that unsched. pkt arrive earlier
     // because of unexpected delay on the req. and so we have to make the new
     // entry in incompleteRxMsgs and inboundMsgQueue.
@@ -596,8 +596,8 @@ HomaTransport::ReceiveScheduler::processReceivedUnschedData(HomaPkt* rxPkt)
         ASSERT(inboundMsg->bytesToGrant == 0);
 
         // this message is complete, so send it to the application
-        AppMessage* rxMsg = inboundMsg->prepareRxMsgForApp();
-        transport->send(rxMsg, "appOut", 0);
+        Rpc* rxMsg = inboundMsg->prepareRxRpc();
+        transport->send(rxMsg, "rpcHandlerOut");
 
         // remove this message from the incompleteRxMsgs
         incompleteRxMsgs[rxPkt->getMsgId()].remove(inboundMsg);
@@ -658,8 +658,8 @@ HomaTransport::ReceiveScheduler::processReceivedSchedData(HomaPkt* rxPkt)
     if (inboundMsg->bytesToReceive <= 0) {
 
         // send message to app
-        AppMessage* rxMsg = inboundMsg->prepareRxMsgForApp();
-        transport->send(rxMsg, "appOut", 0);
+        Rpc* rxMsg = inboundMsg->prepareRxRpc();
+        transport->send(rxMsg, "rpcHandlerOut");
         EV_INFO << "Finished receiving msgId " << rxPkt->getMsgId()
                 << " with size " << inboundMsg->msgSize
                 << " from source address " << inboundMsg->srcAddr
@@ -1036,10 +1036,10 @@ HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize,
     return grantPkt;
 }
 
-AppMessage*
-HomaTransport::InboundMessage::prepareRxMsgForApp()
+Rpc*
+HomaTransport::InboundMessage::prepareRxRpc()
 {
-    AppMessage* rxMsg = new AppMessage();
+    Rpc* rxMsg = new Rpc();
     rxMsg->setDestAddr(this->destAddr);
     rxMsg->setSrcAddr(this->srcAddr);
     rxMsg->setByteLength(this->msgSize);

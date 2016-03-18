@@ -112,8 +112,8 @@ MinimalTransport::handleMessage(cMessage* mesg)
                     mesg->getKind());
         }
     } else {
-        if (mesg->arrivedOn("appIn")) {
-            processMsgFromApp(check_and_cast<AppMessage*>(mesg));
+        if (mesg->arrivedOn("rpcHandlerIn")) {
+            processSendRpc(check_and_cast<Rpc*>(mesg));
         } else if (mesg->arrivedOn("udpIn")) {
             processRcvdPkt(check_and_cast<HomaPkt*>(mesg));
         } else {
@@ -170,7 +170,7 @@ MinimalTransport::processStart()
  *      network to a different destination.
  */
 void
-MinimalTransport::processMsgFromApp(AppMessage* mesg)
+MinimalTransport::processSendRpc(Rpc* mesg)
 {
     bytesLeftToSend += mesg->getByteLength();
     msgsLeftToSend++;
@@ -242,12 +242,12 @@ MinimalTransport::processRcvdPkt(HomaPkt* rcvdPkt)
     msgChunk.destAddr = rcvdPkt->getDestAddr();
     msgChunk.offsetByte = rcvdPkt->getSchedDataFields().firstByte;
     msgChunk.chunkLen = rcvdPkt->getDataBytes();
-    AppMessage* mesgToApp = oracleScheduler->appendRecvdChunk(&msgChunk);
+    Rpc* mesgToApp = oracleScheduler->appendRecvdChunk(&msgChunk);
     if (mesgToApp) {
         uint32_t bytesOnWire = HomaPkt::getBytesOnWire(
             mesgToApp->getByteLength(), PktType::SCHED_DATA);
         mesgToApp->setMsgBytesOnWire(bytesOnWire);
-        send(mesgToApp, "appOut", 0);
+        send(mesgToApp, "rpcHandlerOut");
     }
     delete rcvdPkt;
 }

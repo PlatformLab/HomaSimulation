@@ -23,7 +23,7 @@
 #include <omnetpp.h>
 #include "common/Minimal.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
-#include "application/AppMessage_m.h"
+#include "application/Rpc_m.h"
 #include "transport/HomaPkt.h"
 #include "transport/UnschedByteAllocator.h"
 #include "transport/WorkloadEstimator.h"
@@ -60,7 +60,7 @@ class HomaTransport : public cSimpleModule
     {
       PUBLIC:
         explicit OutboundMessage();
-        explicit OutboundMessage(AppMessage* outMsg,
+        explicit OutboundMessage(Rpc* outMsg,
                 SendController* sxController, uint64_t msgId,
                 std::vector<uint16_t> reqUnschedDataVec);
         explicit OutboundMessage(const OutboundMessage& outboundMsg);
@@ -133,7 +133,7 @@ class HomaTransport : public cSimpleModule
         ~SendController();
         void initSendController(HomaConfigDepot* homaConfig,
             PriorityResolver* prioResolver);
-        void processSendMsgFromApp(AppMessage* msg);
+        void processSendRpc(Rpc* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
 
@@ -298,7 +298,7 @@ class HomaTransport : public cSimpleModule
         uint32_t schedBytesInFlight();
         uint32_t unschedBytesInFlight();
         HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
-        AppMessage* prepareRxMsgForApp();
+        Rpc* prepareRxRpc();
         void updatePerPrioStats();
     };
 

@@ -35,8 +35,8 @@ simple MinimalTransport like ITransportScheme
         @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);
 
     gates:
-        input appIn[] @labels(AppMessage/down);
+        input rpcHandlerIn @labels(Rpc/down);
         input udpIn @labels(UDPControlInfo/up);
-        output appOut[] @labels(AppMessage/up);
+        output rpcHandlerOut @labels(Rpc/up);
         output udpOut @labels(UDPControlInfo/down);
 }

@@ -28,10 +28,9 @@ network DcnTopo
         @display("bgb=319,325");
         xml topologyConfig = xmldoc("config.xml");
         int numServersPerTor;
-        double edgeLinkDelay @unit(us) = default(0.0us); // This models NIC
-                                                         // intrinsic delay
+        // This models NIC intrinsic delay
+        double edgeLinkDelay @unit(us) = default(0.0us);
         int nicLinkSpeed @unit(Gbps);
-
         int numTors;
 
         // models the fabrciLinkDealy plus the intrinsic switching delay
@@ -115,8 +114,8 @@ network DcnTopo
             hostSwTurnAroundTime = hostSwTurnAroundTime;
             hostNicSxThinkTime = hostNicSxThinkTime;
             switchFixDelay = switchFixDelay;
-            trafficGeneratorApp[*].isFabricCutThrough = isFabricCutThrough;
-            trafficGeneratorApp[*].isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
+            rpcHandler.isFabricCutThrough = isFabricCutThrough;
+            rpcHandler.isSingleSpeedFabric = (nicLinkSpeed == fabricLinkSpeed);
         }
 
         configurator: IPv4NetworkConfigurator {
@@ -131,6 +130,10 @@ network DcnTopo
         }
 
     connections allowunconnected:
+        for i=0..numHosts-1, for j=0..(host[i].numTrafficGeneratorApp)-1 {
+            host[i].oracleSchedOut[j] --> oracleSRPTScheduler.appIn++;
+        }
+
         for i=0..numTors-1, for j=0..numServersPerTor-1 {
             tor[i].ethg$o++ --> EdgeChannel{delay=(edgeLinkDelay+switchFixDelay);} --> host[i * numServersPerTor + j].ethg$i++;
             tor[i].ethg$i++ <-- EdgeChannel{delay=(edgeLinkDelay+hostNicSxThinkTime);} <-- host[i * numServersPerTor + j].ethg$o++;

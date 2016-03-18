@@ -101,12 +101,12 @@ PseudoIdealPriorityTransport::handleMessage(cMessage *msg)
                 processStop();
                 break;
             default:
-                throw cRuntimeError("Received SelfMsg of type(%d) is not valid.",
-                        msg->getKind());
+                throw cRuntimeError("Received SelfMsg of type(%d) is"
+                    " not valid.", msg->getKind());
         }
     } else {
-        if (msg->arrivedOn("appIn")) {
-            processMsgFromApp(check_and_cast<AppMessage*>(msg));
+        if (msg->arrivedOn("rpcHandlerIn")) {
+            processSendRpc(check_and_cast<Rpc*>(msg));
         } else if (msg->arrivedOn("udpIn")) {
             processRcvdPkt(check_and_cast<HomaPkt*>(msg));
         }
@@ -114,7 +114,7 @@ PseudoIdealPriorityTransport::handleMessage(cMessage *msg)
 }
 
 void
-PseudoIdealPriorityTransport::processMsgFromApp(AppMessage* sendMsg)
+PseudoIdealPriorityTransport::processSendRpc(Rpc* sendMsg)
 {
     emit(msgsLeftToSendSignal, 1);
     emit(bytesLeftToSendSignal, sendMsg->getByteLength());
@@ -191,14 +191,14 @@ PseudoIdealPriorityTransport::processRcvdPkt(HomaPkt* rxPkt)
         if (rxMsgList.empty()) {
             incompleteRxMsgsMap.erase(msgId);
         }
-        AppMessage* rxMsg = new AppMessage();
+        Rpc* rxMsg = new Rpc();
         rxMsg->setDestAddr(inboundRxMsg->destAddr);
         rxMsg->setSrcAddr(inboundRxMsg->srcAddr);
         rxMsg->setMsgCreationTime(inboundRxMsg->msgCreationTime);
         rxMsg->setTransportSchedDelay(SIMTIME_ZERO);
         rxMsg->setByteLength(inboundRxMsg->msgByteLen);
         rxMsg->setMsgBytesOnWire(inboundRxMsg->totalBytesOnWire);
-        send(rxMsg, "appOut", 0);
+        send(rxMsg, "rpcHandlerOut");
         delete inboundRxMsg;
     }
     delete rxPkt;
@@ -259,8 +259,8 @@ PseudoIdealPriorityTransport::InboundMsg::appendPktData(HomaPkt* rxPkt)
 
     numBytesToRecv -= dataBytesInPkt;
     if (numBytesToRecv < 0) {
-        throw cRuntimeError("Remaining bytes to receive for an inbound msg can't be"
-                " negative.");
+        throw cRuntimeError("Remaining bytes to receive for an inbound"
+            " msg can't be negative.");
     }
 
     if (numBytesToRecv == 0) {

@@ -599,7 +599,7 @@ def msgBytesOnWire(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest):
         bytesOnWire.bytes = 0.0
         bytesOnWire.cnt = 0.0
         for id in receiverHostIds:
-            bytesStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}BytesOnWire:stats'.format(id, size)
+            bytesStatsKey = 'host[{0}].rpcHandler.msg{1}BytesOnWire:stats'.format(id, size)
             bytesOnWire.cnt += int(hosts.access(bytesStatsKey + '.count'))
             totalCnt +=  int(hosts.access(bytesStatsKey + '.count'))
             bytesOnWire.bytes += int(hosts.access(bytesStatsKey + '.sum'))
@@ -626,12 +626,12 @@ def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, e
         queuingDelayList = list()
         e2eStretchList = list()
         for id in receiverHostIds:
-            e2eDelayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EDelay:histogram.bins'.format(id, size)
-            e2eDelayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EDelay:stats'.format(id, size)
-            queuingDelayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}QueuingDelay:histogram.bins'.format(id, size)
-            queuingDelayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}QueuingDelay:stats'.format(id, size)
-            e2eStretchHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EStretch:histogram.bins'.format(id, size)
-            e2eStretchStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}E2EStretch:stats'.format(id, size)
+            e2eDelayHistogramKey = 'host[{0}].rpcHandler.msg{1}E2EDelay:histogram.bins'.format(id, size)
+            e2eDelayStatsKey = 'host[{0}].rpcHandler.msg{1}E2EDelay:stats'.format(id, size)
+            queuingDelayHistogramKey = 'host[{0}].rpcHandler.msg{1}QueuingDelay:histogram.bins'.format(id, size)
+            queuingDelayStatsKey = 'host[{0}].rpcHandler.msg{1}QueuingDelay:stats'.format(id, size)
+            e2eStretchHistogramKey = 'host[{0}].rpcHandler.msg{1}E2EStretch:histogram.bins'.format(id, size)
+            e2eStretchStatsKey = 'host[{0}].rpcHandler.msg{1}E2EStretch:stats'.format(id, size)
             e2eDelayForSize = AttrDict()
             queuingDelayForSize = AttrDict()
             e2eStretchForSize = AttrDict()
@@ -727,14 +727,14 @@ def transportSchedDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, 
         delayList = list()
         lagList = list()
         for id in receiverHostIds:
-            delayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:histogram.bins'.format(id, size)
-            delayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:stats'.format(id, size)
+            delayHistogramKey = 'host[{0}].rpcHandler.msg{1}TransportSchedDelay:histogram.bins'.format(id, size)
+            delayStatsKey = 'host[{0}].rpcHandler.msg{1}TransportSchedDelay:stats'.format(id, size)
             delayForSize = AttrDict()
             delayForSize = getInterestingModuleStats(hosts, delayStatsKey, delayHistogramKey)
             delayList.append(delayForSize)
 
-            preemptLagHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedPreemptionLag:histogram.bins'.format(id, size)
-            preemptLagStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedPreemptionLag:stats'.format(id, size)
+            preemptLagHistogramKey = 'host[{0}].rpcHandler.msg{1}TransportSchedPreemptionLag:histogram.bins'.format(id, size)
+            preemptLagStatsKey = 'host[{0}].rpcHandler.msg{1}TransportSchedPreemptionLag:stats'.format(id, size)
             preemptLagForSize = AttrDict()
             preemptLagForSize = getInterestingModuleStats(hosts, preemptLagStatsKey, preemptLagHistogramKey)
             lagList.append(preemptLagForSize)
@@ -847,14 +847,14 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
         nicRxDutyCycles.append(nicRcvDutyCycle)
 
         if hostId in xmlParsedDic.senderIds:
-            txAppsBytes.append(hostStats.access('trafficGeneratorApp[0].sentMsg:sum(packetBytes).value'))
-            txAppsRates.append(hostStats.access('trafficGeneratorApp[0].sentMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
+            txAppsBytes.append(hostStats.access('rpcHandler.sentMsg:sum(packetBytes).value'))
+            txAppsRates.append(hostStats.access('rpcHandler.sentMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
             txNicsBytes.append(nicSendBytes)
             txNicsRates.append(nicSendRate)
             txNicsDutyCycles.append(nicSendDutyCycle)
         if hostId in xmlParsedDic.receiverIds:
-            rxAppsBytes.append(hostStats.access('trafficGeneratorApp[0].rcvdMsg:sum(packetBytes).value'))
-            rxAppsRates.append(hostStats.access('trafficGeneratorApp[0].rcvdMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
+            rxAppsBytes.append(hostStats.access('rpcHandler.rcvdMsg:sum(packetBytes).value'))
+            rxAppsRates.append(hostStats.access('rpcHandler.rcvdMsg:last(sumPerDuration(packetBytes)).value')*8.0/1e9)
             rxNicsBytes.append(nicRcvBytes)
             rxNicsRates.append(nicRcvRate)
             rxNicsDutyCycles.append(nicRcvDutyCycle)

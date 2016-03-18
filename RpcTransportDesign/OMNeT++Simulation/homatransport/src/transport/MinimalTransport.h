@@ -20,7 +20,7 @@
 #include "common/Minimal.h"
 #include "transport/OracleGreedySRPTScheduler.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
-#include "application/AppMessage_m.h"
+#include "application/Rpc_m.h"
 #include "transport/HomaPkt.h"
 
 /**
@@ -45,7 +45,7 @@ class MinimalTransport : public cSimpleModule
     virtual void finish();
     void processStart();
     void processTransmitPkt();
-    void processMsgFromApp(AppMessage* mesg);
+    void processSendRpc(Rpc* mesg);
     void processRcvdPkt(HomaPkt* mesg);
     void refreshSchedule();
     friend class OracleGreedySRPTScheduler;

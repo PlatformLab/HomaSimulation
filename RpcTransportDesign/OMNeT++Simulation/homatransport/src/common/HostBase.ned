@@ -22,6 +22,7 @@ import inet.transportlayer.ITCP;
 import inet.transportlayer.IUDP;
 import homatransport.application.ITrafficGeneratorApp;
 import homatransport.transport.ITransportScheme;
+import homatransport.application.RpcHandler;
 
 //
 // A simplified version of StandardHost module from inet package. Many
@@ -35,8 +36,8 @@ module HostBase extends NodeBase
         xml hostConfig;
         int nicLinkSpeed @unit(Gbps);
         int fabricLinkSpeed @unit(Gbps);
-
         int numTrafficGeneratorApp = default(0);
+
         // no of TCP apps. Specify the app types in INI file with
         // tcpApp[0..1].typename="TCPEchoApp" syntax
         int numTcpApps = default(0);
@@ -63,16 +64,23 @@ module HostBase extends NodeBase
         double hostNicSxThinkTime @unit(us);
         double switchFixDelay @unit(us);
 
+    gates:
+        output oracleSchedOut[numTrafficGeneratorApp] @loose;
+
     submodules:
         trafficGeneratorApp[numTrafficGeneratorApp]: <default("WorkloadSynthesizer")> like ITrafficGeneratorApp {
             parameters:
                 @display("p=490,38");
                 appConfig = xmldoc("config.xml", "/topologyConfig/hostConfig[@id=$PARENTMODULE_INDEX]/appConfig");
                 nicLinkSpeed = nicLinkSpeed;
+        }
+
+        rpcHandler: RpcHandler {
+            parameters:
+                nicLinkSpeed = nicLinkSpeed;
                 fabricLinkSpeed = fabricLinkSpeed;
                 edgeLinkDelay = edgeLinkDelay;
                 fabricLinkDelay = fabricLinkDelay;
-
                 hostSwTurnAroundTime = hostSwTurnAroundTime;
                 hostNicSxThinkTime = hostNicSxThinkTime;
                 switchFixDelay = switchFixDelay;
@@ -107,9 +115,13 @@ module HostBase extends NodeBase
 
     connections allowunconnected:
         for i=0..numTrafficGeneratorApp-1 {
-            trafficGeneratorApp[i].transportOut --> transportScheme.appIn++;
-            trafficGeneratorApp[i].transportIn <-- transportScheme.appOut++;
+            trafficGeneratorApp[i].rpcHandlerOut --> rpcHandler.appIn++;
+            trafficGeneratorApp[i].rpcHandlerIn <-- rpcHandler.appOut++;
+            trafficGeneratorApp[i].oracleSchedulerOut --> oracleSchedOut[i] if transportSchemeType == "MinimalTransport";
         }
+
+        rpcHandler.transportOut --> transportScheme.rpcHandlerIn;
+        rpcHandler.transportIn <-- transportScheme.rpcHandlerOut;
 
         transportScheme.udpOut --> udp.appIn++ if  hasTransportScheme;
         transportScheme.udpIn <-- udp.appOut++ if hasTransportScheme;

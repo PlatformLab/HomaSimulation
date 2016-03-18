@@ -26,9 +26,9 @@ moduleinterface ITransportScheme
         xml transportConfig;
         int nicLinkSpeed @unit(Gbps);
     gates:
-        input appIn[] @labels(AppMessage/down);
+        input rpcHandlerIn @labels(Rpc/down);
         input udpIn @labels(UDPControlInfo/up);
-        output appOut[] @labels(AppMessage/up);
+        output rpcHandlerOut @labels(Rpc/up);
         output udpOut @labels(UDPControlInfo/down);
 }
 
@@ -40,8 +40,8 @@ simple TransportSchemeNone like ITransportScheme
         xml transportConfig;
         int nicLinkSpeed @unit(Gbps);
     gates:
-        input appIn[] @labels(AppMessage/down);
+        input rpcHandlerIn @labels(Rpc/down);
         input udpIn @labels(UDPControlInfo/up);
-        output appOut[] @labels(AppMessage/up);
+        output rpcHandlerOut @labels(Rpc/up);
         output udpOut @labels(UDPControlInfo/down);
 }

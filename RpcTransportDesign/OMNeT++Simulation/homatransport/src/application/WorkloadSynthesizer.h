@@ -29,7 +29,7 @@
 /**
  * Mocks message generating behaviour of an application. Given a messge size
  * distribution and a interarrival time distribution, this module generates
- * message sizes of that distribution and sends them in interarrival times
+ * message sizes of the size distribution and sends them in interarrival times
  * sampled from the interarrival distribution.
  */
 class WorkloadSynthesizer : public cSimpleModule
@@ -41,51 +41,30 @@ class WorkloadSynthesizer : public cSimpleModule
   PROTECTED:
     enum SelfMsgKinds { START = 1, SEND, STOP };
 
-    // generates samples from the a given random distribution
+    // generates samples from given random distributions for message size and
+    // inter arrival times.
     MsgSizeDistributions *msgSizeGenerator;
 
-    // parameters
+    // parameters from NED files
     std::vector<inet::L3Address> destAddresses;
+    bool isSender;
     simtime_t startTime;
     simtime_t stopTime;
-    bool isSender;
-    int maxDataBytesPerPkt;
-    int maxDataBytesPerEthFrame;
     cXMLElement* xmlConfig;
     uint32_t nicLinkSpeed; // in Gb/s
-    uint32_t fabricLinkSpeed;
-    double fabricLinkDelay;
-    double edgeLinkDelay;
-    double hostSwTurnAroundTime;
-    double hostNicSxThinkTime;
-    double switchFixDelay;
-    bool isFabricCutThrough;
-    bool isSingleSpeedFabric;
 
-    // states
+    // Timer object for event generation
     cMessage* selfMsg;
+
+    // Ip address of the local host
     inet::L3Address srcAddress;
-    int sendMsgSize; // In bytes
+
+    // holds the size (in bytes) of the next message to be transmitted
+    int txMsgSize;
 
     // statistics
     int numSent;
     int numReceived;
-
-    static simsignal_t sentMsgSignal;
-    static simsignal_t rcvdMsgSignal;
-
-    // Signal for end to end to delay every received messages
-    static simsignal_t msgE2EDelaySignal;
-
-    // keep pairs of upper bound message size range and its corresponding
-    // signal id.
-    std::vector<uint64_t> msgSizeRangeUpperBounds;
-    std::vector<uint64_t> msgBytesOnWireSignalVec;
-    std::vector<simsignal_t> msgE2ELatencySignalVec;
-    std::vector<simsignal_t> msgE2EStretchSignalVec;
-    std::vector<simsignal_t> msgQueueDelaySignalVec;
-    std::vector<simsignal_t> msgTransprotSchedDelaySignalVec;
-    std::vector<simsignal_t> msgTransprotSchedPreemptionLagSignalVec;
 
   PROTECTED:
     virtual void initialize();
@@ -100,8 +79,6 @@ class WorkloadSynthesizer : public cSimpleModule
     void sendMsg();
     void setupNextSend();
     void parseAndProcessXMLConfig();
-    void registerTemplatedStats(const char* msgSizeRanges);
-    double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
 };
 
 #endif //__HOMATRANSPORT_WORKLOADSYNTHESIZER_H_

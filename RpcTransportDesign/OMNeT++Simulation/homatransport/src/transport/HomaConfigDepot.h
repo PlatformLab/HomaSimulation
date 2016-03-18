@@ -19,8 +19,9 @@
 #include "omnetpp.h"
 #include "common/Minimal.h"
 
-// This class is the ultimate place for storing all config parameters. All other
-// classes will get a pointer to this class and can read params from this
+// This class is the ultimate place for storing all config parameters for
+// HomaTransport. All other classes will get a pointer to this class and can
+// read params from this
 class HomaConfigDepot {
   PUBLIC:
     HomaConfigDepot(cComponent* ownerTransport);

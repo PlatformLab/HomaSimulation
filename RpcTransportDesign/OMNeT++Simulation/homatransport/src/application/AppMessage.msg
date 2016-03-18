@@ -20,13 +20,10 @@ class noncobject inet::L3Address;
 
 
 //
-// TODO generated message class
+// A packet structure for communication (msg transmission and reception) between
+//appliation and RpcHandler
 //
 packet AppMessage {
      inet::L3Address destAddr;
      inet::L3Address srcAddr;
-     simtime_t msgCreationTime;
-     simtime_t transportSchedDelay;
-     simtime_t transportSchedPreemptionLag;
-     long msgBytesOnWire;
 }

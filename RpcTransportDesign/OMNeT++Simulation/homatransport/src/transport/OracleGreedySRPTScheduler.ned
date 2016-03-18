@@ -28,4 +28,6 @@ simple OracleGreedySRPTScheduler {
     parameters:
         xml transportConfig = default(xml("<param/>"));
         int nicLinkSpeed @unit(Gbps) = default(10Gbps);
+    gates:
+        input appIn[] @loose @label(AppMessage/down);
 }

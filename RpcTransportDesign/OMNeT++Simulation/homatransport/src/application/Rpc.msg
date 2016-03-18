@@ -12,20 +12,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
-package homatransport.application;
+
+cplusplus {{
+#include "inet/networklayer/common/L3Address.h"
+}}
+class noncobject inet::L3Address;
+
 
 //
-// Interface for applications
+// This object provides the medium for communicating between the RpcHandler and
+// Transport layer. This object also keeps enough information for calculating
+// and dumping stattistics like end to end delay and stretch of a message. 
 //
-moduleinterface ITrafficGeneratorApp
-{
-    parameters:
-        @display("i=block/app");
-        xml appConfig;
-        int nicLinkSpeed @unit(Gbps);
-
-    gates:
-        input rpcHandlerIn @label(AppMessage/up);
-        output rpcHandlerOut @labels(AppMessage/down);
-        output oracleSchedulerOut @loose @label(AppMessage/down);
+packet Rpc {
+     inet::L3Address destAddr;
+     inet::L3Address srcAddr;
+     simtime_t msgCreationTime;
+     simtime_t transportSchedDelay;
+     simtime_t transportSchedPreemptionLag;
+     long msgBytesOnWire;
 }

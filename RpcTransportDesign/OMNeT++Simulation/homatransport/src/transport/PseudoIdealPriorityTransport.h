@@ -21,7 +21,7 @@
 #include <list>
 #include "common/Minimal.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
-#include "application/AppMessage_m.h"
+#include "application/Rpc_m.h"
 #include "transport/HomaPkt.h"
 
 /**
@@ -50,7 +50,7 @@ class PseudoIdealPriorityTransport : public cSimpleModule
     virtual void handleMessage(cMessage *msg);
     virtual void processStart();
     virtual void processStop();
-    virtual void processMsgFromApp(AppMessage* sendMsg);
+    virtual void processSendRpc(Rpc* sendMsg);
     virtual void processRcvdPkt(HomaPkt* rxPkt);
     virtual void finish();
 

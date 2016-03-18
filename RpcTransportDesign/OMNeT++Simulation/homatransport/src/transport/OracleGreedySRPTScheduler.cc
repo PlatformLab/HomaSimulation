@@ -41,7 +41,9 @@ OracleGreedySRPTScheduler::initialize()
 void
 OracleGreedySRPTScheduler::handleMessage(cMessage* msg)
 {
-    return;
+    if (msg->isSelfMessage() || !msg->arrivedOn("appIn"))
+        throw cRuntimeError("Unexpected message has arrived");
+    delete msg;
 }
 
 void
@@ -122,7 +124,7 @@ OracleGreedySRPTScheduler::subscribeEndhostTransport(
  *      transmitted over the network.
  */
 void
-OracleGreedySRPTScheduler::scheduleNewMesg(AppMessage* appMesg)
+OracleGreedySRPTScheduler::scheduleNewMesg(Rpc* appMesg)
 {
     InflightMessage* newMsg = new InflightMessage(appMesg, this);
     senderMsgMap.at(newMsg->sxTransport).insert(newMsg);
@@ -196,16 +198,16 @@ OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport,
  * \return
  *      If the received chunk was the last piece of the message and the
  *      message is complete after this message, this method constructs an
- *      AppMessage corresponding to this message and returns the pointer to the
- *      AppMessage. Otherwise, it returns null.
+ *      Rpc corresponding to this message and returns the pointer to the
+ *      Rpc. Otherwise, it returns null.
  *      Note: It is the responsibility of the caller to free up the allocated
- *      memory for the returned AppMessage.
+ *      memory for the returned Rpc.
  */
-AppMessage*
+Rpc*
 OracleGreedySRPTScheduler::appendRecvdChunk(
     OracleGreedySRPTScheduler::MesgChunk* msgChunk)
 {
-    AppMessage* rxMsg = NULL;
+    Rpc* rxMsg = NULL;
     InflightMessage* msg = msgIdMap.at(msgChunk->msgId);
     if (msg->appendRecvdChunk(msgChunk->offsetByte, msgChunk->chunkLen)) {
         msgChunk->lastChunk = true;
@@ -214,7 +216,7 @@ OracleGreedySRPTScheduler::appendRecvdChunk(
         allRxMsg.erase(msg);
         auto& allSxMsgs = senderMsgMap.at(msg->sxTransport);
         ASSERT(allSxMsgs.find(msg) == allSxMsgs.end());
-        rxMsg = new AppMessage();
+        rxMsg = new Rpc();
         rxMsg->setDestAddr(msg->destAddr);
         rxMsg->setSrcAddr(msg->srcAddr);
         rxMsg->setMsgCreationTime(msg->msgCreationTime);
@@ -326,7 +328,7 @@ OracleGreedySRPTScheduler::recomputeGlobalSrptSchedule()
  *      The central oracle srpt scheduler that manages the transmit scheduling
  *      of all messages in the network.
  */
-OracleGreedySRPTScheduler::InflightMessage::InflightMessage(AppMessage* appMesg,
+OracleGreedySRPTScheduler::InflightMessage::InflightMessage(Rpc* appMesg,
         OracleGreedySRPTScheduler* oracleScheduler)
     : oracleScheduler(oracleScheduler)  
     , msgId(oracleScheduler->getNewMsgId())
