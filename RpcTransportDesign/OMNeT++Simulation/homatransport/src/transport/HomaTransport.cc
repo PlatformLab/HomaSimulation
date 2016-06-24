@@ -46,7 +46,7 @@ HomaTransport::HomaTransport()
     , homaConfig(NULL)
     , prioResolver(NULL)
     , distEstimator(NULL)
-    , selfMsg(NULL)
+    , grantTimer(NULL)
 {}
 
 /**
@@ -90,16 +90,16 @@ HomaTransport::initialize()
     if (homaConfig->grantMaxBytes > maxDataBytes) {
         homaConfig->grantMaxBytes = maxDataBytes;
     }
-    selfMsg = new cMessage("GrantTimer");
-    selfMsg->setKind(SelfMsgKind::START);
+    grantTimer = new cMessage("GrantTimer");
+    grantTimer->setKind(SelfMsgKind::START);
     registerTemplatedStats(homaConfig->allPrio);
 
     distEstimator = new WorkloadEstimator(homaConfig);
     prioResolver = new PriorityResolver(homaConfig, distEstimator);
     prioResolver->recomputeCbf(homaConfig->cbfCapMsgSize);
-    rxScheduler.initialize(homaConfig, selfMsg, prioResolver);
+    rxScheduler.initialize(homaConfig, grantTimer, prioResolver);
     sxController.initSendController(homaConfig, prioResolver);
-    scheduleAt(simTime(), selfMsg);
+    scheduleAt(simTime(), grantTimer);
     outstandingGrantBytes = 0;
 }
 
@@ -108,7 +108,7 @@ HomaTransport::processStart()
 {
     socket.setOutputGate(gate("udpOut"));
     socket.bind(homaConfig->localPort);
-    selfMsg->setKind(SelfMsgKind::GRANT);
+    grantTimer->setKind(SelfMsgKind::GRANT);
 }
 
 void
@@ -121,7 +121,7 @@ void
 HomaTransport::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
-        ASSERT(msg == selfMsg);
+        ASSERT(msg == grantTimer);
         switch (msg->getKind()) {
             case SelfMsgKind::START:
                 processStart();
@@ -184,7 +184,7 @@ HomaTransport::sendPacket(HomaPkt* sxPkt)
 void
 HomaTransport::finish()
 {
-    cancelAndDelete(selfMsg);
+    cancelAndDelete(grantTimer);
 }
 
 

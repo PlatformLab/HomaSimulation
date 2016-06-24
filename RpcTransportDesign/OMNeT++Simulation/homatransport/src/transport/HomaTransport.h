@@ -489,9 +489,9 @@ class HomaTransport : public cSimpleModule
     // seeing.
     WorkloadEstimator *distEstimator;
 
-    // Timer object for this transport. Will be used for implementing timely
-    // scheduled
-    cMessage* selfMsg;
+    // Timer object for sending grants by this transport. Will be used for
+    // implementing timely scheduling transmissions to this receiver.
+    cMessage* grantTimer;
 
     // Tracks the total outstanding grant bytes which will be used for stats
     // collection and recording.
