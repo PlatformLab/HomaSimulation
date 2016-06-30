@@ -123,12 +123,17 @@ class HomaTransport : public cSimpleModule
      * keeps the state necessary for transmisssion of the messages. For every
      * new message that arrives from the applications, this class is responsible
      * for sending the request packet, unscheduled packets, and scheduled packet
-     * (when a grants are received).
+     * (when grants are received).
      */
     class SendController
     {
       PUBLIC:
         typedef std::unordered_map<uint64_t, OutboundMessage> OutboundMsgMap;
+        typedef std::priority_queue<
+            HomaPkt*,
+            std::vector<HomaPkt*>,
+            HomaPkt::PrioGreater> OutbndPktQueue;
+
         SendController(HomaTransport* transport);
         ~SendController();
         void initSendController(HomaConfigDepot* homaConfig,
@@ -136,6 +141,7 @@ class HomaTransport : public cSimpleModule
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
+        void sendOrQueue(cMessage* msg);
 
       PROTECTED:
 
@@ -161,6 +167,10 @@ class HomaTransport : public cSimpleModule
 
         // The object that keeps the configuration parameters for the transport
         HomaConfigDepot *homaConfig;
+
+        // Priority Queue containing pkts that are to be sent out sorted by
+        // pkt priorities
+        OutbndPktQueue sxQueue;
         friend class OutboundMessage;
     };
 
@@ -428,19 +438,19 @@ class HomaTransport : public cSimpleModule
     virtual void finish();
     void sendPacket(HomaPkt* sxPkt);
     void processStart();
-    void processGrantTimer();
     void registerTemplatedStats(uint16_t numPrio);
     const inet::L3Address& getLocalAddr() {return localAddr;}
 
     /**
      * A self message essentially models a timer for this transport and can have
-     * one the below types.
+     * one of the below types.
      */
     enum SelfMsgKind
     {
         START = 1,  // Timer type when the transport is in initialization phase.
-        GRANT = 2,  // Timer type in normal working state of transport.
-        STOP  = 3   // Timer type when the transport is in cleaning phase.
+        GRANT = 2,  // Timer type for common state of a grant timer.
+        SEND  = 3,  // Timer type for common state of a send timer.
+        STOP  = 4   // Timer type when the transport is in cleaning phase.
     };
 
     /**
@@ -492,6 +502,11 @@ class HomaTransport : public cSimpleModule
     // Timer object for sending grants by this transport. Will be used for
     // implementing timely scheduling transmissions to this receiver.
     cMessage* grantTimer;
+
+    // Timer object for send side packet pacing. At every packet transmission at
+    // sender this will be used to schedule next send after the current send is
+    // completed.
+    cMessage* sendTimer;
 
     // Tracks the total outstanding grant bytes which will be used for stats
     // collection and recording.

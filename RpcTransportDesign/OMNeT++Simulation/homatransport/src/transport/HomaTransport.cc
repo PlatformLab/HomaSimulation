@@ -47,6 +47,7 @@ HomaTransport::HomaTransport()
     , prioResolver(NULL)
     , distEstimator(NULL)
     , grantTimer(NULL)
+    , sendTimer(NULL)
 {}
 
 /**
@@ -92,6 +93,8 @@ HomaTransport::initialize()
     }
     grantTimer = new cMessage("GrantTimer");
     grantTimer->setKind(SelfMsgKind::START);
+    sendTimer = new cMessage("SendTimer");
+    sendTimer->setKind(SelfMsgKind::START);
     registerTemplatedStats(homaConfig->allPrio);
 
     distEstimator = new WorkloadEstimator(homaConfig);
@@ -109,25 +112,24 @@ HomaTransport::processStart()
     socket.setOutputGate(gate("udpOut"));
     socket.bind(homaConfig->localPort);
     grantTimer->setKind(SelfMsgKind::GRANT);
-}
-
-void
-HomaTransport::processGrantTimer()
-{
-    rxScheduler.sendAndScheduleGrant();
+    sendTimer->setKind(SelfMsgKind::SEND);
 }
 
 void
 HomaTransport::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
-        ASSERT(msg == grantTimer);
         switch (msg->getKind()) {
             case SelfMsgKind::START:
                 processStart();
                 break;
             case SelfMsgKind::GRANT:
-                processGrantTimer();
+                ASSERT(msg == grantTimer);
+                rxScheduler.sendAndScheduleGrant();
+                break;
+            case SelfMsgKind::SEND:
+                ASSERT(msg == sendTimer);
+                sxController.sendOrQueue(msg);
                 break;
         }
     } else {
@@ -185,6 +187,7 @@ void
 HomaTransport::finish()
 {
     cancelAndDelete(grantTimer);
+    cancelAndDelete(sendTimer);
 }
 
 
@@ -267,6 +270,38 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
         outboundMsgMap.erase(rxPkt->getMsgId());
     }
     delete rxPkt;
+}
+
+void
+HomaTransport::SendController::sendOrQueue(cMessage* msg)
+{
+    HomaPkt* sxPkt = dynamic_cast<HomaPkt*>(msg);
+    if (sxPkt){
+        if (transport->sendTimer->isScheduled()) {
+            // this is a pkt that needs to be send out
+            sxQueue.push(sxPkt);
+            return;
+        } else {
+            ASSERT(sxQueue.empty());
+        }
+    } else {
+        if (msg != transport->sendTimer || msg->getKind() != SelfMsgKind::SEND) {
+            throw cRuntimeError("Expected SendTimer of kind SEND!");
+        }
+
+        if (sxQueue.empty()) {
+            return;
+        }
+        sxPkt = sxQueue.top();
+        sxQueue.pop();
+    }
+
+    uint32_t pktLenOnWire =
+        HomaPkt::getBytesOnWire(sxPkt->getDataBytes(), (PktType)sxPkt->getPktType());
+    simtime_t nextSendTime = SimTime(1e-9 * (pktLenOnWire * 8.0 /
+        homaConfig->nicLinkSpeed)) + simTime();
+    transport->sendPacket(sxPkt);
+    transport->scheduleAt(nextSendTime, transport->sendTimer);
 }
 
 /**
@@ -399,7 +434,7 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
         unschedPkt->setUnschedFields(unschedFields);
         unschedPkt->setByteLength(unschedPkt->headerSize() +
             unschedPkt->getDataBytes());
-        sxController->transport->sendPacket(unschedPkt);
+        sxController->sendOrQueue(unschedPkt);
         EV_INFO << "Send unsched pkt with msgId " << this->msgId << " from "
             << this->srcAddr.str() << " to " << this->destAddr.str() << endl;
 
@@ -432,7 +467,7 @@ HomaTransport::OutboundMessage::sendSchedBytes(uint32_t numBytes,
     dataFields.lastByte = dataFields.firstByte + bytesToSend - 1;
     dataPkt->setSchedDataFields(dataFields);
     dataPkt->setByteLength(bytesToSend + dataPkt->headerSize());
-    sxController->transport->sendPacket(dataPkt);
+    sxController->sendOrQueue(dataPkt);
 
     // update outbound messgae
     this->bytesLeft -= bytesToSend;
@@ -709,7 +744,7 @@ HomaTransport::ReceiveScheduler::sendAndScheduleGrant()
             transport->outstandingGrantBytes);
 
         // send the grant out
-        transport->sendPacket(grantPkt);
+        transport->sxController.sendOrQueue(grantPkt);
 
         // set the grantTimer for the next grant
         if (grantTimer->isScheduled()) {

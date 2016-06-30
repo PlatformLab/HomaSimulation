@@ -184,17 +184,24 @@ HomaPkt::compareSizeAndPrios(cObject* obj1, cObject* obj2)
 /**
  *
  * For a message of size numDataBytes comprised of packets of type homaPktType,
- * this function returns the actual bytes transmitted on the wire.
+ * this function returns the actual bytes transmitted on the wire. Both data
+ * bytes packed in the packet and the header size of the packet are cosidered in
+ * the calculation.
  *
- * NOTE: calling this function with numDataBytes=0 assumes that you are sending
- * a packet with no data on the wire and you want to see how many bytes an empty
- * packet is on the wire.
  */
 uint32_t
 HomaPkt::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
 {
     HomaPkt homaPkt = HomaPkt();
     homaPkt.setPktType(homaPktType);
+
+    // FIXME: Using this function can cause bugs in general since HomaPkt
+    // header size can be different for two pkts of same type (eg.
+    // grant pkts). Care must be taken when using this function. Solution:
+    // Better to have a version of this function that takes in a poiter to the
+    // pkt and uses the real header size of the packet to do calcualtion when
+    // possible. This requires to find all invokations of this function and
+    // replace them with the new function when possible.  
     uint32_t homaPktHdrSize = homaPkt.headerSize();
 
     uint32_t bytesOnWire = 0;

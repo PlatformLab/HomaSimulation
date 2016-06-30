@@ -36,6 +36,31 @@ class HomaPkt : public HomaPkt_Base
     // homatransport as soon as it arrives at the transport.
     HomaTransport* ownerTransport;
 
+    /**
+     * A predicate functor to compare priorities of two HomaPkt instance. It's a
+     * utility predicate for creating PriorityQueues of HomaPkt instances.
+     */
+    class PrioGreater {
+      PUBLIC:
+        PrioGreater(){}
+
+        /**
+         * Predicate functor operator () for comparison.
+         *
+         * \param pkt1
+         *      first pkt for priority comparison
+         * \param pkt2
+         *      second pkt for priority comparison
+         * \return
+         *      true if pkt1 priority is greater than or equal to pkt2 prio.
+         */
+        bool operator()(const HomaPkt* pkt1,
+            const HomaPkt* pkt2)
+        {
+            return pkt1->getPriority() >= pkt2->getPriority();
+        }
+    };
+
   PRIVATE:
     void copy(const HomaPkt& other);
 
