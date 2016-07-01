@@ -222,6 +222,11 @@ HomaTransport::SendController::initSendController(HomaConfigDepot* homaConfig,
 HomaTransport::SendController::~SendController()
 {
     delete unschedByteAllocator;
+    while (!sxQueue.empty()) {
+        HomaPkt* head = sxQueue.top();
+        sxQueue.pop();
+        delete head;
+    }
 }
 
 void
