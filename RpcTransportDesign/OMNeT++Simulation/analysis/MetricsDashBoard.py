@@ -283,7 +283,7 @@ def aggrsQueueWaitTime(aggrs, generalInfo, xmlParsedDic, reportDigest):
         aggrsQueuingTimeDigest = digestModulesStats(aggrsQueuingTimeStats)
         reportDigest.assign('queueWaitTime.aggrs.{0}'.format(keyString), aggrsQueuingTimeDigest)
 
-def parseXmlFile(xmlConfigFile):
+def parseXmlFile(xmlConfigFile, generalInfo):
     xmlConfig = minidom.parse(xmlConfigFile)
     xmlParsedDic = AttrDict()
 
@@ -305,7 +305,7 @@ def parseXmlFile(xmlConfigFile):
                     receiverIds += destIds
     xmlParsedDic.senderIds = senderIds
     if allHostsReceive is True:
-        receiverIds = range(0, numTors*numServersPerTor)
+        receiverIds = range(0, int(generalInfo.numTors)*int(generalInfo.numServersPerTor))
     xmlParsedDic.receiverIds = [elem for elem in set(receiverIds)]
     return xmlParsedDic
 
@@ -1273,10 +1273,10 @@ def main():
         scalarResultFile = 'homatransport/src/dcntopo/results/RecordAllStats-0.sca'
 
     xmlConfigFile = 'homatransport/src/dcntopo/config.xml'
-    xmlParsedDic = AttrDict()
-    xmlParsedDic = parseXmlFile(xmlConfigFile)
     parsedStats = AttrDict()
     parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(scalarResultFile))
+    xmlParsedDic = AttrDict()
+    xmlParsedDic = parseXmlFile(xmlConfigFile, parsedStats.generalInfo)
     queueWaitTimeDigest = AttrDict()
     hostQueueWaitTimes(parsedStats.hosts, xmlParsedDic, queueWaitTimeDigest)
     torsQueueWaitTime(parsedStats.tors, parsedStats.generalInfo, xmlParsedDic, queueWaitTimeDigest)
