@@ -37,8 +37,8 @@ class HomaPkt : public HomaPkt_Base
     HomaTransport* ownerTransport;
 
     /**
-     * A predicate functor to compare priorities of two HomaPkt instance. It's a
-     * utility predicate for creating PriorityQueues of HomaPkt instances.
+     * A utility predicate for creating PriorityQueues of HomaPkt instances
+     * based on priority numbers.
      */
     class PrioGreater {
       PUBLIC:
@@ -57,7 +57,13 @@ class HomaPkt : public HomaPkt_Base
         bool operator()(const HomaPkt* pkt1,
             const HomaPkt* pkt2)
         {
-            return pkt1->getPriority() >= pkt2->getPriority();
+            return (pkt1->getPriority() > pkt2->getPriority()) ||
+                   (pkt1->getPriority() == pkt2->getPriority() &&
+                        pkt1->getCreationTime() > pkt2->getCreationTime()) ||
+                   (pkt1->getPriority() == pkt2->getPriority() &&
+                        pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                        pkt1->getUnschedFields().firstByte >
+                        pkt2->getUnschedFields().firstByte);
         }
     };
 

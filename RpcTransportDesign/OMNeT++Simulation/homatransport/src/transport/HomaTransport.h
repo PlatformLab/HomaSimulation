@@ -210,7 +210,9 @@ class HomaTransport : public cSimpleModule
             bool operator()(const InboundMessage* msg1,
                 const InboundMessage* msg2)
             {
-                return msg1->bytesToGrant > msg2->bytesToGrant;
+                return (msg1->bytesToGrant > msg2->bytesToGrant) ||
+                    (msg1->bytesToGrant == msg2->bytesToGrant &&
+                    msg1->msgCreationTime > msg2->msgCreationTime);
             }
         };
         const uint32_t& getMsgSize() { return msgSize; }
