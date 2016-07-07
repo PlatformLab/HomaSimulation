@@ -143,7 +143,6 @@ void
 WorkloadSynthesizer::initialize()
 {
     // read in module parameters
-    int parentHostIdx = -1;
     nicLinkSpeed = par("nicLinkSpeed").longValue();
     fabricLinkSpeed = par("fabricLinkSpeed").longValue();
     edgeLinkDelay = 1e-6 * par("edgeLinkDelay").doubleValue();
@@ -160,6 +159,15 @@ WorkloadSynthesizer::initialize()
     // Setup templated statistics ans signals
     const char* msgSizeRanges = par("msgSizeRanges").stringValue();
     registerTemplatedStats(msgSizeRanges);
+
+    // Find host id for parent host module of this app
+    cModule* parentHost = this->getParentModule();
+    if (strcmp(parentHost->getName(), "host") != 0) {
+        throw cRuntimeError("'%s': Not a valid parent module type. Expected"
+                " \"HostBase\" for parent module type.",
+                parentHost->getName());
+    }
+    parentHostIdx = parentHost->getIndex();
 
     // Initialize the msgSizeGenerator
     const char* workLoadType = par("workloadType").stringValue();
@@ -218,13 +226,6 @@ WorkloadSynthesizer::initialize()
                 MsgSizeDistributions::DistributionChoice::SIZE_IN_FILE;
         distFileName = std::string(
                 "../../sizeDistributions/HostidSizeInterarrival.txt");
-        cModule* parentHost = this->getParentModule();
-        if (strcmp(parentHost->getName(), "host") != 0) {
-            throw cRuntimeError("'%s': Not a valid parent module type. Expected"
-                    " \"HostBase\" for parent module type.",
-                    parentHost->getName());
-        }
-        parentHostIdx = parentHost->getIndex();
     } else {
         throw cRuntimeError("'%s': Not a valie workload type.",workLoadType);
     }
@@ -295,16 +296,22 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
                 isSenderParam);
     }
 
-
     // destAddress will be populated with the destination hosts in the xml
     // config file. If no destination is specified in the xml config file, then
-    // dest host be chosen randomly among all the possible dest hosts.
+    // dest host be chosen randomly among all the possible dest hosts. Positive
+    // dest ids for hosts this app will send to and negative for hosts this app
+    // doesn't send to.
     std::string destIdsStr =
             std::string(xmlConfig->getElementByPath("destIds")->getNodeValue());
     std::stringstream destIdsStream(destIdsStr);
     int id;
     std::unordered_set<int> destHostIds;
     while (destIdsStream >> id) {
+        if (id == -1) {
+            destHostIds.clear();
+            destHostIds.insert(id);
+            break;
+        }
         destHostIds.insert(id);
     }
 
@@ -313,8 +320,16 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
     const char *token;
     while((token = tokenizer.nextToken()) != NULL) {
         cModule* mod = simulation.getModuleByPath(token);
-        if (!destHostIds.empty() && destHostIds.count(mod->getIndex()) == 0) {
+        if (!destHostIds.empty()) {
+            if (destHostIds.count(-1)) {
+                // Don't include this host (ie loopback) to the set of possible
+                // destination hosts
+                if (mod->getIndex() == parentHostIdx) {
+                    continue;
+                }
+            } else if (!destHostIds.count(mod->getIndex())) {
                 continue;
+            }
         }
         inet::L3Address result;
         inet::L3AddressResolver().tryResolve(token, result);

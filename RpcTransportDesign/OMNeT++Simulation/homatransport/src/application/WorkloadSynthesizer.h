@@ -61,6 +61,7 @@ class WorkloadSynthesizer : public cSimpleModule
     double switchFixDelay;
     bool isFabricCutThrough;
     bool isSingleSpeedFabric;
+    int parentHostIdx;
 
     // states
     cMessage* selfMsg;
