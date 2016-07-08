@@ -293,7 +293,8 @@ def parseXmlFile(xmlConfigFile, generalInfo):
     for hostConfig in xmlConfig.getElementsByTagName('hostConfig'):
         isSender = hostConfig.getElementsByTagName('isSender')[0]
         if isSender.childNodes[0].data == 'true':
-            senderIds.append(int(hostConfig.getAttribute('id')))
+            hostId = int(hostConfig.getAttribute('id'))
+            senderIds.append(hostId)
             if allHostsReceive is False:
                 destIdsNode = hostConfig.getElementsByTagName('destIds')[0]
                 destIds = list()
@@ -301,6 +302,8 @@ def parseXmlFile(xmlConfigFile, generalInfo):
                     destIds = [int(destId) for destId in destIdsNode.firstChild.data.split()]
                 if destIds == []:
                     allHostsReceive = True
+                elif -1 in destIds:
+                    receiverIds += [idx for idx in range(0, int(generalInfo.numTors)*int(generalInfo.numServersPerTor)) if idx != hostId]
                 else:
                     receiverIds += destIds
     xmlParsedDic.senderIds = senderIds

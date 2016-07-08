@@ -48,7 +48,7 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
         xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
         xmlParsedDic = AttrDict()
-        xmlParsedDic = parseXmlFile(xmlConfigFile)
+        xmlParsedDic = parseXmlFile(xmlConfigFile,parsedStats.generalInfo)
         msgBytesOnWireDigest = AttrDict()
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
@@ -120,7 +120,7 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
         parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
         xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
         xmlParsedDic = AttrDict()
-        xmlParsedDic = parseXmlFile(xmlConfigFile)
+        xmlParsedDic = parseXmlFile(xmlConfigFile,parsedStats.generalInfo)
         msgBytesOnWireDigest = AttrDict()
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
