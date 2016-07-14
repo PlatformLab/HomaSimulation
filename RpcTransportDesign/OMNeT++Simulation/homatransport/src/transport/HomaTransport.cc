@@ -364,6 +364,57 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
 }
 
 /**
+ * Predicate operator for comparing OutboundMessages. This function
+ * by design return strict ordering on messages meaning that no two
+ * distinct message ever compare equal. (ie result of !(a,b)&&!(b,a)
+ * is always false)
+ *
+ * \param msg1
+ *      first queue of outbound pkts for comparison
+ * \param msg2
+ *      second queue of outbound pkts for comparison
+ * \return
+ *      true if msg1 is compared greater than q2 (ie. pkts of msg1
+ *      are in lower priority for transmission than pkts2 of msg2)
+ */
+bool
+HomaTransport::SendController::OutbndMsgSorter::operator()(
+        OutboundMessage* msg1, OutboundMessage* msg2) {
+
+    switch (msg1->homaConfig->getSenderScheme()) {
+        case HomaConfigDepot::SenderScheme::OBSERVE_PKT_PRIOS: {
+            auto &q1 = msg1->getTxPktQueue();
+            auto &q2 = msg2->getTxPktQueue();
+            HomaPkt* pkt1 = q1.top();
+            HomaPkt* pkt2 = q2.top();
+            return (pkt1->getPriority() < pkt2->getPriority()) ||
+                (pkt1->getPriority() == pkt2->getPriority() &&
+                pkt1->getCreationTime() < pkt2->getCreationTime()) ||
+                (pkt1->getPriority() == pkt2->getPriority() &&
+                pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                msg1->getMsgCreationTime() < 
+                msg2->getMsgCreationTime()) ||
+                (pkt1->getPriority() == pkt2->getPriority() &&
+                pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                msg1->getMsgCreationTime() == 
+                msg2->getMsgCreationTime() &&
+                msg1->getMsgId() < msg2->getMsgId());
+        }
+        case HomaConfigDepot::SenderScheme::SRBF: 
+            return msg1->getBytesLeft() < msg2->getBytesLeft() ||
+                (msg1->getBytesLeft() == msg2->getBytesLeft() &&
+                msg1->getMsgCreationTime() < msg2->getMsgCreationTime()) ||
+                (msg1->getBytesLeft() == msg2->getBytesLeft() &&
+                msg1->getMsgCreationTime() == msg2->getMsgCreationTime() &&
+                msg1->getMsgId() < msg2->getMsgId());
+
+        default:
+            throw cRuntimeError("Undefined SenderScheme parameter");
+    }
+}
+
+
+/**
  * HomaTransport::OutboundMessage
  */
 HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
@@ -569,6 +620,39 @@ HomaTransport::OutboundMessage::getTransmitReadyPkt(HomaPkt** outPkt)
     *outPkt = head; 
     return !txPkts.empty();
 }
+
+/**
+ * A utility predicate for comparing HomaPkt instances
+ * based on pkt information and senderScheme param.
+ *
+ * \param pkt1
+ *      first pkt for comparison
+ * \param pkt2
+ *      second pkt for comparison
+ * \return
+ *      true if pkt1 is compared greater than pkt2.
+ */
+bool
+HomaTransport::OutboundMessage::OutbndPktSorter::operator()(const HomaPkt* pkt1,
+    const HomaPkt* pkt2)
+{
+    HomaConfigDepot::SenderScheme txScheme =
+        pkt1->ownerTransport->homaConfig->getSenderScheme();
+    switch (txScheme) {
+        case HomaConfigDepot::SenderScheme::OBSERVE_PKT_PRIOS:
+        case HomaConfigDepot::SenderScheme::SRBF:
+            return (pkt1->getPriority() > pkt2->getPriority()) ||
+                (pkt1->getPriority() == pkt2->getPriority() &&
+                pkt1->getCreationTime() > pkt2->getCreationTime()) ||
+                (pkt1->getPriority() == pkt2->getPriority() &&
+                pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                pkt1->getUnschedFields().firstByte >
+                pkt2->getUnschedFields().firstByte);
+        default:
+                throw cRuntimeError("Undefined SenderScheme parameter");
+    }
+}
+
 
 /**
  * HomaTransport::ReceiveScheduler
