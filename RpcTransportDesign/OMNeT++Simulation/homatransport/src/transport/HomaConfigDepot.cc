@@ -31,6 +31,7 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     schedPrioAssignMode = ownerTransport->par("schedPrioAssignMode");
     unschedPrioResolutionMode =
         ownerTransport->par("unschedPrioResolutionMode");
+    senderScheme = ownerTransport->par("senderScheme");
     isRoundRobinScheduler =
         ownerTransport->par("isRoundRobinScheduler").boolValue();
     cbfCapMsgSize = std::stoul(
@@ -41,4 +42,19 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
         ownerTransport->par("useUnschRateInScheduler").boolValue();
     xmlConfig = ownerTransport->par("transportConfig").xmlValue();
     workloadType = ownerTransport->par("workloadType").stringValue();
+    paramToEnum();
 }
+
+void
+HomaConfigDepot::paramToEnum()
+{
+    if (strcmp(senderScheme, "OBSERVE_PKT_PRIOS")) {
+        sxScheme = SenderScheme::OBSERVE_PKT_PRIOS;
+    } else if (strcmp(senderScheme, "SRBF")) {
+        sxScheme = SenderScheme::SRBF;
+    } else {
+        throw cRuntimeError("Unknown SenderScheme: %s", senderScheme);
+    }
+}
+
+

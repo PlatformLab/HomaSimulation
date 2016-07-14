@@ -66,9 +66,60 @@ class HomaTransport : public cSimpleModule
         explicit OutboundMessage(const OutboundMessage& outboundMsg);
         ~OutboundMessage();
         OutboundMessage& operator=(const OutboundMessage& other);
-        void sendRequestAndUnsched();
-        int sendSchedBytes(uint32_t numBytes, uint16_t schedPrio);
+        void prepareRequestAndUnsched();
+        uint32_t prepareSchedPkt(uint32_t numBytes, uint16_t schedPrio);
+
+      PUBLIC:
+        /**
+         * A utility predicate for creating PriorityQueues of HomaPkt instances.
+         * Determines in what order pkts of this msg will be sent out to the
+         * network.
+         */
+        class OutbndPktSorter {
+          PUBLIC:
+            OutbndPktSorter(){}
+            /**
+             * A utility predicate for comparing HomaPkt instances
+             * based on pkt information and senderScheme param.
+             *
+             * \param pkt1
+             *      first pkt for comparison
+             * \param pkt2
+             *      second pkt for comparison
+             * \return
+             *      true if pkt1 is compared greater than pkt2.
+             */
+            bool operator()(const HomaPkt* pkt1, const HomaPkt* pkt2)
+            {
+                HomaConfigDepot::SenderScheme txScheme =
+                    pkt1->ownerTransport->homaConfig->getSenderScheme();
+                switch (txScheme) {
+                    case HomaConfigDepot::SenderScheme::OBSERVE_PKT_PRIOS:
+                    case HomaConfigDepot::SenderScheme::SRBF:
+                        return (pkt1->getPriority() > pkt2->getPriority()) ||
+                            (pkt1->getPriority() == pkt2->getPriority() &&
+                            pkt1->getCreationTime() > pkt2->getCreationTime()) ||
+                            (pkt1->getPriority() == pkt2->getPriority() &&
+                            pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                            pkt1->getUnschedFields().firstByte >
+                            pkt2->getUnschedFields().firstByte);
+                    default:
+                            throw cRuntimeError("Undefined SenderScheme parameter");
+                }
+            }
+        };
+        typedef std::priority_queue<
+            HomaPkt*,
+            std::vector<HomaPkt*>,
+            OutbndPktSorter> OutbndPktQueue;
+
+        // getters functions
         const uint32_t& getMsgSize() { return msgSize; }
+        const uint64_t& getMsgId() { return msgId; }
+        const OutbndPktQueue& getTxPktQueue() {return txPkts;}
+        const uint32_t getBytesLeft() { return bytesLeft; }
+        const simtime_t getMsgCreationTime() { return msgCreationTime; }
+        bool getTransmitReadyPkt(HomaPkt** outPkt);
 
       PROTECTED:
         // Unique identification number assigned by in the construction time for
@@ -78,12 +129,16 @@ class HomaTransport : public cSimpleModule
         // Total byte size of the message received from application
         uint32_t msgSize;
 
-        // Total num bytes remained to be sent for this msg.
-        uint32_t bytesLeft;
+        // Total num bytes remained to be scheduled for transmission for this msg.
+        uint32_t bytesToSched;
 
         // Index of the next byte to be transmitted for this msg. Always
         // initialized to zero.
-        uint32_t nextByteToSend;
+        uint32_t nextByteToSched;
+
+        // Total num bytes left to be transmitted for this messge, including
+        // bytes that are scheduled but not yet sent to the network.
+        uint32_t bytesLeft;
 
         // This vector is length of total unsched pkts to be sent for
         // this message. Element i in this vector is number of data bytes to be
@@ -103,6 +158,10 @@ class HomaTransport : public cSimpleModule
         // Simulation global time at which this message was originally created
         // in the application.
         simtime_t msgCreationTime;
+
+        // Priority Queue containing all sched/unsched pkts set to be sent out for
+        // this message and are waiting for transmission. 
+        OutbndPktQueue txPkts;
 
         // The SendController that manages the transmission of this msg.
         SendController* sxController;
@@ -129,11 +188,6 @@ class HomaTransport : public cSimpleModule
     {
       PUBLIC:
         typedef std::unordered_map<uint64_t, OutboundMessage> OutboundMsgMap;
-        typedef std::priority_queue<
-            HomaPkt*,
-            std::vector<HomaPkt*>,
-            HomaPkt::PrioGreater> OutbndPktQueue;
-
         SendController(HomaTransport* transport);
         ~SendController();
         void initSendController(HomaConfigDepot* homaConfig,
@@ -141,13 +195,78 @@ class HomaTransport : public cSimpleModule
         void processSendMsgFromApp(AppMessage* msg);
         void processReceivedGrant(HomaPkt* rxPkt);
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
-        void sendOrQueue(cMessage* msg);
+        void sendOrQueue(cMessage* msg = NULL);
+
+      PUBLIC:
+        /**
+         * A predicate func object for sorting OutboundMessages based on the
+         * senderScheme used for transport. Detemines in what order
+         * OutboundMessages will send their sched/unsched outbound packets (ie.
+         * pkts queues in OutboundMessage::txPkts). 
+         */
+        class OutbndMsgSorter {
+          PUBLIC:
+            OutbndMsgSorter(){}
+
+            /**
+             * Predicate operator for comparing OutboundMessages. This function
+             * by design return strict ordering on messages meaning that no two
+             * distinct message ever compare equal. (ie result of !(a,b)&&!(b,a)
+             * is always false)
+             *
+             * \param msg1
+             *      first queue of outbound pkts for comparison
+             * \param msg2
+             *      second queue of outbound pkts for comparison
+             * \return
+             *      true if msg1 is compared greater than q2 (ie. pkts of msg1
+             *      are in lower priority for transmission than pkts2 of msg2)
+             */
+            bool operator()(OutboundMessage* msg1, OutboundMessage* msg2) {
+                
+                switch (msg1->homaConfig->getSenderScheme()) {
+                    case HomaConfigDepot::SenderScheme::OBSERVE_PKT_PRIOS: {
+                        auto &q1 = msg1->getTxPktQueue();
+                        auto &q2 = msg2->getTxPktQueue();
+                        HomaPkt* pkt1 = q1.top();
+                        HomaPkt* pkt2 = q2.top();
+                        return (pkt1->getPriority() < pkt2->getPriority()) ||
+                            (pkt1->getPriority() == pkt2->getPriority() &&
+                            pkt1->getCreationTime() < pkt2->getCreationTime()) ||
+                            (pkt1->getPriority() == pkt2->getPriority() &&
+                            pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                            msg1->getMsgCreationTime() < 
+                            msg2->getMsgCreationTime()) ||
+                            (pkt1->getPriority() == pkt2->getPriority() &&
+                            pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                            msg1->getMsgCreationTime() == 
+                            msg2->getMsgCreationTime() &&
+                            msg1->getMsgId() < msg2->getMsgId());
+                    }
+                    case HomaConfigDepot::SenderScheme::SRBF: 
+                        return msg1->getBytesLeft() < msg2->getBytesLeft() ||
+                            (msg1->getBytesLeft() == msg2->getBytesLeft() &&
+                            msg1->getMsgCreationTime() < msg2->getMsgCreationTime()) ||
+                            (msg1->getBytesLeft() == msg2->getBytesLeft() &&
+                            msg1->getMsgCreationTime() == msg2->getMsgCreationTime() &&
+                            msg1->getMsgId() < msg2->getMsgId());
+
+                    default:
+                        throw cRuntimeError("Undefined SenderScheme parameter");
+                }
+            }
+        };
 
       PROTECTED:
-
         // For the purpose of statistics recording, this variable tracks the
-        // total number bytes left to send over all outstanding messages.
+        // total number bytes left to be sent for all outstanding messages.
+        // (including unsched/sched bytes ready to be sent but not yet
+        // transmitted).
         uint64_t bytesLeftToSend;
+
+        // Sum of all sched bytes in all outbound messages that are yet to be
+        // scheduled by their corresponding reveivers;
+        uint64_t bytesNeedGrant;
 
         // The identification number for the next outstanding message.
         uint64_t msgId;
@@ -162,15 +281,20 @@ class HomaTransport : public cSimpleModule
         // Determine priority of packets that are to be sent
         PriorityResolver *prioResolver;
 
+        // Sorted collection of all OutboundMessages that have unsched/sched
+        // pkts queued up and ready to be sent out into the network.
+        std::set<OutboundMessage*, OutbndMsgSorter> outbndMsgSet;
+
         // Transport that owns this SendController.
         HomaTransport* transport;
 
+        // Queue for keeping grants that receiver side of this host machine
+        // wants to send out.
+        std::priority_queue<HomaPkt, std::vector<HomaPkt>,
+            std::greater<HomaPkt>> outGrantQueue;
+
         // The object that keeps the configuration parameters for the transport
         HomaConfigDepot *homaConfig;
-
-        // Priority Queue containing pkts that are to be sent out sorted by
-        // pkt priorities
-        OutbndPktQueue sxQueue;
         friend class OutboundMessage;
     };
 
@@ -297,7 +421,6 @@ class HomaTransport : public cSimpleModule
         //***************************************************************//
         std::vector<uint32_t> sumInflightUnschedPerPrio;
         std::vector<uint32_t> sumInflightSchedPerPrio;
-
 
         friend class CompareBytesToGrant;
         friend class ReceiveScheduler;
@@ -438,7 +561,7 @@ class HomaTransport : public cSimpleModule
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
-    void sendPacket(HomaPkt* sxPkt);
+    void sendPktAndScheduleNext(HomaPkt* sxPkt);
     void processStart();
     void registerTemplatedStats(uint16_t numPrio);
     const inet::L3Address& getLocalAddr() {return localAddr;}
@@ -461,8 +584,11 @@ class HomaTransport : public cSimpleModule
     // Signal for number of incomplete TX msgs received from the application.
     static simsignal_t msgsLeftToSendSignal;
 
-    // Signal for total numbet of msg bytes remained to send for all msgs.
+    // Signal for total number of msg bytes yet to be sent for all msgs.
     static simsignal_t bytesLeftToSendSignal;
+
+    // Signal for total sched. bytes yet to receive grants from their receivers
+    static simsignal_t bytesNeedGrantSignal;
 
     // Signal for total number of in flight grant bytes.
     static simsignal_t outstandingGrantBytesSignal;

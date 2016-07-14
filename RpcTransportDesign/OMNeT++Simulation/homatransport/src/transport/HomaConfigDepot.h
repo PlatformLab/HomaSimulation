@@ -26,6 +26,15 @@ class HomaConfigDepot {
     HomaConfigDepot(cComponent* ownerTransport);
     ~HomaConfigDepot(){}
 
+    /**
+     * Corresponding enum values for SenderScheme config param. 
+     */
+    enum SenderScheme {
+        OBSERVE_PKT_PRIOS = 0,  // Highest prio homa pkt first
+        SRBF,                   // Pkt of shortest remaining mesg first
+        UNDEFINED
+    };
+
   PUBLIC:
     cComponent* ownerTransport;
 
@@ -69,6 +78,9 @@ class HomaConfigDepot {
     // packets. Resolution modes are defined in PrioResolver class.
     const char* unschedPrioResolutionMode;
 
+    // Defines the type of logic sender uses for transmitting messages and pkts
+    const char* senderScheme;
+
     // Specifies the scheduler type. True, means round robin scheduler and false
     // is for SRBF scheduler.
     bool isRoundRobinScheduler;
@@ -93,5 +105,20 @@ class HomaConfigDepot {
     // workload type. The value must be similar to WorkloadSynthesizer
     // workloadType.
     const char* workloadType;
+
+  PRIVATE:
+    // Enum-ed corresponding value for SenderScheme param. Provided for doing
+    // faster runtime checks based on SenderScheme values.
+    SenderScheme sxScheme;
+
+  PUBLIC:
+    /**
+     * getter method for SenderScheme enum-ed param.
+     */
+    const SenderScheme getSenderScheme() {return sxScheme;}
+
+
+  PRIVATE:
+    void paramToEnum(); 
 };
 #endif

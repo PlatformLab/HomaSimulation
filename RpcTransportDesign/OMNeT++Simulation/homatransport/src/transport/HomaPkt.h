@@ -36,37 +36,6 @@ class HomaPkt : public HomaPkt_Base
     // homatransport as soon as it arrives at the transport.
     HomaTransport* ownerTransport;
 
-    /**
-     * A utility predicate for creating PriorityQueues of HomaPkt instances
-     * based on priority numbers.
-     */
-    class PrioGreater {
-      PUBLIC:
-        PrioGreater(){}
-
-        /**
-         * Predicate functor operator () for comparison.
-         *
-         * \param pkt1
-         *      first pkt for priority comparison
-         * \param pkt2
-         *      second pkt for priority comparison
-         * \return
-         *      true if pkt1 priority is greater than or equal to pkt2 prio.
-         */
-        bool operator()(const HomaPkt* pkt1,
-            const HomaPkt* pkt2)
-        {
-            return (pkt1->getPriority() > pkt2->getPriority()) ||
-                   (pkt1->getPriority() == pkt2->getPriority() &&
-                        pkt1->getCreationTime() > pkt2->getCreationTime()) ||
-                   (pkt1->getPriority() == pkt2->getPriority() &&
-                        pkt1->getCreationTime() == pkt2->getCreationTime() &&
-                        pkt1->getUnschedFields().firstByte >
-                        pkt2->getUnschedFields().firstByte);
-        }
-    };
-
   PRIVATE:
     void copy(const HomaPkt& other);
 
@@ -75,9 +44,9 @@ class HomaPkt : public HomaPkt_Base
         int kind=0);
     HomaPkt(const HomaPkt& other);
     HomaPkt& operator=(const HomaPkt& other);
-
-
     virtual HomaPkt *dup() const;
+    uint32_t getFirstByte() const;
+    friend bool operator>(const HomaPkt &lhs, const HomaPkt &rhs);
 
     // ADD CODE HERE to redefine and implement pure virtual functions from
     // HomaPkt_Base
@@ -110,5 +79,6 @@ class HomaPkt : public HomaPkt_Base
 
     static uint32_t getBytesOnWire(uint32_t numDataBytes, PktType homaPktType);
 };
+
 
 #endif /* HOMAPKT_H_ */

@@ -44,6 +44,8 @@ simple HomaTransport like ITransportScheme
         string schedPrioAssignMode = default("NO_OVER_COMMIT");
         // Coulde be any of PrioResolutionMode values in PriorityResolver.h
         string unschedPrioResolutionMode;
+        // The kind of logic transport uses at sender for sending messages and pkts
+        string senderScheme = default("OBSERVE_PKT_PRIOS"); 
         // Specifies that only first cbfCapMsgSize bytes of a message must
         // be used in computing the cbf function. This value is supposed to be uint32_t
         // type, but since NED don't support 'unsigned int',
@@ -63,6 +65,7 @@ simple HomaTransport like ITransportScheme
 
         @statistic[msgsLeftToSend](title="num msgs left to send"; source=msgsLeftToSend; record=stats, histogram; interpolationmode=none);
         @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);
+        @statistic[bytesNeedGrant](title="num total sched bytes left to send"; source=bytesNeedGrant; record=stats, histogram; interpolationmode=none);
         @statistic[totalOutstandingBytes](title="total bytes in flight"; source=totalOutstandingBytes; record=stats, histogram; interpolationmode=none);
         @statistic[outstandingGrantBytes](title="num total bytes left to send"; source=outstandingGrantBytes; record=stats, histogram; interpolationmode=none);
         @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes); interpolationmode=none);

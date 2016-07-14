@@ -47,6 +47,20 @@ HomaPkt::dup() const
 }
 
 uint32_t
+HomaPkt::getFirstByte() const
+{
+    switch (getPktType()) {
+        case PktType::SCHED_DATA:
+            return getSchedDataFields().firstByte;
+        case PktType::UNSCHED_DATA:
+        case PktType::REQUEST:
+            return getUnschedFields().firstByte;
+        default:
+            return 0;
+    }
+}
+
+uint32_t
 HomaPkt::headerSize()
 {
     uint32_t size = sizeof(msgId_var);
@@ -233,4 +247,42 @@ HomaPkt::getBytesOnWire(uint32_t numDataBytes, PktType homaPktType)
     bytesOnWire += numPartialBytesOnWire;
 
     return bytesOnWire;
+}
+
+/**
+ * Strictly order packets. Orders first based on their priorities, then arrival
+ * time at module (eg. queue), then creation times. For packets belong to same
+ * sender, then order based on msgId as msgIds are monotonically increasing.
+ * Then for packets belong to same message, also order based on index of data
+ * bytes in packet.
+ */
+bool
+operator>(const HomaPkt& lhs, const HomaPkt& rhs)
+{
+    if (lhs.getPriority() > rhs.getPriority() ||
+            (lhs.getPriority() == rhs.getPriority() &&
+            lhs.getArrivalTime() > rhs.getArrivalTime()) ||
+
+            (lhs.getPriority() == rhs.getPriority() &&
+            lhs.getArrivalTime() == rhs.getArrivalTime() &&
+            lhs.getCreationTime() > rhs.getCreationTime()) ||
+
+            (lhs.getPriority() == rhs.getPriority() &&
+            lhs.getArrivalTime() == rhs.getArrivalTime() &&
+            lhs.getCreationTime() == rhs.getCreationTime() &&
+            lhs.getSrcAddr() == rhs.getSrcAddr() &&
+            lhs.getMsgId() > rhs.getMsgId()) ||
+            
+            (lhs.getPriority() == rhs.getPriority() &&
+            lhs.getArrivalTime() == rhs.getArrivalTime() &&
+            lhs.getCreationTime() == rhs.getCreationTime() &&
+            lhs.getSrcAddr() == rhs.getSrcAddr() &&
+            lhs.getMsgId() == rhs.getMsgId() &&
+            lhs.getFirstByte() > rhs.getFirstByte())) {
+        // The last two set of conditions are necessary for ordering pkts belong
+        // to same message before they are sent to network.
+        return true;
+    } else {
+        return false;
+    }
 }

@@ -30,6 +30,8 @@ simsignal_t HomaTransport::msgsLeftToSendSignal =
         registerSignal("msgsLeftToSend");
 simsignal_t HomaTransport::bytesLeftToSendSignal =
         registerSignal("bytesLeftToSend");
+simsignal_t HomaTransport::bytesNeedGrantSignal =
+        registerSignal("bytesNeedGrant");
 simsignal_t HomaTransport::outstandingGrantBytesSignal =
         registerSignal("outstandingGrantBytes");
 simsignal_t HomaTransport::totalOutstandingBytesSignal =
@@ -178,9 +180,14 @@ HomaTransport::handleMessage(cMessage *msg)
 }
 
 void
-HomaTransport::sendPacket(HomaPkt* sxPkt)
+HomaTransport::sendPktAndScheduleNext(HomaPkt* sxPkt)
 {
+    uint32_t pktLenOnWire =
+        HomaPkt::getBytesOnWire(sxPkt->getDataBytes(), (PktType)sxPkt->getPktType());
+    simtime_t nextSendTime = SimTime(1e-9 * (pktLenOnWire * 8.0 /
+        homaConfig->nicLinkSpeed)) + simTime();
     socket.sendTo(sxPkt, sxPkt->getDestAddr(), homaConfig->destPort);
+    scheduleAt(nextSendTime, sendTimer);
 }
 
 void
@@ -196,10 +203,12 @@ HomaTransport::finish()
  */
 HomaTransport::SendController::SendController(HomaTransport* transport)
     : bytesLeftToSend(0)
+    , bytesNeedGrant(0)
     , msgId(0)
     , outboundMsgMap()
     , unschedByteAllocator(NULL)
     , prioResolver(NULL)
+    , outbndMsgSet()
     , transport(transport)
     , homaConfig(NULL)
 
@@ -212,6 +221,7 @@ HomaTransport::SendController::initSendController(HomaConfigDepot* homaConfig,
     this->homaConfig = homaConfig;
     this->prioResolver = prioResolver;
     bytesLeftToSend = 0;
+    bytesNeedGrant = 0;
     std::random_device rd;
     std::mt19937_64 merceneRand(rd());
     std::uniform_int_distribution<uint64_t> dist(0, UINTMAX_MAX);
@@ -222,11 +232,6 @@ HomaTransport::SendController::initSendController(HomaConfigDepot* homaConfig,
 HomaTransport::SendController::~SendController()
 {
     delete unschedByteAllocator;
-    while (!sxQueue.empty()) {
-        HomaPkt* head = sxQueue.top();
-        sxQueue.pop();
-        delete head;
-    }
 }
 
 void
@@ -234,6 +239,7 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
 {
     transport->emit(msgsLeftToSendSignal, outboundMsgMap.size());
     transport->emit(bytesLeftToSendSignal, bytesLeftToSend);
+    transport->emit(bytesNeedGrantSignal, bytesNeedGrant);
     uint32_t destAddr =
             sendMsg->getDestAddr().toIPv4().getInt();
     uint32_t msgSize = sendMsg->getByteLength();
@@ -243,14 +249,15 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
     outboundMsgMap.emplace(std::piecewise_construct,
             std::forward_as_tuple(msgId),
             std::forward_as_tuple(sendMsg, this, msgId, reqUnschedDataVec));
-    outboundMsgMap.at(msgId).sendRequestAndUnsched();
-    if (outboundMsgMap.at(msgId).bytesLeft <= 0) {
-        outboundMsgMap.erase(msgId);
-    } else {
-        bytesLeftToSend += outboundMsgMap.at(msgId).bytesLeft;
-    }
+    OutboundMessage* outboundMsg = &(outboundMsgMap.at(msgId));
+    outboundMsg->prepareRequestAndUnsched();
+    auto insResult = outbndMsgSet.insert(outboundMsg);
+    ASSERT(insResult.second); // check insertion took place
+    bytesLeftToSend += outboundMsg->getBytesLeft();
+    bytesNeedGrant += outboundMsg->bytesToSched;
     msgId++;
     delete sendMsg;
+    sendOrQueue();
 }
 
 void
@@ -263,50 +270,91 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
     OutboundMessage* outboundMsg = &(outboundMsgMap.at(rxPkt->getMsgId()));
     ASSERT(rxPkt->getDestAddr() == outboundMsg->srcAddr &&
             rxPkt->getSrcAddr() == outboundMsg->destAddr);
+    size_t numRemoved = outbndMsgSet.erase(outboundMsg);
+    ASSERT(numRemoved <= 1); // At most one item removed
 
-    int bytesLeftOld = outboundMsg->bytesLeft;
-    int bytesLeftNew = outboundMsg->sendSchedBytes(
+    int bytesToSchedOld = outboundMsg->bytesToSched;
+    int bytesToSchedNew = outboundMsg->prepareSchedPkt(
         rxPkt->getGrantFields().grantBytes, rxPkt->getGrantFields().schedPrio);
-    int bytesSent = bytesLeftOld - bytesLeftNew;
-    bytesLeftToSend -= bytesSent;
-    ASSERT(bytesSent > 0 && bytesLeftToSend >= 0);
-
-    if (bytesLeftNew <= 0) {
-        outboundMsgMap.erase(rxPkt->getMsgId());
-    }
+    int bytesSent = bytesToSchedOld - bytesToSchedNew;
+    bytesNeedGrant -= bytesSent;
+    ASSERT(bytesSent > 0 && bytesLeftToSend >= 0 && bytesNeedGrant >= 0);
+    auto insResult = outbndMsgSet.insert(outboundMsg);
+    ASSERT(insResult.second); // check insertion took place
     delete rxPkt;
+    sendOrQueue();
 }
 
 void
 HomaTransport::SendController::sendOrQueue(cMessage* msg)
 {
-    HomaPkt* sxPkt = dynamic_cast<HomaPkt*>(msg);
-    if (sxPkt){
+    HomaPkt* sxPkt;
+    if (msg == transport->sendTimer) {
+        ASSERT(msg->getKind() == SelfMsgKind::SEND);
+        if (!outGrantQueue.empty()) {
+            sxPkt = (HomaPkt*)(&outGrantQueue.top());
+            outGrantQueue.pop();
+            transport->sendPktAndScheduleNext(sxPkt);
+            return;
+        }
+
+        if (!outbndMsgSet.empty()) {
+            OutboundMessage* highPrioMsg = *(outbndMsgSet.begin());
+            size_t numRemoved =  outbndMsgSet.erase(highPrioMsg);
+            ASSERT(numRemoved == 1); // check only one msg is removed
+            bool hasMoreReadyPkt = highPrioMsg->getTransmitReadyPkt(&sxPkt);
+            bytesLeftToSend -= sxPkt->getDataBytes();
+            transport->sendPktAndScheduleNext(sxPkt);
+            if (highPrioMsg->getBytesLeft() <= 0) {
+                ASSERT(!hasMoreReadyPkt);
+                outboundMsgMap.erase(highPrioMsg->getMsgId());
+                return;
+            }
+
+            if (hasMoreReadyPkt) {
+                auto insResult = outbndMsgSet.insert(highPrioMsg);
+                ASSERT(insResult.second); // check insertion took place
+                return;
+            }
+        }
+        return;
+    }
+    sxPkt = dynamic_cast<HomaPkt*>(msg);
+    if (sxPkt) {
+        ASSERT(sxPkt->getPktType() == PktType::GRANT);
         if (transport->sendTimer->isScheduled()) {
-            // this is a pkt that needs to be send out
-            sxQueue.push(sxPkt);
+            outGrantQueue.push(*sxPkt);
             return;
         } else {
-            ASSERT(sxQueue.empty());
-        }
-    } else {
-        if (msg != transport->sendTimer || msg->getKind() != SelfMsgKind::SEND) {
-            throw cRuntimeError("Expected SendTimer of kind SEND!");
-        }
-
-        if (sxQueue.empty()) {
+            ASSERT(outGrantQueue.empty());
+            transport->sendPktAndScheduleNext(sxPkt);
             return;
         }
-        sxPkt = sxQueue.top();
-        sxQueue.pop();
     }
 
-    uint32_t pktLenOnWire =
-        HomaPkt::getBytesOnWire(sxPkt->getDataBytes(), (PktType)sxPkt->getPktType());
-    simtime_t nextSendTime = SimTime(1e-9 * (pktLenOnWire * 8.0 /
-        homaConfig->nicLinkSpeed)) + simTime();
-    transport->sendPacket(sxPkt);
-    transport->scheduleAt(nextSendTime, transport->sendTimer);
+    ASSERT(!msg);
+    if (transport->sendTimer->isScheduled()) {
+        return;
+    }
+
+    ASSERT(outGrantQueue.empty() && outbndMsgSet.size() == 1);
+    OutboundMessage* highPrioMsg = *(outbndMsgSet.begin());
+    size_t numRemoved =  outbndMsgSet.erase(highPrioMsg);
+    ASSERT(numRemoved == 1); // check the msg is removed
+    bool hasMoreReadyPkt = highPrioMsg->getTransmitReadyPkt(&sxPkt);
+    bytesLeftToSend -= sxPkt->getDataBytes();
+    transport->sendPktAndScheduleNext(sxPkt);
+    if (highPrioMsg->getBytesLeft() <= 0) {
+        ASSERT(!hasMoreReadyPkt);
+        outboundMsgMap.erase(highPrioMsg->getMsgId());
+        return;
+    }
+
+    if (hasMoreReadyPkt) {
+        auto insResult = outbndMsgSet.insert(highPrioMsg);
+        ASSERT(insResult.second); // check insertion took place
+        return;
+    }
 }
 
 /**
@@ -317,22 +365,23 @@ HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
         std::vector<uint16_t> reqUnschedDataVec)
     : msgId(msgId)
     , msgSize(outMsg->getByteLength())
+    , bytesToSched(outMsg->getByteLength())
+    , nextByteToSched(0)
     , bytesLeft(outMsg->getByteLength())
-    , nextByteToSend(0)
     , reqUnschedDataVec(reqUnschedDataVec)
     , destAddr(outMsg->getDestAddr())
     , srcAddr(outMsg->getSrcAddr())
     , msgCreationTime(outMsg->getMsgCreationTime())
     , sxController(sxController)
     , homaConfig(sxController->homaConfig)
-
 {}
 
 HomaTransport::OutboundMessage::OutboundMessage()
     : msgId(0)
     , msgSize(0)
+    , bytesToSched(0)
+    , nextByteToSched(0)
     , bytesLeft(0)
-    , nextByteToSend(0)
     , reqUnschedDataVec({0})
     , destAddr()
     , srcAddr()
@@ -343,7 +392,13 @@ HomaTransport::OutboundMessage::OutboundMessage()
 {}
 
 HomaTransport::OutboundMessage::~OutboundMessage()
-{}
+{
+    while (!txPkts.empty()) {
+        HomaPkt* head = txPkts.top();
+        txPkts.pop();
+        delete head;
+    }
+}
 
 HomaTransport::OutboundMessage::OutboundMessage(const OutboundMessage& other)
 {
@@ -365,8 +420,9 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
     this->homaConfig = other.homaConfig;
     this->msgId = other.msgId;
     this->msgSize = other.msgSize;
+    this->bytesToSched = other.bytesToSched;
+    this->nextByteToSched = other.nextByteToSched;
     this->bytesLeft = other.bytesLeft;
-    this->nextByteToSend = other.nextByteToSend;
     this->reqUnschedDataVec = other.reqUnschedDataVec;
     this->destAddr = other.destAddr;
     this->srcAddr = other.srcAddr;
@@ -374,7 +430,7 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
 }
 
 void
-HomaTransport::OutboundMessage::sendRequestAndUnsched()
+HomaTransport::OutboundMessage::prepareRequestAndUnsched()
 {
     PriorityResolver::PrioResolutionMode unschedPrioResMode =
         sxController->prioResolver->strPrioModeToInt(
@@ -415,9 +471,9 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
         unschedFields.msgByteLen = msgSize;
         unschedFields.msgCreationTime = msgCreationTime;
         unschedFields.totalUnschedBytes = totalUnschedBytes;
-        unschedFields.firstByte = this->nextByteToSend;
+        unschedFields.firstByte = this->nextByteToSched;
         unschedFields.lastByte =
-            this->nextByteToSend + this->reqUnschedDataVec[i] - 1;
+            this->nextByteToSched + this->reqUnschedDataVec[i] - 1;
         unschedFields.prioUnschedBytes = prioUnschedBytes;
         for (size_t j = 0;
                 j < unschedFields.prioUnschedBytes.size(); j += 2) {
@@ -439,13 +495,14 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
         unschedPkt->setUnschedFields(unschedFields);
         unschedPkt->setByteLength(unschedPkt->headerSize() +
             unschedPkt->getDataBytes());
-        sxController->sendOrQueue(unschedPkt);
-        EV_INFO << "Send unsched pkt with msgId " << this->msgId << " from "
-            << this->srcAddr.str() << " to " << this->destAddr.str() << endl;
+        txPkts.push(unschedPkt);
+        EV_INFO << "Unsched pkt with msgId " << this->msgId << " ready for"
+            " transmit from " << this->srcAddr.str() << " to " <<
+            this->destAddr.str() << endl;
 
         // update the OutboundMsg for the bytes sent in this iteration of loop
-        this->bytesLeft -= unschedPkt->getDataBytes();
-        this->nextByteToSend += unschedPkt->getDataBytes();
+        this->bytesToSched -= unschedPkt->getDataBytes();
+        this->nextByteToSched += unschedPkt->getDataBytes();
 
         // all packet except the first one are UNSCHED
         pktType = PktType::UNSCHED_DATA;
@@ -453,14 +510,14 @@ HomaTransport::OutboundMessage::sendRequestAndUnsched()
     } while (i < reqUnschedDataVec.size());
 }
 
-int
-HomaTransport::OutboundMessage::sendSchedBytes(uint32_t numBytes,
+uint32_t
+HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t numBytes,
     uint16_t schedPrio)
 {
-    ASSERT(this->bytesLeft > 0);
-    uint32_t bytesToSend = std::min(numBytes, this->bytesLeft);
+    ASSERT(this->bytesToSched > 0);
+    uint32_t bytesToSend = std::min(numBytes, this->bytesToSched);
 
-    // create a data pkt and send out
+    // create a data pkt and push it txPkts queue for 
     HomaPkt* dataPkt = new HomaPkt(sxController->transport);
     dataPkt->setPktType(PktType::SCHED_DATA);
     dataPkt->setSrcAddr(this->srcAddr);
@@ -468,22 +525,44 @@ HomaTransport::OutboundMessage::sendSchedBytes(uint32_t numBytes,
     dataPkt->setMsgId(this->msgId);
     dataPkt->setPriority(schedPrio);
     SchedDataFields dataFields;
-    dataFields.firstByte = this->nextByteToSend;
+    dataFields.firstByte = this->nextByteToSched;
     dataFields.lastByte = dataFields.firstByte + bytesToSend - 1;
     dataPkt->setSchedDataFields(dataFields);
     dataPkt->setByteLength(bytesToSend + dataPkt->headerSize());
-    sxController->sendOrQueue(dataPkt);
+    txPkts.push(dataPkt);
 
     // update outbound messgae
-    this->bytesLeft -= bytesToSend;
-    this->nextByteToSend = dataFields.lastByte + 1;
+    this->bytesToSched -= bytesToSend;
+    this->nextByteToSched = dataFields.lastByte + 1;
 
-    EV_INFO << "Sent " <<  bytesToSend << " bytes from msgId " << this->msgId
-            << " to destination " << this->destAddr.str() << " ("
-            << this->bytesLeft << " bytes left.)" << endl;
-    return this->bytesLeft;
+    EV_INFO << "Prepared " <<  bytesToSend << " bytes for transmission from"
+            << " msgId " << this->msgId << " to destination " <<
+            this->destAddr.str() << " (" << this->bytesToSched <<
+            " bytes left.)" << endl;
+    return this->bytesToSched;
 }
 
+/**
+ * Among all transmission reay packets for this message, this function retrieve
+ * highest priority packet from sender's perspective for this message.
+ *
+ * \return outPkt
+ *      The packet to be transmitted for this message
+ * \return 
+ *      True if if the returned pkt is not the last ready for transmission
+ *      packet for this msg and this message hase more pkts queue up and ready
+ *      for transmission.
+ */
+bool
+HomaTransport::OutboundMessage::getTransmitReadyPkt(HomaPkt** outPkt)
+{
+    ASSERT(!txPkts.empty());
+    HomaPkt* head = txPkts.top();
+    txPkts.pop();
+    bytesLeft -= head->getDataBytes();
+    *outPkt = head; 
+    return !txPkts.empty();
+}
 
 /**
  * HomaTransport::ReceiveScheduler
