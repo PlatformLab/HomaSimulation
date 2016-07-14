@@ -48,6 +48,30 @@ class HomaPkt : public HomaPkt_Base
     uint32_t getFirstByte() const;
     friend bool operator>(const HomaPkt &lhs, const HomaPkt &rhs);
 
+    /**
+     * A utility predicate for creating PriorityQueues of HomaPkt instances
+     * based on priority numbers.
+     */
+    class HomaPktSorter {
+      PUBLIC:
+        HomaPktSorter(){}
+
+        /**
+         * Predicate functor operator () for comparison.
+         *
+         * \param pkt1
+         *      first pkt for priority comparison
+         * \param pkt2
+         *      second pkt for priority comparison
+         * \return
+         *      true if pkt1 compared greater than pkt2.
+         */
+        bool operator()(const HomaPkt* pkt1, const HomaPkt* pkt2)
+        {
+            return *pkt1 > *pkt2;
+        }
+    };
+
     // ADD CODE HERE to redefine and implement pure virtual functions from
     // HomaPkt_Base
 

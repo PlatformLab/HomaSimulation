@@ -24,7 +24,7 @@
 Define_Module(HomaTransport);
 
 /**
- * Registering all of the statistics collection signals.
+ * Registering all statistics collection signals.
  */
 simsignal_t HomaTransport::msgsLeftToSendSignal =
         registerSignal("msgsLeftToSend");
@@ -232,6 +232,12 @@ HomaTransport::SendController::initSendController(HomaConfigDepot* homaConfig,
 HomaTransport::SendController::~SendController()
 {
     delete unschedByteAllocator;
+    while (!outGrantQueue.empty()) {
+        HomaPkt* head = outGrantQueue.top();
+        outGrantQueue.pop();
+        delete head;
+    }
+
 }
 
 void
@@ -292,7 +298,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     if (msg == transport->sendTimer) {
         ASSERT(msg->getKind() == SelfMsgKind::SEND);
         if (!outGrantQueue.empty()) {
-            sxPkt = (HomaPkt*)(&outGrantQueue.top());
+            sxPkt = outGrantQueue.top();
             outGrantQueue.pop();
             transport->sendPktAndScheduleNext(sxPkt);
             return;
@@ -323,7 +329,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     if (sxPkt) {
         ASSERT(sxPkt->getPktType() == PktType::GRANT);
         if (transport->sendTimer->isScheduled()) {
-            outGrantQueue.push(*sxPkt);
+            outGrantQueue.push(sxPkt);
             return;
         } else {
             ASSERT(outGrantQueue.empty());

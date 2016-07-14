@@ -290,8 +290,8 @@ class HomaTransport : public cSimpleModule
 
         // Queue for keeping grants that receiver side of this host machine
         // wants to send out.
-        std::priority_queue<HomaPkt, std::vector<HomaPkt>,
-            std::greater<HomaPkt>> outGrantQueue;
+        std::priority_queue<HomaPkt*, std::vector<HomaPkt*>,
+            HomaPkt::HomaPktSorter> outGrantQueue;
 
         // The object that keeps the configuration parameters for the transport
         HomaConfigDepot *homaConfig;
