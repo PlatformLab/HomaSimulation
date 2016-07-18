@@ -11,6 +11,7 @@ GTEST_DIR = ../../../../../share/googletest/googletest
 ## all source files in ./ directory or other directories
 SOURCE=TestMain.cc \
 	UnschedByteAllocatorTest.cc \
+	HomaTransportTest.cc \
 	../../src/application/MsgSizeDistributions.cc \
 	../../src/application/WorkloadSynthesizer.cc \
 	../../src/common/Lagger.cc \
@@ -171,5 +172,5 @@ $(GTEST_SRC_DIR)/.dep/%.d: $(GTEST_SRC_DIR)/%.cc
 .PHONY: clean
 
 clean:
-	@-rm -f $(TARGET) $(OBJS) $(DEPENDS)
+	@-rm -rf $(TARGET) $(OBJS) $(DEPENDS)
 

@@ -6,6 +6,34 @@ Creates an omnet++ environment and runs testMain() function from TestMain.cc
 #include "TestUtil.h"
 #include "TestMain.cc"
 
+%inifile: homaTransportConfig.ini
+
+**.transportSchemeType = "${transportSchemeType = HomaTransport}"
+**.nicLinkSpeed = 10Gbps
+**.transportScheme.isRoundRobinScheduler = false
+**.transportScheme.useUnschRateInScheduler = false
+**.transportScheme.maxOutstandingRecvBytes = 0x25E4 B ##9700B is the RTT in bytes
+**.transportScheme.prioLevels = 16
+**.transportScheme.unschedPrioResolutionMode = "HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES"
+**.transportScheme.schedPrioAssignMode = "HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES"
+**.transportScheme.prioResolverPrioLevels = prioLevels*0.5
+**.transportScheme.adaptiveSchedPrioLevels = prioLevels*0.5
+**.transportScheme.cbfCapMsgSize = "0x25E4"
+**.transportScheme.defaultReqBytes = 1442B
+**.transportScheme.defaultUnschedBytes = 7752B
+**.transportScheme.senderScheme = "OBSERVE_PKT_PRIOS"
+**.transportScheme.localPort = 2222
+**.transportScheme.destPort = 2222
+**.eth[*].**.transportType = "HomaTransport"
+
+%file: SyncAndSendApp.ned
+simple SyncAndSendApp
+{
+    gates:
+        input transportIn[] @label(AppMessage/up);
+        output transportOut[] @labels(AppMessage/down);
+}
+
 %activity:
     int argc = 1;
     char* argv[5] = {"main"};
