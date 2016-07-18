@@ -48,9 +48,9 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
 void
 HomaConfigDepot::paramToEnum()
 {
-    if (strcmp(senderScheme, "OBSERVE_PKT_PRIOS")) {
+    if (strcmp(senderScheme, "OBSERVE_PKT_PRIOS") == 0) {
         sxScheme = SenderScheme::OBSERVE_PKT_PRIOS;
-    } else if (strcmp(senderScheme, "SRBF")) {
+    } else if (strcmp(senderScheme, "SRBF") == 0) {
         sxScheme = SenderScheme::SRBF;
     } else {
         throw cRuntimeError("Unknown SenderScheme: %s", senderScheme);

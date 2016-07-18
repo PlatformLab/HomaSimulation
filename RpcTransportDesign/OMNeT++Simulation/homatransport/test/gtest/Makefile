@@ -172,5 +172,5 @@ $(GTEST_SRC_DIR)/.dep/%.d: $(GTEST_SRC_DIR)/%.cc
 .PHONY: clean
 
 clean:
-	@-rm -rf $(TARGET) $(OBJS) $(DEPENDS)
+	@-rm -rf $(TARGET) $(OBJS) $(DEPENDS) work
 

@@ -184,8 +184,9 @@ HomaTransport::sendPktAndScheduleNext(HomaPkt* sxPkt)
 {
     uint32_t pktLenOnWire =
         HomaPkt::getBytesOnWire(sxPkt->getDataBytes(), (PktType)sxPkt->getPktType());
+    simtime_t currentTime = simTime();
     simtime_t nextSendTime = SimTime(1e-9 * (pktLenOnWire * 8.0 /
-        homaConfig->nicLinkSpeed)) + simTime();
+        homaConfig->nicLinkSpeed)) + currentTime;
     socket.sendTo(sxPkt, sxPkt->getDestAddr(), homaConfig->destPort);
     scheduleAt(nextSendTime, sendTimer);
 }
