@@ -386,20 +386,34 @@ HomaTransport::SendController::OutbndMsgSorter::operator()(
         case HomaConfigDepot::SenderScheme::OBSERVE_PKT_PRIOS: {
             auto &q1 = msg1->getTxPktQueue();
             auto &q2 = msg2->getTxPktQueue();
-            HomaPkt* pkt1 = q1.top();
-            HomaPkt* pkt2 = q2.top();
-            return (pkt1->getPriority() < pkt2->getPriority()) ||
-                (pkt1->getPriority() == pkt2->getPriority() &&
-                pkt1->getCreationTime() < pkt2->getCreationTime()) ||
-                (pkt1->getPriority() == pkt2->getPriority() &&
-                pkt1->getCreationTime() == pkt2->getCreationTime() &&
-                msg1->getMsgCreationTime() < 
-                msg2->getMsgCreationTime()) ||
-                (pkt1->getPriority() == pkt2->getPriority() &&
-                pkt1->getCreationTime() == pkt2->getCreationTime() &&
-                msg1->getMsgCreationTime() == 
-                msg2->getMsgCreationTime() &&
-                msg1->getMsgId() < msg2->getMsgId());
+            if (q2.empty()) {
+                if (q1.empty()) {
+                    return (msg1->getMsgCreationTime() <
+                        msg2->getMsgCreationTime()) ||
+                        (msg1->getMsgCreationTime() ==
+                        msg2->getMsgCreationTime() &&
+                         msg1->getMsgId() < msg2->getMsgId());
+                } else {
+                    return true;
+                }
+            } else if (q1.empty()) {
+                return false;
+            } else {
+                HomaPkt* pkt1 = q1.top();
+                HomaPkt* pkt2 = q2.top();
+                return (pkt1->getPriority() < pkt2->getPriority()) ||
+                    (pkt1->getPriority() == pkt2->getPriority() &&
+                    pkt1->getCreationTime() < pkt2->getCreationTime()) ||
+                    (pkt1->getPriority() == pkt2->getPriority() &&
+                    pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                    msg1->getMsgCreationTime() < 
+                    msg2->getMsgCreationTime()) ||
+                    (pkt1->getPriority() == pkt2->getPriority() &&
+                    pkt1->getCreationTime() == pkt2->getCreationTime() &&
+                    msg1->getMsgCreationTime() == 
+                    msg2->getMsgCreationTime() &&
+                    msg1->getMsgId() < msg2->getMsgId());
+            }
         }
         case HomaConfigDepot::SenderScheme::SRBF: 
             return msg1->getBytesLeft() < msg2->getBytesLeft() ||
