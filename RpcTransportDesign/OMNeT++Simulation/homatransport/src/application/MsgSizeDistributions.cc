@@ -175,7 +175,7 @@ void
 MsgSizeDistributions::getFacebookSizeInterarrival(int &msgSize,
         double &nextInterarrivalTime)
 {
-    // Facebook workload constants
+    // Facebook KeyValue workload constants
     int sizeOffset = msgSizeProbDistVector.back().first;
     double probOffset = msgSizeProbDistVector.back().second;
 

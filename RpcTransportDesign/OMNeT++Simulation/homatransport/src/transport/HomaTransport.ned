@@ -42,10 +42,13 @@ simple HomaTransport like ITransportScheme
 
         // Could be any of PrioPaceMode values defined in TrafficPacer.h
         string schedPrioAssignMode = default("NO_OVER_COMMIT");
+
         // Coulde be any of PrioResolutionMode values in PriorityResolver.h
         string unschedPrioResolutionMode;
+
         // The kind of logic transport uses at sender for sending messages and pkts
         string senderScheme = default("OBSERVE_PKT_PRIOS"); 
+
         // Specifies that only first cbfCapMsgSize bytes of a message must
         // be used in computing the cbf function. This value is supposed to be uint32_t
         // type, but since NED don't support 'unsigned int',
@@ -60,8 +63,14 @@ simple HomaTransport like ITransportScheme
         @signal[msgsLeftToSend](type=long);
         @signal[bytesLeftToSend](type=long);
         @signal[totalOutstandingBytes](type=long);
-        @signal[outstandingGrantBytes](type=long);
+        @signal[totalOutstandingBytes](type=long);
         @singal[homaPktPrio*Signal](type=HomaPkt);
+        @signal[rxActiveTime](type=simtime_t);
+        @signal[rxActiveBytes](type=long);
+        @signal[sxActiveTime](type=simtime_t);
+        @signal[sxActiveBytes](type=long);
+        @signal[sxSchedPktDelay](type=simtime_t);
+        @signal[sxUnschedPktDelay](type=simtime_t);
 
         @statistic[msgsLeftToSend](title="num msgs left to send"; source=msgsLeftToSend; record=stats, histogram; interpolationmode=none);
         @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);
@@ -69,6 +78,12 @@ simple HomaTransport like ITransportScheme
         @statistic[totalOutstandingBytes](title="total bytes in flight"; source=totalOutstandingBytes; record=stats, histogram; interpolationmode=none);
         @statistic[outstandingGrantBytes](title="num total bytes left to send"; source=outstandingGrantBytes; record=stats, histogram; interpolationmode=none);
         @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes); interpolationmode=none);
+        @statistic[rxActiveTime](title="Time periods receiver expects to get bytes"; source=rxActiveTime; record=stats, histogram; interpolationmode=none);
+        @statistic[rxActiveBytes](title="Bytes received during each active period"; source=rxActiveBytes; record=stats, histogram; interpolationmode=none);
+        @statistic[sxActiveTime](title="Time periods sender has bytes to send"; source=sxActiveTime; record=stats, histogram; interpolationmode=none);
+        @statistic[sxActiveBytes](title="Bytes sent during each active period"; source=sxActiveBytes; record=stats, histogram; interpolationmode=none);
+        @statistic[sxSchedPktDelay](title="Sender delays for sched pkts"; source=sxSchedPktDelay; record=stats, histogram; interpolationmode=none);
+        @statistic[sxUnschedPktDelay](title="Sender delays for unsched pkts"; source=sxUnschedPktDelay; record=stats, histogram; interpolationmode=none);
 
     gates:
         input appIn[] @labels(AppMessage/down);

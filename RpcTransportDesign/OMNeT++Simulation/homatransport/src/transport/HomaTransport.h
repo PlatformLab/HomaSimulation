@@ -113,6 +113,14 @@ class HomaTransport : public cSimpleModule
         // bytes that are scheduled but not yet sent to the network.
         uint32_t bytesLeft;
 
+        // Total unsched bytes left to be transmitted for this messge.
+        uint32_t unschedBytesLeft;
+
+        // Next time this message expects an unsched packet must be sent. This
+        // is equal to time at which last bit of last unsched pkt was serialized
+        // out to the network.
+        simtime_t nextExpectedUnschedTxTime;
+
         // This vector is length of total unsched pkts to be sent for
         // this message. Element i in this vector is number of data bytes to be
         // sent by the i'th unsched packet for this message. Note that first
@@ -184,6 +192,9 @@ class HomaTransport : public cSimpleModule
         };
 
       PROTECTED:
+        void dataPktToSend(HomaPkt* sxPkt);
+
+      PROTECTED:
         // For the purpose of statistics recording, this variable tracks the
         // total number bytes left to be sent for all outstanding messages.
         // (including unsched/sched bytes ready to be sent but not yet
@@ -221,6 +232,14 @@ class HomaTransport : public cSimpleModule
 
         // The object that keeps the configuration parameters for the transport
         HomaConfigDepot *homaConfig;
+
+        // Tracks the begining of time periods during which outstanding bytes is
+        // nonzero.
+        simtime_t activePeriodStart;
+
+        // Tracks the bytes received during each active period.
+        uint64_t sentBytesPerActivePeriod;
+
         friend class OutboundMessage;
     };
 
@@ -420,8 +439,7 @@ class HomaTransport : public cSimpleModule
 
         explicit ReceiveScheduler(HomaTransport* transport);
         ~ReceiveScheduler();
-        void processReceivedSchedData(HomaPkt* rxPkt);
-        void processReceivedUnschedData(HomaPkt* rxPkt);
+        void processReceivedPkt(HomaPkt* rxPkt);
         void sendAndScheduleGrant();
         void initialize(HomaConfigDepot* homaConfig, cMessage* grantTimer,
             PriorityResolver* prioResolver);
@@ -473,7 +491,16 @@ class HomaTransport : public cSimpleModule
         // collection.
         uint64_t unschedBytesToRecv;
 
+        // Tracks the begining of time periods during which outstanding bytes is
+        // nonzero.
+        simtime_t activePeriodStart;
+
+        // Tracks the bytes received during each active period.
+        uint64_t rcvdBytesPerActivePeriod;
+
       PROTECTED:
+        void processReceivedSchedData(HomaPkt* rxPkt);
+        void processReceivedUnschedData(HomaPkt* rxPkt);
         void addArrivedBytes(PktType pktType, uint16_t prio,
             uint32_t dataBytes);
         void addSentGrantBytes(uint16_t prio, uint32_t grantedBytes);
@@ -522,6 +549,31 @@ class HomaTransport : public cSimpleModule
     // Signal for total number of in flight bytes including both grants and
     // unscheduled packets.
     static simsignal_t totalOutstandingBytesSignal;
+    
+    // Signal for recording times during which receiver outstanding bytes is non zero.
+    static simsignal_t rxActiveTimeSignal;
+
+    // Signal for recording bytes received during each active time. Along with
+    // acitveTimeSignal, will help us to find receiver wasted bw as result of pkts
+    // delayed because of queuing or senders delaying scheduled pkts.
+    static simsignal_t rxActiveBytesSignal;
+    
+    // Signal for recording time periods during which sender has bytes awaiting
+    // tranmission.
+    static simsignal_t sxActiveTimeSignal;
+
+    // Signal for recording total bytes transmitted during each active time.
+    // Along with active time, this helps us figure wasted bw at the sender
+    // because of not receiving timely grants from receiver.
+    static simsignal_t sxActiveBytesSignal;
+
+    // Signal for recording sender delay in transmitting sched. packets. This
+    // delay can translate to bubbles in receiver's link.
+    static simsignal_t sxSchedPktDelaySignal;
+
+    // Signal for recording sender delay in transmitting unsched. packets that
+    // might translate to bubbles in receiver's link.
+    static simsignal_t sxUnschedPktDelaySignal;
 
     // Signal for tracking the statistics on how priorities are being used.
     std::vector<simsignal_t> priorityStatsSignals;
