@@ -1019,6 +1019,7 @@ def printHomaRates(parsedStats, xmlParsedDic):
     digestHomaRates(trafficDic.rxHostsTraffic.nics.sx.grantPkts, 'RX NICs Grant SxRate:')
     printStatsLine(trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest, trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest.title, tw, fw, '', printKeys)
 
+
 def printHomaOutstandingBytes(parsedStats, xmlParsedDic, unit):
     tw = 25
     fw = 8
@@ -1087,6 +1088,104 @@ def digestQueueLenInfo(queueLenDic, title):
     if len(queueLenDic.maxCnt) > 0:
         queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
         queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
+
+def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
+    nicLinkSpeed = int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
+    senderHostIds = xmlParsedDic.senderIds
+    receiverHostIds = xmlParsedDic.receiverIds
+
+    activeAndWasted = AttrDict()
+    activeAndWasted.rx.activeTime = 0
+    activeAndWasted.rx.wastedTime = 0
+    activeAndWasted.rx.expectedBytes = 0
+    activeAndWasted.rx.realBytes = 0
+    activeAndWasted.rx.fracTotalTime = 0
+    activeAndWasted.rx.fracActiveTime = 0
+
+    activeAndWasted.sx.activeTime = 0
+    activeAndWasted.sx.wastedTime = 0
+    activeAndWasted.sx.expectedBytes = 0
+    activeAndWasted.sx.realBytes = 0
+    activeAndWasted.sx.fracTotalTime = 0
+    activeAndWasted.sx.fracActiveTime = 0
+    activeAndWasted.sx.schedDelayFrac = 0
+    activeAndWasted.sx.unschedDelayFrac = 0
+    activeAndWasted.sx.delayFrac = 0
+
+    activeAndWasted.nicLinkSpeed = nicLinkSpeed
+    activeAndWasted.simTime = 0
+    simTime = 0
+    divideNoneZero = lambda dividend, divisor: dividend * 1.0/divisor if divisor !=0 else 0.0
+    for host in parsedStats.hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        hostStats = parsedStats.hosts[host]
+        simTime = float(hostStats.access('eth[0].mac.\"simulated time\".value'))
+        if hostId in receiverHostIds:
+            rxActiveTimeStats = hostStats.access('transportScheme.rxActiveTime:stats')
+            rxBytesStats = hostStats.access('transportScheme.rxActiveBytes:stats')
+            activeTime = rxActiveTimeStats.sum
+            expectedBytes = (rxActiveTimeStats.sum)*nicLinkSpeed*1e9/8.0
+            realBytes = 1.0 * rxBytesStats.sum
+            wastedTime = (expectedBytes-realBytes)*8.0/(nicLinkSpeed*1e9)
+            fracTotalTime = wastedTime/simTime
+            fracActiveTime = divideNoneZero(wastedTime, activeTime)
+
+            activeAndWasted.rx.activeTime += activeTime/len(receiverHostIds)
+            activeAndWasted.rx.expectedBytes += expectedBytes/len(receiverHostIds)
+            activeAndWasted.rx.realBytes += realBytes/len(receiverHostIds)
+            activeAndWasted.rx.wastedTime += wastedTime/len(receiverHostIds)
+            activeAndWasted.rx.fracTotalTime += 100*fracTotalTime/len(receiverHostIds)
+            activeAndWasted.rx.fracActiveTime += 100*fracActiveTime/len(receiverHostIds)
+
+        if hostId in senderHostIds:
+            sxActiveTimeStats = hostStats.access('transportScheme.sxActiveTime:stats')
+            sxBytesStats = hostStats.access('transportScheme.sxActiveBytes:stats')
+            activeTime = sxActiveTimeStats.sum
+            expectedBytes = (sxActiveTimeStats.sum)*nicLinkSpeed*1e9/8.0
+            realBytes = 1.0 * sxBytesStats.sum
+            wastedTime = (expectedBytes-realBytes)*8.0/(nicLinkSpeed*1e9)
+            fracTotalTime = wastedTime/simTime
+            fracActiveTime = divideNoneZero(wastedTime, activeTime)
+            schedDelayStats = hostStats.access('transportScheme.sxSchedPktDelay:stats')
+            schedDelayFrac = 1.0 * schedDelayStats.sum / simTime
+            unschedDelayStats = hostStats.access('transportScheme.sxUnschedPktDelay:stats')
+            unschedDelayFrac = 1.0 * unschedDelayStats.sum / simTime
+            sumDelayFrac = schedDelayFrac + unschedDelayFrac
+
+            activeAndWasted.sx.activeTime += activeTime/len(senderHostIds)
+            activeAndWasted.sx.expectedBytes += expectedBytes/len(senderHostIds)
+            activeAndWasted.sx.realBytes += realBytes/len(senderHostIds)
+            activeAndWasted.sx.wastedTime += wastedTime/len(senderHostIds)
+            activeAndWasted.sx.fracTotalTime += 100*fracTotalTime/len(senderHostIds)
+            activeAndWasted.sx.fracActiveTime += 100*fracActiveTime/len(senderHostIds)
+            activeAndWasted.sx.schedDelayFrac += 100*schedDelayFrac/len(senderHostIds)
+            activeAndWasted.sx.unschedDelayFrac += 100*unschedDelayFrac/len(senderHostIds)
+            activeAndWasted.sx.delayFrac += 100*sumDelayFrac/len(senderHostIds)
+
+    activeAndWasted.simTime = simTime
+    return activeAndWasted
+
+def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
+    tw = 14 
+    fw = 14 
+    lineMax = 90
+    title = 'Average Wasted Time and Bandwidth at Senders and Receivers'
+    printKeys =['sx.fracTotalTime', 'rx.fracActiveTime', 'rx.fracTotalTime', 'sx.schedDelayFrac', 'sx.unschedDelayFrac', 'sx.delayFrac'] 
+                                                        
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+
+    print("="*lineMax)
+    print("Sx Wasted ".ljust(tw) + 'Sx Wasted '.center(fw) + 'Rx Wasted'.center(fw) + 'Rx Wasted'.center(fw) +
+            'Sx Sched'.center(fw) + 'Sx Unsched'.center(fw) + 'Sx Total'.center(fw))
+    print("Active BW %".ljust(tw) + 'Total BW %'.center(fw) + 'Active BW %'.center(fw) + 'Total BW %'.center(fw) +
+            'Delay %'.center(fw) + 'Delay %'.center(fw) + 'Delay %'.center(fw) )
+    print("_"*lineMax)
+    print('{0:.2f}'.format(activeAndWasted.sx.fracActiveTime).ljust(tw) + '{0:.2f}'.format(activeAndWasted.sx.fracTotalTime).center(fw) +
+        '{0:.2f}'.format(activeAndWasted.rx.fracActiveTime).center(fw) + '{0:.2f}'.format(activeAndWasted.rx.fracTotalTime).center(fw) +
+        '{0:.2f}'.format(activeAndWasted.sx.schedDelayFrac).center(fw) +  '{0:.2f}'.format(activeAndWasted.sx.unschedDelayFrac).center(fw) +
+        '{0:.2f}'.format(activeAndWasted.sx.delayFrac).center(fw)) 
+    
 
 def printQueueLength(parsedStats, xmlParsedDic):
     printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
@@ -1288,6 +1387,9 @@ def main():
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         printHomaOutstandingBytes(parsedStats, xmlParsedDic, 'KB')
     printHomaRates(parsedStats, xmlParsedDic)
+    if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
+        activeAndWasted = calculateWastedTimesAndBw(parsedStats, xmlParsedDic)
+        printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted)
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
