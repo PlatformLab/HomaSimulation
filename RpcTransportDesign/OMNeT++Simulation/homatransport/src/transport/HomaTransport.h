@@ -16,10 +16,11 @@
 #ifndef __HOMATRANSPORT_HOMATRANSPORT_H_
 #define __HOMATRANSPORT_HOMATRANSPORT_H_
 
-#include <unordered_map>
 #include <queue>
 #include <vector>
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
 #include <omnetpp.h>
 #include "common/Minimal.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
@@ -90,6 +91,8 @@ class HomaTransport : public cSimpleModule
         const uint32_t& getMsgSize() { return msgSize; }
         const uint64_t& getMsgId() { return msgId; }
         const OutbndPktQueue& getTxPktQueue() {return txPkts;}
+        const std::unordered_set<HomaPkt*>& getTxSchedPkts()
+            {return txSchedPkts;}
         const uint32_t getBytesLeft() { return bytesLeft; }
         const simtime_t getMsgCreationTime() { return msgCreationTime; }
         bool getTransmitReadyPkt(HomaPkt** outPkt);
@@ -141,8 +144,11 @@ class HomaTransport : public cSimpleModule
         simtime_t msgCreationTime;
 
         // Priority Queue containing all sched/unsched pkts set to be sent out for
-        // this message and are waiting for transmission. 
+        // this message and are waiting for transmission.
         OutbndPktQueue txPkts;
+
+        // Set  of all sched pkts ready for transmission
+        std::unordered_set<HomaPkt*> txSchedPkts;
 
         // The SendController that manages the transmission of this msg.
         SendController* sxController;
@@ -177,22 +183,25 @@ class HomaTransport : public cSimpleModule
         void processReceivedGrant(HomaPkt* rxPkt);
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
         void sendOrQueue(cMessage* msg = NULL);
+        void handlePktTransmitEnd();
 
       PUBLIC:
         /**
          * A predicate func object for sorting OutboundMessages based on the
          * senderScheme used for transport. Detemines in what order
          * OutboundMessages will send their sched/unsched outbound packets (ie.
-         * pkts queues in OutboundMessage::txPkts). 
+         * pkts queues in OutboundMessage::txPkts).
          */
         class OutbndMsgSorter {
           PUBLIC:
             OutbndMsgSorter(){}
             bool operator()(OutboundMessage* msg1, OutboundMessage* msg2);
         };
+        typedef std::set<OutboundMessage*, OutbndMsgSorter> SortedOutboundMsg;
 
       PROTECTED:
         void dataPktToSend(HomaPkt* sxPkt);
+        void msgTransmitComplete(OutboundMessage* msg);
 
       PROTECTED:
         // For the purpose of statistics recording, this variable tracks the
@@ -208,8 +217,20 @@ class HomaTransport : public cSimpleModule
         // The identification number for the next outstanding message.
         uint64_t msgId;
 
+        // Keeps a copy of last packet transmitted by this module
+        HomaPkt sentPkt;
+
+        // Serialization time of sentPkt at nic link speed
+        simtime_t sentPktDuration;
+
         // The hash map from the msgId to outstanding messages.
         OutboundMsgMap outboundMsgMap;
+
+        // Each entry (ie. map value) of is a sorted set of all outbound
+        // messages for a specific receiver mapped to the ip address of that
+        // receiver (ie. map key).
+        std::unordered_map<uint32_t, std::unordered_set<OutboundMessage*>>
+                rxAddrMsgMap;
 
         // For each distinct receiver, allocates the number of request and
         // unsched bytes for various sizes of message.
@@ -220,15 +241,15 @@ class HomaTransport : public cSimpleModule
 
         // Sorted collection of all OutboundMessages that have unsched/sched
         // pkts queued up and ready to be sent out into the network.
-        std::set<OutboundMessage*, OutbndMsgSorter> outbndMsgSet;
-
-        // Transport that owns this SendController.
-        HomaTransport* transport;
+        SortedOutboundMsg outbndMsgSet;
 
         // Queue for keeping grants that receiver side of this host machine
         // wants to send out.
         std::priority_queue<HomaPkt*, std::vector<HomaPkt*>,
             HomaPkt::HomaPktSorter> outGrantQueue;
+
+        // Transport that owns this SendController.
+        HomaTransport* transport;
 
         // The object that keeps the configuration parameters for the transport
         HomaConfigDepot *homaConfig;
@@ -241,6 +262,7 @@ class HomaTransport : public cSimpleModule
         uint64_t sentBytesPerActivePeriod;
 
         friend class OutboundMessage;
+        friend class HomaTransport;
     };
 
     /**
@@ -549,7 +571,7 @@ class HomaTransport : public cSimpleModule
     // Signal for total number of in flight bytes including both grants and
     // unscheduled packets.
     static simsignal_t totalOutstandingBytesSignal;
-    
+
     // Signal for recording times during which receiver outstanding bytes is non zero.
     static simsignal_t rxActiveTimeSignal;
 
@@ -557,7 +579,7 @@ class HomaTransport : public cSimpleModule
     // acitveTimeSignal, will help us to find receiver wasted bw as result of pkts
     // delayed because of queuing or senders delaying scheduled pkts.
     static simsignal_t rxActiveBytesSignal;
-    
+
     // Signal for recording time periods during which sender has bytes awaiting
     // tranmission.
     static simsignal_t sxActiveTimeSignal;
