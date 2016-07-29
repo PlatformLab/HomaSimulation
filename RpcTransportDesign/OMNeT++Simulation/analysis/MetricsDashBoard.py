@@ -1376,7 +1376,11 @@ def main():
     else:
         scalarResultFile = 'homatransport/src/dcntopo/results/RecordAllStats-0.sca'
 
-    xmlConfigFile = 'homatransport/src/dcntopo/config.xml'
+    if len(args) > 1:
+        xmlConfigFile = args[1]
+    else: 
+        xmlConfigFile = 'homatransport/src/dcntopo/config.xml'
+
     parsedStats = AttrDict()
     parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(scalarResultFile))
     xmlParsedDic = AttrDict()
