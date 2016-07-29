@@ -1099,6 +1099,7 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
     activeAndWasted.rx.wastedTime = 0
     activeAndWasted.rx.expectedBytes = 0
     activeAndWasted.rx.realBytes = 0
+    activeAndWasted.rx.totalTime = 0
     activeAndWasted.rx.fracTotalTime = 0
     activeAndWasted.rx.fracActiveTime = 0
 
@@ -1106,6 +1107,7 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
     activeAndWasted.sx.wastedTime = 0
     activeAndWasted.sx.expectedBytes = 0
     activeAndWasted.sx.realBytes = 0
+    activeAndWasted.sx.totalTime = 0
     activeAndWasted.sx.fracTotalTime = 0
     activeAndWasted.sx.fracActiveTime = 0
     activeAndWasted.sx.schedDelayFrac = 0
@@ -1129,15 +1131,12 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
             expectedBytes = (rxActiveTimeStats.sum)*nicLinkSpeed*1e9/8.0
             realBytes = 1.0 * rxBytesStats.sum
             wastedTime = (expectedBytes-realBytes)*8.0/(nicLinkSpeed*1e9)
-            fracTotalTime = wastedTime/simTime
-            fracActiveTime = divideNoneZero(wastedTime, activeTime)
 
-            activeAndWasted.rx.activeTime += activeTime/len(receiverHostIds)
-            activeAndWasted.rx.expectedBytes += expectedBytes/len(receiverHostIds)
-            activeAndWasted.rx.realBytes += realBytes/len(receiverHostIds)
-            activeAndWasted.rx.wastedTime += wastedTime/len(receiverHostIds)
-            activeAndWasted.rx.fracTotalTime += 100*fracTotalTime/len(receiverHostIds)
-            activeAndWasted.rx.fracActiveTime += 100*fracActiveTime/len(receiverHostIds)
+            activeAndWasted.rx.activeTime += activeTime
+            activeAndWasted.rx.expectedBytes += expectedBytes
+            activeAndWasted.rx.realBytes += realBytes
+            activeAndWasted.rx.wastedTime += wastedTime
+            activeAndWasted.rx.totalTime += simTime
 
         if hostId in senderHostIds:
             sxActiveTimeStats = hostStats.access('transportScheme.sxActiveTime:stats')
@@ -1146,23 +1145,29 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
             expectedBytes = (sxActiveTimeStats.sum)*nicLinkSpeed*1e9/8.0
             realBytes = 1.0 * sxBytesStats.sum
             wastedTime = (expectedBytes-realBytes)*8.0/(nicLinkSpeed*1e9)
-            fracTotalTime = wastedTime/simTime
-            fracActiveTime = divideNoneZero(wastedTime, activeTime)
             schedDelayStats = hostStats.access('transportScheme.sxSchedPktDelay:stats')
-            schedDelayFrac = 1.0 * schedDelayStats.sum / simTime
+            schedDelayFrac = 1.0 * schedDelayStats.sum
             unschedDelayStats = hostStats.access('transportScheme.sxUnschedPktDelay:stats')
-            unschedDelayFrac = 1.0 * unschedDelayStats.sum / simTime
+            unschedDelayFrac = 1.0 * unschedDelayStats.sum
             sumDelayFrac = schedDelayFrac + unschedDelayFrac
 
-            activeAndWasted.sx.activeTime += activeTime/len(senderHostIds)
-            activeAndWasted.sx.expectedBytes += expectedBytes/len(senderHostIds)
-            activeAndWasted.sx.realBytes += realBytes/len(senderHostIds)
-            activeAndWasted.sx.wastedTime += wastedTime/len(senderHostIds)
-            activeAndWasted.sx.fracTotalTime += 100*fracTotalTime/len(senderHostIds)
-            activeAndWasted.sx.fracActiveTime += 100*fracActiveTime/len(senderHostIds)
-            activeAndWasted.sx.schedDelayFrac += 100*schedDelayFrac/len(senderHostIds)
-            activeAndWasted.sx.unschedDelayFrac += 100*unschedDelayFrac/len(senderHostIds)
-            activeAndWasted.sx.delayFrac += 100*sumDelayFrac/len(senderHostIds)
+            activeAndWasted.sx.activeTime += activeTime
+            activeAndWasted.sx.expectedBytes += expectedBytes
+            activeAndWasted.sx.realBytes += realBytes
+            activeAndWasted.sx.wastedTime += wastedTime
+            activeAndWasted.sx.totalTime += simTime
+            activeAndWasted.sx.schedDelayFrac += schedDelayFrac
+            activeAndWasted.sx.unschedDelayFrac += unschedDelayFrac
+            activeAndWasted.sx.delayFrac += sumDelayFrac
+
+    activeAndWasted.rx.fracTotalTime = 100*activeAndWasted.rx.wastedTime/activeAndWasted.rx.totalTime
+    activeAndWasted.rx.fracActiveTime = 100*divideNoneZero(activeAndWasted.rx.wastedTime, activeAndWasted.rx.activeTime)
+
+    activeAndWasted.sx.fracTotalTime = 100*activeAndWasted.sx.wastedTime/activeAndWasted.sx.totalTime
+    activeAndWasted.sx.fracActiveTime = 100*divideNoneZero(activeAndWasted.sx.wastedTime, activeAndWasted.sx.activeTime)
+    activeAndWasted.sx.schedDelayFrac = 100*activeAndWasted.sx.schedDelayFrac / activeAndWasted.sx.totalTime
+    activeAndWasted.sx.unschedDelayFrac = 100*activeAndWasted.sx.unschedDelayFrac / activeAndWasted.sx.totalTime
+    activeAndWasted.sx.delayFrac = 100*activeAndWasted.sx.delayFrac / activeAndWasted.sx.totalTime
 
     activeAndWasted.simTime = totalSimTime / len(parsedStats.hosts.keys())
     return activeAndWasted
