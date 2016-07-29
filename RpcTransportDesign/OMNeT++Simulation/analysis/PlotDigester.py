@@ -109,7 +109,7 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
     tw_l = 15
     f.write('TransportType'.center(tw_l) + 'LoadFactor'.center(tw_l) +
         'WorkLoad'.center(tw_h) + 'MsgSizeRange'.center(tw_l) +
-        'SizeCntPercent'.center(tw_l) + 'BytesPercent'.center(tw_l) + 
+        'SizeCntPercent'.center(tw_l) + 'BytesPercent'.center(tw_l) +
         'UnschedBytes'.center(tw_l) + 'MeanStretch'.center(tw_l) +
         'MedianStretch'.center(tw_l) + '99PercentStretch'.center(tw_l) + '\n')
     for dirFile in resultFiles:
@@ -167,7 +167,7 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
                 '{0}'.format('NA').center(tw_l) + '{0}'.format(tailStretch).center(tw_l) + '\n')
         f.write('{0}'.format(transport).center(tw_l) + '{0}'.format(loadFactor).center(tw_l) +
                 '{0}'.format(workLoad).center(tw_h) + '{0}'.format('OverAllSizes').center(tw_l) +
-                '{0}'.format(1.00).center(tw_l) + '{0}'.format(100).center(tw_l) + 
+                '{0}'.format(1.00).center(tw_l) + '{0}'.format(100).center(tw_l) +
                 '{0}'.format(UnschedBytes).center(tw_l) + '{0}'.format(avgStretch).center(tw_l)  +
                 '{0}'.format('NA').center(tw_l) + '{0}'.format('NA').center(tw_l) + '\n')
     f.close()

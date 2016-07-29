@@ -608,9 +608,9 @@ def msgBytesOnWire(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest):
             bytesOnWire.bytes += int(hosts.access(bytesStatsKey + '.sum'))
             totalBytes += int(hosts.access(bytesStatsKey + '.sum'))
 
-        msgBytesOnWireDigest['{0}'.format(size)] = bytesOnWire 
+        msgBytesOnWireDigest['{0}'.format(size)] = bytesOnWire
     for size in msgBytesOnWireDigest.keys():
-        msgBytesOnWireDigest[size].cntPercent = 100 * msgBytesOnWireDigest[size].cnt / totalCnt 
+        msgBytesOnWireDigest[size].cntPercent = 100 * msgBytesOnWireDigest[size].cnt / totalCnt
         msgBytesOnWireDigest[size].bytesPercent = 100 * msgBytesOnWireDigest[size].bytes / totalBytes
     return
 
@@ -1115,11 +1115,13 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
     activeAndWasted.nicLinkSpeed = nicLinkSpeed
     activeAndWasted.simTime = 0
     simTime = 0
+    totalSimTime = 0
     divideNoneZero = lambda dividend, divisor: dividend * 1.0/divisor if divisor !=0 else 0.0
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
         simTime = float(hostStats.access('eth[0].mac.\"simulated time\".value'))
+        totalSimTime += simTime
         if hostId in receiverHostIds:
             rxActiveTimeStats = hostStats.access('transportScheme.rxActiveTime:stats')
             rxBytesStats = hostStats.access('transportScheme.rxActiveBytes:stats')
@@ -1162,16 +1164,16 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
             activeAndWasted.sx.unschedDelayFrac += 100*unschedDelayFrac/len(senderHostIds)
             activeAndWasted.sx.delayFrac += 100*sumDelayFrac/len(senderHostIds)
 
-    activeAndWasted.simTime = simTime
+    activeAndWasted.simTime = totalSimTime / len(parsedStats.hosts.keys())
     return activeAndWasted
 
 def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
-    tw = 14 
-    fw = 14 
+    tw = 14
+    fw = 14
     lineMax = 90
     title = 'Average Wasted Time and Bandwidth at Senders and Receivers'
-    printKeys =['sx.fracTotalTime', 'rx.fracActiveTime', 'rx.fracTotalTime', 'sx.schedDelayFrac', 'sx.unschedDelayFrac', 'sx.delayFrac'] 
-                                                        
+    printKeys =['sx.fracTotalTime', 'rx.fracActiveTime', 'rx.fracTotalTime', 'sx.schedDelayFrac', 'sx.unschedDelayFrac', 'sx.delayFrac']
+
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
 
@@ -1184,8 +1186,8 @@ def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
     print('{0:.2f}'.format(activeAndWasted.sx.fracActiveTime).ljust(tw) + '{0:.2f}'.format(activeAndWasted.sx.fracTotalTime).center(fw) +
         '{0:.2f}'.format(activeAndWasted.rx.fracActiveTime).center(fw) + '{0:.2f}'.format(activeAndWasted.rx.fracTotalTime).center(fw) +
         '{0:.2f}'.format(activeAndWasted.sx.schedDelayFrac).center(fw) +  '{0:.2f}'.format(activeAndWasted.sx.unschedDelayFrac).center(fw) +
-        '{0:.2f}'.format(activeAndWasted.sx.delayFrac).center(fw)) 
-    
+        '{0:.2f}'.format(activeAndWasted.sx.delayFrac).center(fw))
+
 
 def printQueueLength(parsedStats, xmlParsedDic):
     printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
