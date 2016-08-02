@@ -20,9 +20,9 @@ Define_Module(OracleGreedySRPTScheduler);
 
 OracleGreedySRPTScheduler::OracleGreedySRPTScheduler()
     : globalMsgId(0) 
+    , txMsgSet()
     , senderMsgMap()
     , receiverMsgMap()
-    , hostTranports()
     , msgIdMap()
     , hostAddrTransports()
     , scheduledMsgs()
@@ -99,14 +99,10 @@ bool
 OracleGreedySRPTScheduler::subscribeEndhostTransport(
     MinimalTransport* transport, inet::L3Address transportAddr)
 {
+    uint32_t ipv4Addr = transportAddr.toIPv4().getInt();
     try {
-        senderMsgMap.at(transport);
+        hostAddrTransports.at(ipv4Addr);
     } catch (std::exception& e) {
-        hostTranports.push_back(transport);
-        senderMsgMap[transport] = {};
-        receiverMsgMap[transport] = {};
-        ASSERT(transportAddr.getType() == inet::L3Address::AddressType::IPv4);
-        uint32_t ipv4Addr = transportAddr.toIPv4().getInt();
         hostAddrTransports[ipv4Addr] = transport;
         return true;
     }
@@ -116,8 +112,8 @@ OracleGreedySRPTScheduler::subscribeEndhostTransport(
 /**
  * This function must be called whenever a new message has entered the
  * simulation from an application at the end host. This method informs the
- * oracle scheduler about the new created message and the message will be
- * cosidered in the scheduling algorithm in the future.
+ * oracle scheduler about the new created message. At every new message arrival,
+ * the oracle recomputes a new schedule for next packet transmission.
  *
  * \param appMesg
  *      pointer to the message created in application that needs to be
@@ -126,10 +122,11 @@ OracleGreedySRPTScheduler::subscribeEndhostTransport(
 void
 OracleGreedySRPTScheduler::scheduleNewMesg(Rpc* appMesg)
 {
-    InflightMessage* newMsg = new InflightMessage(appMesg, this);
-    senderMsgMap.at(newMsg->sxTransport).insert(newMsg);
-    receiverMsgMap.at(newMsg->rxTransport).insert(newMsg);
-    msgIdMap[newMsg->msgId] = newMsg;
+    InflightMessage* newMesg = new InflightMessage(appMesg, this);
+    txMsgSet.insert(newMesg);
+    senderMsgMap[newMesg->sxTransport].insert(newMesg);
+    receiverMsgMap[newMesg->rxTransport].insert(newMesg);
+    msgIdMap[newMesg->msgId] = newMesg;
     recomputeGlobalSrptSchedule();
 }
 
@@ -160,8 +157,9 @@ OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport,
 
     // Side effect: Calling this function reduces the remaining bytes of the
     // messages and therefore might change the position of this message in
-    // senderMsgMap and receiverMsgMap. These changes must be appropriately
-    // applied in senderMsgMap and receiverMsgMap.
+    // txMsgSet, senderMsgMap, and receiverMsgMap. These changes must be
+    // appropriately applied in senderMsgMap and receiverMsgMap.
+    txMsgSet.erase(msg);
     auto& allSxMsgs = senderMsgMap.at(msg->sxTransport);
     allSxMsgs.erase(msg);
     auto& allRxMsg = receiverMsgMap.at(msg->rxTransport);
@@ -180,9 +178,15 @@ OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport,
     // sender that has finished transmission.
     if (msg->bytesToSend <= 0) {
         chunk->lastChunk = true;
+        if (allSxMsgs.empty()) {
+            // If the sender transport of this message has no more outstanding
+            // mesgs, then clean up the this transport from the senderMsgMap. 
+            senderMsgMap.erase(msg->sxTransport);
+        }
         recomputeGlobalSrptSchedule();
     } else {
         allSxMsgs.insert(msg);
+        txMsgSet.insert(msg);
     }
     allRxMsg.insert(msg);
 
@@ -199,9 +203,8 @@ OracleGreedySRPTScheduler::getNextChunkToSend(MinimalTransport* sxTransport,
  *      If the received chunk was the last piece of the message and the
  *      message is complete after this message, this method constructs an
  *      Rpc corresponding to this message and returns the pointer to the
- *      Rpc. Otherwise, it returns null.
- *      Note: It is the responsibility of the caller to free up the allocated
- *      memory for the returned Rpc.
+ *      Rpc. Otherwise, it returns null. It is the responsibility of the caller
+ *      to free up the allocated memory for the returned Rpc.
  */
 Rpc*
 OracleGreedySRPTScheduler::appendRecvdChunk(
@@ -211,11 +214,15 @@ OracleGreedySRPTScheduler::appendRecvdChunk(
     InflightMessage* msg = msgIdMap.at(msgChunk->msgId);
     if (msg->appendRecvdChunk(msgChunk->offsetByte, msgChunk->chunkLen)) {
         msgChunk->lastChunk = true;
+        ASSERT(txMsgSet.find(msg) == txMsgSet.end());
         msgIdMap.erase(msgChunk->msgId);
         auto& allRxMsg = receiverMsgMap.at(msg->rxTransport);
         allRxMsg.erase(msg);
-        auto& allSxMsgs = senderMsgMap.at(msg->sxTransport);
-        ASSERT(allSxMsgs.find(msg) == allSxMsgs.end());
+        if (allRxMsg.empty()) {
+            // If this receiver expects no more outstanding message, the clean
+            // up this transport from the receiverMsgMap
+            receiverMsgMap.erase(msg->rxTransport);
+        }
         rxMsg = new Rpc();
         rxMsg->setDestAddr(msg->destAddr);
         rxMsg->setSrcAddr(msg->srcAddr);
@@ -228,6 +235,7 @@ OracleGreedySRPTScheduler::appendRecvdChunk(
     return rxMsg;
 }
 
+
 /**
  * Finds a message transmission schedule (ie .a match) from senders to receivers
  * based on SRPT policy.
@@ -235,78 +243,37 @@ OracleGreedySRPTScheduler::appendRecvdChunk(
 void
 OracleGreedySRPTScheduler::recomputeGlobalSrptSchedule()
 {
+
     scheduledMsgs.clear();
 
     // The map below tracks the matches found in the scheduling algorithm. 
-    // The key is end host transport at sender side, the value is a pair.
-    // pair.first is the mesg schedule found for the key transport as a sender
-    // and pair.second is the index of outstanding sx messages that has been
-    // inpected in the set of all messages for the key transport.
-    std::unordered_map<MinimalTransport*, std::pair<InflightMessage*, size_t>>
-        sxSchedules;
-    sxSchedules.clear();
-
-    // The map below tracks the matches found in the scheduling algorithm. 
-    // The key is end host transport at receiver side, the value is a sorted set
-    // of possible schedules used in every iteration of the scheduling
-    // algorithm until a match is found.
-    std::unordered_map<MinimalTransport*, std::set<InflightMessage*,
-        InflightMessage::MesgSorter>> rxPotentialSchedules;
-    rxPotentialSchedules.clear();
-    
-    // For every receiver transport (key), the map will contain the scheduled
-    // message (value) for that trasport.
+    // For every receiver transport (ie. hash key), the mapped value is the
+    // scheduled message for that receiver trasport.
     std::unordered_map<MinimalTransport*, InflightMessage*> rxSchedules;
     rxSchedules.clear();
 
-    do {
-        rxPotentialSchedules.clear();
-        size_t randOffset = intrand(hostTranports.size());
-        for (size_t i = 0; i < hostTranports.size(); i++) {
-            size_t ind = (i + randOffset) % hostTranports.size();
-            MinimalTransport* sxTransport = hostTranports[ind];
-            auto sxSchedule = sxSchedules[sxTransport];
-            if (sxSchedule.first != NULL) {
-                // match has been found
-                continue;
-            }
-
-            auto sxMsgsSorted = senderMsgMap[sxTransport];
-            if (sxSchedule.second >= sxMsgsSorted.size()) {
-                // This all outstaanding mesgs of this sender transport has been
-                // tried in previous iterations and couldn't find a match for
-                // them.
-                continue;
-            }
-
-            auto mesgToSched = sxMsgsSorted.begin(); 
-            std::advance(mesgToSched, sxSchedule.second);
-            while (sxSchedule.second < sxMsgsSorted.size()) {
-                sxSchedule.second++;
-                MinimalTransport* msgRxTrans = (*mesgToSched)->rxTransport;
-                auto schedMsg = rxSchedules[msgRxTrans];
-                if (schedMsg) {
-                    mesgToSched++;
-                    continue;
-                } else {
-                    rxPotentialSchedules[msgRxTrans].insert(*mesgToSched);
-                    break;
-                }
-            }
+    // Iterate through all messages that are waiting for transmission based on
+    // the SRPT policy and match the senders and receivers.
+    for (auto mesgIt = txMsgSet.begin(); mesgIt != txMsgSet.end(); ++mesgIt) {
+        if (scheduledMsgs.size() == senderMsgMap.size() ||
+                rxSchedules.size() == receiverMsgMap.size()) {
+            break;
         }
 
-        for (auto schedsIt : rxPotentialSchedules) {
-            MinimalTransport* rxTransport = schedsIt.first;
-            auto potentialScheds = schedsIt.second; 
-            ASSERT(rxSchedules[rxTransport] == NULL);
-            InflightMessage* schedMsg = *(potentialScheds.begin());
-            ASSERT(sxSchedules[schedMsg->sxTransport].first == NULL &&
-                rxSchedules[schedMsg->rxTransport] == NULL);
-            sxSchedules[schedMsg->sxTransport].first = schedMsg;
-            scheduledMsgs[schedMsg->sxTransport] = schedMsg;
-            rxSchedules[schedMsg->rxTransport] = schedMsg;
+        InflightMessage* mesg = *mesgIt;
+        MinimalTransport* mesgRxTrans = mesg->rxTransport;
+        MinimalTransport* mesgSxTrans = mesg->sxTransport;
+
+        if (scheduledMsgs.find(mesgSxTrans) != scheduledMsgs.end() ||
+                rxSchedules.find(mesgRxTrans) != rxSchedules.end()) {
+            // A shorter message has been already found for either sender or
+            // receiver of this mesg therefore this message can't be scheduled.
+            continue;
         }
-    } while (!rxPotentialSchedules.empty());
+
+        rxSchedules[mesgRxTrans] = mesg;
+        scheduledMsgs[mesgSxTrans] = mesg;
+    }
 
     // set newly found schedule at the senders to transmit corresponding mesgs
     for (auto schedTxMesg : scheduledMsgs) {

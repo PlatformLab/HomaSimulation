@@ -107,7 +107,11 @@ class OracleGreedySRPTScheduler : public cSimpleModule
                     lhs->msgByteLen < rhs->msgByteLen) ||
                     (lhs->bytesToSend == rhs->bytesToSend && 
                     lhs->msgByteLen == rhs->msgByteLen &&
-                    lhs->msgCreationTime < rhs->msgCreationTime); 
+                    lhs->msgCreationTime < rhs->msgCreationTime) ||
+                    (lhs->bytesToSend == rhs->bytesToSend && 
+                    lhs->msgByteLen == rhs->msgByteLen &&
+                    lhs->msgCreationTime == rhs->msgCreationTime &&
+                    lhs->msgId < rhs->msgId); 
             }
         };
 
@@ -148,20 +152,20 @@ class OracleGreedySRPTScheduler : public cSimpleModule
     };
 
   PROTECTED:
-    typedef std::unordered_map<MinimalTransport*,
-        std::set<InflightMessage*, InflightMessage::MesgSorter>> EndhostMesgMap;
+    typedef std::set<InflightMessage*, InflightMessage::MesgSorter> SortedMesgs;
+    typedef std::unordered_map<MinimalTransport*, SortedMesgs> EndhostMesgMap;
 
     // A counter that monotonically increasese and tracks the global
     // identification number of next message to be generated in the simulation.
     uint64_t globalMsgId;
 
-    // A hash table from sender/receiver transports to a sorted list of all
+    // Sorted set of all active messages to be transmitted by the senders
+    SortedMesgs txMsgSet;
+
+    // Hash table from sender/receiver transports to a sorted list of all
     // active messages associated with that sender/reciever.
     EndhostMesgMap senderMsgMap;
     EndhostMesgMap receiverMsgMap;
-
-    // contains pointer to all end host transports.
-    std::vector<MinimalTransport*> hostTranports;
 
     // maps msgIds to pointer to InflightMessage
     std::unordered_map<uint64_t, InflightMessage*> msgIdMap;
@@ -169,7 +173,7 @@ class OracleGreedySRPTScheduler : public cSimpleModule
     // IPv4 Address to host transport map
     std::unordered_map<uint32_t, MinimalTransport*> hostAddrTransports;
 
-    // Contains the most recent scheduled messages for transmissio at senders
+    // Contains the most recent scheduled messages for transmission at senders
     std::unordered_map<MinimalTransport*, InflightMessage*> scheduledMsgs;
 
     friend class MinimalTransport;
