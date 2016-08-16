@@ -140,7 +140,7 @@ class Mesg():
         self.simParams = simParams
 
         # Each element in this list corresponds to a train of packets sent together
-        # [(arrivalTimeAtRecvr, totalDataBytesInPkts, [pkt1BytesOneWire, pkt2BytesOnWire, ...]), ...]
+        # [(txStart, txStop, arrivalTimeAtRecvr, totalDataBytesInPkts, [pkt1BytesOneWire, pkt2BytesOnWire, ...]), ...]
         self.pktsInflight = []
         self.pktsRecvd = []
         self.recvTime = tCreation
@@ -187,11 +187,12 @@ class Mesg():
         pktsOnWire.append((partialHdrBytes, numPartialBytesOnWire-partialHdrBytes))
         return bytesOnWire, pktsOnWire
 
-    def transmitBytes(self, txDuration, currentTime):
+    def transmitBytes(self, tStart, tStop):
         """
         Returns number of bytes yet to be transmitted for this message after
         call to this function
         """
+        txDuration = tStop - tStart
         assert txDuration >= 0
         assert self.bytesToSend > 0
         # For txDuration time, get how many bytes will be transmitted
@@ -215,9 +216,23 @@ class Mesg():
             dataBytesSent += dataBytesToSend
             self.bytesToSend -= dataBytesToSend
 
+        # Add transmitting packets to inflight pkts
         if inflightPkts:
-            recvTimeAtRx = self.pktsRecvTime(currentTime, inflightPkts)
-            self.pktsInflight.append((recvTimeAtRx, dataBytesSent, inflightPkts))
+            if self.pktsInflight and self.pktsInflight[-1][1] == tStart:
+                # this new train of packet comes right after previous one (ie.
+                # tStart of this train is equal to tStop of prev train), so
+                # append this new train of packets to the previous train
+                lastInflight = self.pktsInflight[-1]
+                prevTxPkts = lastInflight[3]
+                newTxPkts = \
+                    prevTxPkts[0:-1] + [(prevTxPkts[-1] + inflightPkts[0])] + inflightPkts[1:]
+                newInflight =\
+                    (lastInflight[0], tStop, lastInflight[2] + dataBytesSent, newTxPkts)
+                self.pktsInflight.pop() # remove previous pkts
+                self.pktsInflight.append(newInflight) # append new pkts comprised of previous one and new one
+            else:
+                self.pktsInflight.append((tStart, tStop, dataBytesSent, inflightPkts))
+
 
         # Remove transmitted packets from txPkts
         while self.txPkts and sum(self.txPkts[0]) == 0:
@@ -226,23 +241,25 @@ class Mesg():
         assert self.bytesToSend >= 0
         return self.bytesToSend
 
-    def recvBytes(self, currentTime):
-        # Returns number of data bytes yet to receiver after this func. call
-        # returns
-        pktsStillInflight = []
+    def recvTransmittedPkts(self):
+        # For a fully transmitted message, return time at which the message is
+        # fully delivered at receiver.
+        assert self.bytesToSend == 0
+        recvTime = self.tCreation
+        dataBytesRecvd = 0
         for i, pktTrain in enumerate(self.pktsInflight):
-            arrivalTime = pktTrain[0]
-            if arrivalTime <= currentTime:
-                dataBytes = pktTrain[1]
-                self.recvTime = max(self.recvTime, arrivalTime)
-                self.bytesToRecv -= dataBytes
-                self.pktsRecvd.append(pktTrain)
-            else:
-                pktsStillInflight.append(pktTrain)
+            tStart = pktTrain[0]
+            tStop = pktTrain[1]
+            dataBytesSentInPkt = pktTrain[2] 
+            inflightPkts = pktTrain[3]
+            dataBytesRecvd += dataBytesSentInPkt
+            pktsRecvTimeAtRx = self.pktsRecvTime(tStart, inflightPkts)
+            recvTime = max(recvTime, pktsRecvTimeAtRx)
+            self.pktsRecvd.append((tStart, tStop, pktsRecvTimeAtRx, dataBytesSentInPkt, inflightPkts))
 
-        self.pktsInflight[:] = pktsStillInflight
-        assert self.bytesToRecv >= 0
-        return self.bytesToRecv
+        self.recvTime = recvTime
+        assert self.bytesToRecv == dataBytesRecvd
+        self.bytesToRecv -= dataBytesRecvd 
 
     def getTxDuration(self):
         # return how long does it take to transmit all bytes of this mesg
@@ -406,8 +423,9 @@ class GreedySRPTOracleScheduler():
         # set of these two contains all messages that need to transmit.
         self.schedMesgs = []
 
-        # all messages that have data to be received
-        self.activeRxMesgs = {}
+        # Contain messages that have sent all their data. Holds them until they
+        # are handled and garbadge collected.
+        self.completedTxMesgs = {}
 
         self.resultFd =\
             open(self.simParams.workloadType + '_{0:.2f}'.format(self.simParams.loadFactor), 'w')
@@ -421,13 +439,11 @@ class GreedySRPTOracleScheduler():
             # Find next time to run scheduling
             nextMsgTime = self.trafficData.getNextDueTime()
             nextSchedTime = min(nextMsgTime, self.earliestTxCompletion(self.t))
-            txDuration = nextSchedTime - self.t
-            assert txDuration >= 0
+            assert nextSchedTime >= self.t
 
             # Update state of the system at nextSchedTime for the currently
-            # scheduled (transmitting) mesgs and actively being received messages
-            self.transmitSchedMesgs(self.t, txDuration)
-            self.recvInfilghtBytes(self.t)
+            # scheduled (transmitting) mesgs
+            self.transmitSchedMesgs(self.t, nextSchedTime)
 
             # Update current time
             self.t = nextSchedTime
@@ -445,9 +461,9 @@ class GreedySRPTOracleScheduler():
             # calculate new schedule
             self.scheduleTransmission()
 
-        # Set the current time to infinity and let all inflight bytes to drain out
-        # of network and get delivered at receivers
-        self.recvInfilghtBytes(sys.float_info.max)
+            # Let all inflight bytes belong to fully transmitted messages to drain out
+            # of network and get delivered at receivers
+            self.recvTransmittedMesgs()
 
         self.resultFd.close()
 
@@ -499,7 +515,7 @@ class GreedySRPTOracleScheduler():
                 min(earliestTxCompletionTime, mesg.getTxDuration() + currentTime)
         return earliestTxCompletionTime
 
-    def transmitSchedMesgs(self, currentTime, txDuration):
+    def transmitSchedMesgs(self, currentTime, txStopTime):
         # Transmit from currently scheduled messages starting at currentTime
         # for txDuration time period. The side effect of this call is that,
         # messages whose transmission is not finished, will be unscheduled and
@@ -507,27 +523,26 @@ class GreedySRPTOracleScheduler():
         incompleteTxMesgs = []
         while self.schedMesgs:
             mesg = self.schedMesgs.pop(0)
-            self.activeRxMesgs[mesg.msgId] = mesg
-            if mesg.transmitBytes(txDuration, currentTime):
+            if mesg.transmitBytes(currentTime, txStopTime):
                 incompleteTxMesgs.append(mesg)
+            else:
+                self.completedTxMesgs[mesg.msgId] = mesg
 
         for mesg in incompleteTxMesgs:
             self.pushActiveTxMesg(mesg)
 
-    def recvInfilghtBytes(self, currentTime):
+    def recvTransmittedMesgs(self):
         recvdMesgIds = []
-        for mesgId, mesg in self.activeRxMesgs.iteritems():
-            if not(mesg.recvBytes(currentTime)):
-                recvdMesgIds.append(mesgId)
-        for recvdMesgId in recvdMesgIds:
-            mesg = self.activeRxMesgs[recvdMesgId]
+        for mesgId, mesg in self.completedTxMesgs.iteritems():
+            mesg.recvTransmittedPkts()
             recordLine = '{0}\t{1}\t{2}\t{3:.2f}\t{4}\t{5}\t{6}\t{7}\t{8}\n'.format(
                 mesg.size, mesg.tCreation, mesg.recvTime,
                 (mesg.recvTime-mesg.tCreation)/(mesg.minRecvTime-mesg.tCreation),
                 mesg.msgId, self.ipHostId[mesg.sendrIntIp], ipIntToStr(mesg.sendrIntIp),
                 self.ipHostId[mesg.recvrIntIp], ipIntToStr(mesg.recvrIntIp))
             self.resultFd.write(recordLine)
-            del self.activeRxMesgs[recvdMesgId]
+
+        self.completedTxMesgs.clear()
 
     def hasBytesToTransmit(self):
         return bool(self.schedMesgs) or bool(self.activeTxMesgs)
