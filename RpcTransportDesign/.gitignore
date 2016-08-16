@@ -8,3 +8,4 @@ OMNeT++Simulation/*
 !OMNeT++Simulation/analysis
 !OMNeT++Simulation/test
 !OMNeT++Simulation/scripts
+!OMNeT++Simulation/GreedySRPTOracleScheduler

@@ -19,6 +19,7 @@ import re
 import sys
 import warnings
 sys.path.insert(0, os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
+from parseResultFiles import *
 from MetricsDashBoard import *
 
 def roundLoadFactor(loadFactor):
@@ -44,8 +45,16 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         'MeanStretch'.center(tw_l) + 'MedianStretch'.center(tw_l) +
         '99PercentStretch'.center(tw_l) + '\n')
     for filename in glob(os.path.join(resultDir, '*.sca')):
+
+        sp = ScalarParser(filename) 
         parsedStats = AttrDict()
-        parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
+        parsedStats.hosts = sp.hosts
+        parsedStats.tors = sp.tors
+        parsedStats.aggrs = sp.aggrs
+        parsedStats.cores = sp.cores
+        parsedStats.generalInfo = sp.generalInfo
+
+
         xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
         xmlParsedDic = AttrDict()
         xmlParsedDic = parseXmlFile(xmlConfigFile,parsedStats.generalInfo)
@@ -116,8 +125,15 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
         match = re.match('(\S+)/(\S+)', dirFile)
         transport = match.group(1)
         filename = resultDir + '/' + dirFile
+
+        sp = ScalarParser(filename) 
         parsedStats = AttrDict()
-        parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(filename))
+        parsedStats.hosts = sp.hosts
+        parsedStats.tors = sp.tors
+        parsedStats.aggrs = sp.aggrs
+        parsedStats.cores = sp.cores
+        parsedStats.generalInfo = sp.generalInfo
+
         xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
         xmlParsedDic = AttrDict()
         xmlParsedDic = parseXmlFile(xmlConfigFile,parsedStats.generalInfo)

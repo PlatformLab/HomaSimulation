@@ -17,113 +17,8 @@ import re
 import sys
 import warnings
 
-class AttrDict(dict):
-    """A mapping with string keys that aliases x.y syntax to x['y'] syntax.
-    The attribute syntax is easier to read and type than the item syntax.
-    """
-    def __getattr__(self, name):
-        if name not in self:
-            self[name] = AttrDict()
-        return self[name]
-    def __setattr__(self, name, value):
-        self[name] = value
-    def __delattr__(self, name):
-        del self[name]
-    def assign(self, path, value):
-        """
-        Given a hierarchical path such as 'x.y.z' and
-        a value, perform an assignment as if the statement
-        self.x.y.z had been invoked.
-        """
-        names = path.split('.')
-        container = self
-        for name in names[0:-1]:
-            if name not in container:
-                container[name] = AttrDict()
-            container = container[name]
-        container[names[-1]] = value
-    def access(self, path):
-        """
-        Given a hierarchical path such as 'x.y.z' returns the value as if the
-        statement self.x.y.z had been invoked.
-        """
-        names = path.split('.')
-        container = self
-        for name in names[0:-1]:
-            if name not in container:
-                raise Exception, 'path does not exist: {0}'.format(path)
-                container[name] = AttrDict()
-            container = container[name]
-        return container[names[-1]]
-
-def parse(f):
-    """
-    Scan a result file containing scalar statistics for omnetsimulation, and
-    returns a list of AttrDicts, one containing the metrics for each server.
-    """
-    hosts = AttrDict()
-    tors = AttrDict()
-    aggrs = AttrDict()
-    cores = AttrDict()
-    generalInfo = AttrDict()
-    net = ""
-    for line in f:
-        if not line or line.isspace():
-            break;
-        match = re.match('attr\s+(\S+)\s+(".+"|\S+)', line)
-        if match:
-            generalInfo.assign(match.group(1), match.group(2))
-            if match.group(1) == 'network':
-                net = match.group(2)
-    if net == "":
-        raise Exception, 'no network name in file: {0}'.format(f.name)
-
-    currDict = AttrDict()
-    for line in f:
-        match = re.match('(\S+)\s+{0}\.(([a-zA-Z]+).+\.\S+)\s+(".+"|\S+)\s*(\S*)'.format(net), line)
-        if match:
-            topLevelModule = match.group(3)
-            if topLevelModule == 'tor':
-                currDict = tors
-            elif topLevelModule == 'host':
-                currDict = hosts
-            elif topLevelModule == 'aggRouter':
-                currDict = aggrs
-            elif topLevelModule == 'core':
-                currDict = cores
-            else:
-                raise Exception, 'no such module defined for parser: {0}'.format(topLevelModule)
-            entryType = match.group(1)
-            if entryType == 'statistic':
-                var = match.group(2)+'.'+match.group(4)
-                currDict.assign(var+'.bins', [])
-            elif entryType == 'scalar':
-                var = match.group(2)+'.'+match.group(4)
-                subVar = var + '.value'
-                value = float(match.group(5))
-                currDict.assign(subVar, value)
-            else:
-                raise Exception, '{0}: not defined for this parser'.format(match.group(1))
-            continue
-        match = re.match('(\S+)\s+(".+"|\S+)\s+(".+"|\S+)', line)
-        if not match and not line.isspace():
-            warnings.warn('Parser cant find a match for line: {0}'.format(line), RuntimeWarning)
-        if currDict:
-            entryType = match.group(1)
-            subVar = var + '.' + match.group(2)
-            value = match.group(3)
-            if entryType == 'field':
-                currDict.assign(subVar, float(value))
-            elif entryType == 'attr':
-                currDict.assign(subVar, value)
-            elif entryType == 'bin':
-                subVar = var + '.bins'
-                valuePair = (float(match.group(2)), float(match.group(3)))
-                currDict.access(subVar).append(valuePair)
-            else:
-                warnings.warn('Entry type not known to parser: {0}'.format(entryType), RuntimeWarning)
-    f.close()
-    return hosts, tors, aggrs, cores, generalInfo
+sys.path.insert(0, os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
+from parseResultFiles import *
 
 def copyExclude(source, dest, exclude):
     selectKeys = (key for key in source if key not in exclude)
@@ -1386,8 +1281,14 @@ def main():
     else: 
         xmlConfigFile = 'homatransport/src/dcntopo/config.xml'
 
+    sp = ScalarParser(scalarResultFile) 
     parsedStats = AttrDict()
-    parsedStats.hosts, parsedStats.tors, parsedStats.aggrs, parsedStats.cores, parsedStats.generalInfo  = parse(open(scalarResultFile))
+    parsedStats.hosts = sp.hosts
+    parsedStats.tors = sp.tors
+    parsedStats.aggrs = sp.aggrs
+    parsedStats.cores = sp.cores
+    parsedStats.generalInfo = sp.generalInfo
+
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile, parsedStats.generalInfo)
     queueWaitTimeDigest = AttrDict()
