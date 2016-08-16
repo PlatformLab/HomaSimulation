@@ -272,6 +272,26 @@ class Mesg():
         at sender at time txStart, this method returns the arrival time of last bit of this
         train at the receiver.
         """
+        # Returns the arrival time of last pkt in pkts list when pkts are going
+        # across the network through links with speeds in linkSpeeds list
+        def pktsDeliveryTime(linkSpeeds, pkts):
+            K = len(linkSpeeds) # index of hops starts at zero for sender
+                                # host and K for receiver host 
+            N = len(pkts) # number of packets
+
+            # arrivals[n][k] gives arrival time of pkts[n-1] at hop k.
+            arrivals = [[0]*(K+1) for i in range(N+1)]
+
+            # arrivals[0][:] = 0 (ie. arrival of an imaginary first packet of
+            # mesg or last pkt of previous pkts train) and arrivals[:][0] = 0
+            # (ie. all packets at first hop that is the sender). These remain
+            # zero and considered for correct boundary conditions of the formula
+            for n in range(1,N+1):
+                for k in range(1,K+1):
+                    arrivals[n][k] = pkts[n-1] * 8.0 * 1e-9 / linkSpeeds[k-1] +\
+                        max(arrivals[n-1][k], arrivals[n][k-1])
+            return arrivals[-1][-1]
+
         if self.recvrIntIp == self.sendrIntIp:
             # When sender and receiver are the same machine
             return txStart
@@ -280,38 +300,26 @@ class Mesg():
         fabricSwitchFixDelay = self.simParams.switchFixDelay
         linkDelays = []
         switchFixDelays = []
+        linkSpeeds = []
         totalDelay = 0
-
-        # n is index of pkt in pkts list, k is index of hops starting at zero
-        # for first switch near sender and last being the destination host.
-        pktNArrivalTimeAtHopK =\
-            lambda linkSpeeds, pkts, n, k : 0 if k < 0 or n < 0 else\
-            pkts[n] * 8.0 * 1e-9 / linkSpeeds[k] +\
-            max(pktNArrivalTimeAtHopK(linkSpeeds, pkts, n, k-1),\
-            pktNArrivalTimeAtHopK(linkSpeeds, pkts, n-1, k))
 
         if ((self.sendrIntIp >> 8) & 255) == ((self.recvrIntIp >> 8) & 255):
             # receiver and sender are in same rack
 
-            linkSpeeds = [self.simParams.nicLinkSpeed] * 2
-            numHops = 2 # includes num switches plus the destination
             switchFixDelays += [edgeSwitchFixDelay]
             linkDelays += [self.simParams.edgeLinkDelay] * 2
 
             if not(self.simParams.isFabricCutThrough):
-                totalDelay += pktNArrivalTimeAtHopK(linkSpeeds, txPkts, len(txPkts)-1, numHops-1)
+                linkSpeeds = [self.simParams.nicLinkSpeed] * 2
             else:
-                #Abusing the pktNArrivalTimeAtHopK function
-                totalDelay +=\
-                    pktNArrivalTimeAtHopK([self.simParams.nicLinkSpeed], txPkts,\
-                    len(txPkts)-1, 0)
+                # In order to abuse the pktsDeliveryTime function for finding network
+                # serializaiton delay when switches are cut through, we need to
+                # define linkSpeeds like below
+                linkSpeeds = [self.simParams.nicLinkSpeed]
 
         elif ((self.sendrIntIp >> 16) & 255) == ((self.recvrIntIp >> 16) & 255):
             # receiver and sender are in same pod
-            linkSpeeds =\
-                [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed,\
-                self.simParams.fabricLinkSpeed, self.simParams.nicLinkSpeed]
-            numHops = 4 # includes num switches plus the destination
+
             switchFixDelays +=\
                 [edgeSwitchFixDelay, fabricSwitchFixDelay, edgeSwitchFixDelay]
             linkDelays +=\
@@ -319,20 +327,15 @@ class Mesg():
                 self.simParams.fabricLinkDelay, self.simParams.edgeLinkDelay]
 
             if not(self.simParams.isFabricCutThrough):
-                totalDelay += pktNArrivalTimeAtHopK(linkSpeeds, txPkts, len(txPkts)-1, numHops-1)
+                linkSpeeds =\
+                    [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed,\
+                    self.simParams.fabricLinkSpeed, self.simParams.nicLinkSpeed]
             else:
-                #Abusing the pktNArrivalTimeAtHopK function
-                totalDelay +=\
-                    pktNArrivalTimeAtHopK([self.simParams.nicLinkSpeed,\
-                    self.simParams.fabricLinkSpeed], txPkts, len(txPkts)-1, 1)
+                linkSpeeds = [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed]
 
         elif ((self.sendrIntIp >> 24) & 255) == ((self.recvrIntIp >> 24) & 255):
             # receiver and sender in two different pod
-            linkSpeeds =\
-                [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed,\
-                self.simParams.fabricLinkSpeed, self.simParams.fabricLinkSpeed,\
-                self.simParams.fabricLinkSpeed, self.simParams.nicLinkSpeed]
-            numHops = 6 # includes num switches plus the destination
+
             switchFixDelays +=\
                 [edgeSwitchFixDelay, fabricSwitchFixDelay, fabricSwitchFixDelay,\
                 fabricSwitchFixDelay, edgeSwitchFixDelay]
@@ -342,14 +345,17 @@ class Mesg():
                 self.simParams.fabricLinkDelay, self.simParams.edgeLinkDelay]
 
             if not(self.simParams.isFabricCutThrough):
-                totalDelay += pktNArrivalTimeAtHopK(linkSpeeds, txPkts, len(txPkts)-1, numHops-1)
+                linkSpeeds =\
+                    [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed,\
+                    self.simParams.fabricLinkSpeed, self.simParams.fabricLinkSpeed,\
+                    self.simParams.fabricLinkSpeed, self.simParams.nicLinkSpeed]
             else:
-                #Abusing the pktNArrivalTimeAtHopK function
-                totalDelay +=\
-                    pktNArrivalTimeAtHopK([self.simParams.nicLinkSpeed,\
-                    self.simParams.fabricLinkSpeed], txPkts, len(txPkts)-1, 1)
+                linkSpeeds = [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed]
         else:
             raise Exception, 'Sender and receiver IPs dont abide the rules in config.xml file.'
+
+        # Add network serialization delays at switches and sender nic
+        totalDelay += pktsDeliveryTime(linkSpeeds, txPkts)
 
         # Add fixed delays:
         totalDelay +=\
@@ -363,6 +369,7 @@ class TrafficData:
         self.trafficData = trafficData
         self.hostIdIpAddr = hostIdIpAddr
         self.size = sum([len(hostTraffic) for hostTraffic in trafficData.values()])
+        self.numInitialMesgs = self.size
         self.onDueMesgs = []
         for hostId in trafficData.keys():
             # Populate onDueMesgs with one mesg from each sender
@@ -428,14 +435,24 @@ class GreedySRPTOracleScheduler():
         self.completedTxMesgs = {}
 
         self.resultFd =\
-            open(self.simParams.workloadType + '_{0:.2f}'.format(self.simParams.loadFactor), 'w')
+            open(self.simParams.workloadType + '__{0:.2f}'.format(self.simParams.loadFactor), 'w')
         self.resultFd.write('msgSize\tcreationTime\tcompletionTime\tstretch'
             '\tmsgId\tsendrId\tsenderIp\trecvrId\trecvrIp\n')
 
     def runSimulation(self):
-        pdb.set_trace()
+        nextPrintTime = 0
         while not(self.trafficData.empty()) or self.hasBytesToTransmit():
-            print self.t
+            
+            if int(self.t*1e3) == nextPrintTime:
+                # every 10ms print a progress report
+                nextPrintTime += 10
+                activeMesgs = len(self.activeTxMesgs) + len(self.schedMesgs)
+                mesgsRemained = self.trafficData.size + activeMesgs
+                print('time:{0}, no. mesgs trasmitted: {1}, no. active mesgs: {2}'
+                    ' no. future mesgs: {3}'.format(self.t,
+                    self.trafficData.numInitialMesgs - mesgsRemained, activeMesgs,
+                    self.trafficData.size))
+
             # Find next time to run scheduling
             nextMsgTime = self.trafficData.getNextDueTime()
             nextSchedTime = min(nextMsgTime, self.earliestTxCompletion(self.t))
@@ -464,7 +481,7 @@ class GreedySRPTOracleScheduler():
             # Let all inflight bytes belong to fully transmitted messages to drain out
             # of network and get delivered at receivers
             self.recvTransmittedMesgs()
-
+        
         self.resultFd.close()
 
     def scheduleTransmission(self):
