@@ -14,6 +14,7 @@ from numpy import *
 from glob import glob
 from optparse import OptionParser
 from pprint import pprint
+import bisect
 import pdb
 
 sys.path.insert(0, os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
@@ -144,7 +145,7 @@ class Mesg():
         self.pktsInflight = []
         self.pktsRecvd = []
         self.recvTime = tCreation
-        self.minRecvTime =\
+        self.minRecvTime, pktArrivalsAtHops =\
             self.pktsRecvTime(self.tCreation, [sum(pkt) for pkt in self.txPkts])
 
     def __lt__(self, other):
@@ -245,19 +246,20 @@ class Mesg():
         # For a fully transmitted message, return time at which the message is
         # fully delivered at receiver.
         assert self.bytesToSend == 0
-        recvTime = self.tCreation
         dataBytesRecvd = 0
+        pktsRecvTimeAtRecvr = self.tCreation
+        pktsArrivalsAtHops = None
         for i, pktTrain in enumerate(self.pktsInflight):
             tStart = pktTrain[0]
             tStop = pktTrain[1]
             dataBytesSentInPkt = pktTrain[2] 
             inflightPkts = pktTrain[3]
             dataBytesRecvd += dataBytesSentInPkt
-            pktsRecvTimeAtRx = self.pktsRecvTime(tStart, inflightPkts)
-            recvTime = max(recvTime, pktsRecvTimeAtRx)
-            self.pktsRecvd.append((tStart, tStop, pktsRecvTimeAtRx, dataBytesSentInPkt, inflightPkts))
+            pktsRecvTimeAtRecvr, pktsArrivalsAtHops =\
+                self.pktsRecvTime(tStart, inflightPkts, pktsArrivalsAtHops)
+            self.pktsRecvd.append((tStart, tStop, pktsRecvTimeAtRecvr, dataBytesSentInPkt, inflightPkts))
 
-        self.recvTime = recvTime
+        self.recvTime = pktsRecvTimeAtRecvr
         assert self.bytesToRecv == dataBytesRecvd
         self.bytesToRecv -= dataBytesRecvd 
 
@@ -266,11 +268,12 @@ class Mesg():
         txBytesOnWire = sum(self.txPkts)
         return (txBytesOnWire * 8.0 * 1e-9) / self.simParams.nicLinkSpeed
 
-    def pktsRecvTime(self, txStart, txPkts):
+    def pktsRecvTime(self, txStart, txPkts, prevPktArrivals=None):
         """
         For a train of txPkts as [pkt0.byteOnWire, pkt1.byteOnWire,.. ] that start transmission
         at sender at time txStart, this method returns the arrival time of last bit of this
-        train at the receiver.
+        train at the receiver. prevPktArrivals is the arrival times of
+        txPkts train prior this one for this message.
         """
         # Returns the arrival time of last pkt in pkts list when pkts are going
         # across the network through links with speeds in linkSpeeds list
@@ -283,14 +286,22 @@ class Mesg():
             arrivals = [[0]*(K+1) for i in range(N+1)]
 
             # arrivals[0][:] = 0 (ie. arrival of an imaginary first packet of
-            # mesg or last pkt of previous pkts train) and arrivals[:][0] = 0
-            # (ie. all packets at first hop that is the sender). These remain
-            # zero and considered for correct boundary conditions of the formula
+            # mesg or last pkt of previous txPkts train) and
+            # arrivals[:][0] = txStart (ie. all packets at first hop that is the
+            # sender). These are considered for correct boundary conditions of
+            # the formula
+            if prevPktArrivals:
+                arrivals[0][:] = prevPktArrivals
+
+            for i in range(N+1):
+                arrivals[i][0] = txStart
+
             for n in range(1,N+1):
                 for k in range(1,K+1):
                     arrivals[n][k] = pkts[n-1] * 8.0 * 1e-9 / linkSpeeds[k-1] +\
                         max(arrivals[n-1][k], arrivals[n][k-1])
-            return arrivals[-1][-1]
+
+            return arrivals[-1][:]
 
         if self.recvrIntIp == self.sendrIntIp:
             # When sender and receiver are the same machine
@@ -355,14 +366,15 @@ class Mesg():
             raise Exception, 'Sender and receiver IPs dont abide the rules in config.xml file.'
 
         # Add network serialization delays at switches and sender nic
-        totalDelay += pktsDeliveryTime(linkSpeeds, txPkts)
+        pktArrivalsAtHops = pktsDeliveryTime(linkSpeeds, txPkts)
+        totalDelay += pktArrivalsAtHops[-1]
 
         # Add fixed delays:
         totalDelay +=\
             self.simParams.hostSwTurnAroundTime * 2 + self.simParams.hostNicSxThinkTime +\
             sum(linkDelays) + sum(switchFixDelays)
 
-        return txStart + totalDelay
+        return totalDelay, pktArrivalsAtHops
 
 class TrafficData:
     def __init__(self, trafficData, hostIdIpAddr):
@@ -436,7 +448,7 @@ class GreedySRPTOracleScheduler():
 
         self.resultFd =\
             open(self.simParams.workloadType + '__{0:.2f}'.format(self.simParams.loadFactor), 'w')
-        self.resultFd.write('msgSize\tcreationTime\tcompletionTime\tstretch'
+        self.resultFd.write('msgSize\tmsgSizeOnWire\tsizeHistBin\tcreationTime\tcompletionTime\tstretch'
             '\tmsgId\tsendrId\tsenderIp\trecvrId\trecvrIp\n')
 
     def runSimulation(self):
@@ -552,8 +564,13 @@ class GreedySRPTOracleScheduler():
         recvdMesgIds = []
         for mesgId, mesg in self.completedTxMesgs.iteritems():
             mesg.recvTransmittedPkts()
-            recordLine = '{0}\t{1}\t{2}\t{3:.2f}\t{4}\t{5}\t{6}\t{7}\t{8}\n'.format(
-                mesg.size, mesg.tCreation, mesg.recvTime,
+            histBinInd = bisect.bisect_left(self.simParams.msgSizeRanges, mesg.size)
+            histBin =\
+                'inf' if histBinInd==len(self.simParams.msgSizeRanges)\
+                else self.simParams.msgSizeRanges[histBinInd]
+            recordLine =\
+                '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\t\t{10}\n'.format(
+                mesg.size, mesg.sizeOnWire, histBin, mesg.tCreation, mesg.recvTime,
                 (mesg.recvTime-mesg.tCreation)/(mesg.minRecvTime-mesg.tCreation),
                 mesg.msgId, self.ipHostId[mesg.sendrIntIp], ipIntToStr(mesg.sendrIntIp),
                 self.ipHostId[mesg.recvrIntIp], ipIntToStr(mesg.recvrIntIp))
