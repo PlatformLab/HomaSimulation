@@ -10,7 +10,7 @@ option_list = list(
     make_option(
         c("-i", "--infile"),
         type="character",
-        default="./FABRICATED_HEAVY_MIDDLE__77.50",
+        default="FACEBOOK_HADOOP_ALL__77.50",
         help="Result file out of GreedySRPTOracleScheduler simulator",
         metavar="/path/to/file/filename"),
     make_option(
@@ -29,7 +29,6 @@ if (opt$infile == option_list[[1]]@default) {
 if (opt$outpath == option_list[[2]]@default) {
     print(sprintf("Using default value for --outpath arg: %s", opt$outpath));
 }
-
 
 # Read simulation results from file
 simResult <- read.table(opt$infile, col.names=c("mesgSize", "mesgSizeOnWire", "sizeHistBin",
@@ -76,28 +75,30 @@ for (statName in names(stretchStats)[-1]) {
     i <- i+1
     txtYlim <- sprintf("pmin(%d/2, %s/2)",yLimit, statName) 
     txtLabel <- sprintf("paste(sizeHistBin, \":\", format(%s, digits=3))", statName)
+    plotTitle = sprintf("%s VS. Cummulative Mesg Size Fraction", statName)
 
     plotList[[i]] <- ggplot(stretch, aes_string(x="cumCntFrac-cntFrac/2", y= statName, width="cntFrac")) + 
         geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-        geom_text(data=stretch, aes_string(x="cumCntFrac", y=txtYlim, label=txtLabel, angle="90", size="11")) +
+        geom_text(data=stretch, aes_string(x="cumCntFrac", y=txtYlim, label=txtLabel, angle="90", size="20")) +
         theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
             strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
             plot.title = element_text(size = titleSize)) +
         scale_x_continuous(breaks = stretch$cumCntFrac, labels=as.character(round(stretch$cumCntFrac,2))) +
-        coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE))))
 
+        coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE)))) +
+        labs(title = plotTitle, x = "Cumulative Mesg Size Fraction", y = statName)
 
     i <- i+1
+    plotTitle = sprintf("%s VS. Cummulative Mesg Bytes Fraction", statName)
     plotList[[i]] <- ggplot(stretch, aes_string(x="cumBytesFrac-bytesFrac/2", y= statName, width="bytesFrac")) + 
         geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-        geom_text(data=stretch, aes_string(x="cumBytesFrac", y=txtYlim, label=txtLabel, angle="90", size="11"))+
+        geom_text(data=stretch, aes_string(x="cumBytesFrac", y=txtYlim, label=txtLabel, angle="90", size="20"))+
         theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
             strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
             plot.title = element_text(size = titleSize)) +
         scale_x_continuous(breaks = stretch$cumBytesFrac, labels=as.character(round(stretch$cumCntFrac,2))) +
-        coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE))))
-
-
+        coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE)))) +
+        labs(title = plotTitle, x = "Cumulative Mesg Bytes Fraction", y = statName)
 }
 
 pdf(sprintf("%s/Stretch.pdf", opt$outpath), width=40*2, height=15*i/2)
