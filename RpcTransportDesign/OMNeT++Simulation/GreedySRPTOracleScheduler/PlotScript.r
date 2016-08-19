@@ -37,6 +37,7 @@ simResult <- read.table(opt$infile, col.names=c("mesgSize", "mesgSizeOnWire", "s
 
 #simResult <- read.table("FACEBOOK_HADOOP_ALL__77.50", col.names=c("mesgSize", "mesgSizeOnWire", "sizeHistBin",
 #    "creationTime", "completionTime", "stretch", "mesgId", "senderId", "senderIP", "recvrId", "recvrIP"), skip=1)
+#opt <- list(); opt$outpath =  "./plots"
 
 simResult <- simResult[order(simResult$sizeHistBin, simResult$stretch),]
 simResult$mesgSizeOnWire <- as.numeric(simResult$mesgSizeOnWire)
@@ -66,24 +67,40 @@ stretchStats <- merge(stretchStats, stretchMean)
 stretch <- merge(sizeStats, stretchStats)
 
 # Plot Stretch
+textSize <- 35
+titleSize <- 30
 yLimit <- 25
 plotList <- list()
 i <- 0
 for (statName in names(stretchStats)[-1]) {
     i <- i+1
-    #txtYlim <- sprintf("pmin(%d/2, %s/2)",yLimit, statName) 
+    txtYlim <- sprintf("pmin(%d/2, %s/2)",yLimit, statName) 
+    txtLabel <- sprintf("paste(sizeHistBin, \":\", format(%s, digits=3))", statName)
+
     plotList[[i]] <- ggplot(stretch, aes_string(x="cumCntFrac-cntFrac/2", y= statName, width="cntFrac")) + 
-        geom_bar(stat="identity", position="identity", fill="white", color="darkgreen")
-        #+ geom_text(data=stretch, aes_string(x="cumCntFract", y=txtYlim), angle=90, size=11)
+        geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
+        geom_text(data=stretch, aes_string(x="cumCntFrac", y=txtYlim, label=txtLabel, angle="90", size="11")) +
+        theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+            strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+            plot.title = element_text(size = titleSize)) +
+        scale_x_continuous(breaks = stretch$cumCntFrac, labels=as.character(round(stretch$cumCntFrac,2))) +
+        coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE))))
+
 
     i <- i+1
     plotList[[i]] <- ggplot(stretch, aes_string(x="cumBytesFrac-bytesFrac/2", y= statName, width="bytesFrac")) + 
-        geom_bar(stat="identity", position="identity", fill="white", color="darkgreen")
-        #+ geom_text(data=stretch, aes_string(x="cumCntFract", y=txtYlim), angle=90, size=11)
+        geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
+        geom_text(data=stretch, aes_string(x="cumBytesFrac", y=txtYlim, label=txtLabel, angle="90", size="11"))+
+        theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+            strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
+            plot.title = element_text(size = titleSize)) +
+        scale_x_continuous(breaks = stretch$cumBytesFrac, labels=as.character(round(stretch$cumCntFrac,2))) +
+        coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE))))
+
+
 }
 
-pdf(sprintf("%s/Stretch.pdf", opt$outpath), width=20*2, height=15*i/2)
+pdf(sprintf("%s/Stretch.pdf", opt$outpath), width=40*2, height=15*i/2)
 args.list <- c(plotList, list(ncol=2))
 do.call(grid.arrange, args.list)
 dev.off()
-
