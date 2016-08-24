@@ -10,7 +10,7 @@ option_list = list(
     make_option(
         c("-i", "--infile"),
         type="character",
-        default="FACEBOOK_HADOOP_ALL__77.50",
+        default="FABRICATED_HEAVY_MIDDLE__81.38",
         help="Result file out of GreedySRPTOracleScheduler simulator",
         metavar="/path/to/file/filename"),
     make_option(
@@ -30,16 +30,30 @@ if (opt$outpath == option_list[[2]]@default) {
     print(sprintf("Using default value for --outpath arg: %s", opt$outpath));
 }
 
-# Read simulation results from file
-simResult <- read.table(opt$infile, col.names=c("mesgSize", "mesgSizeOnWire", "sizeHistBin",
-    "creationTime", "completionTime", "stretch", "mesgId", "senderId", "senderIP", "recvrId", "recvrIP"), skip=1)
+# Read simulation results from file, if a row is malformed, use NA for it
+simResultRaw <- read.table(opt$infile, col.names=c("mesgSize", "mesgSizeOnWire", "sizeHistBin",
+    "creationTime", "completionTime", "stretch", "mesgId", "senderId", "senderIP", "recvrId", "recvrIP"),
+    skip=1, fill=TRUE)
 
-#simResult <- read.table("FACEBOOK_HADOOP_ALL__77.50", col.names=c("mesgSize", "mesgSizeOnWire", "sizeHistBin",
-#    "creationTime", "completionTime", "stretch", "mesgId", "senderId", "senderIP", "recvrId", "recvrIP"), skip=1)
-#opt <- list(); opt$outpath =  "./plots"
+#remove NA rows
+na_rows <- complete.cases(simResultRaw)
+simResult <- simResultRaw[na_rows,]
 
-simResult <- simResult[order(simResult$sizeHistBin, simResult$stretch),]
-simResult$mesgSizeOnWire <- as.numeric(simResult$mesgSizeOnWire)
+#simResult <- simResult[order(simResult$sizeHistBin, simResult$stretch),]
+asNumeric <- function(simResult, colNames)
+{
+    # For the columns that are recorded as factor or integer, we need converti
+    # them to numeric otherwise we may encounter errors later.
+    for (colName in colNames) {
+        if (is.factor(simResult[[colName]])) {
+            simResult[[colName]] <- as.numeric(levels(simResult[[colName]]))[simResult[[colName]]]
+        } else {
+            simResult[[colName]] <- as.numeric(simResult[[colName]])
+        }
+    }
+    return(simResult)
+}
+simResult <- asNumeric(simResult, c("mesgSize", "mesgSizeOnWire", "sizeHistBin", "creationTime", "completionTime", "stretch", "mesgId", "senderId", "recvrId"))
 
 # calculate size distribution statistics
 sizeStats <- aggregate(mesgSizeOnWire~sizeHistBin, simResult, sum)
@@ -56,7 +70,7 @@ sizeStats$cumBytesFrac <- cumsum(sizeStats$bytesFrac)
 # Find stretch stats
 stretchStats <- aggregate(stretch~sizeHistBin, simResult, quantile, c(0,0.5,.99,1))
 tmp <- data.frame(stretchStats$stretch)
-stretchStats <- data.frame(stretchStats$sizeHistBin, tmp) 
+stretchStats <- data.frame(stretchStats$sizeHistBin, tmp)
 names(stretchStats) <- c('sizeHistBin', 'min', 'median','NinetyNinePct', 'max')
 stretchMean <- aggregate(stretch~sizeHistBin, simResult, mean)
 names(stretchMean)[2] <- 'mean'
@@ -64,6 +78,7 @@ stretchStats <- merge(stretchStats, stretchMean)
 
 # Size and stretch stats combines
 stretch <- merge(sizeStats, stretchStats)
+stretch <- stretch[order(stretch$sizeHistBin),]
 
 # Plot Stretch
 textSize <- 35
@@ -73,11 +88,11 @@ plotList <- list()
 i <- 0
 for (statName in names(stretchStats)[-1]) {
     i <- i+1
-    txtYlim <- sprintf("pmin(%d/2, %s/2)",yLimit, statName) 
+    txtYlim <- sprintf("pmin(%d/2, %s/2)",yLimit, statName)
     txtLabel <- sprintf("paste(sizeHistBin, \":\", format(%s, digits=3))", statName)
     plotTitle = sprintf("%s VS. Cummulative Mesg Size Fraction", statName)
 
-    plotList[[i]] <- ggplot(stretch, aes_string(x="cumCntFrac-cntFrac/2", y= statName, width="cntFrac")) + 
+    plotList[[i]] <- ggplot(stretch, aes_string(x="cumCntFrac-cntFrac/2", y= statName, width="cntFrac")) +
         geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
         geom_text(data=stretch, aes_string(x="cumCntFrac", y=txtYlim, label=txtLabel, angle="90", size="20")) +
         theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
@@ -90,7 +105,7 @@ for (statName in names(stretchStats)[-1]) {
 
     i <- i+1
     plotTitle = sprintf("%s VS. Cummulative Mesg Bytes Fraction", statName)
-    plotList[[i]] <- ggplot(stretch, aes_string(x="cumBytesFrac-bytesFrac/2", y= statName, width="bytesFrac")) + 
+    plotList[[i]] <- ggplot(stretch, aes_string(x="cumBytesFrac-bytesFrac/2", y= statName, width="bytesFrac")) +
         geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
         geom_text(data=stretch, aes_string(x="cumBytesFrac", y=txtYlim, label=txtLabel, angle="90", size="20"))+
         theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
