@@ -17,6 +17,13 @@
 #include "transport/HomaTransport.h"
 #include "transport/PriorityResolver.h"
 
+/**
+ * This module is an essential part of receiver driven congestion control
+ * mechansim of HomaTransport. Providing the highest priority outstanding
+ * message, this module determines whether grant can be sent for that message
+ * and what the priority the grant must be sent.
+ */
+
 class TrafficPacer
 {
   PUBLIC:
