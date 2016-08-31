@@ -111,7 +111,7 @@ for (statName in names(stretchStats)[-1]) {
         theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
             strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
             plot.title = element_text(size = titleSize)) +
-        scale_x_continuous(breaks = stretch$cumBytesFrac, labels=as.character(round(stretch$cumCntFrac,2))) +
+        scale_x_continuous(breaks = stretch$cumBytesFrac, labels=as.character(round(stretch$cumBytesFrac,2))) +
         coord_cartesian(ylim=c(0, min(yLimit, max(stretch[[statName]], na.rm=TRUE)))) +
         labs(title = plotTitle, x = "Cumulative Mesg Bytes Fraction", y = statName)
 }
