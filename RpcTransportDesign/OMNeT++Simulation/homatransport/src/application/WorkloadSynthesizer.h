@@ -19,6 +19,7 @@
 #include <omnetpp.h>
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <sstream>
 #include "inet/networklayer/common/L3Address.h"
 #include "common/Minimal.h"
@@ -44,7 +45,10 @@ class WorkloadSynthesizer : public cSimpleModule
     // generates samples from the a given random distribution
     MsgSizeDistributions *msgSizeGenerator;
 
-    // parameters
+    /*******************************
+     *          parameters         *
+     *******************************/
+    // contains destination addresses as specified in config.xml for each host.
     std::vector<inet::L3Address> destAddresses;
     simtime_t startTime;
     simtime_t stopTime;
@@ -67,6 +71,9 @@ class WorkloadSynthesizer : public cSimpleModule
     cMessage* selfMsg;
     inet::L3Address srcAddress;
     int sendMsgSize; // In bytes
+    int nextDestHostId; // -1 means the destination must be chosen
+                        // randomely based on config.xml information.
+    std::unordered_map<int, inet::L3Address> hostIdAddrMap;
 
     // statistics
     int numSent;

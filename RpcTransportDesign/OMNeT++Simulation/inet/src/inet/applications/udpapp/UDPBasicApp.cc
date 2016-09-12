@@ -121,8 +121,10 @@ void UDPBasicApp::sendPacket()
     L3Address destAddr = chooseDestAddr();
     int maxUdpPayloadSize = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE - UDP_HEADER_SIZE;
     int udpMsgBytes;
+    int dummyDestHostId;
     double dummyInterArrival;
-    msgSizeGenerator.getSizeAndInterarrival(udpMsgBytes, dummyInterArrival);
+    msgSizeGenerator.getSizeAndInterarrival(udpMsgBytes, dummyDestHostId,
+        dummyInterArrival);
     char msgName[32];
     if (udpMsgBytes == 0) {
         sprintf(msgName, "UDPBasicAppData-%d", numSent);

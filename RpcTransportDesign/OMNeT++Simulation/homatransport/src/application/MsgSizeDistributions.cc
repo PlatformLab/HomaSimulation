@@ -19,7 +19,7 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         int maxDataBytesPerPkt, InterArrivalDist interArrivalDist,
         DistributionChoice sizeDistSelector, double avgRate, int callerHostId)
     : msgSizeProbDistVector()
-    , msgSizeInterarrivalQueue()
+    , msgSizeDestInterarrivalQueue()
     , sizeDistSelector(sizeDistSelector)
     , interArrivalDist(interArrivalDist)
     , avgMsgSize(0.0)
@@ -50,15 +50,17 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
         ASSERT(interArrivalDist == InterArrivalDist::INTERARRIVAL_IN_FILE);
         double dt = 0.0;
         std::string hostIdSizeInterarrivalLine;
-        int hostId;
+        int srcHostId;
+        int destHostId;
         int msgSize;
         double deltaTime;
         while (getline(distFileStream, hostIdSizeInterarrivalLine)) {
-            sscanf(hostIdSizeInterarrivalLine.c_str(), "%d %d %lf",
-                    &hostId, &msgSize, &deltaTime);
+            sscanf(hostIdSizeInterarrivalLine.c_str(), "%d %d %d %lf",
+                    &srcHostId, &destHostId, &msgSize, &deltaTime);
             dt += deltaTime;
-            if (hostId == callerHostId) {
-                msgSizeInterarrivalQueue.push(std::make_pair(msgSize, dt));
+            if (srcHostId == callerHostId) {
+                msgSizeDestInterarrivalQueue.push(
+                    std::make_tuple(msgSize, destHostId, dt));
                 dt = 0.0;
             }
         }
@@ -91,10 +93,12 @@ MsgSizeDistributions::MsgSizeDistributions(const char* distFileName,
 }
 
 void
-MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
+MsgSizeDistributions::getSizeAndInterarrival(int &msgSize, int &destHostId,
         double &nextInterarrivalTime)
 {
-    std::pair<int, double> sizeInterarrivalPair;
+    // Default value -1 if not destHostId is determined in the files. In which
+    // case, the destination will be chosen based on the config.xml file.
+    destHostId = -1;
     switch(sizeDistSelector) {
         case DistributionChoice::DCTCP:
         case DistributionChoice::FACEBOOK_WEB_SERVER_INTRACLUSTER:
@@ -109,7 +113,8 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
             getFacebookSizeInterarrival(msgSize, nextInterarrivalTime);
             return;
         case DistributionChoice::SIZE_IN_FILE:
-            getInfileSizeInterarrival(msgSize, nextInterarrivalTime);
+            getInfileSizeInterarrivalDest(msgSize, destHostId, 
+                nextInterarrivalTime);
             return;
         default:
             msgSize = -1;
@@ -119,20 +124,21 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize,
 }
 
 void
-MsgSizeDistributions::getInfileSizeInterarrival(int &msgSize,
-        double &nextInterarrivalTime)
+MsgSizeDistributions::getInfileSizeInterarrivalDest(int &msgSize,
+    int &destHostId, double &nextInterarrivalTime)
 {
     ASSERT(interArrivalDist == InterArrivalDist::INTERARRIVAL_IN_FILE);
-    if (msgSizeInterarrivalQueue.empty()) {
+    if (msgSizeDestInterarrivalQueue.empty()) {
         msgSize = -1;
         nextInterarrivalTime = 0.0;
         return;
     }
 
-    msgSizeInterarrivalQueue.front();
-    msgSize = msgSizeInterarrivalQueue.front().first;
-    nextInterarrivalTime = msgSizeInterarrivalQueue.front().second;
-    msgSizeInterarrivalQueue.pop();
+    auto msgTuple = msgSizeDestInterarrivalQueue.front();
+    msgSize = std::get<0>(msgTuple);
+    destHostId = std::get<1>(msgTuple);
+    nextInterarrivalTime = std::get<2>(msgTuple);
+    msgSizeDestInterarrivalQueue.pop();
     return;
 }
 

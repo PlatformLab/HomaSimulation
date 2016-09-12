@@ -35,6 +35,8 @@ WorkloadSynthesizer::WorkloadSynthesizer()
     selfMsg = NULL;
     isSender = false;
     sendMsgSize = -1;
+    nextDestHostId = -1;
+    hostIdAddrMap.clear();
 }
 
 WorkloadSynthesizer::~WorkloadSynthesizer()
@@ -320,6 +322,14 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
     const char *token;
     while((token = tokenizer.nextToken()) != NULL) {
         cModule* mod = simulation.getModuleByPath(token);
+        inet::L3Address result;
+        inet::L3AddressResolver().tryResolve(token, result);
+        if (result.isUnspecified()) {
+            EV_ERROR << "cannot resolve destination address: "
+                    << token << endl;
+        }
+        hostIdAddrMap[mod->getIndex()] = result;
+
         if (!destHostIds.empty()) {
             if (destHostIds.count(-1)) {
                 // Don't include this host (ie loopback) to the set of possible
@@ -330,12 +340,6 @@ WorkloadSynthesizer::parseAndProcessXMLConfig()
             } else if (!destHostIds.count(mod->getIndex())) {
                 continue;
             }
-        }
-        inet::L3Address result;
-        inet::L3AddressResolver().tryResolve(token, result);
-        if (result.isUnspecified()) {
-            EV_ERROR << "cannot resolve destination address: "
-                    << token << endl;
         }
         destAddresses.push_back(result);
     }
@@ -387,7 +391,12 @@ WorkloadSynthesizer::chooseDestAddr()
 void
 WorkloadSynthesizer::sendMsg()
 {
-    inet::L3Address destAddrs = chooseDestAddr();
+    inet::L3Address destAddrs;
+    if (nextDestHostId == -1) {
+        destAddrs = chooseDestAddr();
+    } else {
+        destAddrs = hostIdAddrMap[nextDestHostId];
+    }
     char msgName[100];
     sprintf(msgName, "WorkloadSynthesizerMsg-%d", numSent);
     AppMessage *appMessage = new AppMessage(msgName);
@@ -458,7 +467,8 @@ void
 WorkloadSynthesizer::setupNextSend()
 {
     double nextSendInterval;
-    msgSizeGenerator->getSizeAndInterarrival(sendMsgSize, nextSendInterval);
+    msgSizeGenerator->getSizeAndInterarrival(sendMsgSize, nextDestHostId,
+        nextSendInterval);
     simtime_t nextSendTime = nextSendInterval + simTime();
     if (sendMsgSize < 0 || nextSendTime > stopTime) {
         selfMsg->setKind(STOP);
