@@ -32,7 +32,7 @@ HomaMsgSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
             HomaTransport::OutboundMessage* outMsg;
             HomaTransport* transport = homaPkt->ownerTransport;
             if ((inbndMsg =
-                    transport->rxScheduler.lookupIncompleteRxMsg(homaPkt))) {
+                    transport->rxScheduler.lookupInboundMesg(homaPkt))) {
                 msgSize = inbndMsg->getMsgSize();
             } else {
                 outMsg = &(transport->sxController.getOutboundMsgMap()->at(

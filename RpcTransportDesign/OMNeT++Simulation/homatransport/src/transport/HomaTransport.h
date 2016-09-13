@@ -301,9 +301,16 @@ class HomaTransport : public cSimpleModule
             bool operator()(const InboundMessage* msg1,
                 const InboundMessage* msg2)
             {
-                return (msg1->bytesToGrant > msg2->bytesToGrant) ||
+                return (msg1->bytesToGrant < msg2->bytesToGrant) ||
                     (msg1->bytesToGrant == msg2->bytesToGrant &&
-                    msg1->msgCreationTime > msg2->msgCreationTime);
+                        msg1->msgSize < msg2->msgSize) ||
+                    (msg1->bytesToGrant == msg2->bytesToGrant &&
+                        msg1->msgSize == msg2->msgSize &&
+                        msg1->msgCreationTime < msg2->msgCreationTime) ||
+                    (msg1->bytesToGrant == msg2->bytesToGrant &&
+                        msg1->msgSize == msg2->msgSize &&
+                        msg1->msgCreationTime == msg2->msgCreationTime &&
+                        msg1->msgIdAtSender < msg2->msgIdAtSender);
             }
         };
         const uint32_t& getMsgSize() { return msgSize; }
@@ -331,9 +338,13 @@ class HomaTransport : public cSimpleModule
         // send for this message.
         uint32_t bytesToGrant;
 
-        // Tracks the total number of bytes scheduled (granted) for this
+        // Tracks the total number of data bytes scheduled (granted) for this
         // messages but has not yet been received.
         uint32_t bytesGrantedInFlight;
+
+        // Total number of bytes inflight for this message including all
+        // different header bytes and ethernet overhead bytes.
+        uint32_t totalBytesInFlight;
 
         // Tracks the total number of bytes that has not yet been received for
         // this message. The message is complete when this value reaches zero
@@ -379,7 +390,7 @@ class HomaTransport : public cSimpleModule
         //***************************************************************//
         std::vector<uint64_t> bytesRecvdPerPrio;
         std::vector<uint64_t> scheduledBytesPerPrio;
-        std::vector<uint64_t> unschedToReceivePerPrio;
+        std::vector<uint64_t> unschedToRecvPerPrio;
 
         //***************************************************************//
         //****Below variables are snapshots, first after construction****//
@@ -396,7 +407,7 @@ class HomaTransport : public cSimpleModule
 
       PROTECTED:
         void copy(const InboundMessage& other);
-        void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd);
+        void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd, PktType pktType);
         uint32_t schedBytesInFlight();
         uint32_t unschedBytesInFlight();
         HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
@@ -413,33 +424,9 @@ class HomaTransport : public cSimpleModule
     class ReceiveScheduler
     {
       PUBLIC:
-        enum QueueType
-        {
-            PRIO_QUEUE = 0,
-            FIFO_QUEUE = 1,
-            INVALID_TYPE = 2
-        };
-
-        class InboundMsgQueue
-        {
-          PUBLIC:
-            typedef std::priority_queue<InboundMessage*,
-                std::vector<InboundMessage*>,
-                InboundMessage::CompareBytesToGrant> PriorityQueue;
-
-            explicit InboundMsgQueue();
-            void initialize (QueueType queueType);
-            void push(InboundMessage* inboundMsg);
-            InboundMessage* top();
-            void pop();
-            bool empty();
-            size_t size();
-
-          PRIVATE:
-            PriorityQueue prioQueue;
-            std::queue<InboundMessage*> fifoQueue;
-            QueueType queueType;
-        };
+        explicit ReceiveScheduler(HomaTransport* transport);
+        ~ReceiveScheduler();
+        InboundMessage* lookupInboundMesg(HomaPkt* rxPkt) const;
 
         class UnschedRateComputer {
           PUBLIC:
@@ -456,36 +443,97 @@ class HomaTransport : public cSimpleModule
             HomaConfigDepot* homaConfig;
         };
 
-        typedef std::unordered_map<uint64_t, std::list<InboundMessage*>>
-            InboundMsgsMap;
+        class SenderState {
+          PUBLIC:
+            SenderState(inet::IPv4Address srcAddr,
+                ReceiveScheduler* rxScheduler, cMessage* grantTimer,
+                HomaConfigDepot* homaConfig);
+            ~SenderState(){}
+            simtime_t getNextGrantTime(simtime_t currentTime, uint32_t grantSize);
+            int sendAndScheduleGrant(uint32_t grantPrio);
+            int handleInboundPkt(HomaPkt* rxPkt);
 
-        explicit ReceiveScheduler(HomaTransport* transport);
-        ~ReceiveScheduler();
-        void processReceivedPkt(HomaPkt* rxPkt);
-        void sendAndScheduleGrant();
-        void initialize(HomaConfigDepot* homaConfig, cMessage* grantTimer,
-            PriorityResolver* prioResolver);
-        InboundMessage* lookupIncompleteRxMsg(HomaPkt* rxPkt);
+          PROTECTED:
+            HomaConfigDepot* homaConfig;
+            ReceiveScheduler* rxScheduler;
+
+            // Timer object for sending grants for this sender. Will be used
+            // for sending grants for this sender if totalBytesInFlight for the
+            // top mesg of this sender is less than RTT.
+            cMessage* grantTimer;
+            inet::IPv4Address senderAddr;
+
+            // A sorted list of sched messages that need grants from the sender.
+            std::set<InboundMessage*, InboundMessage::CompareBytesToGrant>
+                mesgsToGrant;
+
+            // Map of all incomplete inboundMsgs from the sender hashed by msgId
+            std::unordered_map<uint64_t, InboundMessage*> incompleteMesgs;
+
+            // Priority of last sent grant
+            uint32_t lastGrantPrio;
+            // Index of this sender in SchedSenders as of last time
+            // grant was sent
+            uint32_t lastIdx;
+
+            friend class HomaTransport::ReceiveScheduler;
+        };
+
+        class SchedSenders {
+          PUBLIC:
+            SchedSenders(HomaConfigDepot* homaConfig);
+            ~SchedSenders();
+            std::pair<int, int> insPoint(SenderState* s);
+            void insert(SenderState* s);
+            int remove(SenderState* s);
+            SenderState* removeAt(uint32_t rmInd);
+            void handleGrantRequest(SenderState* s, int sInd, int headInd);
+
+            class CompSched {
+              PUBLIC:
+                CompSched(){}
+                bool operator()(const SenderState* lhs, const SenderState* rhs)
+                {
+                    if (!lhs && !rhs)
+                        return false;
+                    if (!lhs && rhs)
+                        return true;
+                    if (lhs && !rhs)
+                        return false;
+
+                    InboundMessage::CompareBytesToGrant cbg;
+                    return cbg(*lhs->mesgsToGrant.begin(), *rhs->mesgsToGrant.begin());
+                }
+            };
+
+          PROTECTED:
+            std::vector<SenderState*> senders;
+            uint16_t schedPrios;
+            uint16_t numToGrant;
+            uint32_t headIdx;
+            uint32_t numSenders;
+            HomaConfigDepot* homaConfig;
+            friend class HomaTransport::ReceiveScheduler;
+        };
 
       PROTECTED:
         HomaTransport* transport;
         HomaConfigDepot *homaConfig;
-        cMessage* grantTimer;
-        TrafficPacer* trafficPacer;
         UnschedRateComputer* unschRateComp;
-
-        // A container for incomplete messages that are sorted based on the
-        // remaining bytes to grant.
-        InboundMsgQueue inboundMsgQueue;
-
-        // Keeps a hash map of all incomplete inboundMsgs from their msgId key.
-        // the value of the map is list of all messages with the same msgId from
-        // different senders.
-        InboundMsgsMap incompleteRxMsgs;
+        std::unordered_map<uint32_t, SenderState*> ipSendersMap;
+        std::unordered_map<cMessage*, SenderState*> grantTimersMap;
+        SchedSenders* schedSenders;
 
         //*******************************************************//
         //*****Below variables are for statistic collection******//
         //*******************************************************//
+
+        // These variables track inflight bytes at any point of time
+        std::vector<uint32_t> inflightUnschedPerPrio;
+        std::vector<uint32_t> inflightSchedPerPrio;
+        uint64_t inflightSchedBytes;
+        uint64_t inflightUnschedBytes;
+
         // The vector below is of size allPrio and each element of the vector is
         // a monotoically increasing number that tracks total number of bytes
         // received on that priority through out the simulation.  Used for
@@ -502,7 +550,7 @@ class HomaTransport : public cSimpleModule
         // a monotoically increasing number that tracks total number of unsched
         // bytes that are expected to be received on that priority through out
         // the simulation. Used for statistics collection.
-        std::vector<uint64_t> unschedToReceivePerPrio;
+        std::vector<uint64_t> unschedToRecvPerPrio;
 
         // A monotonically increasing number that tracks total number of bytes
         // received throughout the simulation. Used for statistics collection.
@@ -521,13 +569,33 @@ class HomaTransport : public cSimpleModule
         uint64_t rcvdBytesPerActivePeriod;
 
       PROTECTED:
-        void processReceivedSchedData(HomaPkt* rxPkt);
-        void processReceivedUnschedData(HomaPkt* rxPkt);
+        void initialize(HomaConfigDepot* homaConfig,
+            PriorityResolver* prioResolver);
+        void processReceivedPkt(HomaPkt* rxPkt);
+        void processGrantTimers(cMessage* grantTimer);
+
+        inline uint64_t getInflightBytes()
+        {
+            return inflightUnschedBytes + inflightSchedBytes;
+        }
+
+        inline const std::vector<uint32_t>& getInflightUnschedPerPrio()
+        {
+            return inflightUnschedPerPrio;
+        }
+
+        inline const std::vector<uint32_t>& getInflightSchedPerPrio()
+        {
+            return inflightSchedPerPrio;
+        }
+
         void addArrivedBytes(PktType pktType, uint16_t prio,
             uint32_t dataBytes);
-        void addSentGrantBytes(uint16_t prio, uint32_t grantedBytes);
+        void addPendingGrantedBytes(uint16_t prio, uint32_t grantedBytes);
         void addPendingUnschedBytes(PktType pktType, uint16_t prio,
             uint32_t bytesToArrive);
+        void pendingBytesArrived(PktType pktType, uint16_t prio,
+            uint32_t dataBytesInPkt);
         friend class HomaTransport;
         friend class InboundMessage;
     };
@@ -626,10 +694,6 @@ class HomaTransport : public cSimpleModule
     // Keeps track of the message size distribution that this transport is
     // seeing.
     WorkloadEstimator *distEstimator;
-
-    // Timer object for sending grants by this transport. Will be used for
-    // implementing timely scheduling transmissions to this receiver.
-    cMessage* grantTimer;
 
     // Timer object for send side packet pacing. At every packet transmission at
     // sender this will be used to schedule next send after the current send is

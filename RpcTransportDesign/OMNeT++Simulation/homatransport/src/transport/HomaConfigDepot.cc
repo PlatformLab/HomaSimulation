@@ -22,10 +22,13 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     localPort = ownerTransport->par("localPort");
     destPort = ownerTransport->par("destPort");
     nicLinkSpeed = ownerTransport->par("nicLinkSpeed");
-    maxOutstandingRecvBytes = ownerTransport->par("maxOutstandingRecvBytes");
+    maxOutstandingRecvBytes =
+        (uint32_t)ownerTransport->par("maxOutstandingRecvBytes");
     grantMaxBytes = (uint32_t) ownerTransport->par("grantMaxBytes");
     allPrio = (uint16_t) ownerTransport->par("prioLevels");
     adaptiveSchedPrioLevels = (uint16_t) ownerTransport->par("adaptiveSchedPrioLevels");
+    numSendersToKeepGranted = (uint16_t) ownerTransport->par("numSendersToKeepGranted");
+    ASSERT(numSendersToKeepGranted <= adaptiveSchedPrioLevels);
     prioResolverPrioLevels =
         (uint16_t) ownerTransport->par("prioResolverPrioLevels");
     schedPrioAssignMode = ownerTransport->par("schedPrioAssignMode");

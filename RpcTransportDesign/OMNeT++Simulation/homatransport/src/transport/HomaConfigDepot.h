@@ -27,7 +27,7 @@ class HomaConfigDepot {
     ~HomaConfigDepot(){}
 
     /**
-     * Corresponding enum values for SenderScheme config param. 
+     * Corresponding enum values for SenderScheme config param.
      */
     enum SenderScheme {
         OBSERVE_PKT_PRIOS = 0,  // Highest prio homa pkt first
@@ -50,7 +50,7 @@ class HomaConfigDepot {
     // upper bound on the total allowed outstanding bytes. It is necessary (BUT
     // NOT ENOUGH) for the rxScheduler to check that the total outstanding bytes
     // is smaller than this value every time a new grant is to be sent.
-    int maxOutstandingRecvBytes;
+    uint32_t maxOutstandingRecvBytes;
 
     // udp ports assigned to this transprt
     int localPort;
@@ -65,6 +65,11 @@ class HomaConfigDepot {
     // Total priority levels available for adaptive scheduling when adaptive
     // scheduling is enabled.
     uint16_t adaptiveSchedPrioLevels;
+
+    // Number of senders that receiver tries to keeps granted cuncurrently to
+    // avoid its bandwidth wasted in one or more of the these senders stops
+    // sending. This number is at most as large as adaptiveSchedPrioLevels
+    uint16_t numSendersToKeepGranted;
 
     // Total number of priorities that PrioResolver would use to resolve
     // priorities.
@@ -119,6 +124,6 @@ class HomaConfigDepot {
 
 
   PRIVATE:
-    void paramToEnum(); 
+    void paramToEnum();
 };
 #endif

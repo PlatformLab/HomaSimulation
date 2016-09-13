@@ -55,6 +55,9 @@ WorkloadEstimator::WorkloadEstimator(HomaConfigDepot* homaConfig)
                 == 0) {
             distFileName = std::string("../../sizeDistributions/"
                     "Fabricated_Heavy_Head.txt");
+        } else if (strcmp(workloadType, "PRESET_IN_FILE") == 0) {
+            distFileName = std::string("../../sizeDistributions/"
+                    "Fabricated_Heavy_Middle.txt");
         } else {
             throw cRuntimeError("'%s': Not a valid workload type.",
             workloadType);

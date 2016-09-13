@@ -425,4 +425,3 @@ TrafficPacer::prioPace2PrioResolution(TrafficPacer::PrioPaceMode prioPaceMode)
     }
     return PriorityResolver::PrioResolutionMode::INVALID_PRIO_MODE;
 }
-
