@@ -850,8 +850,8 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
 
     for (auto it = ipSendersMap.begin(); it != ipSendersMap.end(); it++) {
         SenderState* s = it->second;
-        for (auto itt = s->incompleteMesgs.begin(); itt != s->incompleteMesgs.end();
-                it++) {
+        for (auto itt = s->incompleteMesgs.begin();
+                itt != s->incompleteMesgs.end(); it++) {
             InboundMessage* mesg = itt->second;
             delete mesg;
         }
@@ -1345,7 +1345,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
         (schedPrios - hIdx);
 
     if (leftShift > 0) {
-        ASSERT(!senders[hIdx - leftShift] && (int)hIdx > leftShift);
+        ASSERT(!senders[hIdx - leftShift] && (int)hIdx >= leftShift);
         hIdx -= leftShift;
         insIdx -= leftShift;
     }
