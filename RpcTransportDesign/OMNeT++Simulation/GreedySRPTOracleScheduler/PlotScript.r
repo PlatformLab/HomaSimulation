@@ -80,6 +80,33 @@ stretchStats <- merge(stretchStats, stretchMean)
 stretch <- merge(sizeStats, stretchStats)
 stretch <- stretch[order(stretch$sizeHistBin),]
 
+# Save the data in a file
+fileConn<-file(sprintf("%s/stretchVsTransport.txt", opt$outpath))
+lineContent <- c('TransportType      LoadFactor      WorkLoad        MsgSizeRange        SizeCntPercent      BytesPercent        UnschedBytes        MeanStretch     MedianStretch       99PercentStretch')
+
+matched <- regexpr("[A-Za-z]+.+[A-Za-z]+", opt$infile)
+wl <- substr(opt$infile, matched[1], attr(matched, "match.length"))
+lf <- 0.8
+
+for (i in 1:nrow(stretch)) {
+    stretchLine = stretch[i,]
+    tt <- 'GreedySRPTOracle'
+    msr <- stretchLine$sizeHistBin
+    scp <- 100*stretchLine$cntFrac
+    bp <- 100*stretchLine$bytesFrac
+    ub <- 10000
+    means <-stretchLine$mean
+    meds <-stretchLine$median
+    nnpct <-stretchLine$NinetyNinePct
+    lineMean <- sprintf("%s     %f      %s     %d      %f     %f      %d     %f      NA     NA", tt, lf, wl, msr, scp, bp, ub, means)
+    lineMedian <- sprintf("%s     %f      %s     %d      %f     %f      %d     NA      %f     NA", tt, lf, wl, msr, scp, bp, ub, meds)
+    line99 <- sprintf("%s     %f      %s     %d      %f     %f      %d     NA      NA     %f", tt, lf, wl, msr, scp, bp, ub, nnpct)
+    lineContent <- c(lineContent, lineMean, lineMedian, line99)
+}
+writeLines(lineContent, fileConn)
+close(fileConn)
+
+
 # Plot Stretch
 textSize <- 35
 titleSize <- 30
