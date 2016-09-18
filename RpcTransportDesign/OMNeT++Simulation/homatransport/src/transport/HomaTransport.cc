@@ -887,8 +887,8 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 {
     uint32_t pktLenOnWire = HomaPkt::getBytesOnWire(rxPkt->getDataBytes(),
         (PktType)rxPkt->getPktType());
-    uint64_t msgLen = rxPkt->getUnschedFields().msgByteLen;
-    double ctime = rxPkt->getCreationTime().dbl();
+    //uint64_t msgLen = rxPkt->getUnschedFields().msgByteLen;
+    //double ctime = rxPkt->getCreationTime().dbl();
     if (getInflightBytes() == 0) {
         // We are not in a active period prior to this packet but entered in
         // a active period starting this packet.
@@ -1066,17 +1066,30 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
         uint32_t grantPrio)
 {
     simtime_t currentTime = simTime();
+    auto topMesgIt = mesgsToGrant.begin();
+    ASSERT(topMesgIt != mesgsToGrant.end());
+    InboundMessage* topMesg = *topMesgIt;
+    ASSERT(topMesg->bytesToGrant > 0);
+
+    PriorityResolver::PrioResolutionMode schedPrioResMode =
+        rxScheduler->transport->prioResolver->strPrioModeToInt(
+        homaConfig->schedPrioAssignMode);
+
+    if (schedPrioResMode ==
+            PriorityResolver::PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES ) {
+
+        if (topMesg->bytesToGrant <= homaConfig->cbfCapMsgSize) {
+            grantPrio = rxScheduler->transport->prioResolver->getSchedPktPrio(
+                schedPrioResMode, topMesg);
+        }
+    }
+
     if (grantTimer->isScheduled()){
         if (lastGrantPrio <= grantPrio) {
             return 0;
         }
         rxScheduler->transport->cancelEvent(grantTimer);
     }
-
-    auto topMesgIt = mesgsToGrant.begin();
-    ASSERT(topMesgIt != mesgsToGrant.end());
-    InboundMessage* topMesg = *topMesgIt;
-    ASSERT(topMesg->bytesToGrant > 0);
 
     if (topMesg->totalBytesInFlight >= homaConfig->maxOutstandingRecvBytes) {
         return 0;

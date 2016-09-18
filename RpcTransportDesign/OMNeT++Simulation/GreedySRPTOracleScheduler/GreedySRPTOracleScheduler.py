@@ -7,6 +7,7 @@ find a nonconflicting transmission schedule from senders to receivers.
 """
 
 import sys
+import signal
 import os
 import re
 from heapq import *
@@ -429,6 +430,7 @@ class GreedySRPTOracleScheduler():
         self.trafficData = TrafficData(mesgTx, hostIdIpAddr)
         self.numHosts = len(ipHostId)
         self.hostTxStates = [prf.AttrDict() for hostId in range(self.numHosts)]
+        self.simResults = []
 
         for hostId, txState in enumerate(self.hostTxStates):
             # all mesgs that need to transmit bytes at host i
@@ -447,7 +449,7 @@ class GreedySRPTOracleScheduler():
         self.completedTxMesgs = {}
 
         self.resultFd =\
-            open(self.simParams.workloadType + '__{0:.2f}'.format(self.simParams.loadFactor), 'w')
+            open('results/' + self.simParams.workloadType + '__{0:.2f}'.format(self.simParams.loadFactor), 'w')
         self.resultFd.write('msgSize\tmsgSizeOnWire\tsizeHistBin\tcreationTime\tcompletionTime\tstretch'
             '\tmsgId\tsendrId\tsenderIp\trecvrId\trecvrIp\n')
 
@@ -574,7 +576,12 @@ class GreedySRPTOracleScheduler():
                 (mesg.recvTime-mesg.tCreation)/(mesg.minRecvTime-mesg.tCreation),
                 mesg.msgId, self.ipHostId[mesg.sendrIntIp], ipIntToStr(mesg.sendrIntIp),
                 self.ipHostId[mesg.recvrIntIp], ipIntToStr(mesg.recvrIntIp))
-            self.resultFd.write(recordLine)
+            self.simResults.append(recordLine)
+
+        if len(self.simResults) > 10000 or not(self.hasBytesToTransmit()):
+            for recLine in self.simResults:
+                self.resultFd.write(recLine)
+            del self.simResults[:]
 
         self.completedTxMesgs.clear()
 
