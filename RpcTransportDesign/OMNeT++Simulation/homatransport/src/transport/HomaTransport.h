@@ -472,8 +472,9 @@ class HomaTransport : public cSimpleModule
 
             // Priority of last sent grant
             uint32_t lastGrantPrio;
-            // Index of this sender in SchedSenders as of last time
-            // grant was sent
+
+            // Index of this sender in SchedSenders as of the last time
+            // a grant was sent for this sender
             uint32_t lastIdx;
 
             friend class HomaTransport::ReceiveScheduler;

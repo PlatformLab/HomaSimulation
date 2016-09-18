@@ -861,7 +861,7 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
 }
 
 HomaTransport::InboundMessage*
-HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const 
+HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const
 {
     // Get the SenderState collection for the sender of this pkt
     inet::IPv4Address srcIp = rxPkt->getSrcAddr().toIPv4();
@@ -890,6 +890,13 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     //uint64_t msgLen = rxPkt->getUnschedFields().msgByteLen;
     //double ctime = rxPkt->getCreationTime().dbl();
     //double currentTime = simTime().dbl();
+    //if (currentTime > 1.675159207 && msgLen == 80903) {
+    //    std::cout << "haha" << std::endl;
+    //}
+    //if (currentTime > 1.6752336216 ) {
+    //    std::cout << "haha" << std::endl;
+    //}
+
     if (getInflightBytes() == 0) {
         // We are not in a active period prior to this packet but entered in
         // a active period starting this packet.
@@ -911,7 +918,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
         grantTimer->setKind(SelfMsgKind::GRANT);
         s = new SenderState(srcIp, this, grantTimer, homaConfig);
         grantTimersMap[grantTimer] = s;
-        ipSendersMap[srcIp.getInt()] = s; 
+        ipSendersMap[srcIp.getInt()] = s;
     } else {
         s = iter->second;
     }
@@ -1072,6 +1079,8 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     InboundMessage* topMesg = *topMesgIt;
     ASSERT(topMesg->bytesToGrant > 0);
 
+    uint32_t newIdx = grantPrio - homaConfig->allPrio +
+        homaConfig->adaptiveSchedPrioLevels;
     PriorityResolver::PrioResolutionMode schedPrioResMode =
         rxScheduler->transport->prioResolver->strPrioModeToInt(
         homaConfig->schedPrioAssignMode);
@@ -1100,8 +1109,7 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
         std::min(topMesg->bytesToGrant, homaConfig->grantMaxBytes);
     HomaPkt* grantPkt = topMesg->prepareGrant(grantSize, grantPrio);
     lastGrantPrio = grantPrio;
-    lastIdx = lastGrantPrio - homaConfig->allPrio +
-        homaConfig->adaptiveSchedPrioLevels;
+    lastIdx = newIdx;
     // update stats and send grant
     grantSize = grantPkt->getGrantFields().grantBytes;
     uint16_t prio = grantPkt->getGrantFields().schedPrio;
@@ -1271,7 +1279,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
         ASSERT(s == *nltIt);
         numSenders--;
         int ind = nltIt - senders.begin();
-        if (ind == (int)headIdx && 
+        if (ind == (int)headIdx &&
                 (ind+std::min(numSenders, (uint32_t)numToGrant) < schedPrios)) {
             senders[ind] = NULL;
             headIdx++;
