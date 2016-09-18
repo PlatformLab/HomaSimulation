@@ -889,6 +889,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
         (PktType)rxPkt->getPktType());
     //uint64_t msgLen = rxPkt->getUnschedFields().msgByteLen;
     //double ctime = rxPkt->getCreationTime().dbl();
+    //double currentTime = simTime().dbl();
     if (getInflightBytes() == 0) {
         // We are not in a active period prior to this packet but entered in
         // a active period starting this packet.
@@ -1235,7 +1236,10 @@ int sInd, int headInd)
     if (!s)
         return;
 
-    handleGrantRequest(s, headIdx + numToGrant - 1, headIdx);
+    auto retNew = insPoint(s);
+    int sIndNewNew = retNew.first;
+    int headIndNewNew = retNew.second;
+    handleGrantRequest(s, sIndNewNew, headIndNewNew);
 }
 
 /**
@@ -1290,12 +1294,13 @@ HomaTransport::ReceiveScheduler::SchedSenders::removeAt(uint32_t rmIdx)
     }
     numSenders--;
     SenderState* rmvd = senders[rmIdx];
-    senders.erase(senders.begin()+rmIdx);
     ASSERT(rmvd);
     if (rmIdx == headIdx &&
             (rmIdx+std::min(numSenders, (uint32_t)numToGrant) < schedPrios)) {
         senders[rmIdx] = NULL;
         headIdx++;
+    } else {
+        senders.erase(senders.begin()+rmIdx);
     }
     return rmvd;
 }
