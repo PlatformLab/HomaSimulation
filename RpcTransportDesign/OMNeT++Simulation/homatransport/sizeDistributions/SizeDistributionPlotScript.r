@@ -81,46 +81,46 @@ unschedFracFrame <- rbind(unschedFracFrame,
     Workload="Facebook KeyValue-Servers"))
 
 
-predefProb <- read.table("DCTCP_MsgSizeDist.txt", col.names=c('MessageSize', 'CDF'), skip=1)
-predefProb$MessageSize <-  predefProb$MessageSize*1500
-predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
-predefProb$WorkLoad <- "Web Search"
-prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
-cumBytes <- cumsum(byteFrac)/sum(byteFrac)
-predefProb$CBF <- cumBytes
-cdfFrame <- rbind(predefProb, cdfFrame)
-unschedFracFrame <- rbind(unschedFracFrame,
-    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
-    Workload="Web Search"))
+#predefProb <- read.table("DCTCP_MsgSizeDist.txt", col.names=c('MessageSize', 'CDF'), skip=1)
+#predefProb$MessageSize <-  predefProb$MessageSize*1500
+#predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+#predefProb$WorkLoad <- "Web Search"
+#prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+#byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
+#cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+#predefProb$CBF <- cumBytes
+#cdfFrame <- rbind(predefProb, cdfFrame)
+#unschedFracFrame <- rbind(unschedFracFrame,
+#    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
+#    Workload="Web Search"))
 
 
-predefProb <- read.table("Facebook_CacheFollowerDist_IntraCluster.txt",
-        col.names=c('MessageSize', 'CDF'), skip=1)
-predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
-predefProb$WorkLoad <- "Facebook Cache-Servers"
-prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
-cumBytes <- cumsum(byteFrac)/sum(byteFrac)
-predefProb$CBF <- cumBytes
-cdfFrame <- rbind(predefProb, cdfFrame)
-unschedFracFrame <- rbind(unschedFracFrame,
-    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
-    Workload="Facebook Cache-Servers"))
-
-
-predefProb <- read.table("Facebook_WebServerDist_IntraCluster.txt",
-        col.names=c('MessageSize', 'CDF'), skip=1)
-predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
-predefProb$WorkLoad <- "Facebook Web-Servers"
-prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
-cumBytes <- cumsum(byteFrac)/sum(byteFrac)
-predefProb$CBF <- cumBytes
-cdfFrame <- rbind(predefProb, cdfFrame)
-unschedFracFrame <- rbind(unschedFracFrame,
-    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
-    Workload="Facebook Web-Servers"))
+#predefProb <- read.table("Facebook_CacheFollowerDist_IntraCluster.txt",
+#        col.names=c('MessageSize', 'CDF'), skip=1)
+#predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+#predefProb$WorkLoad <- "Facebook Cache-Servers"
+#prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+#byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
+#cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+#predefProb$CBF <- cumBytes
+#cdfFrame <- rbind(predefProb, cdfFrame)
+#unschedFracFrame <- rbind(unschedFracFrame,
+#    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
+#    Workload="Facebook Cache-Servers"))
+#
+#
+#predefProb <- read.table("Facebook_WebServerDist_IntraCluster.txt",
+#        col.names=c('MessageSize', 'CDF'), skip=1)
+#predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+#predefProb$WorkLoad <- "Facebook Web-Servers"
+#prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+#byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
+#cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+#predefProb$CBF <- cumBytes
+#cdfFrame <- rbind(predefProb, cdfFrame)
+#unschedFracFrame <- rbind(unschedFracFrame,
+#    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
+#    Workload="Facebook Web-Servers"))
 
 
 predefProb <- read.table("Facebook_HadoopDist_All.txt",
@@ -151,87 +151,89 @@ unschedFracFrame <- rbind(unschedFracFrame,
     Workload="Fabricated Heavy Middle"))
 
 
-predefProb <- read.table("Fabricated_Heavy_Head.txt",
-        col.names=c('MessageSize', 'CDF'), skip=1)
-predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
-predefProb$WorkLoad <- "Fabricated Heavy Head"
-prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
-byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
-cumBytes <- cumsum(byteFrac)/sum(byteFrac)
-predefProb$CBF <- cumBytes
-cdfFrame <- rbind(predefProb, cdfFrame)
-unschedFracFrame <- rbind(unschedFracFrame,
-    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
-    Workload="Fabricated Heavy Head"))
+#predefProb <- read.table("Fabricated_Heavy_Head.txt",
+#        col.names=c('MessageSize', 'CDF'), skip=1)
+#predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+#predefProb$WorkLoad <- "Fabricated Heavy Head"
+#prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+#byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
+#cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+#predefProb$CBF <- cumBytes
+#cdfFrame <- rbind(predefProb, cdfFrame)
+#unschedFracFrame <- rbind(unschedFracFrame,
+#    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
+#    Workload="Fabricated Heavy Head"))
 
 cdfFrame$WorkLoad <- factor(cdfFrame$WorkLoad)
 cdfCbf = list()
 cdfCbf[[1]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CDF)) +
-        geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
-        labs(title = "Message Size Distribution Used In Simulation") +
+        geom_line(aes(color=WorkLoad, linetype=WorkLoad), size = 3, alpha = 1) +
+        labs(title = "Cumulative Message Size Distribution") +
+        scale_linetype_manual(values=c("dashed", "twodash", "dotdash"))+
         theme(axis.text=element_text(size=30),
-            axis.title=element_text(size=30, face="bold"),
+            axis.title=element_text(size=25, face="bold"),
             panel.grid.major =
                 element_line(size = 0.75, linetype = 'solid', colour = "black"),
             panel.grid.minor =
                 element_line(size = 0.5, linetype = 'solid', colour = "gray"),
-            legend.text=element_text(size=30),
+            legend.text=element_text(size=23),
             legend.title=element_text(size=20, face="bold"),
             legend.position="top",
-        plot.title = element_text(size=20, face="bold")) +
+        plot.title = element_text(size=30, face="bold")) +
         scale_x_log10("Message Sizes (Bytes)")+
-        scale_y_continuous(breaks = round(seq(min(cdfFrame$CDF), max(cdfFrame$CDF), by = 0.1),1))
+        scale_y_continuous(name="Cumulative Size Distribution Function (CDF)", breaks = round(seq(min(cdfFrame$CDF), max(cdfFrame$CDF), by = 0.1),1))
 
 cdfCbf[[2]] <- ggplot(cdfFrame, aes(x=MessageSize,y=CBF)) +
-        geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
-        labs(title = "Message Byte Distribution Used In Simulation") +
+        geom_line(aes(color=WorkLoad, linetype=WorkLoad), size = 3, alpha = 1) +
+        labs(title = "Cumulative Network Traffic Byte Distribution") +
+        scale_linetype_manual(values=c("dashed", "twodash", "dotdash"))+
         theme(axis.text=element_text(size=30),
-            axis.title=element_text(size=30, face="bold"),
+            axis.title=element_text(size=25, face="bold"),
             panel.grid.major =
                 element_line(size = 0.75, linetype = 'solid', colour = "black"),
             panel.grid.minor =
                 element_line(size = 0.5, linetype = 'solid', colour = "gray"),
-            legend.text=element_text(size=30),
+            legend.text=element_text(size=23),
             legend.title=element_text(size=20, face="bold"),
             legend.position="top",
-        plot.title = element_text(size=20, face="bold")) +
+        plot.title = element_text(size=30, face="bold")) +
         scale_x_log10("Message Sizes (Bytes)")+
-        scale_y_continuous(breaks = round(seq(min(cdfFrame$CBF), max(cdfFrame$CBF), by = 0.1),1))
+        scale_y_continuous(name="Cumulative Byte Distribution Function (CBF)",breaks = round(seq(min(cdfFrame$CBF), max(cdfFrame$CBF), by = 0.1),1))
 
-cdfCbf[[3]] <- ggplot(cdfFrame, aes(x=MessageSize, y=pmin(C*RTT*(1-CBF)/8, MessageSize))) +
-        geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
-        labs(title = "Upper bound for unsched bytes") +
-        theme(axis.text=element_text(size=30),
-            axis.title=element_text(size=30, face="bold"),
-            panel.grid.major =
-                element_line(size = 0.75, linetype = 'solid', colour = "black"),
-            panel.grid.minor =
-                element_line(size = 0.5, linetype = 'solid', colour = "gray"),
-            legend.text=element_text(size=30),
-            legend.title=element_text(size=20, face="bold"),
-            legend.position="top",
-        plot.title = element_text(size=20, face="bold")) +
-        scale_x_log10("Message Sizes (Bytes)")+
-        scale_y_continuous(breaks = seq(0, C*RTT/8, by = 0.1*C*RTT/8))
+#cdfCbf[[3]] <- ggplot(cdfFrame, aes(x=MessageSize, y=pmin(C*RTT*(1-CBF)/8, MessageSize))) +
+#        geom_line(aes(color=WorkLoad), size = 2, alpha = 1) +
+#        labs(title = "Upper bound for unsched bytes") +
+#        theme(axis.text=element_text(size=30),
+#            axis.title=element_text(size=30, face="bold"),
+#            panel.grid.major =
+#                element_line(size = 0.75, linetype = 'solid', colour = "black"),
+#            panel.grid.minor =
+#                element_line(size = 0.5, linetype = 'solid', colour = "gray"),
+#            legend.text=element_text(size=30),
+#            legend.title=element_text(size=20, face="bold"),
+#            legend.position="top",
+#        plot.title = element_text(size=20, face="bold")) +
+#        scale_x_log10("Message Sizes (Bytes)")+
+#        scale_y_continuous(breaks = seq(0, C*RTT/8, by = 0.1*C*RTT/8))
+#
+#cdfCbf[[4]] <- ggplot(unschedFracFrame, aes(x=Unsched, y=CumUnschedFrac)) +
+#        geom_line(aes(color=Workload), size = 2, alpha = 1) +
+#        labs(title = "Fraction of transmitted bytes in unsched. pkts (normalized by the max)") +
+#        theme(axis.text=element_text(size=30),
+#            axis.title=element_text(size=30, face="bold"),
+#            panel.grid.major =
+#                element_line(size = 0.75, linetype = 'solid', colour = "black"),
+#            panel.grid.minor =
+#                element_line(size = 0.5, linetype = 'solid', colour = "gray"),
+#            legend.text=element_text(size=30),
+#            legend.title=element_text(size=20, face="bold"),
+#            legend.position="top",
+#        plot.title = element_text(size=20, face="bold")) +
+#        scale_x_log10("Unsched. Limit (Bytes)")+
+#        scale_y_continuous(breaks = seq(0, 1, by = 0.1))
 
-cdfCbf[[4]] <- ggplot(unschedFracFrame, aes(x=Unsched, y=CumUnschedFrac)) +
-        geom_line(aes(color=Workload), size = 2, alpha = 1) +
-        labs(title = "Fraction of transmitted bytes in unsched. pkts (normalized by the max)") +
-        theme(axis.text=element_text(size=30),
-            axis.title=element_text(size=30, face="bold"),
-            panel.grid.major =
-                element_line(size = 0.75, linetype = 'solid', colour = "black"),
-            panel.grid.minor =
-                element_line(size = 0.5, linetype = 'solid', colour = "gray"),
-            legend.text=element_text(size=30),
-            legend.title=element_text(size=20, face="bold"),
-            legend.position="top",
-        plot.title = element_text(size=20, face="bold")) +
-        scale_x_log10("Unsched. Limit (Bytes)")+
-        scale_y_continuous(breaks = seq(0, 1, by = 0.1))
-
-png(file='WorkloadCDFsCBFs.png', width=3000, height=5000)
+pdf(file='WorkloadCDFsCBFs.pdf', width=30, height=10)
 args.list <- list()
-args.list <- c(cdfCbf, list(ncol=1))
+args.list <- c(cdfCbf, list(ncol=2))
 do.call(grid.arrange, args.list)
 dev.off()

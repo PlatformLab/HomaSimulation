@@ -33,17 +33,20 @@ tailStretchVsSize <- ddply(tailStretchVsSize, .(TransportType, LoadFactor, WorkL
     SizeCumPercent = round(cumsum(SizeCntPercent), 2), BytesCumPercent = round(cumsum(BytesPercent), 2))
 tailStretchVsSize$MsgSizeRange <- as.numeric(as.character(tailStretchVsSize$MsgSizeRange))
 
-textSize <- 35
-titleSize <- 30
-yLimit <- 40
+textSize <- 55 
+titleSize <- 55 
+yLimit <- 20
 
 hasPseudoIdeal = !empty(subset(stretchVsSize, TransportType %in% c('PseudoIdeal')))
 normalizedGraph = FALSE
 for (rho in unique(avgStretchVsSize$LoadFactor)) {
     i <- 0
     avgStretchPlot = list()
-    for (transport in sort(unique(stretchVsSize$TransportType))) {
-        for (workload in levels(avgStretchVsSize$WorkLoad)) {
+    for (workload in levels(avgStretchVsSize$WorkLoad)) {
+        for (transport in unique(stretchVsSize[stretchVsSize$WorkLoad==workload,]$TransportType)) {
+            if (transport == "PseudoIdeal") {
+                next
+            }
             # Use CDF as the x axis
             i <- i+1
             tmp <- subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType==transport,
@@ -55,17 +58,16 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
                     'MeanStretch', 'UnschedBytes'))
                 if (transport != 'PseudoIdeal') {
                     tmp$MeanStretch <- tmp$MeanStretch / pseudoIdealDF$MeanStretch
-                    plotTitle = sprintf("Normalized MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("Normalized MeanStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MeanStretch (Normalized to PseudoIdeal)'
                 } else {
-                    plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MeanStretch'
                 }
             } else {
-                plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                plotTitle = sprintf("%s, loadfactor:%s, workload:%s", transport, rho, workload)
                 yLab = 'MeanStretch'
             }
 
@@ -75,8 +77,8 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
             # equal to the probability
             avgStretchPlot[[i]] <- ggplot(tmp, aes(x=SizeCumPercent-SizeCntPercent/2, y=MeanStretch, width=SizeCntPercent)) +
                 geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-                geom_text(data=tmp, aes(x=SizeCumPercent, y=pmin(yLimit/2, MeanStretch/2),
-                    label=paste(MsgSizeRange, ":", format(MeanStretch, digits=3))), angle=90, size=11)
+                geom_text(data=tmp[seq(1, nrow(tmp), 3),], aes(x=SizeCumPercent, y=pmin(yLimit/2, MeanStretch),
+                    label=MsgSizeRange), angle=90, size=20)
 
             if (hasPseudoIdeal && !normalizedGraph) {
                 pseudoIdealDF = subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
@@ -89,10 +91,10 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
 
             plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='')
             avgStretchPlot[[i]] <- avgStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                theme(text = element_text(size=textSize), axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
                     plot.title = element_text(size = titleSize)) +
-                scale_x_continuous(breaks = tmp$SizeCumPercent) +
+                scale_x_continuous(limits = c(0,101), breaks = tmp[seq(1, nrow(tmp), 3),]$SizeCumPercent, expand = c(0, 0)) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MeanStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
 
@@ -107,24 +109,23 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
                     'MeanStretch', 'UnschedBytes'))
                 if (transport != 'PseudoIdeal') {
                     tmp$MeanStretch <- tmp$MeanStretch / pseudoIdealDF$MeanStretch
-                    plotTitle = sprintf("Normalized MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("Normalized MeanStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MeanStretch (Normalized to PseudoIdeal)'
                 } else {
-                    plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MeanStretch'
                 }
             } else {
-                plotTitle = sprintf("MeanStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, avgStretchVsSize$UnschedBytes[1], rho, workload)
+                plotTitle = sprintf("%s, loadfactor:%s, workload:%s", transport, rho, workload)
                 yLab = 'MeanStretch'
             }
 
             avgStretchPlot[[i]] <- ggplot(tmp, aes(x=BytesCumPercent-BytesPercent/2, y=MeanStretch, width=BytesPercent)) +
                 geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-                geom_text(data=tmp, aes(x=BytesCumPercent, y=pmin(yLimit/2, MeanStretch/2),
-                    label=paste(MsgSizeRange, ":", format(MeanStretch, digits=3))), angle=90, size=11)
+                geom_text(data=tmp[seq(1, nrow(tmp), 3),], aes(x=BytesCumPercent, y=pmin(yLimit/2, MeanStretch),
+                    label=MsgSizeRange), angle=90, size=20)
             if (hasPseudoIdeal && !normalizedGraph)  {
                 pseudoIdealDF = subset(avgStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
                     select=c('LoadFactor', 'WorkLoad', 'MsgSizeRange', 'BytesPercent', 'BytesCumPercent', 'TransportType',
@@ -137,19 +138,19 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
 
             plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='')
             avgStretchPlot[[i]] <- avgStretchPlot[[i]] +
-            theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+            theme(text = element_text(size=textSize), axis.text.x = element_text(angle=75, vjust=0.5),
                 strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
                 plot.title = element_text(size = titleSize)) +
-            scale_x_continuous(breaks = tmp$BytesCumPercent) +
+            scale_x_continuous(limits = c(0,101), breaks = tmp[seq(1, nrow(tmp), 3),]$BytesCumPercent, expand = c(0, 0)) +
             coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MeanStretch, na.rm=TRUE)))) +
             labs(title = plotTitle, x = "Cumulative Bytes Percent", y = yLab)
-
         }
+
     }
     pdf(sprintf("plots/MeanStretchVsTransport_rho%s.pdf", rho),
-        width=100*length(unique(avgStretchVsSize$WorkLoad)),
-        height=15*length(unique(stretchVsSize$TransportType)))
-    args.list <- c(avgStretchPlot, list(ncol=2*length(unique(avgStretchVsSize$WorkLoad))))
+        width=80,
+        height=10*length(unique(avgStretchVsSize$WorkLoad)))
+    args.list <- c(avgStretchPlot, list(ncol=2))
     do.call(grid.arrange, args.list)
     dev.off()
 }
@@ -157,8 +158,12 @@ for (rho in unique(avgStretchVsSize$LoadFactor)) {
 for (rho in unique(medianStretchVsSize$LoadFactor)) {
     i <- 0
     medianStretchPlot = list()
-    for (transport in sort(unique(stretchVsSize$TransportType))) {
-        for (workload in levels(medianStretchVsSize$WorkLoad)) {
+    for (workload in levels(medianStretchVsSize$WorkLoad)) {
+        for (transport in unique(stretchVsSize[stretchVsSize$WorkLoad==workload,]$TransportType)) {
+            if (transport == "PseudoIdeal") {
+                next
+            }
+
             # Use CDF as the x axis
             i <- i+1
             tmp <- subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType==transport,
@@ -171,17 +176,16 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
                     'MedianStretch', 'UnschedBytes'))
                 if (transport != 'PseudoIdeal') {
                     tmp$MedianStretch <- tmp$MedianStretch / pseudoIdealDF$MedianStretch
-                    plotTitle = sprintf("Normalized MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("Normalized MedianStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MedianStretch (Normalized to PseudoIdeal)'
                 } else {
-                    plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MedianStretch'
                 }
             } else {
-                plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                plotTitle = sprintf("%s, loadfactor:%s, workload:%s", transport, rho, workload)
                 yLab = 'MedianStretch'
             }
 
@@ -191,8 +195,8 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
             # equal to the probability
             medianStretchPlot[[i]] <- ggplot(tmp, aes(x=SizeCumPercent-SizeCntPercent/2, y=MedianStretch, width=SizeCntPercent)) +
                 geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-                geom_text(data=tmp, aes(x=SizeCumPercent, y=pmin(yLimit/2, MedianStretch/2),
-                    label=paste(MsgSizeRange, ":", format(MedianStretch, digits=3))), angle=90, size=11)
+                geom_text(data=tmp[seq(1, nrow(tmp), 3),], aes(x=SizeCumPercent, y=pmin(yLimit/2, MedianStretch),
+                    label=MsgSizeRange), angle=90, size=20)
 
             if (hasPseudoIdeal && !normalizedGraph) {
                 pseudoIdealDF = subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
@@ -207,10 +211,10 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
 
             plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='')
             medianStretchPlot[[i]] <- medianStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                theme(text = element_text(size=textSize), axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
                     plot.title = element_text(size = titleSize)) +
-                scale_x_continuous(breaks = tmp$SizeCumPercent) +
+                scale_x_continuous(limits = c(0,101), breaks = tmp[seq(1, nrow(tmp), 3),]$SizeCumPercent, expand = c(0, 0)) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MedianStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
 
@@ -226,24 +230,23 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
                     'MedianStretch', 'UnschedBytes'))
                 if (transport != 'PseudoIdeal') {
                     tmp$MedianStretch <- tmp$MedianStretch / pseudoIdealDF$MedianStretch
-                    plotTitle = sprintf("Normalized MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("Normalized MedianStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MedianStretch (Normalized to PseudoIdeal)'
                 } else {
-                    plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'MedianStretch'
                 }
             } else {
-                plotTitle = sprintf("MedianStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, medianStretchVsSize$UnschedBytes[1], rho, workload)
+                plotTitle = sprintf("%s, loadfactor:%s, workload:%s", transport, rho, workload)
                 yLab = 'MedianStretch'
             }
 
             medianStretchPlot[[i]] <- ggplot(tmp, aes(x=BytesCumPercent-BytesPercent/2, y=MedianStretch, width=BytesPercent)) +
                 geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-                geom_text(data=tmp, aes(x=BytesCumPercent, y=pmin(yLimit/2, MedianStretch/2),
-                    label=paste(MsgSizeRange, ":", format(MedianStretch, digits=3))), angle=90, size=11)
+                geom_text(data=tmp[seq(1, nrow(tmp), 3),], aes(x=BytesCumPercent, y=pmin(yLimit/2, MedianStretch),
+                    label=MsgSizeRange), angle=90, size=20)
 
             if (hasPseudoIdeal && !normalizedGraph) {
                 pseudoIdealDF = subset(medianStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
@@ -257,18 +260,18 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
 
             plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='')
             medianStretchPlot[[i]] <- medianStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                theme(text = element_text(size=textSize), axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
                     plot.title = element_text(size = titleSize)) +
-                scale_x_continuous(breaks = tmp$BytesCumPercent) +
+                scale_x_continuous(limits = c(0,101), breaks = tmp[seq(1, nrow(tmp), 3),]$BytesCumPercent, expand = c(0, 0)) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$MedianStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Bytes Percent", y = yLab)
         }
     }
     pdf(sprintf("plots/MedianStretchVsTransport_rho%s.pdf", rho),
-        width=100*length(unique(medianStretchVsSize$WorkLoad)),
-        height=15*length(unique(stretchVsSize$TransportType)))
-    args.list <- c(medianStretchPlot, list(ncol=2*length(unique(medianStretchVsSize$WorkLoad))))
+        width=80,
+        height=10*length(unique(medianStretchVsSize$WorkLoad)))
+    args.list <- c(medianStretchPlot, list(ncol=2))
     do.call(grid.arrange, args.list)
     dev.off()
 }
@@ -276,8 +279,12 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
 for (rho in unique(tailStretchVsSize$LoadFactor)) {
     i <- 0
     tailStretchPlot = list()
-    for (transport in sort(unique(stretchVsSize$TransportType))) {
-        for (workload in levels(tailStretchVsSize$WorkLoad)) {
+    for (workload in levels(tailStretchVsSize$WorkLoad)) {
+        for (transport in unique(stretchVsSize[stretchVsSize$WorkLoad==workload,]$TransportType)) {
+            if (transport == "PseudoIdeal") {
+                next
+            }
+
             # Use CDF as the x axis
             i <- i+1
             tmp <- subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType==transport,
@@ -290,17 +297,16 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
                     'TailStretch', 'UnschedBytes'))
                 if (transport != 'PseudoIdeal') {
                     tmp$TailStretch <- tmp$TailStretch / pseudoIdealDF$TailStretch
-                    plotTitle = sprintf("Normalized TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("Normalized TailStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'TailStretch (Normalized to PseudoIdeal)'
                 } else {
-                    plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'TailStretch'
                 }
             } else {
-                plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                plotTitle = sprintf("%s, loadfactor:%s, workload:%s", transport, rho, workload)
                 yLab = 'TailStretch'
             }
 
@@ -310,8 +316,8 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
             # equal to the probability
             tailStretchPlot[[i]] <- ggplot(tmp, aes(x=SizeCumPercent-SizeCntPercent/2, y=TailStretch, width=SizeCntPercent)) +
                 geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-                geom_text(data=tmp, aes(x=SizeCumPercent, y=pmin(yLimit/2, TailStretch/2),
-                    label=paste(MsgSizeRange, ":", format(TailStretch, digits=3))), angle=90, size=11)
+                geom_text(data=tmp[seq(1, nrow(tmp), 3),], aes(x=SizeCumPercent, y=pmin(yLimit/2, 2*TailStretch),
+                    label=MsgSizeRange), angle=90, size=20)
 
             if (hasPseudoIdeal && !normalizedGraph) {
                 pseudoIdealDF = subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
@@ -323,10 +329,10 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
             }
 
             tailStretchPlot[[i]] <- tailStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                theme(text = element_text(size=textSize), axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
                     plot.title = element_text(size = titleSize)) +
-                scale_x_continuous(breaks = tmp$SizeCumPercent) +
+                scale_x_continuous(limits = c(0,101), breaks = tmp[seq(1, nrow(tmp), 3),]$SizeCumPercent, expand = c(0, 0)) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$TailStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Msg Size Percent", y = yLab)
 
@@ -343,24 +349,23 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
                     'TailStretch', 'UnschedBytes'))
                 if (transport != 'PseudoIdeal') {
                     tmp$TailStretch <- tmp$TailStretch / pseudoIdealDF$TailStretch
-                    plotTitle = sprintf("Normalized TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("Normalized TailStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'TailStretch (Normalized to PseudoIdeal)'
                 } else {
-                    plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                        loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                    plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, priorities:%s,
+                        loadfactor:%s, workload:%s", transport, rho, workload)
                     yLab = 'TailStretch'
                 }
             } else {
-                plotTitle = sprintf("TailStrech VS. Cummulative Msg Size Percent, transport:%s, unsched:%d,
-                    loadfactor:%s, workload:%s", transport, tailStretchVsSize$UnschedBytes[1], rho, workload)
+                plotTitle = sprintf("%s, loadfactor:%s, workload:%s", transport, rho, workload)
                 yLab = 'TailStretch'
             }
 
             tailStretchPlot[[i]] <- ggplot(tmp, aes(x=BytesCumPercent-BytesPercent/2, y=TailStretch, width=BytesPercent)) +
                 geom_bar(stat="identity", position="identity", fill="white", color="darkgreen") +
-                geom_text(data=tmp, aes(x=BytesCumPercent, y=pmin(yLimit/2, TailStretch/2),
-                    label=paste(MsgSizeRange, ":", format(TailStretch, digits=3))), angle=90, size=11)
+                geom_text(data=tmp[seq(1, nrow(tmp), 3),], aes(x=BytesCumPercent, y=pmin(yLimit/2, 2*TailStretch),
+                    label=MsgSizeRange), angle=90, size=20)
 
             if (hasPseudoIdeal && !normalizedGraph) {
                 pseudoIdealDF = subset(tailStretchVsSize, WorkLoad==workload & LoadFactor==rho & TransportType=='PseudoIdeal',
@@ -373,18 +378,18 @@ for (rho in unique(tailStretchVsSize$LoadFactor)) {
 
             plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n', as.integer(nchar(plotTitle)/2)), sep='', collapse='')
             tailStretchPlot[[i]] <- tailStretchPlot[[i]] +
-                theme(text = element_text(size=textSize, face="bold"), axis.text.x = element_text(angle=75, vjust=0.5),
+                theme(text = element_text(size=textSize), axis.text.x = element_text(angle=75, vjust=0.5),
                     strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
                     plot.title = element_text(size = titleSize)) +
-                scale_x_continuous(breaks = tmp$BytesCumPercent) +
+                scale_x_continuous(limits = c(0,101), breaks = tmp[seq(1, nrow(tmp), 3),]$BytesCumPercent, expand = c(0, 0)) +
                 coord_cartesian(ylim=c(0, min(yLimit, max(tmp$TailStretch, na.rm=TRUE)))) +
                 labs(title = plotTitle, x = "Cumulative Bytes Percent", y = yLab)
         }
     }
     pdf(sprintf("plots/TailStretchVsTransport_rho%s.pdf", rho),
-        width=100*length(unique(tailStretchVsSize$WorkLoad)),
-        height=15*length(unique(stretchVsSize$TransportType)))
-    args.list <- c(tailStretchPlot, list(ncol=2*length(unique(tailStretchVsSize$WorkLoad))))
+        width=80,
+        height=10*length(unique(tailStretchVsSize$WorkLoad)))
+    args.list <- c(tailStretchPlot, list(ncol=2))
     do.call(grid.arrange, args.list)
     dev.off()
 }

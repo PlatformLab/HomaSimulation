@@ -28,12 +28,12 @@
         </transportConfig>
         <appConfig>
             <!--if true, this host app will send messages as well-->
-            <isSender>true</isSender>
+            <isSender>false</isSender>
             <!--One of the three patterns: 1) the space separated positive ids of the hosts that
                  this app will send messages to. 2) If empty, it means the app will send randomly
                  to every possible host in the topology. 3) If -1, this app sends to all possible
                  hosts except itself.-->
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -42,7 +42,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -51,7 +51,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -60,7 +60,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -69,7 +69,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -78,7 +78,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -87,7 +87,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -96,7 +96,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -105,7 +105,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -114,7 +114,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -123,7 +123,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -132,7 +132,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -141,7 +141,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -150,7 +150,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -159,7 +159,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -168,7 +168,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -177,7 +177,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -186,7 +186,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -195,7 +195,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -204,7 +204,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -213,7 +213,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -222,7 +222,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -231,7 +231,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -240,7 +240,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -249,7 +249,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -258,7 +258,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -267,7 +267,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -276,7 +276,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -285,7 +285,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -294,7 +294,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -303,7 +303,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 
@@ -312,7 +312,7 @@
         </transportConfig>
         <appConfig>
             <isSender>true</isSender>
-            <destIds>-1</destIds>
+            <destIds>0</destIds>
         </appConfig>
     </hostConfig>
 </topologyConfig>
