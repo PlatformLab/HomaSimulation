@@ -84,8 +84,8 @@ stretch <- stretch[order(stretch$sizeHistBin),]
 fileConn<-file(sprintf("%s/stretchVsTransport.txt", opt$outpath))
 lineContent <- c('TransportType      LoadFactor      WorkLoad        MsgSizeRange        SizeCntPercent      BytesPercent        UnschedBytes        MeanStretch     MedianStretch       99PercentStretch')
 
-matched <- regexpr("[A-Za-z]+.+[A-Za-z]+", opt$infile)
-wl <- substr(opt$infile, matched[1], attr(matched, "match.length"))
+wl<- gsub("^.*?\\/", "", opt$infile)
+wl<-gsub("_{2}.*", "", wl)
 lf <- 0.8
 
 for (i in 1:nrow(stretch)) {
