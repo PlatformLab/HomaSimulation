@@ -15,7 +15,7 @@ sys.path.insert(0, os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Sim
 from parseResultFiles import *
 from MetricsDashBoard import *
 
-resultDir = os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/results/paper/manyReceivers_backup'
+resultDir = os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/results/paper/manyReceivers'
 f = open(resultDir + '/fileList.txt')
 resultFiles = [line.rstrip('\n') for line in f]
 f.close()
@@ -37,12 +37,12 @@ for dirFile in resultFiles:
     parsedStats.aggrs = sp.aggrs
     parsedStats.cores = sp.cores
     parsedStats.generalInfo = sp.generalInfo
-    activeAndWasted = calculateWastedTimesAndBw(parsedStats, xmlParsedDic)
     redundancyFactor = parsedStats.generalInfo['numSendersToKeepGranted'] 
     workloadType =  parsedStats.generalInfo['workloadType']
     xmlConfigFile =  os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile,parsedStats.generalInfo)
+    activeAndWasted = calculateWastedTimesAndBw(parsedStats, xmlParsedDic)
     trafficDic = AttrDict()
     txAppsBytes = trafficDic.sxHostsTraffic.apps.sx.bytes = []
     txAppsRates = trafficDic.sxHostsTraffic.apps.sx.rates = []
