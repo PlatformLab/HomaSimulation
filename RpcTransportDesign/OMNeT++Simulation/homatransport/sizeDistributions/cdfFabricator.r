@@ -8,25 +8,25 @@ cdfFromLogScaledCbf <- function()
     # function) values in below. The assumption is that cbf is piecewise linear
     # function of log10(sizeIntervals) with breakpoints defined in sizeIntervals
     # and cbf vectors.
-    
+
     # monotonically increasing vector of msg sizes
     #sizeIntervals <- c(1, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 3529904)
     sizeIntervals <- c(1, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 12158197)
-    
+
     # monotonically increaing cbf (cumulative byte function) vector. First element
     # is always 0 and last element is always one. Each cbf value in this vector
     # corresponds to a size in the sizeIntervals vector.
     #cbf <- c(0, .0016, .0160256, .01923077, .07051282, .4455128, .525641, .6025641, .6987179, .7403846, .7532051, .7660256, .7884615, .900641, .9455128, .9519231, 1)
     cbf <- c(0, .003205128, .006410256, .009615385, .01602564, .05128205, .07051282, .09294872, .1185897, .1762821, .2564103, .3012821, .3461538, .4679487, .5512321, .6826923, 1)
-    
+
     multipLiers <- (cbf[2:length(cbf)] - cbf[1:length(cbf)-1]) *
         (1/sizeIntervals[1:length(cbf)-1] - 1/sizeIntervals[2:length(cbf)]) /
         (log10(sizeIntervals[2:length(cbf)]) - log10(sizeIntervals[1:length(cbf)-1]))
     avgSize <- log(10)/sum(multipLiers)
     cdfRanges <- cumsum(multipLiers)/sum(multipLiers)
     cdfConsts <- c(0, cdfRanges[1:length(cdfRanges)-1])
-    
-    
+
+
     #create cdf sample vector and find the corresponding sizes.
     #cdf sample vector must be sorted: cdf <- seq(0.001, 1, 0.001)
     cdf <- c()
@@ -38,20 +38,20 @@ cdfFromLogScaledCbf <- function()
         cdf <- c(cdf, seq(cdfBounds[ind], cdfBounds[ind+1], (cdfBounds[ind+1] - cdfBounds[ind])/numElem))
     }
     cdf <- sort(unique(cdf))
-    
-    
+
+
     #Corresponding sizes for cdf values
     sizes <- c()
     for (cdfVal in cdf)
     {
         ind <- match(1, findInterval(cdfRanges, cdfVal))
-        invMsgSize <- (1 / sizeIntervals[ind]) - 
+        invMsgSize <- (1 / sizeIntervals[ind]) -
             ((cdfVal - cdfConsts[ind]) * log(10) *
             (log10(sizeIntervals[ind+1]) - log10(sizeIntervals[ind])) /
             (cbf[ind+1]-cbf[ind]) / avgSize)
-        sizes <- c(sizes, 1/invMsgSize) 
+        sizes <- c(sizes, 1/invMsgSize)
     }
-    
+
     # round the sizes to integers and remove possible duplicates that rounding might
     # have caused.
     sizes <- round(sizes)
@@ -61,7 +61,7 @@ cdfFromLogScaledCbf <- function()
     sizes <- sizes[ind]
     pdf <- cdf - c(0, cdf[1:length(cdf)-1])
     avgSize <- sum(pdf*sizes)
-    
+
     filename = "Google_AllRPC.txt"
     write(avgSize, file=filename)
     df <- data.frame(sizes, cdf)
@@ -76,16 +76,16 @@ cdfFromCdfSamples <- function()
     # values in below. The assumption is that cdf is piecewise linear
     # function of log10(sizeIntervals) with breakpoints defined in sizeIntervals
     # and cdf vectors.
-    
-    # monotonically increasing vector of msg sizes
-    sizeIntervals <- c() 
 
-    
+    # monotonically increasing vector of msg sizes
+    sizeIntervals <- c()
+
+
     # monotonically increaing cdf vector. First element
     # is always 0 and last element is always one. Each cdf value in this vector
     # corresponds to a size in the sizeIntervals vector.
     cdfIntervals <- c()
-    
+
     # For Facebook Hadoop All
     sizeIntervals <- c(50, 92 ,217 ,271 ,300 ,326 ,376 ,425 ,480 ,600 ,679 ,737 ,800 ,885 ,1042 ,1277 ,
         1413 ,1534 ,1664 ,2214 ,3396 ,5210 ,7830 ,31946 ,36844 ,39973 ,44260 ,47050 ,51046 ,62583 ,
@@ -121,10 +121,10 @@ cdfFromCdfSamples <- function()
     #    0.5465 ,0.5558 ,0.5651 ,0.5743 ,0.5836 ,0.5923 ,0.6022 ,0.6115 ,0.6208 ,0.6301 ,0.6394 ,0.6580 ,0.6766 ,
     #    0.6952 ,0.7138 ,0.7200 ,0.7230 ,0.7416 ,0.7602 ,0.7787 ,0.7974 ,0.8160 ,0.8346 ,0.8532 ,0.8717 ,0.9276 ,
     #    0.9740 ,0.9888 ,0.9944 ,1.0)
-    
+
     cdfRanges <- cdfIntervals[2:length(cdfIntervals)]
     cdfConsts <- cdfIntervals[1:length(cdfIntervals)-1]
-    
+
     #create cdf sample vector and find the corresponding sizes.
     #cdf sample vector must be sorted: cdf <- seq(0.001, 1, 0.001)
     cdf <- c()
@@ -133,19 +133,19 @@ cdfFromCdfSamples <- function()
         cdf <- c(cdf, seq(cdfIntervals[ind], cdfIntervals[ind+1], (cdfIntervals[ind+1] - cdfIntervals[ind])/5))
     }
     cdf <- sort(unique(cdf))
-    
-    
+
+
     #Corresponding sizes for cdf values
     sizes <- c()
     for (cdfVal in cdf)
     {
         ind <- match(1, findInterval(cdfRanges, cdfVal))
         logMsgSize <- (cdfVal - cdfConsts[ind]) *
-            (log10(sizeIntervals[ind+1])-log10(sizeIntervals[ind])) / 
+            (log10(sizeIntervals[ind+1])-log10(sizeIntervals[ind])) /
             (cdfRanges[ind]-cdfConsts[ind]) + log10(sizeIntervals[ind])
-        sizes <- c(sizes, 10**(logMsgSize)) 
+        sizes <- c(sizes, 10**(logMsgSize))
     }
-    
+
     # round the sizes to integers and remove possible duplicates that rounding might
     # have caused.
     sizes <- round(sizes)
@@ -155,7 +155,7 @@ cdfFromCdfSamples <- function()
     sizes <- sizes[ind]
     pdf <- cdf - c(0, cdf[1:length(cdf)-1])
     avgSize <- sum(pdf*sizes)
-    
+
     filename = "Facebook_HadoopDist_All.txt"
     write(avgSize, file=filename)
     df <- data.frame(sizes, cdf)
