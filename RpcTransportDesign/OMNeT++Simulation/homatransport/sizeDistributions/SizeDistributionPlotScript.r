@@ -150,6 +150,32 @@ unschedFracFrame <- rbind(unschedFracFrame,
     data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
     Workload="Fabricated Heavy Middle"))
 
+predefProb <- read.table("Google_SearchRPC.txt",
+        col.names=c('MessageSize', 'CDF'), skip=1)
+predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+predefProb$WorkLoad <- "Google Search RPC"
+prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
+cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+predefProb$CBF <- cumBytes
+cdfFrame <- rbind(predefProb, cdfFrame)
+unschedFracFrame <- rbind(unschedFracFrame,
+    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
+    Workload="Google Search RPC"))
+
+predefProb <- read.table("Google_AllRPC.txt",
+        col.names=c('MessageSize', 'CDF'), skip=1)
+predefProb <- rbind(data.frame(MessageSize=c(0,predefProb$MessageSize[1]-1), CDF=c(0,0)), predefProb)
+predefProb$WorkLoad <- "Google All RPC"
+prob = predefProb$CDF-c(0,predefProb$CDF[1:length(predefProb$CDF)-1])
+byteFrac = prob * sapply(predefProb$MessageSize, msgSizeOnWire)
+cumBytes <- cumsum(byteFrac)/sum(byteFrac)
+predefProb$CBF <- cumBytes
+cdfFrame <- rbind(predefProb, cdfFrame)
+unschedFracFrame <- rbind(unschedFracFrame,
+    data.frame(Unsched=unschedVec, CumUnschedFrac=getUnschedFrac(prob, predefProb$MessageSize),
+    Workload="Google All RPC"))
+
 
 predefProb <- read.table("Fabricated_Heavy_Head.txt",
         col.names=c('MessageSize', 'CDF'), skip=1)
