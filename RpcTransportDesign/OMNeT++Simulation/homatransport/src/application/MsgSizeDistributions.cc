@@ -101,6 +101,8 @@ MsgSizeDistributions::getSizeAndInterarrival(int &msgSize, int &destHostId,
     destHostId = -1;
     switch(sizeDistSelector) {
         case DistributionChoice::DCTCP:
+        case DistributionChoice::GOOGLE_ALL_RPC:
+        case DistributionChoice::GOOGLE_SEARCH_RPC:
         case DistributionChoice::FACEBOOK_WEB_SERVER_INTRACLUSTER:
         case DistributionChoice::FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER:
         case DistributionChoice::FACEBOOK_HADOOP_ALL:

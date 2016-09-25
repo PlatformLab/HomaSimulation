@@ -202,6 +202,13 @@ WorkloadSynthesizer::initialize()
                 FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER;
         distFileName = std::string("../../sizeDistributions/"
                 "Facebook_CacheFollowerDist_IntraCluster.txt");
+    } else if (strcmp(workLoadType, "GOOGLE_ALL_RPC")
+            == 0) {
+        distSelector =
+                MsgSizeDistributions::DistributionChoice::
+                GOOGLE_ALL_RPC;
+        distFileName = std::string("../../sizeDistributions/"
+                "Google_AllRPC.txt");
     } else if (strcmp(workLoadType, "FACEBOOK_HADOOP_ALL")
             == 0) {
         distSelector =
@@ -216,7 +223,13 @@ WorkloadSynthesizer::initialize()
                 FABRICATED_HEAVY_MIDDLE;
         distFileName = std::string("../../sizeDistributions/"
                 "Fabricated_Heavy_Middle.txt");
-    }  else if (strcmp(workLoadType, "FABRICATED_HEAVY_HEAD")
+    } else if (strcmp(workLoadType, "GOOGLE_SEARCH_RPC")
+            == 0) {
+        distSelector =
+            MsgSizeDistributions::DistributionChoice::GOOGLE_SEARCH_RPC;
+        distFileName = std::string("../../sizeDistributions/"
+                " Google_AllRPC.txt");
+    } else if (strcmp(workLoadType, "FABRICATED_HEAVY_HEAD")
             == 0) {
         distSelector =
                 MsgSizeDistributions::DistributionChoice::

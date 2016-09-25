@@ -23,6 +23,8 @@ class MsgSizeDistributions {
     enum DistributionChoice {
         SIZE_IN_FILE = 0,
         DCTCP,
+        GOOGLE_SEARCH_RPC,
+        GOOGLE_ALL_RPC,
         FACEBOOK_KEY_VALUE,
         FACEBOOK_WEB_SERVER_INTRACLUSTER,
         FACEBOOK_CACHE_FOLLOWER_INTRACLUSTER,

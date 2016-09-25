@@ -11,13 +11,13 @@ cdfFromLogScaledCbf <- function()
 
     # monotonically increasing vector of msg sizes
     #sizeIntervals <- c(1, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 3529904)
-    sizeIntervals <- c(1, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 12158197)
+    sizeIntervals <- c(1, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 15158197)
 
     # monotonically increaing cbf (cumulative byte function) vector. First element
     # is always 0 and last element is always one. Each cbf value in this vector
     # corresponds to a size in the sizeIntervals vector.
     #cbf <- c(0, .0016, .0160256, .01923077, .07051282, .4455128, .525641, .6025641, .6987179, .7403846, .7532051, .7660256, .7884615, .900641, .9455128, .9519231, 1)
-    cbf <- c(0, .003205128, .006410256, .009615385, .01602564, .05128205, .07051282, .09294872, .1185897, .1762821, .2564103, .3012821, .3461538, .4679487, .5512321, .6826923, 1)
+    cbf <- c(0, .0001205128, .001010256, .0070385, .01602564, .05128205, .07051282, .09294872, .1185897, .1762821, .2564103, .3012821, .3461538, .4679487, .5512321, .6826923, 1)
 
     multipLiers <- (cbf[2:length(cbf)] - cbf[1:length(cbf)-1]) *
         (1/sizeIntervals[1:length(cbf)-1] - 1/sizeIntervals[2:length(cbf)]) /
@@ -31,10 +31,11 @@ cdfFromLogScaledCbf <- function()
     #cdf sample vector must be sorted: cdf <- seq(0.001, 1, 0.001)
     cdf <- c()
     cdfBounds <- c(0, cdfRanges)
-    numElem = 8
+    numElemDouble = 3
     for (ind in seq(1, length(cdfRanges)))
     {
-        numElem <- as.integer(numElem*1.08)
+        numElemDouble <- numElemDouble*1.3
+        numElem <- as.integer(numElemDouble)
         cdf <- c(cdf, seq(cdfBounds[ind], cdfBounds[ind+1], (cdfBounds[ind+1] - cdfBounds[ind])/numElem))
     }
     cdf <- sort(unique(cdf))
