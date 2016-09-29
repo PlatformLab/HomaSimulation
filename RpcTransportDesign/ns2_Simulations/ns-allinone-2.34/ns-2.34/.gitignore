@@ -1,3 +1,4 @@
+*.in
 Makefile
 autoconf.h
 common/ptypes2tcl
@@ -17,3 +18,4 @@ indep-utils/webtrace-conv/ucb/Makefile
 indep-utils/webtrace-conv/ucb/ucb-tr-stat
 ns
 nstk
+nse

@@ -777,7 +777,7 @@ xtb_frame *frame;		/* Returned frame */
     memset(new_info->lines, 0, sizeof(Window) * E_LINES);
 
     lineptr = text;
-    while (getline(&lineptr, line)) {
+    while (newgetline(&lineptr, line)) {
 	if (new_info->num_lines >= new_info->alloc_lines) {
 	    int old_alloc_lines_size = new_info->alloc_lines * sizeof(Window);
 	    new_info->alloc_lines *= 2;
@@ -888,7 +888,7 @@ char   *err_text;
 
 
 int 
-getline(tptr, lptr)
+newgetline(tptr, lptr)
 char  **tptr;
 char   *lptr;
 
