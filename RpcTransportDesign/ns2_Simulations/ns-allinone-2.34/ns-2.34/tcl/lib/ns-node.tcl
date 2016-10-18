@@ -4,7 +4,7 @@
 #
 # Copyright (c) 1996-2000 Regents of the University of California.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -20,7 +20,7 @@
 # 4. Neither the name of the University nor of the Research Group may be
 #    used to endorse or promote products derived from this software without
 #    specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ Node proc getid {} {
 	return $id
 }
 
-# The list of modules to be installed. More can be added via node-config. 
+# The list of modules to be installed. More can be added via node-config.
 # Base should always be the first module in this list.
 Node set module_list_ { Base }
 
@@ -78,7 +78,7 @@ Node instproc init args {
 		set address_ $id_
 	}
 	$self cmd addr $address_; # Propagate address_ into C++ space
-	#$ns_ add-node $self $id_        
+	#$ns_ add-node $self $id_
 	set neighbor_ ""
 	set agents_ ""
 	set dmux_ ""
@@ -88,13 +88,13 @@ Node instproc init args {
 	set nodetype_ [$ns_ get-nodetype]
 
 	$self mk-default-classifier
-
 	# XXX Eventually these two should also be converted to modules
 	set multiPath_ [$class set multiPath_]
+
 }
 
 # XXX This instproc is backward compatibility; when satellite node, mobile
-# node (incl. MIP) are converted to routing modules, this should be merged 
+# node (incl. MIP) are converted to routing modules, this should be merged
 # into init{}
 Node instproc mk-default-classifier {} {
 	Node instvar module_list_
@@ -113,7 +113,7 @@ Node instproc node-addr {} {
 }
 
 #----------------------------------------------------------------------
-# XXX This should eventually go away, as we replace nodetype_ with 
+# XXX This should eventually go away, as we replace nodetype_ with
 # routing modules
 Node instproc node-type {} {
 	return [$self set nodetype_]
@@ -134,7 +134,7 @@ Node instproc unregister-module { mod } {
 	$self instvar reg_module_
 	$mod unregister
 	# We do not explicitly check the existence of reg_module_($name).
-	# If not, tcl will issue an error by itself. 
+	# If not, tcl will issue an error by itself.
 	unset reg_module_([$mod module-name])
 	delete $mod
 }
@@ -163,7 +163,7 @@ Node instproc get-module { name } {
 # Address classifier manipulation
 #
 
-# Increase the routing table size counter - keeps track of rtg table 
+# Increase the routing table size counter - keeps track of rtg table
 # size for each node. For bookkeeping only.
 Node instproc incr-rtgtable-size {} {
 	$self instvar rtsize_
@@ -179,23 +179,23 @@ Node instproc entry {} {
 	return [$self set classifier_]
 }
 
-# Place classifier $clsfr at the node entry point. 
+# Place classifier $clsfr at the node entry point.
 #
-# - Place the existing entry at slot $hook of the new classifier. Usually 
+# - Place the existing entry at slot $hook of the new classifier. Usually
 #   it is an address classifier sitting in a node entry, so this means that
-#   a special address should be assigned to pass packets to the original 
-#   classifier, if this is necessary. 
+#   a special address should be assigned to pass packets to the original
+#   classifier, if this is necessary.
 #
 # - Associate the new classifier with $module (stored in mod_assoc_). This
-#   information is used later when the associated classifier is replaced, 
+#   information is used later when the associated classifier is replaced,
 #   then $module will be notified of this event and requested to unregister.
 #
-# - The original classifier is stored in hook_assoc_, this is used in 
+# - The original classifier is stored in hook_assoc_, this is used in
 #   install-entry{} to connect the new classifier to the "classifier chain"
 #   to which the replaced classifier is linked.
 #
-# - To install at the entry something derived from Connector rather than 
-#   Classifier, you should specify $hook as "target". 
+# - To install at the entry something derived from Connector rather than
+#   Classifier, you should specify $hook as "target".
 Node instproc insert-entry { module clsfr {hook ""} } {
 	$self instvar classifier_ mod_assoc_ hook_assoc_
 	if { $hook != "" } {
@@ -213,10 +213,10 @@ Node instproc insert-entry { module clsfr {hook ""} } {
 	set classifier_ $clsfr
 }
 
-# We separate insert-entry from install-entry because we need a method to 
-# replace the current entry classifier and _remove_ routing functionality 
-# associated with that classifier. These two methods cannot be merged by 
-# checking whether $hook is empty. 
+# We separate insert-entry from install-entry because we need a method to
+# replace the current entry classifier and _remove_ routing functionality
+# associated with that classifier. These two methods cannot be merged by
+# checking whether $hook is empty.
 Node instproc install-entry { module clsfr {hook ""} } {
 	$self instvar classifier_ mod_assoc_ hook_assoc_
 	if [info exists classifier_] {
@@ -242,9 +242,9 @@ Node instproc install-entry { module clsfr {hook ""} } {
 
 # CHANGE:
 # Node no longer keeps list of all rtmodules to be notified.
-# Instead we now have a chain (linked list) of modules, 
-# with rtnotif_ being the head of this linked list. 
-# Routing info flows from thru all rtmodules linked by this 
+# Instead we now have a chain (linked list) of modules,
+# with rtnotif_ being the head of this linked list.
+# Routing info flows from thru all rtmodules linked by this
 # chain.
 
 # Whenever a route is added or deleted, $module should be notified
@@ -274,9 +274,9 @@ Node instproc unreg-route-notify { module } {
 
 Node instproc add-route { dst target } {
 	$self instvar rtnotif_
-	# Notify every module that is interested about this 
+	# Notify every module that is interested about this
 	# route installation
-	
+
 	if {$rtnotif_ != ""} {
 		$rtnotif_ add-route $dst $target
 	}
@@ -325,7 +325,7 @@ Node instproc intf-changed {} {
 
 #----------------------------------------------------------------------
 
-# XXX Eventually add-routes{} and delete-routes{} should be 
+# XXX Eventually add-routes{} and delete-routes{} should be
 # unified with add-route{} for a single interface to install routes.
 
 # Node support for equal cost multi path routing
@@ -352,6 +352,19 @@ Node instproc add-routes {id ifs} {
 			# 3. install the mclassifier in the node classifier_
 			#
 			set mpathClsfr_($id) [new Classifier/MultiPath]
+			$mpathClsfr_($id) set nodeid_ [$self id]
+			set nodecolor_ [$self get-attribute "COLOR"]
+			set nodetype_ 0
+			if {$nodecolor_ == "green"} {
+				set nodetype_ 1
+			}
+			if {$nodecolor_ == "blue"} {
+				set nodetype_ 2
+			}
+			if {$nodecolor_ == "red"} {
+				set nodetype_ 3
+			}
+			$mpathClsfr_($id) set nodetype_ $nodetype_
 			if {$routes_($id) > 0} {
 				assert "$routes_($id) == 1"
 				$mpathClsfr_($id) installNext \
@@ -381,21 +394,21 @@ Node instproc delete-routes {id ifs nullagent} {
 	} else {
 		$self delete-route $id $nullagent
 		incr routes_($id) -1
-		# Notice that after this operation routes_($id) may not 
+		# Notice that after this operation routes_($id) may not
 		# necessarily be 0.
 	}
 }
 
-# Enable multicast routing support in this node. 
-# 
-# XXX This instproc should ONLY be used when you want multicast only on a 
+# Enable multicast routing support in this node.
+#
+# XXX This instproc should ONLY be used when you want multicast only on a
 # subset of nodes as a means to save memory. If you want to run multicast on
 # your entire topology, use [new Simulator -multicast on].
 Node instproc enable-mcast args {
-	# Do NOT add Mcast using Node enable-module, because the latter 
+	# Do NOT add Mcast using Node enable-module, because the latter
 	# enables mcast for all nodes that may be created later
 	$self register-module [new RtModule/Mcast]
-	
+
 }
 
 #--------------------------------------------------------------
@@ -423,11 +436,11 @@ Node instproc demux {} {
 }
 
 # Install $demux as the default demuxer of the node, place the existing demux
-# at $port of the new demuxer. 
+# at $port of the new demuxer.
 #
-# XXX Here we do not have a similar difference like that between 
-# "insert-entry" and "install-entry", because even if a demux 
-# is replaced, the associated routing module should not be removed. 
+# XXX Here we do not have a similar difference like that between
+# "insert-entry" and "install-entry", because even if a demux
+# is replaced, the associated routing module should not be removed.
 #
 # This is a rather arbitrary decision, but we do not have better clue
 # how demuxers will be used among routing modules.
@@ -461,12 +474,12 @@ Node instproc unreg-port-notify { module } {
 # Attach an agent to a node: pick a port and bind the agent to the port.
 #
 # To install module-specific demuxers, do that in your module's register{}
-# method. Since this method will be called during Node::init{}, when 
+# method. Since this method will be called during Node::init{}, when
 # Node::attach{} is called dmux_ will already be present hence the following
 # default dmux_ construction will not be triggered.
 #
 Node instproc attach { agent { port "" } } {
-	$self instvar agents_ address_ dmux_ 
+	$self instvar agents_ address_ dmux_
 	#
 	# Assign port number (i.e., this agent receives
 	# traffic addressed to this host and port)
@@ -477,7 +490,7 @@ Node instproc attach { agent { port "" } } {
 	# We call the entry method on ourself to find the front door
 	# (e.g., for multicast the first object is not the unicast classifier)
 	#
-	# Also, stash the node in the agent and set the local addr of 
+	# Also, stash the node in the agent and set the local addr of
 	# this agent.
 	#
 	$agent set node_ $self
@@ -527,7 +540,7 @@ Node instproc detach { agent nullagent } {
 	$agent set node_ ""
 	$agent set agent_addr_ 0
 	$agent target $nullagent
-	# Install nullagent to sink transit packets   
+	# Install nullagent to sink transit packets
 	$dmux_ install [$agent set agent_port_] $nullagent
 
 	foreach m [$self set ptnotif_] {
@@ -558,7 +571,7 @@ Node instproc neighbors {} {
 Node instproc add-neighbor {p {pushback 0}} {
 	$self instvar neighbor_
 	lappend neighbor_ $p
-	
+
 	#added for keeping the neighbor list in the Node (for pushback) - ratul
 	if { $pushback == 1 } {
 		$self cmd add-neighbor $p

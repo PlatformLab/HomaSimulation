@@ -32,7 +32,7 @@
  * SUCH DAMAGE.
  *
  */
- 
+
 #ifndef ns_tcpsink_h
 #define ns_tcpsink_h
 
@@ -41,7 +41,7 @@
 #include "tcp.h"
 
 /* max window size */
-// #define MWS 1024  
+// #define MWS 1024
 #define MWS 64
 #define MWM (MWS-1)
 #define HS_MWS 65536
@@ -70,7 +70,7 @@ public:
 protected:
 	int next_;		/* next packet expected */
 	int maxseen_;		/* max packet number seen */
-	int wndmask_;		/* window mask - either MWM or HS_MWM - Sylvia */ 
+	int wndmask_;		/* window mask - either MWM or HS_MWM - Sylvia */
 	int ecn_unacked_;	/* ECN forwarded to sender, but not yet
 				 * acknowledged. */
 	int *seen_;		/* array of packets seen */
@@ -83,7 +83,7 @@ public:
 // derive Sacker from TclObject to allow for traced variable
 class SackStack;
 class Sacker : public Acker, public TclObject {
-public: 
+public:
 	Sacker() : base_nblocks_(-1), sf_(0) { };
 	~Sacker();
 	void append_ack(hdr_cmn*, hdr_tcp*, int oldSeqno) const;
@@ -121,14 +121,14 @@ protected:
 	Packet* save_;		/* place to stash saved packet while delaying */
 				/* used by DelAckSink */
 	int generate_dsacks_;	// used only by sack sinks
-	int qs_enabled_; // to enable QuickStart 
-	int RFC2581_immediate_ack_;	// Used to generate ACKs immediately 
+	int qs_enabled_; // to enable QuickStart
+	int RFC2581_immediate_ack_;	// Used to generate ACKs immediately
 	int bytes_;  	// for JOBS
 					// for RFC2581-compliant gap-filling.
 	double lastreset_; 	/* W.N. used for detecting packets  */
 				/* from previous incarnations */
         int ecn_syn_;           /* allow SYN/ACK packets to be ECN-capable */
-
+	int ecnhat_;            /* Mohammad: added to enable ECNHAT receiver behavior */
 };
 
 class DelAckSink;

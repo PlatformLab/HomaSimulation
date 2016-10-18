@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 1997 Regents of the University of California.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -18,7 +18,7 @@
  * 4. Neither the name of the University nor of the Research Group may be
  *    used to endorse or promote products derived from this software without
  *    specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,6 +40,8 @@ static const char rcsid[] =
 #include "queue-monitor.h"
 #include "trace.h"
 #include <math.h>
+
+#include "ip.h"
 
 int QueueMonitor::command(int argc, const char*const* argv)
 {
@@ -70,13 +72,13 @@ int QueueMonitor::command(int argc, const char*const* argv)
 		if (strcmp(argv[1], "printRTTs") == 0) {
 			if (keepRTTstats_ && channel1_) {
 				printRTTs();
-			} 
+			}
 			return (TCL_OK);
 		}
 		if (strcmp(argv[1], "printSeqnos") == 0) {
 			if (keepSeqnoStats_ && channel1_) {
 				printSeqnos();
-			} 
+			}
 			return (TCL_OK);
 		}
 	}
@@ -159,11 +161,11 @@ QueueMonitor::printRTTs() {
 	(void)Tcl_Write(channel1_, wrk, n);
 	for (i = 0; i < topBin; i++) {
 		if (RTTbins_[i] > 0) {
-		   	sprintf(wrk, "%d to %d ms: frac %5.3f num %d time %4.2f\n", 
-		   	  i*MsPerBin, (i+1)*MsPerBin, 
+		   	sprintf(wrk, "%d to %d ms: frac %5.3f num %d time %4.2f\n",
+		   	  i*MsPerBin, (i+1)*MsPerBin,
 			  (double)RTTbins_[i]/numRTTs_,
-		   	  RTTbins_[i], now); 
-			n = strlen(wrk); wrk[n] = 0; 
+		   	  RTTbins_[i], now);
+			n = strlen(wrk); wrk[n] = 0;
 			(void)Tcl_Write(channel1_, wrk, n);
 		}
 	}
@@ -178,21 +180,21 @@ QueueMonitor::printRTTs() {
 
 void
 QueueMonitor::printSeqnos() {
-	int i, n, topBin; 
+	int i, n, topBin;
 	char wrk[500];
 
 	topBin = int(maxSeqno_ / SeqnoBinSize_);
 	double now = Scheduler::instance().clock();
-	sprintf(wrk, "Distribution of Seqnos, %d seqnos per bin, time %4.2f\n", 
+	sprintf(wrk, "Distribution of Seqnos, %d seqnos per bin, time %4.2f\n",
 	   SeqnoBinSize_, now);
  	n = strlen(wrk); wrk[n] = 0;
 	(void)Tcl_Write(channel1_, wrk, n);
 	for (i = 0; i < topBin; i++) {
 		if (SeqnoBins_[i] > 0) {
-		   	sprintf(wrk, "%d to %d seqnos: frac %5.3f num %d time %4.2f\n", 
-		   	  i*SeqnoBinSize_, (i+1)*SeqnoBinSize_ - 1, 
+		   	sprintf(wrk, "%d to %d seqnos: frac %5.3f num %d time %4.2f\n",
+		   	  i*SeqnoBinSize_, (i+1)*SeqnoBinSize_ - 1,
 			  (double)SeqnoBins_[i]/numSeqnos_,
-		   	  SeqnoBins_[i], now); 
+		   	  SeqnoBins_[i], now);
 			n = strlen(wrk); wrk[n] = 0;
 			(void)Tcl_Write(channel1_, wrk, n);
 		}
@@ -217,7 +219,7 @@ QueueMonitor::printStats() {
 	wrk[n+1] = 0;
 	(void)Tcl_Write(channel_, wrk, n+1);
 	wrk[n] = 0;
-}	
+}
 
 // packet arrival to a queue
 void QueueMonitor::in(Packet* p)
@@ -245,6 +247,20 @@ void QueueMonitor::in(Packet* p)
 		prevTime_ = now;
 	}
 
+	//Shuang: count small flow arrivals
+	hdr_ip* iph = hdr_ip::access(p);
+	int prio = iph->prio() / 1460;
+	if (prio < 100000 && pktsz > 100) {
+		karrivals_[calc_prio(prio)] ++;
+	}
+
+	//Shuang: count ack arrivals
+	//hdr_rcp* rh = hdr_rcp::access(p);
+	//if (rh->RCP_pkt_type() == RCP_ACK) {
+	//	ack_arrivals_++;
+	//}
+
+
 	barrivals_ += pktsz;
 	parrivals_++;
 	size_ += pktsz;
@@ -267,12 +283,19 @@ void QueueMonitor::out(Packet* p)
 	double now = Scheduler::instance().clock();
 	int pktsz = hdr->size();
 
-	if (pf->ce() && pf->ect()) 
+	if (pf->ce() && pf->ect())
 		pmarks_++;
 	size_ -= pktsz;
 	pkts_--;
 	bdepartures_ += pktsz;
 	pdepartures_++;
+
+	//Shuang: count ack departure
+	//hdr_rcp* rh = hdr_rcp::access(p);
+	//if (rh->RCP_pkt_type() == RCP_ACK) {
+	//	ack_departures_++;
+	//}
+
 	if (bytesInt_)
 		bytesInt_->newPoint(now, double(size_));
 	if (pktsInt_)
@@ -302,6 +325,19 @@ void QueueMonitor::drop(Packet* p)
 	bdrops_ += pktsz;
 	pdrops_++;
 
+	//Shuang: count small flow dropping
+	hdr_ip* iph = hdr_ip::access(p);
+	int prio = iph->prio() / 1460;
+	if (prio < 100000 && pktsz > 100) {
+		kdrops_[calc_prio(prio)] ++;
+	}
+	//Shuang: count ack dropping
+	//hdr_rcp* rh = hdr_rcp::access(p);
+	//if (rh->RCP_pkt_type() == RCP_ACK) {
+	//	ack_drops_++;
+	//}
+
+
 	if (pf->qs())
 		qs_drops_++;
 
@@ -313,9 +349,23 @@ void QueueMonitor::drop(Packet* p)
 		printStats();
 }
 
+int QueueMonitor::calc_prio(int prio)
+{
+	if (prio <= 10)
+		return prio;
+	if (prio <= 100)
+		return 10 + prio / 10;
+	if (prio <= 1000)
+		return 20 + prio / 100;
+	if (prio <= 10000)
+		return 30 + prio / 1000;
+	if (prio <= 100000)
+		return 40 + prio / 10000;
+}
+
 // The procedure to estimate the rate of the incoming traffic
 void QueueMonitor::estimateRate(Packet *pkt) {
-	
+
 	hdr_cmn* hdr  = hdr_cmn::access(pkt);
 	int pktSize   = hdr->size() << 3; /* length of the packet in bits */
 
@@ -330,9 +380,9 @@ void QueueMonitor::estimateRate(Packet *pkt) {
 		pktSize+= temp_size_;
 		temp_size_ = 0;
 	}
-	
+
 	prevTime_ = now;
-	
+
 	estRate_ = (1 - exp(-timeGap/k_))*((double)pktSize)/timeGap + exp(-timeGap/k_)*estRate_;
 }
 
@@ -343,7 +393,7 @@ void QueueMonitor::keepRTTstats(Packet *pkt) {
 	packet_t t = hdr->ptype();
 	if (t == PT_TCP || t == PT_HTTP || t == PT_FTP || t == PT_TELNET) {
 		hdr_tcp *tcph = hdr_tcp::access(pkt);
-		rttInMs = tcph->last_rtt(); 
+		rttInMs = tcph->last_rtt();
 		if (rttInMs < 0) rttInMs = 0;
 		topBin = maxRTT_ * binsPerSec_;
 		if (numRTTs_ == 0) {
@@ -363,12 +413,12 @@ void QueueMonitor::keepRTTstats(Packet *pkt) {
 
 //The procedure to keep Seqno (sequence number) statistics.
 void QueueMonitor::keepSeqnoStats(Packet *pkt) {
-        int i, j, topBin, seqno; 
+        int i, j, topBin, seqno;
 	hdr_cmn* hdr  = hdr_cmn::access(pkt);
 	packet_t t = hdr->ptype();
 	if (t == PT_TCP || t == PT_HTTP || t == PT_FTP || t == PT_TELNET) {
 		hdr_tcp *tcph = hdr_tcp::access(pkt);
-		seqno = tcph->seqno(); 
+		seqno = tcph->seqno();
 		if (seqno < 0) seqno = 0;
 		topBin = int(maxSeqno_ / SeqnoBinSize_);
 		if (numSeqnos_ == 0) {
@@ -432,9 +482,9 @@ public:
 } snoopq_tagger_class;
 
 static class QueueMonitorEDClass : public TclClass {
-public: 
+public:
 	QueueMonitorEDClass() : TclClass("QueueMonitor/ED") {}
-	TclObject* create(int, const char*const*) { 
+	TclObject* create(int, const char*const*) {
 		return (new EDQueueMonitor);
 	}
 } queue_monitor_ed_class;
@@ -448,7 +498,6 @@ public:
  * ############################################################
  */
 
-#include "ip.h"
 QueueMonitorCompat::QueueMonitorCompat()
 {
 	memset(pkts_, 0, sizeof(pkts_));
@@ -583,9 +632,9 @@ int QueueMonitorCompat::command(int argc, const char*const* argv)
 }
 
 static class QueueMonitorCompatClass : public TclClass {
- public: 
+ public:
 	QueueMonitorCompatClass() : TclClass("QueueMonitor/Compat") {}
-	TclObject* create(int, const char*const*) { 
+	TclObject* create(int, const char*const*) {
 		return (new QueueMonitorCompat);
 	}
 } queue_monitor_compat_class;

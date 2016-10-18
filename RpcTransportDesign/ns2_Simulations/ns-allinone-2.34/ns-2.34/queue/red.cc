@@ -34,22 +34,22 @@
  *
  * Here is one set of parameters from one of Sally's simulations
  * (this is from tcpsim, the older simulator):
- * 
+ *
  * ed [ q_weight=0.002 thresh=5 linterm=30 maxthresh=15
  *         mean_pktsize=500 dropmech=random-drop queue-size=60
- *         plot-file=none bytes=false doubleq=false dqthresh=50 
+ *         plot-file=none bytes=false doubleq=false dqthresh=50
  *	   wait=true ]
- * 
- * 1/"linterm" is the max probability of dropping a packet. 
+ *
+ * 1/"linterm" is the max probability of dropping a packet.
  * There are different options that make the code
  * more messy that it would otherwise be.  For example,
  * "doubleq" and "dqthresh" are for a queue that gives priority to
- *   small (control) packets, 
- * "bytes" indicates whether the queue should be measured in bytes 
- *   or in packets, 
- * "dropmech" indicates whether the drop function should be random-drop 
- *   or drop-tail when/if the queue overflows, and 
- *   the commented-out Holt-Winters method for computing the average queue 
+ *   small (control) packets,
+ * "bytes" indicates whether the queue should be measured in bytes
+ *   or in packets,
+ * "dropmech" indicates whether the drop function should be random-drop
+ *   or drop-tail when/if the queue overflows, and
+ *   the commented-out Holt-Winters method for computing the average queue
  *   size can be ignored.
  * "wait" indicates whether the gateway should wait between dropping
  *   packets.
@@ -74,18 +74,18 @@ public:
 	REDClass() : TclClass("Queue/RED") {}
 	TclObject* create(int argc, const char*const* argv) {
 		//printf("creating RED Queue. argc = %d\n", argc);
-		
+
 		//mod to enable RED to take arguments
-		if (argc==5) 
+		if (argc==5)
 			return (new REDQueue(argv[4]));
 		else
 			return (new REDQueue("Drop"));
 	}
 } class_red;
 
-/* Strangely this didn't work. 
+/* Strangely this didn't work.
  * Seg faulted for child classes.
-REDQueue::REDQueue() { 
+REDQueue::REDQueue() {
 	REDQueue("Drop");
 }
 */
@@ -96,7 +96,7 @@ REDQueue::REDQueue() {
 REDQueue::REDQueue(const char * trace) : link_(NULL), de_drop_(NULL), EDTrace(NULL), tchan_(0), idle_(1), idletime_(0.0)
 {
 	initParams();
-	
+
 	//	printf("Making trace type %s\n", trace);
 	if (strlen(trace) >=20) {
 		printf("trace type too long - allocate more space to traceType in red.h and recompile\n");
@@ -121,8 +121,8 @@ REDQueue::REDQueue(const char * trace) : link_(NULL), de_drop_(NULL), EDTrace(NU
 	bind("interval_", &edp_.interval);	    // adaptive red param
 	bind("feng_adaptive_",&edp_.feng_adaptive); // adaptive red variant
 	bind("targetdelay_", &edp_.targetdelay);    // target delay
-	bind("top_", &edp_.top);		    // maximum for max_p	
-	bind("bottom_", &edp_.bottom);		    // minimum for max_p	
+	bind("top_", &edp_.top);		    // maximum for max_p
+	bind("bottom_", &edp_.bottom);		    // minimum for max_p
 	bind_bool("wait_", &edp_.wait);
 	bind("linterm_", &edp_.max_p_inv);
 	bind("mark_p_", &edp_.mark_p);
@@ -139,7 +139,7 @@ REDQueue::REDQueue(const char * trace) : link_(NULL), de_drop_(NULL), EDTrace(NU
 
 	bind_bool("drop_front_", &drop_front_);	    // drop first pkt
 	//	_RENAMED("drop-front_", "drop_front_");
-	
+
 	bind_bool("drop_rand_", &drop_rand_);	    // drop pkt at random
 	//	_RENAMED("drop-rand_", "drop_rand_");
 
@@ -150,7 +150,7 @@ REDQueue::REDQueue(const char * trace) : link_(NULL), de_drop_(NULL), EDTrace(NU
 	bind("prob1_", &edv_.v_prob1);		    // dropping probability
 	bind("curq_", &curq_);			    // current queue size
 	bind("cur_max_p_", &edv_.cur_max_p);        // current max_p
-	
+
 
 	q_ = new PacketQueue();			    // underlying queue
 	pq_ = q_;
@@ -159,7 +159,7 @@ REDQueue::REDQueue(const char * trace) : link_(NULL), de_drop_(NULL), EDTrace(NU
 	print_edp();
 	print_edv();
 #endif
-	
+
 }
 
 
@@ -174,13 +174,13 @@ void REDQueue::initialize_params()
 /*
  * If q_weight=0, set it to a reasonable value of 1-exp(-1/C)
  * This corresponds to choosing q_weight to be of that value for
- * which the packet time constant -1/ln(1-q_weight) per default RTT 
+ * which the packet time constant -1/ln(1-q_weight) per default RTT
  * of 100ms is an order of magnitude more than the link capacity, C.
  *
  * If q_weight=-1, then the queue weight is set to be a function of
- * the bandwidth and the link propagation delay.  In particular, 
- * the default RTT is assumed to be three times the link delay and 
- * transmission delay, if this gives a default RTT greater than 100 ms. 
+ * the bandwidth and the link propagation delay.  In particular,
+ * the default RTT is assumed to be three times the link delay and
+ * transmission delay, if this gives a default RTT greater than 100 ms.
  *
  * If q_weight=-2, set it to a reasonable value of 1-exp(-10/C).
  */
@@ -189,7 +189,7 @@ void REDQueue::initialize_params()
  	} else if (edp_.q_w == -1.0) {
 		double rtt = 3.0*(edp_.delay+1.0/edp_.ptc);
 		//printf("delay: %5.4f rtt: %5.4f\n", edp_.delay, rtt);
-		if (rtt < 0.1) 
+		if (rtt < 0.1)
 			rtt = 0.1;
 		edp_.q_w = 1.0 - exp(-1.0/(10*rtt*edp_.ptc));
 	} else if (edp_.q_w == -2.0) {
@@ -206,24 +206,24 @@ void REDQueue::initialize_params()
 		if (edp_.th_min_pkts < targetqueue / 2.0 )
 			edp_.th_min_pkts = targetqueue / 2.0 ;
         }
-	if (edp_.th_max_pkts == 0) 
+	if (edp_.th_max_pkts == 0)
 		edp_.th_max_pkts = 3.0 * edp_.th_min_pkts;
         //printf("th_min_pkts: %7.5f th_max_pkts: %7.5f\n", edp_.th_min_pkts, edp_.th_max);
 	//printf("q_w: %7.5f\n", edp_.q_w);
 	if (edp_.bottom == 0) {
 		edp_.bottom = 0.01;
-		// Set bottom to at most 1/W, for W the delay-bandwidth 
+		// Set bottom to at most 1/W, for W the delay-bandwidth
 		//   product in packets for a connection with this bandwidth,
 		//   1000-byte packets, and 100 ms RTTs.
-		// So W = 0.1 * link_->bandwidth() / 8000 
+		// So W = 0.1 * link_->bandwidth() / 8000
 		double bottom1 = 80000.0/link_->bandwidth();
-		if (bottom1 < edp_.bottom) 
+		if (bottom1 < edp_.bottom)
 			edp_.bottom = bottom1;
 		//printf("bottom: %9.7f\n", edp_.bottom);
 	}
 }
 
-void REDQueue::initParams() 
+void REDQueue::initParams()
 {
 	edp_.mean_pktsize = 0;
 	edp_.idle_pktsize = 0;
@@ -248,7 +248,7 @@ void REDQueue::initParams()
 	edp_.feng_adaptive = 0;
 	edp_.ptc = 0.0;
 	edp_.delay = 0.0;
-	
+
 	edv_.v_ave = 0.0;
 	edv_.v_prob1 = 0.0;
 	edv_.v_slope = 0.0;
@@ -267,8 +267,8 @@ void REDQueue::initParams()
 
 void REDQueue::reset()
 {
-	
-        //printf("3: th_min_pkts: %5.2f\n", edp_.th_min_pkts); 
+
+        //printf("3: th_min_pkts: %5.2f\n", edp_.th_min_pkts);
 	/*
 	 * Compute the "packet time constant" if we know the
 	 * link bandwidth.  The ptc is the max number of (avg sized)
@@ -280,35 +280,35 @@ void REDQueue::reset()
 		edp_.ptc = link_->bandwidth() / (8.0 * edp_.mean_pktsize);
 		initialize_params();
 	}
-	if (edp_.th_max_pkts == 0) 
+	if (edp_.th_max_pkts == 0)
 		edp_.th_max_pkts = 3.0 * edp_.th_min_pkts;
 	/*
 	 * If queue is measured in bytes, scale min/max thresh
 	 * by the size of an average packet (which is specified by user).
 	 */
         if (qib_) {
-		//printf("1: th_min in pkts: %5.2f mean_pktsize: %d \n", edp_.th_min_pkts, edp_.mean_pktsize); 
-                edp_.th_min = edp_.th_min_pkts * edp_.mean_pktsize;  
+		//printf("1: th_min in pkts: %5.2f mean_pktsize: %d \n", edp_.th_min_pkts, edp_.mean_pktsize);
+                edp_.th_min = edp_.th_min_pkts * edp_.mean_pktsize;
                 edp_.th_max = edp_.th_max_pkts * edp_.mean_pktsize;
-		//printf("2: th_min in bytes (if qib): %5.2f mean_pktsize: %d \n", edp_.th_min, edp_.mean_pktsize); 
+		//printf("2: th_min in bytes (if qib): %5.2f mean_pktsize: %d \n", edp_.th_min, edp_.mean_pktsize);
         } else {
 		edp_.th_min = edp_.th_min_pkts;
 		edp_.th_max = edp_.th_max_pkts;
 	}
-	 
+
 	edv_.v_ave = 0.0;
 	edv_.v_slope = 0.0;
 	edv_.count = 0;
 	edv_.count_bytes = 0;
 	edv_.old = 0;
 	double th_diff = (edp_.th_max - edp_.th_min);
-	if (th_diff == 0) { 
+	if (th_diff == 0) {
 		//XXX this last check was added by a person who knows
 		//nothing of this code just to stop FP div by zero.
 		//Values for thresholds were equal at time 0.  If you
 		//know what should be here, please cleanup and remove
 		//this comment.
-		th_diff = 1.0; 
+		th_diff = 1.0;
 	}
 	edv_.v_a = 1.0 / th_diff;
 	edv_.cur_max_p = 1.0 / edp_.max_p_inv;
@@ -324,16 +324,16 @@ void REDQueue::reset()
 		idletime_ = Scheduler::instance().clock();
 	else
 		idletime_ = 0.0; /* sched not instantiated yet */
-	
-	if (debug_) 
+
+	if (debug_)
 		printf("Doing a queue reset\n");
 	Queue::reset();
-	if (debug_) 
+	if (debug_)
 		printf("Done queue reset\n");
 }
 
 /*
- *  Updating max_p, following code from Feng et al. 
+ *  Updating max_p, following code from Feng et al.
  *  This is only called for Adaptive RED.
  *  From "A Self-Configuring RED Gateway", from Feng et al.
  *  They recommend alpha = 3, and beta = 2.
@@ -376,7 +376,7 @@ void REDQueue::updateMaxP(double new_ave, double now)
 			alpha = 0.25*edv_.cur_max_p;
 		edv_.cur_max_p = edv_.cur_max_p + alpha;
 		edv_.lastset = now;
-	} 
+	}
 }
 
 /*
@@ -394,7 +394,7 @@ double REDQueue::estimator(int nqueued, int m, double ave, double q_w)
 	old_ave = new_ave;
 	new_ave *= 1.0 - q_w;
 	new_ave += q_w * nqueued;
-	
+
 	double now = Scheduler::instance().clock();
 	if (edp_.adaptive == 1) {
 		if (edp_.feng_adaptive == 1)
@@ -434,25 +434,25 @@ Packet* REDQueue::deque()
  * Calculate the drop probability.
  */
 double
-REDQueue::calculate_p_new(double v_ave, double th_max, int gentle, double v_a, 
+REDQueue::calculate_p_new(double v_ave, double th_max, int gentle, double v_a,
 	double v_b, double v_c, double v_d, double max_p)
 {
 	double p;
 	if (gentle && v_ave >= th_max) {
 		// p ranges from max_p to 1 as the average queue
-		// size ranges from th_max to twice th_max 
+		// size ranges from th_max to twice th_max
 		p = v_c * v_ave + v_d;
-        } else if (!gentle && v_ave >= th_max) { 
+        } else if (!gentle && v_ave >= th_max) {
                 // OLD: p continues to range linearly above max_p as
                 // the average queue size ranges above th_max.
-                // NEW: p is set to 1.0 
+                // NEW: p is set to 1.0
                 p = 1.0;
         } else {
                 // p ranges from 0 to max_p as the average queue
-                // size ranges from th_min to th_max 
+                // size ranges from th_min to th_max
                 p = v_a * v_ave + v_b;
                 // p = (v_ave - th_min) / (th_max - th_min)
-                p *= max_p; 
+                p *= max_p;
         }
 	if (p > 1.0)
 		p = 1.0;
@@ -464,7 +464,7 @@ REDQueue::calculate_p_new(double v_ave, double th_max, int gentle, double v_a,
  * This is being kept for backwards compatibility.
  */
 double
-REDQueue::calculate_p(double v_ave, double th_max, int gentle, double v_a, 
+REDQueue::calculate_p(double v_ave, double th_max, int gentle, double v_a,
 	double v_b, double v_c, double v_d, double max_p_inv)
 {
 	double p = calculate_p_new(v_ave, th_max, gentle, v_a,
@@ -476,7 +476,7 @@ REDQueue::calculate_p(double v_ave, double th_max, int gentle, double v_a,
  * Make uniform instead of geometric interdrop periods.
  */
 double
-REDQueue::modify_p(double p, int count, int count_bytes, int bytes, 
+REDQueue::modify_p(double p, int count, int count_bytes, int bytes,
    int mean_pktsize, int wait, int size)
 {
 	double count1 = (double) count;
@@ -506,7 +506,7 @@ REDQueue::modify_p(double p, int count, int count_bytes, int bytes,
 }
 
 /*
- * 
+ *
  */
 
 /*
@@ -517,7 +517,7 @@ REDQueue::drop_early(Packet* pkt)
 {
 	hdr_cmn* ch = hdr_cmn::access(pkt);
 
-	edv_.v_prob1 = calculate_p_new(edv_.v_ave, edp_.th_max, edp_.gentle, 
+	edv_.v_prob1 = calculate_p_new(edv_.v_ave, edp_.th_max, edp_.gentle,
   	  edv_.v_a, edv_.v_b, edv_.v_c, edv_.v_d, edv_.cur_max_p);
 	edv_.v_prob = modify_p(edv_.v_prob1, edv_.count, edv_.count_bytes,
 	  edp_.bytes, edp_.mean_pktsize, edp_.wait, ch->size());
@@ -559,8 +559,8 @@ REDQueue::drop_early(Packet* pkt)
 		edv_.count = 0;
 		edv_.count_bytes = 0;
 		hdr_flags* hf = hdr_flags::access(pickPacketForECN(pkt));
-		if (edp_.setbit && hf->ect() && 
-                     (!edp_.use_mark_p || edv_.v_prob1 < edp_.mark_p)) { 
+		if (edp_.setbit && hf->ect() &&
+		    (!edp_.use_mark_p || edv_.v_prob1 <= edp_.mark_p)) { // Mohammad: I changed < to <=
 			hf->ce() = 1; 	// mark Congestion Experienced bit
 			// Tell the queue monitor here - call emark(pkt)
 			return (0);	// no drop
@@ -575,7 +575,7 @@ REDQueue::drop_early(Packet* pkt)
  * Pick packet for early congestion notification (ECN). This packet is then
  * marked or dropped. Having a separate function do this is convenient for
  * supporting derived classes that use the standard RED algorithm to compute
- * average queue size but use a different algorithm for choosing the packet for 
+ * average queue size but use a different algorithm for choosing the packet for
  * ECN notification.
  */
 Packet*
@@ -590,7 +590,7 @@ REDQueue::pickPacketForECN(Packet* pkt)
  * average queue size but use a different algorithm for choosing the victim.
  */
 Packet*
-REDQueue::pickPacketToDrop() 
+REDQueue::pickPacketToDrop()
 {
 	int victim;
 
@@ -601,7 +601,7 @@ REDQueue::pickPacketToDrop()
 	else			/* default is drop_tail_ */
 		victim = q_->length() - 1;
 
-	return(q_->lookup(victim)); 
+	return(q_->lookup(victim));
 }
 
 /*
@@ -645,7 +645,7 @@ void REDQueue::enque(Packet* pkt)
 		// Use idle_pktsize instead of mean_pktsize, for
 		//  a faster response to idle times.
 		if (edp_.cautious == 3) {
-			double ptc = edp_.ptc * 
+			double ptc = edp_.ptc *
 			   edp_.mean_pktsize / edp_.idle_pktsize;
 			m = int(ptc * (now - idletime_));
 		} else
@@ -657,7 +657,7 @@ void REDQueue::enque(Packet* pkt)
 	 * the scaled version above [scaled by m due to idle time]
 	 */
 	edv_.v_ave = estimator(qib_ ? q_->byteLength() : q_->length(), m + 1, edv_.v_ave, edp_.q_w);
-	//printf("v_ave: %6.4f (%13.12f) q: %d)\n", 
+	//printf("v_ave: %6.4f (%13.12f) q: %d)\n",
 	//	double(edv_.v_ave), double(edv_.v_ave), q_->length());
 	if (summarystats_) {
 		/* compute true average queue size for summary stats */
@@ -690,12 +690,12 @@ void REDQueue::enque(Packet* pkt)
 	curq_ = qlen;	// helps to trace queue during arrival, if enabled
 
 	if (qavg >= edp_.th_min && qlen > 1) {
-		if (!edp_.use_mark_p && 
+		if (!edp_.use_mark_p &&
 			((!edp_.gentle && qavg >= edp_.th_max) ||
 			(edp_.gentle && qavg >= 2 * edp_.th_max))) {
 			droptype = DTYPE_FORCED;
 		} else if (edv_.old == 0) {
-			/* 
+			/*
 			 * The average queue size has just crossed the
 			 * threshold from below to above "minthresh", or
 			 * from above "minthresh" with an empty queue to
@@ -710,7 +710,7 @@ void REDQueue::enque(Packet* pkt)
 	} else {
 		/* No packets are being dropped.  */
 		edv_.v_prob = 0.0;
-		edv_.old = 0;		
+		edv_.old = 0;
 	}
 	if (qlen >= qlim) {
 		// see if we've exceeded the queue size
@@ -720,7 +720,7 @@ void REDQueue::enque(Packet* pkt)
 	if (droptype == DTYPE_UNFORCED) {
 		/* pick packet for ECN, which is dropping in this case */
 		Packet *pkt_to_drop = pickPacketForECN(pkt);
-		/* 
+		/*
 		 * If the packet picked is different that the one that just arrived,
 		 * add it to the queue and remove the chosen packet.
 		 */
@@ -732,11 +732,11 @@ void REDQueue::enque(Packet* pkt)
 
 		// deliver to special "edrop" target, if defined
 		if (de_drop_ != NULL) {
-	
-		//trace first if asked 
-		// if no snoop object (de_drop_) is defined, 
+
+		//trace first if asked
+		// if no snoop object (de_drop_) is defined,
 		// this packet will not be traced as a special case.
-			if (EDTrace != NULL) 
+			if (EDTrace != NULL)
 				((Trace *)EDTrace)->recvOnly(pkt);
 
 			reportDrop(pkt);
@@ -783,7 +783,7 @@ int REDQueue::command(int argc, const char*const* argv)
 		if (strcmp(argv[1], "edrop-trace") == 0) {
 			if (EDTrace != NULL) {
 				tcl.resultf("%s", EDTrace->name());
-				if (debug_) 
+				if (debug_)
 					printf("edrop trace exists according to RED\n");
 			}
 			else {
@@ -801,7 +801,7 @@ int REDQueue::command(int argc, const char*const* argv)
 			print_summarystats();
 			return (TCL_OK);
 		}
-	} 
+	}
 	else if (argc == 3) {
 		// attach a file for variable tracing
 		if (strcmp(argv[1], "attach") == 0) {
@@ -843,17 +843,17 @@ int REDQueue::command(int argc, const char*const* argv)
 			return (TCL_OK);
 		}
 		if (strcmp(argv[1], "edrop-trace") == 0) {
-			if (debug_) 
+			if (debug_)
 				printf("Ok, Here\n");
 			NsObject * t  = (NsObject *)TclObject::lookup(argv[2]);
-			if (debug_)  
+			if (debug_)
 				printf("Ok, Here too\n");
 			if (t == 0) {
 				tcl.resultf("no object %s", argv[2]);
 				return (TCL_ERROR);
 			}
 			EDTrace = t;
-			if (debug_)  
+			if (debug_)
 				printf("Ok, Here too too too %d\n", ((Trace *)EDTrace)->type_);
 			return (TCL_OK);
 		}
@@ -903,17 +903,17 @@ REDQueue::trace(TracedVar* v)
 				double(*((TracedDouble*) v)));
 		}
 		n = strlen(wrk);
-		wrk[n] = '\n'; 
+		wrk[n] = '\n';
 		wrk[n+1] = 0;
 		(void)Tcl_Write(tchan_, wrk, n+1);
 	}
-	return; 
+	return;
 }
 
 /* for debugging help */
 void REDQueue::print_edp()
 {
-	printf("mean_pktsz: %d\n", edp_.mean_pktsize); 
+	printf("mean_pktsz: %d\n", edp_.mean_pktsize);
 	printf("bytes: %d, wait: %d, setbit: %d\n",
 		edp_.bytes, edp_.wait, edp_.setbit);
 	printf("minth: %f, maxth: %f\n", edp_.th_min, edp_.th_max);
@@ -933,7 +933,7 @@ void REDQueue::print_summarystats()
 {
 	//double now = Scheduler::instance().clock();
 	printf("True average queue: %5.3f", true_ave_);
-	if (qib_) 
+	if (qib_)
 		printf(" (in bytes)");
         printf(" time: %5.3f\n", total_time_);
 }
@@ -942,7 +942,7 @@ void REDQueue::print_summarystats()
 /*
  * This procedure is obsolete, and only included for backward compatibility.
  * The new procedure is REDQueue::estimator
- */ 
+ */
 /*
  * Compute the average queue size.
  * The code contains two alternate methods for this, the plain EWMA

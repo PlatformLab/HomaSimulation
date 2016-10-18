@@ -4,7 +4,7 @@
 #
 # Copyright (c) 1996-1997 Regents of the University of California.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -20,7 +20,7 @@
 # 4. Neither the name of the University nor of the Research Group may be
 #    used to endorse or promote products derived from this software without
 #    specific prior written permission.
-# 
+#
 
 # @(#) $Header: /cvsroot/nsnam/ns-2/tcl/lib/ns-default.tcl,v 1.383 2009/01/02 21:50:24 tom_henderson Exp $
 
@@ -103,8 +103,16 @@ Queue/DropTail set drop_front_ false
 Queue/DropTail set summarystats_ false
 Queue/DropTail set queue_in_bytes_ false
 Queue/DropTail set mean_pktsize_ 500
+# Mohammad: Smart drop
+Queue/DropTail set drop_smart_ false
+Queue/DropTail set sq_limit_ 10
 
 Queue/DropTail/PriQueue set Prefer_Routing_Protocols    1
+
+# Shuang: Priority drop
+Queue/DropTail set drop_prio_ false
+Queue/DropTail set deque_prio_ false
+Queue/DropTail set keep_order_ false
 
 # special cmu implemented priority queue used by DSR
 CMUPriQueue set qlen_logthresh_ 10
@@ -118,6 +126,24 @@ Queue/dsRED set ecn_ 0
 # XXX Temporary fix XXX
 # support only xcp flows; set to 1 when supporting both tcp and xcp flows; temporary fix for allocating link BW between xcp and tcp queues until dynamic queue weights come into effect. This fix should then go away
 Queue/XCP set tcp_xcp_on_ 0  ;
+
+# Drop Tail Variant
+# Queue/DropTailVariant set drop_front_ false
+# Queue/DropTailVariant set summarystats_ false
+# Queue/DropTailVariant set queue_in_bytes_ false
+# Queue/DropTailVariant set mean_pktsize_ 500
+# Queue/DropTailVariant set tcp_queue_limit_pkts_ 1000
+
+# Queue/DropTailVariant/RCP set alpha_ 0.4
+# Queue/DropTailVariant/RCP set beta_ 0.4
+# Queue/DropTailVariant/RCP set gamma_ 1
+# Queue/DropTailVariant/RCP set min_pprtt_ 0.01
+# Queue/DropTailVariant/RCP set init_rate_fact_ 0.05
+# Queue/DropTailVariant/RCP set print_status_ 1
+# Queue/DropTailVariant/RCP set rate_fact_mode_ 0
+# Queue/DropTailVariant/RCP set fixed_rate_fact_ 0.05 ;# effecitve only if rate_fact_mode = 1
+# Queue/DropTailVariant/RCP set propag_rtt_ 1.0  ;# effecitve only if rate_fact_mode = 3
+# Queue/DropTailVariant/RCP set upd_timeslot_ 0.01  ;# rate update interval (sec).
 
 Queue/RED set bytes_ true ;		# default changed on 10/11/2004.
 Queue/RED set queue_in_bytes_ true ;	# default changed on 10/11/2004.
@@ -158,7 +184,7 @@ Queue/RED set cur_max_p_ 0
 Queue/RED set summarystats_ false
 ### Adaptive RED.
 Queue/RED set alpha_ 0.01
-Queue/RED set beta_ 0.9 
+Queue/RED set beta_ 0.9
 Queue/RED set adaptive_ 0
 Queue/RED set interval_ 0.5
 Queue/RED set targetdelay_ 0.005
@@ -168,6 +194,15 @@ Queue/RED set bottom_ 0
 ###   for automatic configuration.
 Queue/RED set cautious_ 0
 Queue/RED set feng_adaptive_ 0
+# Mohammad: Phantom Queue extensions
+Queue/RED set pq_enable_ 0
+Queue/RED set pq_mode_ 0
+Queue/RED set pq_drainrate_ 0 ; # need to set this when PQ is enabled
+                                # always in bps
+Queue/RED set pq_thresh_ 0
+# Shuang: priority dropping/deque extensions
+Queue/RED set drop_prio_ 0
+Queue/RED set deque_prio_ 0
 
 Queue/RED/RIO set bytes_ false
 Queue/RED/RIO set queue_in_bytes_ false
@@ -225,9 +260,9 @@ Queue/PI set curq_ 0
 # Queue/Vq set queue_in_bytes_ false
 Queue/Vq set queue_in_bytes_ true
 # Default for queue_in_bytes_ changed to true on 4/28/2002.
-Queue/Vq set markpkts_ false 
+Queue/Vq set markpkts_ false
 Queue/Vq set ecnlim_ 0.8
-Queue/Vq set buflim_ 1.0 
+Queue/Vq set buflim_ 1.0
 # Queue/Vq set gamma_ 0.895
 Queue/Vq set gamma_ 0.98
 # Default for gamma_ changed to 0.98 on 4/28/2002.
@@ -235,6 +270,9 @@ Queue/Vq set mean_pktsize_ 1000
 Queue/Vq set curq_ 0
 Queue/Vq set drop_front_ 0
 Queue/Vq set markfront_ 0
+# Mohammad
+Queue/Vq set ctilde_ 0
+Queue/Vq set vq_len_ 0
 
 Queue/REM set gamma_ 0.001
 Queue/REM set phi_ 1.001
@@ -298,6 +336,20 @@ QueueMonitor set pdrops_ 0
 QueueMonitor set pmarks_ 0
 QueueMonitor set bdrops_ 0
 
+#added for count dropping from small flow - Shuang
+QueueMonitor set num_monitor_ 50
+for {set k 0} {$k < 50} {incr k} {
+    set tmp kdrops$k
+	QueueMonitor set $tmp 0
+	set tmp karrivals$k
+	QueueMonitor set $tmp 0
+}
+
+QueueMonitor set ack_arrivals_ 0
+QueueMonitor set ack_drops_ 0
+QueueMonitor set ack_departures_ 0
+
+
 QueueMonitor set qs_pkts_ 0
 QueueMonitor set qs_bytes_ 0
 QueueMonitor set qs_drops_ 0
@@ -326,7 +378,7 @@ QueueMonitor/ED set epdrops_ 0
 QueueMonitor/ED set ebdrops_ 0
 
 #mon stuff added for RedPD and Pushback - ratul
-QueueMonitor/ED set mon_epdrops_ 0                     
+QueueMonitor/ED set mon_epdrops_ 0
 QueueMonitor/ED set mon_ebdrops_ 0
 
 QueueMonitor/ED/Flowmon set enable_in_ true
@@ -339,7 +391,7 @@ QueueMonitor/ED/Flow set src_ -1
 QueueMonitor/ED/Flow set dst_ -1
 QueueMonitor/ED/Flow set flowid_ -1
 
-QueueMonitor/ED/Flow/TB set target_rate_ 128000 
+QueueMonitor/ED/Flow/TB set target_rate_ 128000
 QueueMonitor/ED/Flow/TB set bucket_depth_ 10000
 QueueMonitor/ED/Flow/TB set tbucket_ 10000
 QueueMonitor/ED/Flow/TSW set target_rate_ 0
@@ -353,15 +405,14 @@ QueueMonitor/ED/Flow/RedPD set monitored_ 0
 QueueMonitor/ED/Flow/RedPD set unresponsive_ 0
 QueueMonitor/ED/Flow/RedPD set monitorStartTime_ 0
 QueueMonitor/ED/Flow/RedPD set unresponsiveStartTime_ 0
-QueueMonitor/ED/Flow/RedPD set lastDropTime_ 0 
-QueueMonitor/ED/Flow/RedPD set auto_ 0 
+QueueMonitor/ED/Flow/RedPD set lastDropTime_ 0
+QueueMonitor/ED/Flow/RedPD set auto_ 0
 
 DelayLink set bandwidth_ 1.5Mb
 DelayLink set delay_ 100ms
 DelayLink set debug_ false
 DelayLink set avoidReordering_ false ;	# Added 3/27/2003.
 					# Set to true to avoid reordering when
-					#   changing link bandwidth or delay.
 DynamicLink set status_ 1
 DynamicLink set debug_ false
 
@@ -389,6 +440,11 @@ Classifier/Addr/MPLS set reroute_option_ 0
 Classifier/Addr/MPLS set control_driven_ 0
 Classifier/Addr/MPLS set data_driven_ 0
 
+# Mohammad
+Classifier/MultiPath set nodeid_ 0
+Classifier/MultiPath set nodetype_ 0
+Classifier/MultiPath set perflow_ 0
+Classifier/MultiPath set checkpathid_ 0
 #
 # FEC models
 #
@@ -567,8 +623,8 @@ Node/MobileNode set DECAP_PORT 1
 
 # Default settings for Hierarchical topology
 #
-# Bits are allocated for different fields like port, nodeid, mcast, 
-# hierarchical-levels. 
+# Bits are allocated for different fields like port, nodeid, mcast,
+# hierarchical-levels.
 # All Mask and Shift values are stored in Class AddrParams.
 AddrParams set ALL_BITS_SET 0xffffffff
 AddrParams PortShift 0
@@ -597,7 +653,7 @@ Simulator set EotTrace_ OFF
 
 
 # This flag should be initially empty. It will be set to either ON or OFF
-# by Simulator::create-wireless-node{}. 
+# by Simulator::create-wireless-node{}.
 Simulator set IMEPFlag_ ""
 Simulator set WirelessNewTrace_ 0
 Simulator set propInstCreated_ 0
@@ -634,7 +690,16 @@ NetworkInterface set debug_ false
 TBF set rate_ 64k
 TBF set bucket_ 1024
 TBF set qlen_ 0
-
+# Mohammad: Pacer variables
+TBF set pacer_enable_ 0
+TBF set assoc_timeout_ 0.01
+TBF set assoc_prob_ 0.125
+TBF set maxrate_ 1000000000
+TBF set minrate_ 10000000
+TBF set qlength_factor_ 122;
+TBF set rate_ave_factor_ 0.125
+TBF set rate_update_interval_  0.000064
+TBF set debug_ 0
 #
 # mobile Ip
 #
@@ -646,17 +711,17 @@ MIPEncapsulator set ttl_ 32
 MIPEncapsulator set debug_ false
 
 # GAF
- 
+
 GAFPartner set addr_ 0
 GAFPartner set port_ 254
 GAFPartner set shift_ 0
 GAFPartner set mask_ [AddrParams set ALL_BITS_SET]
-GAFPartner set debug_ false                  
- 
+GAFPartner set debug_ false
+
 # HTTP-related defaults are in ../tcl/webcache/http-agent.tcl
 
 #
-# Wireless simulation support 
+# Wireless simulation support
 #
 
 Mac set debug_ false
@@ -671,7 +736,7 @@ LL set mindelay_                50us
 LL set delay_                   25us
 LL set bandwidth_               0       ;# not used
 LL set debug_ false
-LL set avoidReordering_ false ;	#not used 
+LL set avoidReordering_ false ;	#not used
 
 Snoop set debug_ false
 
@@ -695,7 +760,7 @@ Snoop set debug_ false
 Mac/802_11 set bugFix_timer_ true;         # fix for when RTS/CTS not used
 # details at http://www.dei.unipd.it/wdyn/?IDsezione=2435
 
- Mac/802_11 set BeaconInterval_	       0.1		;# 100ms	
+ Mac/802_11 set BeaconInterval_	       0.1		;# 100ms
  Mac/802_11 set ScanType_	PASSIVE
  Mac/802_11 set ProbeDelay_	0.0001		;# 0.1 ms
  Mac/802_11 set MaxChannelTime_ 0.011		;# 11 ms
@@ -721,7 +786,7 @@ Mac/802_11Ext set LongRetryLimit_   4
 Mac/802_11Ext set MAC_DBG           0
 
 
-# 
+#
 # Support for Abstract LAN
 #
 
@@ -735,18 +800,18 @@ Mac/802_3 set trace_ false
 
 # Turning on/off sleep-wakeup cycles for SMAC
 Mac/SMAC set syncFlag_ 1
-                                                                                                                
+
 # Nodes synchronize their schedules in SMAC
 Mac/SMAC set selfConfigFlag_ 1
 
 # Default duty cycle in SMAC
-Mac/SMAC set dutyCycle_ 10                                                                                                                
+Mac/SMAC set dutyCycle_ 10
 #
 # Unity gain, omni-directional antennas
 # Set up the antennas to be centered in the node and 1.5 meters above it
 Antenna/OmniAntenna set X_ 0
 Antenna/OmniAntenna set Y_ 0
-Antenna/OmniAntenna set Z_ 1.5 
+Antenna/OmniAntenna set Z_ 1.5
 Antenna/OmniAntenna set Gt_ 1.0
 Antenna/OmniAntenna set Gr_ 1.0
 
@@ -760,7 +825,7 @@ Phy/WirelessPhy set RXThresh_ 3.652e-10
 Phy/WirelessPhy set bandwidth_ 2e6
 Phy/WirelessPhy set Pt_ 0.28183815
 Phy/WirelessPhy set freq_ 914e+6
-Phy/WirelessPhy set L_ 1.0  
+Phy/WirelessPhy set L_ 1.0
 
 Phy/WirelessPhyExt set CSThresh_ 6.30957e-12           ;# -82 dBm
 Phy/WirelessPhyExt set noise_floor_ 7.96159e-14        ;# -101 dBm
@@ -844,9 +909,9 @@ Agent/SCTP set mtu_ 1500                ;# MTU of ethernet (most common)
 Agent/SCTP set initialRwnd_ 65536       ;# default inital receiver window
 Agent/SCTP set initialSsthresh_ 65536   ;# default inital ssthresh value
 Agent/SCTP set initialCwnd_ 2           ;# default cwnd = 2 * MTU
-Agent/SCTP set initialRto_ 3.0          ;# default initial RTO = 3 secs       
-Agent/SCTP set minRto_ 1.0              ;# default min RTO = 1 sec            
-Agent/SCTP set maxRto_ 60.0             ;# default max RTO = 60 secs          
+Agent/SCTP set initialRto_ 3.0          ;# default initial RTO = 3 secs
+Agent/SCTP set minRto_ 1.0              ;# default min RTO = 1 sec
+Agent/SCTP set maxRto_ 60.0             ;# default max RTO = 60 secs
 Agent/SCTP set fastRtxTrigger_ 4        ;# 4 missing reports trigger fast rtx
 Agent/SCTP set numOutStreams_ 1         ;# single stream default
 Agent/SCTP set numUnrelStreams_ 0       ;# by default all streams are reliable
@@ -859,28 +924,28 @@ Agent/SCTP set sackDelay_ 0.200         ;# rfc2960 recommends 200 ms
 Agent/SCTP set useMaxBurst_ 1           ;# sctp implementors guide adds this var
 Agent/SCTP set rtxToAlt_ 1              ;# by default rtxs go to alternate dest
 Agent/SCTP set dormantAction_ 0		;# 0 = change dest, 1 = use primary, 2 = use last dest before dormant;
-                                                                             
-## These variables are for simulating reactive routing overheads (for         
-## MANETs, etc). This feature is turned off is delay is 0. The cache lifetime 
-## by default is just slightly larger than the default min RTO to avoid a "cache                                                                             
+
+## These variables are for simulating reactive routing overheads (for
+## MANETs, etc). This feature is turned off is delay is 0. The cache lifetime
+## by default is just slightly larger than the default min RTO to avoid a "cache
 ## miss" after a single timeout event.
-Agent/SCTP set routeCalcDelay_ 0        ;# time to calculate a route          
-Agent/SCTP set routeCacheLifetime_ 1.2  ;# how long a route remains cached  
+Agent/SCTP set routeCalcDelay_ 0        ;# time to calculate a route
+Agent/SCTP set routeCacheLifetime_ 1.2  ;# how long a route remains cached
 
 Agent/SCTP set trace_all_ 0             ;# trace all vars ?
 
 ## These variables are set because they have to be bound to be traceable.
 ## This default does not matter to us at all.
-Agent/SCTP set cwnd_ 0                 ; 
-Agent/SCTP set rwnd_ 0                 ; 
+Agent/SCTP set cwnd_ 0                 ;
+Agent/SCTP set rwnd_ 0                 ;
 Agent/SCTP set rto_ 0                  ;
 Agent/SCTP set errorCount_ 0           ;
-Agent/SCTP set frCount_ 0              ;                                      
-Agent/SCTP set timeoutCount_ 0         ;                                      
-Agent/SCTP set rcdCount_ 0             ;# total count of route calc delays    
+Agent/SCTP set frCount_ 0              ;
+Agent/SCTP set timeoutCount_ 0         ;
+Agent/SCTP set rcdCount_ 0             ;# total count of route calc delays
 
-Agent/SCTP/MultipleFastRtx set mfrCount_ 0                                    
-Agent/SCTP/MfrTimestamp set mfrCount_ 0    
+Agent/SCTP/MultipleFastRtx set mfrCount_ 0
+Agent/SCTP/MfrTimestamp set mfrCount_ 0
 
 ## CMT variables
 Agent/SCTP/CMT set useCmtReordering_ 1  ;# Turn ON CMT Reordering algo
@@ -949,19 +1014,19 @@ Agent/TCP set tcpTick_ 0.01 ;		# default changed on 2002/03/07
 					# to reflect a changing reality.
 Agent/TCP set maxrto_ 60 ; 		# default changed on 2007/03/28
 					#  to reflect RFC2988.
-Agent/TCP set minrto_ 0.2 ;		# Default changed to 200ms on 
+Agent/TCP set minrto_ 0.2 ;		# Default changed to 200ms on
 					#  2004/10/14, to match values
 					#  used by many implementations.
 Agent/TCP set srtt_init_ 0
 Agent/TCP set rttvar_init_ 12
-Agent/TCP set rtxcur_init_ 3.0 ;	# Default changed on 2006/01/21		
+Agent/TCP set rtxcur_init_ 3.0 ;	# Default changed on 2006/01/21
 Agent/TCP set T_SRTT_BITS 3
 Agent/TCP set T_RTTVAR_BITS 2
 Agent/TCP set rttvar_exp_ 2
 Agent/TCP set updated_rttvar_ true ;	# Variable added on 2006/1/21
 Agent/TCP set timerfix_ true ; 		# Variable added on 2001/05/11
- 					# Set to "false" to give the old 
-					#  behavior. 
+ 					# Set to "false" to give the old
+					#  behavior.
 Agent/TCP set rfc2988_ true ;		# Default set to "true" on 2002/03/07.
 					# Set rfc2988_ "true" to give RFC2988-
 					#  compliant behavior for timers.
@@ -984,10 +1049,10 @@ Agent/TCP set singledup_ 1 ;		# default changed on 2001/11/28.
 Agent/TCP set LimTransmitFix_ false ;	# added on 2003/03/31.
 Agent/TCP set precisionReduce_ true ;	# default changed on 2006/1/24.
 Agent/TCP set oldCode_ false
-Agent/TCP set useHeaders_ true ;	# default changed on 2001/11/28. 
+Agent/TCP set useHeaders_ true ;	# default changed on 2001/11/28.
 
 # These are all used for high-speed TCP.
-Agent/TCP set low_window_ 38 ;		# default changed on 2002/8/12.		
+Agent/TCP set low_window_ 38 ;		# default changed on 2002/8/12.
 Agent/TCP set high_window_ 83000
 Agent/TCP set high_p_ 0.0000001
 Agent/TCP set high_decrease_ 0.1
@@ -1011,19 +1076,31 @@ Agent/TCP set nrexmit_ 0
 Agent/TCP set nrexmitpack_ 0
 Agent/TCP set nrexmitbytes_ 0
 Agent/TCP set necnresponses_ 0
-Agent/TCP set ncwndcuts_ 0 
+Agent/TCP set ncwndcuts_ 0
 Agent/TCP set ncwndcuts1_ 0
 
 Agent/TCP set trace_all_oneline_ false
 
-Agent/TCP set QOption_ 0 
+Agent/TCP set QOption_ 0
 Agent/TCP set EnblRTTCtr_ 0
 Agent/TCP set control_increase_ 0
 
 Agent/TCP set SetCWRonRetransmit_ true ; # added on 2005/06/19.
-				 	 # default changed on 2008/06/05. 
+				 	 # default changed on 2008/06/05.
+# Mohammad
+Agent/TCP set ecnhat_ false;
+Agent/TCP set ecnhat_smooth_alpha_ true;
+Agent/TCP set ecnhat_alpha_ 0.0;
+Agent/TCP set ecnhat_g_ 0.125;
+Agent/TCP set ecnhat_enable_beta_ false;
+Agent/TCP set ecnhat_beta_ 0.0;
+Agent/TCP set ecnhat_quadratic_beta_ false;
+Agent/TCP set ecnhat_tcp_friendly_ false;
+Agent/TCP set perPacketMP_ false;
+Agent/TCP set pathAwareMP_ false;
+Agent/TCP set num_paths_ 1
 
-# XXX Generate nam trace or plain old text trace for variables. 
+# XXX Generate nam trace or plain old text trace for variables.
 # When it's true, generate nam trace.
 Agent/TCP set nam_tracevar_ false
 
@@ -1045,7 +1122,7 @@ Agent/TCP set sfrto_enabled_	0 ;	# Added on 2004/10/26 for F-RTO
 Agent/TCP set spurious_response_ 1 ;	# Added on 2004/10/26 for F-RTO
 
 Agent/TCPSink set sport_        0
-Agent/TCPSink set dport_        0         
+Agent/TCPSink set dport_        0
 
 #XXX other kinds of sinks -> should reparent
 Agent/TCPSink set packetSize_ 40
@@ -1057,6 +1134,7 @@ Agent/TCPSink set qs_enabled_ false
 Agent/TCPSink set RFC2581_immediate_ack_ true
 Agent/TCPSink set bytes_ 0
 Agent/TCPSink set ecn_syn_ false ;	# Added 2005/11/21 for SYN/ACK pkts.
+Agent/TCPSink set ecnhat_ false;
 
 Agent/TCPSink/DelAck set interval_ 100ms
 catch {
@@ -1065,7 +1143,7 @@ catch {
 }
 Agent/TCPSink/Sack1/DelAck set interval_ 100ms
 
- # setting newreno_changes_ to 1 implements some changes to reno 
+ # setting newreno_changes_ to 1 implements some changes to reno
  # proposed by Janey Hoe (other than fixing reno's
  # unnecessary retransmit timeouts)
 Agent/TCP/Newreno set newreno_changes_ 0
@@ -1094,7 +1172,7 @@ Agent/TCP/Vegas/RBP set rbp_inter_pace_delay_ 0
 Agent/TCP/Reno/RBP set rbp_scale_ 0.75
 Agent/TCP/Reno/RBP set rbp_segs_actually_paced_ 0
 Agent/TCP/Reno/RBP set rbp_inter_pace_delay_ 0
-# Reno/RBP supports only RBP_CWND_ALGORITHM 
+# Reno/RBP supports only RBP_CWND_ALGORITHM
 # Agent/TCP/Reno/RBP set rbp_rate_algorithm_ 2
 
 Agent/TCP/Asym set g_ 0.125
@@ -1102,12 +1180,12 @@ Agent/TCP/Reno/Asym set g_ 0.125
 Agent/TCP/Newreno/Asym set g_ 0.125
 
 # RFC793eduTcp -- 19990820, fcela@acm.org
-Agent/TCP/RFC793edu set add793expbackoff_  true 
+Agent/TCP/RFC793edu set add793expbackoff_  true
 Agent/TCP/RFC793edu set add793jacobsonrtt_ false
 Agent/TCP/RFC793edu set add793fastrtx_     false
 Agent/TCP/RFC793edu set add793slowstart_   false
 Agent/TCP/RFC793edu set add793additiveinc_ false
-Agent/TCP/RFC793edu set add793karnrtt_     true 
+Agent/TCP/RFC793edu set add793karnrtt_     true
 Agent/TCP/RFC793edu set rto_               60
 Agent/TCP/RFC793edu set syn_               true
 Agent/TCP/RFC793edu set add793exponinc_    false
@@ -1115,22 +1193,22 @@ Agent/TCP/RFC793edu set add793exponinc_    false
 Agent/TCP/FullTcp instproc done_data {} { }
 
 # Dynamic state:
-Agent/TFRC set rate_ 0 
+Agent/TFRC set rate_ 0
 Agent/TFRC set ndatapack_ 0 ;	# Number of packets sent
 Agent/TFRC set ndatabytes_ 0 ;	# Number of bytes sent
 Agent/TFRC set true_loss_rate_ 0.0 ; # For statistics only.
 # RTT:
-Agent/TFRC set srtt_init_ 0 ;	# Variables for tracking RTT	
-Agent/TFRC set rttvar_init_ 12  
-Agent/TFRC set rtxcur_init_ 6.0	
-Agent/TFRC set rttvar_exp_ 2	
-Agent/TFRC set T_SRTT_BITS 3	
-Agent/TFRC set T_RTTVAR_BITS 2	
+Agent/TFRC set srtt_init_ 0 ;	# Variables for tracking RTT
+Agent/TFRC set rttvar_init_ 12
+Agent/TFRC set rtxcur_init_ 6.0
+Agent/TFRC set rttvar_exp_ 2
+Agent/TFRC set T_SRTT_BITS 3
+Agent/TFRC set T_RTTVAR_BITS 2
 # VoIP mode:
-Agent/TFRC set voip_ 0 ;        # Added on 10/23/2004      
+Agent/TFRC set voip_ 0 ;        # Added on 10/23/2004
 				# 1 for voip mode.
 Agent/TFRC set voip_max_pkt_rate_ 100 ;  # Max rate in pps, for voip mode.
-Agent/TFRC set fsize_ 1460 ;	# Default size for large TCP packets. 
+Agent/TFRC set fsize_ 1460 ;	# Default size for large TCP packets.
 				# Used for VoIP mode.
 Agent/TFRC set headersize_ 32 ; # Size for packet headers.
 # End of VoIP mode.
@@ -1140,18 +1218,18 @@ Agent/TFRC set headersize_ 32 ; # Size for packet headers.
 				# Set to 2 for RFC 4342 algorithms.
 				# Set to 3 for RFC 3448bis algorithms.
 Agent/TFRC set rate_init_option_ 2 ;	# Added on 10/20/2004
-				# Set to 1 for backward compatibility. 
+				# Set to 1 for backward compatibility.
 				# Set to 2 for RFC 3390 initial rates
 				# Default changed on 10/21/2004.
 Agent/TFRC set slow_increase_ 1 ;	# Added on 10/20//2004
-				# Set to 1 for gradual rate changes.  
+				# Set to 1 for gradual rate changes.
 				# This also gives backward compatibility.
-# Agent/TFRC set ss_changes_ 1 ;	# Deleted on 3/14//2006. 
+# Agent/TFRC set ss_changes_ 1 ;	# Deleted on 3/14//2006.
 Agent/TFRC set maxHeavyRounds_ 0; # Number of rounds for sending rate allowed
 				  #  to be greater than twice receiving rate.
 				  # Default changed on 3/27/2007, to conform
 				  # to RFC3448 and CCID 3.
-Agent/TFRC set conservative_ 0 ;  # Set to true for a conservative 
+Agent/TFRC set conservative_ 0 ;  # Set to true for a conservative
 				  # response to heavy congestion.
 Agent/TFRC set scmult_ 1.5 ;	# self clocking parameter for conservative_
 Agent/TFRC set oldCode_ false ; # Set to 1 to use old code for datalimited
@@ -1159,15 +1237,15 @@ Agent/TFRC set oldCode_ false ; # Set to 1 to use old code for datalimited
 				# Parameter added on 12/18/02.
 # End of Variands.
 # Parameters:
-Agent/TFRC set packetSize_ 1000 
+Agent/TFRC set packetSize_ 1000
 Agent/TFRC set df_ 0.95 ;	# decay factor for accurate RTT estimate
-Agent/TFRC set tcp_tick_ 0.1 ;	
-Agent/TFRC set InitRate_ 300 ;	# Initial send rate	
+Agent/TFRC set tcp_tick_ 0.1 ;
+Agent/TFRC set InitRate_ 300 ;	# Initial send rate
 Agent/TFRC set overhead_ 0 ;	# If > 0, dither outgoing packets
 Agent/TFRC set ssmult_ 2 ; 	# Rate of increase during slow-start:
 Agent/TFRC set bval_ 1 ;	# Value of B for TCP formula
 Agent/TFRC set ca_ 1 ; 	 	# Enable Sqrt(RTT) congestion avoidance
-Agent/TFRC set printStatus_ 0 
+Agent/TFRC set printStatus_ 0
 Agent/TFRC set ecn_ 0 ;		# Set to 1 for ECN-capable connection.
 Agent/TFRC set minrto_ 0.0 ;	# Minimum RTO, for use in TCP equation.
 				# The default is not to use minrto_.
@@ -1175,27 +1253,27 @@ Agent/TFRC set SndrType_ 0 ;    # Set to 1 to use data-producing applications
                                 #   such as FTP.
 Agent/TFRC set maxqueue_ MAXSEQ ;  # queue from application.
 Agent/TFRC set rate_init_ 2 ;		# Added on 10/20/2004
-				# Set to 1 for backward compatibility. 
+				# Set to 1 for backward compatibility.
 				# Default changed on 10/21/2004.
-Agent/TFRC set useHeaders_ true ;	# Added on 2005/06/24. 
+Agent/TFRC set useHeaders_ true ;	# Added on 2005/06/24.
 Agent/TFRC set idleFix_ true ;	# Added on 2006/03/12.
 
 Agent/TFRCSink set packetSize_ 40
 Agent/TFRCSink set InitHistorySize_ 100000
-Agent/TFRCSink set NumFeedback_ 1 
+Agent/TFRCSink set NumFeedback_ 1
 Agent/TFRCSink set AdjustHistoryAfterSS_ 1
 Agent/TFRCSink set NumSamples_ -1
 Agent/TFRCSink set discount_ 1;	# History Discounting
 Agent/TFRCSink set minDiscountRatio_ 0.5; # Minimum for history discounting.
 Agent/TFRCSink set printLoss_ 0
 Agent/TFRCSink set smooth_ 1 ;	# smoother Average Loss Interval
-Agent/TFRCSink set ShortIntervals_ 0 ; #  For calculating loss event rates 
+Agent/TFRCSink set ShortIntervals_ 0 ; #  For calculating loss event rates
                         	# for short loss intervals differently
 Agent/TFRCSink set ShortRtts_ 2 ; # Max num of RTTs in a short interval.
 Agent/TFRCSink set minlc_ 4
-Agent/TFRCSink set algo_ 1 ;  	# 1: algo from sigcomm paper 2: ewma 
+Agent/TFRCSink set algo_ 1 ;  	# 1: algo from sigcomm paper 2: ewma
 				# 3: fixed window
-Agent/TFRCSink set maxint_ 1000 ;     # max loss interval history 
+Agent/TFRCSink set maxint_ 1000 ;     # max loss interval history
 Agent/TFRCSink set history_ 0.75 ;    # loss history for EWMA
 Agent/TFRCSink set PreciseLoss_ 1 ;   # 1 for more precise loss events
 				      # Introduced on 12/11/02, default 1.
@@ -1217,7 +1295,7 @@ if [TclObject is-class Agent/TCP/FullTcp] {
 	Agent/TCP/FullTcp set data_on_syn_ false; # allow data on 1st SYN?
 	Agent/TCP/FullTcp set dupseg_fix_ true ; # no rexmt w/dup segs from peer
 	Agent/TCP/FullTcp set dupack_reset_ false; # exit recov on ack < highest
-	Agent/TCP/FullTcp set interval_ 0.1 ; # delayed ACK interval 100ms 
+	Agent/TCP/FullTcp set interval_ 0.1 ; # delayed ACK interval 100ms
 	Agent/TCP/FullTcp set close_on_empty_ false; # close conn if sent all
 	Agent/TCP/FullTcp set signal_on_empty_ false; # signal if sent all
 	Agent/TCP/FullTcp set ts_option_size_ 10; # in bytes
@@ -1227,8 +1305,22 @@ if [TclObject is-class Agent/TCP/FullTcp] {
 	Agent/TCP/FullTcp set halfclose_ false; # do simplex closes (shutdown)?
 	Agent/TCP/FullTcp set nopredict_ false; # disable header prediction code?
         Agent/TCP/FullTcp set ecn_syn_ false; # Make SYN/ACK packet ECN-Capable?
-        Agent/TCP/FullTcp set ecn_syn_wait_ 0; # Wait after marked SYN/ACK? 
+        Agent/TCP/FullTcp set ecn_syn_wait_ 0; # Wait after marked SYN/ACK?
         Agent/TCP/FullTcp set debug_ false;  # Added Sept. 16, 2007.
+	Agent/TCP/FullTcp set flow_remaining_ -1; #Mohammad: added for robust FCT measurement
+	Agent/TCP/FullTcp set dynamic_dupack_ 0; # Mohammad: if non-zero, set dupack threshold to max(3, dynamic_dupack_ * cwnd_)
+	Agent/TCP/FullTcp set prio_scheme_ 2; #Shuang: priority scheme
+	Agent/TCP/FullTcp set prio_num_ 0; #Shuang: number of priority
+	Agent/TCP/FullTcp set prio_cap0 6*1460+15;
+	Agent/TCP/FullTcp set prio_cap1 16*1460+15;
+	Agent/TCP/FullTcp set prio_cap2 30*1460+15;
+	Agent/TCP/FullTcp set prio_cap3 49*1460+15;
+	Agent/TCP/FullTcp set prio_cap4 266*1460+15;
+	Agent/TCP/FullTcp set prio_cap5 1001*1460+15;
+	Agent/TCP/FullTcp set prio_cap6 2825*1460+15;
+	Agent/TCP/FullTcp set prob_cap_ 0; #Shuang: prob mode
+	Agent/TCP/FullTcp set deadline 0; #Shuang: deadline
+	Agent/TCP/FullTcp set early_terminated_ 0; #Shuang
 
 	Agent/TCP/FullTcp/Newreno set recov_maxburst_ 2; # max burst dur recov
 
@@ -1259,6 +1351,14 @@ if [TclObject is-class Agent/TCP/FullTcp] {
 		set open_cwnd_on_pack_ false
 	}
 
+	Agent/TCP/FullTcp/Sack/MinTCP instproc init {} {
+		$self next
+	}
+
+	Agent/TCP/FullTcp/Sack/DDTCP instproc init {} {
+		$self next
+	}
+
 }
 
 if [TclObject is-class Agent/TCP/BayFullTcp] {
@@ -1270,7 +1370,7 @@ if [TclObject is-class Agent/TCP/BayFullTcp] {
 	Agent/TCP/BayFullTcp set data_on_syn_ false; # allow data on 1st SYN?
 	Agent/TCP/BayFullTcp set dupseg_fix_ true ; # no rexmt w/dup segs from peer
 	Agent/TCP/BayFullTcp set dupack_reset_ false; # exit recov on ack < highest
-	Agent/TCP/BayFullTcp set interval_ 0.1 ; # delayed ACK interval 100ms 
+	Agent/TCP/BayFullTcp set interval_ 0.1 ; # delayed ACK interval 100ms
 	Agent/TCP/BayFullTcp set close_on_empty_ false; # close conn if sent all
 	Agent/TCP/BayFullTcp set ts_option_size_ 10; # in bytes
 	Agent/TCP/BayFullTcp set reno_fastrecov_ true; # fast recov true by default
@@ -1355,14 +1455,14 @@ Agent/MIPBS set adSize_ 48
 Agent/MIPBS set shift_ 0
 Agent/MIPBS set mask_ [AddrParams set ALL_BITS_SET]
 Agent/MIPBS set ad_lifetime_ 2
- 
+
 Agent/MIPMH set home_agent_ 0
 Agent/MIPMH set rreqSize_ 52
 Agent/MIPMH set reg_rtx_ 0.5
 Agent/MIPMH set shift_ 0
 Agent/MIPMH set mask_ [AddrParams set ALL_BITS_SET]
 Agent/MIPMH set reg_lifetime_ 2
- 
+
 # Intitialization for directed diffusion : Chalermek
 Agent/Diff_Sink set packetSize_ 512
 Agent/Diff_Sink set interval_   0.5
@@ -1450,6 +1550,24 @@ Queue set util_records_ 5 ; 		# Changed from 0 to 5, 2/25/05.
 # Quick Start definitions end here
 
 Delayer set debug_ false
+
+# # Nandita: Following is for Video traffic. Taken from Xiaoqing Zhu
+# Application/Traffic/VideoCBR set rate_ 0
+# Application/Traffic/VideoCBR set pktsize_ 1500
+# Application/Traffic/VideoCBR set fps_ 30
+# Application/Traffic/VideoCBR set gop_ 15
+# Application/Traffic/VideoCBR set fix_interval_ 0
+# Application/Traffic/VideoCBR set init_delay_ 0.5
+# Application/Traffic/VideoCBR set debug_ 0
+# Application/Traffic/VideoCBR set random_ 0
+
+# Application/Traffic/VideoTrace set init_delay_ 0.5
+# Application/Traffic/VideoTrace set quality_ 0
+# Application/Traffic/VideoTrace set fps_ 30
+# Application/Traffic/VideoTrace set advance_per_gop_ 1
+# Application/Traffic/VideoTrace set debug_ 0
+# Application/Traffic/VideoTrace set random_ 0
+# Application/Traffic/VideoTrace set loop_ 0
 
 Agent/TCP/Linux set rtxcur_init_ 3
 Agent/TCP/Linux set maxrto_ 120

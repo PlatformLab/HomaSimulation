@@ -44,8 +44,8 @@ public:
 	}
 } class_newreno;
 
-NewRenoTcpAgent::NewRenoTcpAgent() : newreno_changes_(0), 
-  newreno_changes1_(0), acked_(0), firstpartial_(0), 
+NewRenoTcpAgent::NewRenoTcpAgent() : newreno_changes_(0),
+  newreno_changes1_(0), acked_(0), firstpartial_(0),
   partial_window_deflation_(0), exit_recovery_fix_(0)
 {
 	bind("newreno_changes_", &newreno_changes_);
@@ -54,7 +54,7 @@ NewRenoTcpAgent::NewRenoTcpAgent() : newreno_changes_(0),
 	bind("partial_window_deflation_", &partial_window_deflation_);
 }
 
-/* 
+/*
  * Process a packet that acks previously unacknowleges data, but
  * does not take us out of Fast Retransmit.
  */
@@ -66,7 +66,7 @@ void NewRenoTcpAgent::partialnewack(Packet* pkt)
 		unsigned int deflate = 0; // Should initialize it?? - haoboy
 		if (tcph->seqno() > last_ack_) // assertion
 			deflate = tcph->seqno() - last_ack_;
-		else 
+		else
 		  	printf("False call to partialnewack:  deflate %u \
 last_ack_ %d\n", deflate, last_ack_);
 		if (dupwnd_ > deflate)
@@ -74,7 +74,7 @@ last_ack_ %d\n", deflate, last_ack_);
 		else {
 			cwnd_ -= (deflate - dupwnd_);
 			// Leave dupwnd_ > 0 to flag "fast recovery" phase
-			dupwnd_ = 1; 
+			dupwnd_ = 1;
 		}
 		if (cwnd_ < 1) {cwnd_ = 1;}
 	}
@@ -92,7 +92,7 @@ void NewRenoTcpAgent::partialnewack_helper(Packet* pkt)
 {
 	if (!newreno_changes1_ || firstpartial_ == 0) {
 		firstpartial_ = 1;
-		/* For newreno_changes1_, 
+		/* For newreno_changes1_,
 		 * only reset the retransmit timer for the first
 		 * partial ACK, so that, in the worst case, we
 		 * don't have to wait for one packet retransmitted
@@ -116,7 +116,7 @@ NewRenoTcpAgent::dupack_action()
         int recovered = (highest_ack_ > recover_);
 	int recovered1 = (highest_ack_ == recover_);
         int allowFastRetransmit = allow_fast_retransmit(last_cwnd_action_);
-        if (recovered || (!bug_fix_ && !ecn_) || allowFastRetransmit 
+        if (recovered || (!bug_fix_ && !ecn_) || allowFastRetransmit
     	      || (bugfix_ss_ && highest_ack_ == 0)) {
                 // (highest_ack_ == 0) added to allow Fast Retransmit
                 //  when the first data packet is dropped.
@@ -127,7 +127,7 @@ NewRenoTcpAgent::dupack_action()
 		/*
 		 * For the Less Careful variant, allow a Fast Retransmit
 		 *  if highest_ack_ == recover.
-		 * RFC 2582 recommends the Careful variant, not the 
+		 * RFC 2582 recommends the Careful variant, not the
 		 *  Less Careful one.
 		 */
                 goto reno_action;
@@ -144,6 +144,9 @@ NewRenoTcpAgent::dupack_action()
                  * all unnecessary Fast Retransmits.
                  */
                 reset_rtx_timer(1,0);
+		/* Mohammad: cut window by half when we have 3 dup ack */
+		if (ecnhat_)
+			slowdown(CLOSE_SSTHRESH_HALF|CLOSE_CWND_HALF);
                 output(last_ack_ + 1, TCP_REASON_DUPACK);
 		dupwnd_ = numdupacks_;
                 return;
@@ -188,7 +191,7 @@ void NewRenoTcpAgent::recv(Packet *pkt, Handler*)
 		endQuickStart();
         if (qs_requested_ == 1)
                 processQuickStart(pkt);
-	if (++acked_ == 1) 
+	if (++acked_ == 1)
 		basertt_ = Scheduler::instance().clock() - firstsent_;
 
 	/* Estimate ssthresh based on the calculated RTT and the estimated
@@ -219,12 +222,17 @@ void NewRenoTcpAgent::recv(Packet *pkt, Handler*)
 	++nackpack_;
 	ts_peer_ = tcph->ts();
 
+
+	if (ecnhat_)
+		update_ecnhat_alpha(pkt);
+
 	if (hdr_flags::access(pkt)->ecnecho() && ecn_)
 		ecn(tcph->seqno());
+
 	recv_helper(pkt);
 	recv_frto_helper(pkt);
 	if (tcph->seqno() > last_ack_) {
-		if (tcph->seqno() >= recover_ 
+		if (tcph->seqno() >= recover_
 		    || (last_cwnd_action_ != CWND_ACTION_DUPACK)) {
 			if (dupwnd_ > 0) {
 			     dupwnd_ = 0;
@@ -288,7 +296,7 @@ void NewRenoTcpAgent::recv(Packet *pkt, Handler*)
 	 */
 
         if (valid_ack || aggressive_maxburst_)
-		if (dupacks_ == 0) 
+		if (dupacks_ == 0)
 			/*
 			 * Maxburst is really only needed for the first
 			 *  window of data on exiting Fast Recovery.

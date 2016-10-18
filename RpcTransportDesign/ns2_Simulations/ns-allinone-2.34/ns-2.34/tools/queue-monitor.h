@@ -1,8 +1,8 @@
-/* -*-	Mode:C++; c-basic-offset:8; tab-width:8; indent-tabs-mode:t -*- 
+/* -*-	Mode:C++; c-basic-offset:8; tab-width:8; indent-tabs-mode:t -*-
  *
  * Copyright (c) 1997 Regents of the University of California.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -18,7 +18,7 @@
  * 4. Neither the name of the University nor of the Research Group may be
  *    used to endorse or promote products derived from this software without
  *    specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,22 +44,38 @@
 #include "flags.h"
 
 class QueueMonitor : public TclObject {
-public: 
+public:
 	QueueMonitor() : bytesInt_(NULL), pktsInt_(NULL), delaySamp_(NULL),
 		size_(0), pkts_(0),
 		parrivals_(0), barrivals_(0),
 		pdepartures_(0), bdepartures_(0),
-		pdrops_(0), pmarks_(0), bdrops_(0), 
+		pdrops_(0), pmarks_(0), bdrops_(0), num_monitor_(50),
+		ack_arrivals_(0), ack_drops_(0), ack_departures_(0),
 			 qs_pkts_(0), qs_bytes_(0), qs_drops_(0),
 		keepRTTstats_(0), maxRTT_(1), numRTTs_(0), binsPerSec_(10),
-		keepSeqnoStats_(0), maxSeqno_(1000), 
+		keepSeqnoStats_(0), maxSeqno_(1000),
 		numSeqnos_(0), SeqnoBinSize_(1),
 		srcId_(0), dstId_(0), channel_(0), channel1_(0),
-		estimate_rate_(0), 
-		k_(0.1), 
+		estimate_rate_(0),
+		k_(0.1),
 		estRate_(0.0),
 		temp_size_(0) {
-		
+
+		//Shuang: monitor the kth drop
+		for (int i = 0; i < num_monitor_; i++) {
+			char buf[20];
+			memset(buf, 0, sizeof(buf));
+			sprintf(buf, "kdrops%d", i);
+			bind(buf, &kdrops_[i]);
+			memset(buf, 0, sizeof(buf));
+			sprintf(buf, "karrivals%d", i);
+			bind(buf, &karrivals_[i]);
+		}
+		bind("num_monitor_", &num_monitor_);
+		bind("ack_arrivals_", &ack_arrivals_);
+		bind("ack_drops_", &ack_drops_);
+		bind("ack_departures_", &ack_departures_);
+
 		bind("size_", &size_);
 		bind("pkts_", &pkts_);
 		bind("parrivals_", &parrivals_);
@@ -93,7 +109,7 @@ public:
 		bind("prevTime_", &prevTime_);
 		bind("startTime_", &startTime_);
  		bind("estRate_", &estRate_);
-		
+
 		startTime_ = Scheduler::instance().clock();
 		prevTime_  = startTime_;
 	};
@@ -101,7 +117,7 @@ public:
 	int size() const { return (size_); }
 	int pkts() const { return (pkts_); }
 #if defined(HAVE_INT64)
-	int64_t parrivals() const { return (parrivals_); }	
+	int64_t parrivals() const { return (parrivals_); }
 	int64_t barrivals() const { return (barrivals_); }
 	int64_t pdepartures() const { return (pdepartures_); }
 	int64_t bdepartures() const { return (bdepartures_); }
@@ -150,6 +166,12 @@ protected:
 	int pdrops_;
 	int pmarks_;
 	int bdrops_;
+	int kdrops_[50];	//Shuang: count the num of kth drop
+	int karrivals_[50];	//Shuang: count the num of kth arrival
+	int num_monitor_;	//Shuang: maximum of k to monitor
+	int ack_arrivals_;  //Shuang: number of ack pkts arrival
+	int ack_drops_;		//Shuang: number of ack pkts dropped
+	int ack_departures_;	//Shuang: number of ack pkts departured
 
 	int qs_pkts_;			/* Number of Quick-Start packets */
 	int qs_bytes_;			/* Number of Quick-Start bytes */
@@ -177,7 +199,7 @@ protected:
 
 	// the estimation of incoming rate using an exponential averaging algorithm due to Stoica
 	// hence a lot of this stuff is inspired by csfq.cc(Stoica)
-	// put in here so that it can be used to estimate the arrival rate for both whole queues as 
+	// put in here so that it can be used to estimate the arrival rate for both whole queues as
 	// well as flows (Flow inherits from EDQueueMonitor);
 public:
 	int estimate_rate_;           /* boolean - whether rate estimation is on or not */
@@ -192,13 +214,14 @@ protected:
 	void estimateRate(Packet *p);
 	void keepRTTstats(Packet *p);
 	void keepSeqnoStats(Packet *p);
+	int calc_prio(int prio);
 };
 
 class SnoopQueue : public Connector {
-public: 
+public:
 	SnoopQueue() : qm_(0) {}
 	int command(int argc, const char*const* argv) {
-		if (argc == 3) { 
+		if (argc == 3) {
 			if (strcmp(argv[1], "set-monitor") == 0) {
 				qm_ = (QueueMonitor*)
 					TclObject::lookup(argv[2]);
@@ -239,7 +262,7 @@ public:
 
 /* Tagger, Like a normal FlowMonitor, use SnoopQueueTagger
  * to start it.
- * By Yun Wang 
+ * By Yun Wang
  */
 class SnoopQueueTagger : public SnoopQueue {
 public:
@@ -254,8 +277,8 @@ public:
  * but also supports the notion of "early" drops
  */
 
-/* 
- * The mon* things added to make it work with redpd. 
+/*
+ * The mon* things added to make it work with redpd.
  * I tried more "elegant" ways -- but mulitple inheritance sucks !!.
  * -ratul
  */
@@ -275,15 +298,15 @@ public:
 		// printf("My epdrops = %d\n",epdrops_);
 		QueueMonitor::drop(p);
 	}
-	
+
 	void mon_edrop(Packet *p) {
 		hdr_cmn* hdr = hdr_cmn::access(p);
 		mon_ebdrops_ += hdr->size();
 		mon_epdrops_++;
-	
+
 		QueueMonitor::drop(p);
 	}
-	
+
 	int epdrops() const { return (epdrops_); }
 	int ebdrops() const { return (ebdrops_); }
 	int mon_epdrops() const { return (mon_epdrops_); }
