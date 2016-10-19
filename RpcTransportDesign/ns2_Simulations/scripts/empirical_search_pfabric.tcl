@@ -54,7 +54,7 @@ set pktSize 1460
 #### trace frequency
 set queueSamplingInterval 0.0001
 
-puts "Simulation input:" 
+puts "Simulation input:"
 puts "Dynamic Flow - Web Search (DCTCP)"
 puts "topology: spines server per rack = $topology_spt, x = $topology_x"
 puts "sim_end $sim_end"
@@ -95,9 +95,9 @@ Agent/TCP set minrto_ $min_rto
 Agent/TCP set maxrto_ 2
 
 Agent/TCP/FullTcp set nodelay_ true; # disable Nagle
-Agent/TCP/FullTcp set segsperack_ $ackRatio; 
+Agent/TCP/FullTcp set segsperack_ $ackRatio;
 Agent/TCP/FullTcp set interval_ 0.000006
-if {$perflowMP == 0} {  
+if {$perflowMP == 0} {
     Agent/TCP/FullTcp set dynamic_dupack_ 0.75
 }
 if {$ackRatio > 2} {
@@ -150,7 +150,7 @@ Queue/RED set thresh_ $DCTCP_K
 Queue/RED set maxthresh_ $DCTCP_K
 Queue/RED set drop_prio_ $drop_prio_
 Queue/RED set deque_prio_ $deque_prio_
-			 
+
 #DelayLink set avoidReordering_ true
 
 ############### NAM ###########################
@@ -163,8 +163,8 @@ if {$enableNAM != 0} {
 
 if {$enableMultiPath == 1} {
     $ns rtproto DV
-    Agent/rtProto/DV set advertInterval	[expr 2*$sim_end]  
-    Node set multiPath_ 1 
+    Agent/rtProto/DV set advertInterval	[expr 2*$sim_end]
+    Node set multiPath_ 1
     if {$perflowMP != 0} {
 	Classifier/MultiPath set perflow_ 1
     }
@@ -211,7 +211,7 @@ for {set i 0} {$i < $S} {incr i} {
 
     #$ns queue-limit $s($i) $n($j) 10000
 
-    $ns duplex-link-op $s($i) $n($j) queuePos -0.5    
+    $ns duplex-link-op $s($i) $n($j) queuePos -0.5
     set qfile(s$i,n$j) [$ns monitor-queue $s($i) $n($j) [open queue_s$i\_n$j.tr w] $queueSamplingInterval]
     set qfile(n$j,s$i) [$ns monitor-queue $n($j) $s($i) [open queue_n$j\_s$i.tr w] $queueSamplingInterval]
 
@@ -219,7 +219,7 @@ for {set i 0} {$i < $S} {incr i} {
 
 for {set i 0} {$i < $topology_tors} {incr i} {
     for {set j 0} {$j < $topology_spines} {incr j} {
-	$ns duplex-link $n($i) $a($j) [set UCap]Gb $mean_link_delay $switchAlg	
+	$ns duplex-link $n($i) $a($j) [set UCap]Gb $mean_link_delay $switchAlg
 	$ns duplex-link-op $n($i) $a($j) queuePos 0.25
     	set qfile(n$i,a$j) [$ns monitor-queue $n($i) $a($j) [open queue_n$i\_a$j.tr w] $queueSamplingInterval]
     	set qfile(a$j,n$i) [$ns monitor-queue $a($j) $n($i) [open queue_a$j\_n$i.tr w] $queueSamplingInterval]
@@ -249,10 +249,10 @@ for {set j 0} {$j < $S } {incr j} {
 	    puts -nonewline "($i,$j) "
 
 	    $agtagr($i,$j) set_PCarrival_process  [expr $lambda/($S - 1)] "CDF_search.tcl" [expr 17*$i+1244*$j] [expr 33*$i+4369*$j]
-   
+
 	    $ns at 0.1 "$agtagr($i,$j) warmup 0.5 5"
 	    $ns at 1 "$agtagr($i,$j) init_schedule"
-	    
+
 	    set init_fid [expr $init_fid + $connections_per_pair];
 	}
     }

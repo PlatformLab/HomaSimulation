@@ -1,5 +1,5 @@
 #
-# TCP pair's have 
+# TCP pair's have
 # - group_id = "src->dst"
 # - pair_id = index of connection among the group
 # - fid = unique flow identifier for this connection (group_id, pair_id)
@@ -9,12 +9,12 @@ set next_fid 0
 Class TCP_pair
 
 #Variables:
-#tcps tcpr:  Sender TCP, Receiver TCP 
+#tcps tcpr:  Sender TCP, Receiver TCP
 #sn   dn  :  source/dest node which TCP sender/receiver exist
 #:  (only for setup_wnode)
 #delay    :  delay between sn and san (dn and dan)
 #:  (only for setup_wnode)
-#san  dan :  nodes to which sn/dn are attached   
+#san  dan :  nodes to which sn/dn are attached
 #aggr_ctrl:  Agent_Aggr_pair for callback
 #start_cbfunc:  callback at start
 #fin_cbfunc:  callback at start
@@ -27,11 +27,11 @@ Class TCP_pair
 #setgid {gid}             <- if applicable (default 0)
 #setpairid {pid}          <- if applicable (default 0)
 #setfid {fid}             <- if applicable (default 0)
-#start { nr_bytes } ;# let start sending nr_bytes 
+#start { nr_bytes } ;# let start sending nr_bytes
 #set_debug_mode { mode }    ;# change to debug_mode
-#setcallback { controller } #; only Agent_Aggr_pair uses to 
+#setcallback { controller } #; only Agent_Aggr_pair uses to
 ##; registor itself
-#fin_notify {}  #; Callback .. this is called 
+#fin_notify {}  #; Callback .. this is called
 ##; by agent when it finished
 #Private Function
 #flow_finished {} {
@@ -41,10 +41,10 @@ TCP_pair instproc init {args} {
     $self instvar tcps tcpr;# Sender TCP,  Receiver TCP
     global myAgent
     eval $self next $args
-    
+
     $self set tcps [new $myAgent]  ;# Sender TCP
     $self set tcpr [new $myAgent]  ;# Receiver TCP
-        
+
     $tcps set_callback $self
 #$tcpr set_callback $self
 
@@ -149,9 +149,9 @@ TCP_pair instproc setfid { fid } {
 TCP_pair instproc settbf { tbf } {
     global ns
     $self instvar tcps tcpr
-    $self instvar san 
+    $self instvar san
     $self instvar tbfs
-    
+
     $self set tbfs $tbf
     $ns attach-tbf-agent $san $tcps $tbf
 }
@@ -186,7 +186,7 @@ TCP_pair instproc start { nr_bytes } {
     if { [info exists aggr_ctrl] } {
 	$aggr_ctrl $start_cbfunc
     }
-  
+
     $tcpr set flow_remaining_ [expr $nr_bytes]
     $tcps set signal_on_empty_ TRUE
     $tcps advance-bytes $nr_bytes
@@ -225,7 +225,7 @@ TCP_pair instproc fin_notify {} {
 
     $self instvar dt
     $self instvar bps
-    
+
     $self flow_finished
 
     #Shuang
@@ -235,7 +235,7 @@ TCP_pair instproc fin_notify {} {
     #
     # Mohammad commenting these
     # for persistent connections
-    # 
+    #
     #$tcps reset
     #$tcpr reset
 
@@ -282,18 +282,18 @@ Class Agent_Aggr_pair
 #Note:
 #Contoller and placeholder of Agent_pairs
 #Let Agent_pairs to arrives according to
-#random process. 
+#random process.
 #Currently, the following two processes are defined
 #- PParrival:
-#flow arrival is poissson and 
-#each flow contains pareto 
+#flow arrival is poissson and
+#each flow contains pareto
 #distributed number of packets.
 #- PEarrival
-#flow arrival is poissson and 
-#each flow contains pareto 
+#flow arrival is poissson and
+#each flow contains pareto
 #distributed number of packets.
 #- PBarrival
-#flow arrival is poissson and 
+#flow arrival is poissson and
 #each flow contains bimodal
 #distributed number of packets.
 
@@ -311,11 +311,11 @@ Class Agent_Aggr_pair
 
 #Public functions:
 #attach-logfile {logf}  <- call if want logfile
-#setup {snode dnode gid nr} <- must 
+#setup {snode dnode gid nr} <- must
 #set_PParrival_process {lambda mean_nbytes shape rands1 rands2}  <- call either
-#set_PEarrival_process {lambda mean_nbytes rands1 rands2}        <- 
+#set_PEarrival_process {lambda mean_nbytes rands1 rands2}        <-
 #set_PBarrival_process {lambda mean_nbytes S1 S2 rands1 rands2}  <- of them
-#init_schedule {}       <- must 
+#init_schedule {}       <- must
 
 #fin_notify { pid bytes fldur bps } ;# Callback
 #start_notify {}                   ;# Callback
@@ -331,7 +331,7 @@ Agent_Aggr_pair instproc init {args} {
 
 
 Agent_Aggr_pair instproc attach-logfile { logf } {
-#Public 
+#Public
     $self instvar logfile
     $self set logfile $logf
 }
@@ -351,7 +351,7 @@ Agent_Aggr_pair instproc setup {snode dnode tbflist tbfindex gid nr init_fid age
     $self instvar nr_pairs  ;# nr of pairs in this group (given)
     $self instvar s_node d_node apair_type ;
 
-    $self set group_id $gid 
+    $self set group_id $gid
     $self set nr_pairs $nr
     $self set s_node $snode
     $self set d_node $dnode
@@ -360,10 +360,10 @@ Agent_Aggr_pair instproc setup {snode dnode tbflist tbfindex gid nr init_fid age
     array set tbf $tbflist
 
     set arrsize [array size tbf]
-    
+
     for {set i 0} {$i < $nr_pairs} {incr i} {
  	$self set apair($i) [new $agent_pair_type]
-	$apair($i) setup $snode $dnode 
+	$apair($i) setup $snode $dnode
 	$apair($i) setgid $group_id  ;# let each pair know our group id
 	$apair($i) setpairid $i      ;# let each pair know his pair id
 	$apair($i) setfid $init_fid  ;# Mohammad: assign next fid
@@ -379,11 +379,11 @@ Agent_Aggr_pair instproc setup {snode dnode tbflist tbfindex gid nr init_fid age
 
 set warmupRNG [new RNG]
 $warmupRNG seed 5251
-    
+
 Agent_Aggr_pair instproc warmup {jitter_period npkts} {
     global ns warmupRNG
     $self instvar nr_pairs apair
-   
+
     for {set i 0} {$i < $nr_pairs} {incr i} {
 	$ns at [expr [$ns now] + [$warmupRNG uniform 0.0 $jitter_period]] "$apair($i) warmup $npkts"
     }
@@ -396,7 +396,7 @@ Agent_Aggr_pair instproc init_schedule {} {
 #according to the arrival process.
     global ns
     $self instvar nr_pairs apair
-    
+
     # Mohammad: initializing last_arrival_time
     #$self instvar last_arrival_time
     #$self set last_arrival_time [$ns now]
@@ -405,7 +405,7 @@ Agent_Aggr_pair instproc init_schedule {} {
     set dt [$rv_flow_intval value]
 
     $self set tnext [expr [$ns now] + $dt]
-    
+
     for {set i 0} {$i < $nr_pairs} {incr i} {
 
 	#### Callback Setting ########################
@@ -426,7 +426,7 @@ Agent_Aggr_pair instproc set_PParrival_process {lambda mean_nbytes shape rands1 
 
 #- PParrival:
 #flow arrival: poissson with rate $lambda
-#flow length : pareto with mean $mean_nbytes bytes and shape parameter $shape. 
+#flow length : pareto with mean $mean_nbytes bytes and shape parameter $shape.
 
     $self instvar rv_flow_intval rv_nbytes
 
@@ -535,7 +535,7 @@ Agent_Aggr_pair instproc set_PBarrival_process {lambda mean_nbytes S1 S2 rands1 
 
 #- PParrival:
 #flow arrival: poissson with rate $lambda
-#flow length : pareto with mean $mean_nbytes bytes and shape parameter $shape. 
+#flow length : pareto with mean $mean_nbytes bytes and shape parameter $shape.
 
     $self instvar rv_flow_intval rv_nbytes
 
@@ -561,7 +561,7 @@ Agent_Aggr_pair instproc set_PBarrival_process {lambda mean_nbytes S1 S2 rands1 
 	puts "In PBarrival, prob for bimodal p_ is negative %p_ exiting.. "
 	flush stdout
 	exit 0
-    } 
+    }
     #else {
     #	puts "# PBarrival S1: $S1 S2: $S2 p_: $p mean $mean_nbytes"
     #}
@@ -598,7 +598,7 @@ Agent_Aggr_pair instproc resetvars {} {
 #   $self instvar fid             ;# current flow id of this group
     $self instvar tnext ;# last flow arrival time
     $self instvar actfl             ;# nr of current active flow
-   
+
     $self set tnext 0.0
 #    $self set fid 0 ;#  flow id starts from 0
     $self set actfl 0
@@ -618,17 +618,17 @@ Agent_Aggr_pair instproc schedule { pid } {
 
     if {$flow_gen >= $sim_end} {
 	return
-    }  
- 
+    }
+
     set t [$ns now]
-    
+
     if { $t > $tnext } {
 	puts "Error, Not enough flows ! Aborting! pair id $pid"
 	flush stdout
-	exit 
+	exit
     }
 
-    # Mohammad: persistent connection.. don't 
+    # Mohammad: persistent connection.. don't
     # need to set fid each time
     #$apair($pid) setfid $fid
     # incr fid
@@ -658,7 +658,7 @@ Agent_Aggr_pair instproc check_if_behind {} {
 	$apair($nr_pairs) setup $s_node $d_node
 	$apair($nr_pairs) setgid $group_id ;
 	$apair($nr_pairs) setpairid $nr_pairs ;
-	
+
 	#### Callback Setting #################
 	$apair($nr_pairs) set_fincallback $self fin_notify
 	$apair($nr_pairs) set_startcallback $self start_notify
@@ -677,13 +677,13 @@ Agent_Aggr_pair instproc fin_notify { pid bytes fldur bps rttimes } {
 #fldur: duration of the flow which has just finished
 #bps  : avg bits/sec of the flow which has just finished
 #Note:
-#If we registor $self as "setcallback" of 
+#If we registor $self as "setcallback" of
 #$apair($id), $apair($i) will callback this
 #function with argument id when the flow between the pair finishes.
 #i.e.
 #If we set:  "$apair(13) setcallback $self" somewhere,
 #"fin_notify 13 $bytes $fldur $bps" is called when the $apair(13)'s flow is finished.
-# 
+#
     global ns flow_gen flow_fin sim_end
     $self instvar logfile
     $self instvar group_id
@@ -696,12 +696,12 @@ Agent_Aggr_pair instproc fin_notify { pid bytes fldur bps rttimes } {
     $self set actfl [expr $actfl - 1]
 
     set fin_fid [$apair($pid) set id]
-    
+
     ###### OUPUT STATISTICS #################
     if { [info exists logfile] } {
         #puts $logfile "flow_stats: [$ns now] gid $group_id pid $pid fid $fin_fid bytes $bytes fldur $fldur actfl $actfl bps $bps"
         set tmp_pkts [expr $bytes / 1460]
-	
+
 	#puts $logfile "$tmp_pkts $fldur $rttimes"
 	puts $logfile "$tmp_pkts $fldur $rttimes $group_id"
 	flush stdout
@@ -709,16 +709,16 @@ Agent_Aggr_pair instproc fin_notify { pid bytes fldur bps rttimes } {
     set flow_fin [expr $flow_fin + 1]
     if {$flow_fin >= $sim_end} {
 	finish
-    } 
+    }
     if {$flow_gen < $sim_end} {
-    $self schedule $pid ;# re-schedule a pair having pair_id $pid. 
+    $self schedule $pid ;# re-schedule a pair having pair_id $pid.
     }
 }
 
 Agent_Aggr_pair instproc start_notify {} {
 #Callback Function
 #Note:
-#If we registor $self as "setcallback" of 
+#If we registor $self as "setcallback" of
 #$apair($id), $apair($i) will callback this
 #function with argument id when the flow between the pair finishes.
 #i.e.
@@ -732,7 +732,7 @@ proc finish {} {
     global sim_start
     global enableNAM namfile
 
-    queueTrace 
+    queueTrace
 
     $ns flush-trace
     close $flowlog
