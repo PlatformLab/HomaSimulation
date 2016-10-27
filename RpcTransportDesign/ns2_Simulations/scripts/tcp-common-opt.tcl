@@ -496,7 +496,7 @@ Agent_Aggr_pair instproc set_PCarrival_process {lambda cdffile rands1 rands2} {
 
     $self set rv_nbytes [new RandomVariable/Empirical]
     $rv_nbytes use-rng $rng2
-    $rv_nbytes set interpolation_ 2
+    $rv_nbytes set interpolation_ 0
     $rv_nbytes loadCDF $cdffile
 }
 
@@ -523,7 +523,7 @@ Agent_Aggr_pair instproc set_LCarrival_process {lambda cdffile rands1 rands2} {
 
     $self set rv_nbytes [new RandomVariable/Empirical]
     $rv_nbytes use-rng $rng2
-    $rv_nbytes set interpolation_ 2
+    $rv_nbytes set interpolation_ 0
     $rv_nbytes loadCDF $cdffile
 }
 
@@ -634,7 +634,7 @@ Agent_Aggr_pair instproc schedule { pid } {
     # incr fid
 
     set tmp_ [expr ceil ([$rv_nbytes value])]
-    set tmp_ [expr $tmp_ * 1460]
+    set tmp_ [expr $tmp_]
     $ns at $tnext "$apair($pid) start $tmp_"
 
     set dt [$rv_flow_intval value]
@@ -703,7 +703,7 @@ Agent_Aggr_pair instproc fin_notify { pid bytes fldur bps rttimes } {
         set tmp_pkts [expr $bytes / 1460]
 
 	#puts $logfile "$tmp_pkts $fldur $rttimes"
-	puts $logfile "$tmp_pkts $fldur $rttimes $group_id"
+	puts $logfile "$bytes $fldur $rttimes $group_id"
 	flush stdout
     }
     set flow_fin [expr $flow_fin + 1]
