@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-$sim_end = 1000000;
+$sim_end = 100000;
 
 $cap = 10;
 $link_delay = 0.000000250;

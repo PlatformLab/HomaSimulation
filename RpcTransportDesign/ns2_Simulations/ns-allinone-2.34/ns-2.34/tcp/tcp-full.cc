@@ -1879,6 +1879,7 @@ FullTcpAgent::recv(Packet *pkt, Handler*)
 			if (flow_remaining_ == 0) {
 			        flags_ |= TF_ACKNOW;
 				flow_remaining_ = -1;
+	            //Tcl::instance().evalf("%s done_data", this->name());
 			}
 			//printf("flow_remaining after dec = %d\n" , flow_remaining_);
 
@@ -2727,6 +2728,7 @@ step6:
 				if (flow_remaining_ == 0) {
 				      flags_ |= TF_ACKNOW;
 				      flow_remaining_ = -1;
+	                  //Tcl::instance().evalf("%s done_data", this->name());
 				}
 				//printf("flow_remaining after dec = %d\n" , flow_remaining_);
        			}
@@ -2759,6 +2761,7 @@ step6:
 				if (flow_remaining_ == 0) {
 				       flags_ |= TF_ACKNOW;
 				       flow_remaining_ = -1;
+	                   //Tcl::instance().evalf("%s done_data", this->name());
 				}
 
 				//printf("flow_remaining after dec = %d\n" , flow_remaining_);

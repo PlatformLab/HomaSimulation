@@ -46,7 +46,7 @@ TCP_pair instproc init {args} {
     $self set tcpr [new $myAgent]  ;# Receiver TCP
 
     $tcps set_callback $self
-#$tcpr set_callback $self
+#    $tcpr set_callback $self
 
     $self set pair_id  0
     $self set group_id 0
