@@ -45,8 +45,8 @@ TCP_pair instproc init {args} {
     $self set tcps [new $myAgent]  ;# Sender TCP
     $self set tcpr [new $myAgent]  ;# Receiver TCP
 
-    $tcps set_callback $self
-#    $tcpr set_callback $self
+    $tcps set_callback $self fin_notify
+    $tcpr set_callback $self fin_recv
 
     $self set pair_id  0
     $self set group_id 0
@@ -116,10 +116,11 @@ TCP_pair instproc setup_wnode {snode dnode link_dly} {
     $ns connect $tcps $tcpr
 }
 
-TCP_pair instproc set_fincallback { controller func} {
-    $self instvar aggr_ctrl fin_cbfunc
+TCP_pair instproc set_fincallback { controller snd_fin rcv_fin } {
+    $self instvar aggr_ctrl fin_cbfunc recv_fin
     $self set aggr_ctrl  $controller
-    $self set fin_cbfunc  $func
+    $self set fin_cbfunc  $snd_fin
+    $self set recv_fin $rcv_fin
 }
 
 TCP_pair instproc set_startcallback { controller func} {
@@ -244,6 +245,34 @@ TCP_pair instproc fin_notify {} {
     }
 }
 
+TCP_pair instproc fin_recv {} {
+    global ns
+    $self instvar sn dn san dan rttimes
+    $self instvar tcps tcpr
+    $self instvar aggr_ctrl recv_fin
+    $self instvar pair_id
+    $self instvar bytes start_time
+
+    $self instvar dt
+    $self instvar bps
+
+    set ct [$ns now]
+    #Shuang commenting these
+    $self set dt  [expr $ct - $start_time]
+    if { $dt == 0 } {
+		puts "dt = 0"
+		flush stdout
+	}
+    $self set bps [expr $bytes * 8.0 / $dt ]
+
+    set old_rttimes $rttimes
+    $self set rttimes [$tcps set nrexmit_]
+    if { [info exists aggr_ctrl] } {
+	    $aggr_ctrl $recv_fin $pair_id $bytes $dt $bps [expr $rttimes - $old_rttimes]
+    }
+
+}
+
 TCP_pair instproc flow_finished {} {
     global ns
     $self instvar start_time bytes id group_id
@@ -264,17 +293,20 @@ TCP_pair instproc flow_finished {} {
     }
 }
 
-Agent/TCP/FullTcp instproc set_callback {tcp_pair} {
+Agent/TCP/FullTcp instproc set_callback {tcp_pair fin_notif} {
     $self instvar ctrl
+    $self instvar finCallback
     $self set ctrl $tcp_pair
+    $self set finCallback $fin_notif
 }
 
 Agent/TCP/FullTcp instproc done_data {} {
     global ns sink
     $self instvar ctrl
-#puts "[$ns now] $self fin-ack received";
+    $self instvar finCallback
+    #puts "[$ns now] $self fin-ack received";
     if { [info exists ctrl] } {
-	$ctrl fin_notify
+	$ctrl $finCallback
     }
 }
 
@@ -409,7 +441,7 @@ Agent_Aggr_pair instproc init_schedule {} {
     for {set i 0} {$i < $nr_pairs} {incr i} {
 
 	#### Callback Setting ########################
-	$apair($i) set_fincallback $self   fin_notify
+	$apair($i) set_fincallback $self fin_notify fin_recv
 	$apair($i) set_startcallback $self start_notify
 	###############################################
 
@@ -660,7 +692,7 @@ Agent_Aggr_pair instproc check_if_behind {} {
 	$apair($nr_pairs) setpairid $nr_pairs ;
 
 	#### Callback Setting #################
-	$apair($nr_pairs) set_fincallback $self fin_notify
+	$apair($nr_pairs) set_fincallback $self fin_notify fin_recv
 	$apair($nr_pairs) set_startcallback $self start_notify
 	#######################################
 	$self schedule $nr_pairs
@@ -703,8 +735,8 @@ Agent_Aggr_pair instproc fin_notify { pid bytes fldur bps rttimes } {
         set tmp_pkts [expr $bytes / 1460]
 
 	#puts $logfile "$tmp_pkts $fldur $rttimes"
-	puts $logfile "$bytes $fldur $rttimes $group_id"
-	flush stdout
+	#puts $logfile "$bytes $fldur $rttimes $group_id"
+	#flush stdout
     }
     set flow_fin [expr $flow_fin + 1]
     if {$flow_fin >= $sim_end} {
@@ -714,6 +746,27 @@ Agent_Aggr_pair instproc fin_notify { pid bytes fldur bps rttimes } {
     $self schedule $pid ;# re-schedule a pair having pair_id $pid.
     }
 }
+
+Agent_Aggr_pair instproc fin_recv { pid bytes fldur bps rttimes } {
+#Callback Function for receiver side, just for 
+#bytes : nr of bytes of the flow which has just finished
+#fldur: duration of the flow which has just finished
+#bps  : avg bits/sec of the flow which has just finished
+#
+    global ns flow_gen flow_fin sim_end
+    $self instvar logfile
+    $self instvar group_id
+
+    ###### OUPUT STATISTICS #################
+    if { [info exists logfile] } {
+        set tmp_pkts [expr $bytes / 1460]
+
+        #puts $logfile "$tmp_pkts $fldur $rttimes"
+        puts $logfile "$bytes $fldur $rttimes $group_id"
+        flush stdout
+    }
+}
+
 
 Agent_Aggr_pair instproc start_notify {} {
 #Callback Function

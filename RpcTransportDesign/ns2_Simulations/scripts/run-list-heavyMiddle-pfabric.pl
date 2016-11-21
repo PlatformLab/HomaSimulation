@@ -1,15 +1,15 @@
 #!/usr/bin/perl -w
-$sim_end = 100000;
+$sim_end = 10000000;
 
 $cap = 10;
 $link_delay = 0.000000250;
 $host_delay = 0.0000005;
-@queueSize = (24);
+@queueSize = (13);
 
 @load = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8);
 
 $connections_per_pair = 1;
-$meanFlowSize = 2567.292;
+$meanFlowSize = 2770.732;
 
 $enableMultiPath = 1;
 @perflowMP = (0);
@@ -18,7 +18,7 @@ $enableMultiPath = 1;
 @ackratio = (1);
 @slowstartrestart = ("true");
 $DCTCP_g = 1.0/16.0;
-@min_rto = (0.000045);
+@min_rto = (0.000024);
 
 $switchAlg = "DropTail";
 @DCTCP_K = (10000);
