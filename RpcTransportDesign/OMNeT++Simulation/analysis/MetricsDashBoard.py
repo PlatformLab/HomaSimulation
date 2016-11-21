@@ -723,7 +723,7 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     nicRxRates = trafficDic.hostsTraffic.nics.rx.rates = []
     nicRxDutyCycles = trafficDic.hostsTraffic.nics.rx.dutyCycles = []
 
-    ethInterArrivalGapBit = 12*8.0
+    ethInterArrivalGapBit = 12*8.0 + 8.0*8
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
