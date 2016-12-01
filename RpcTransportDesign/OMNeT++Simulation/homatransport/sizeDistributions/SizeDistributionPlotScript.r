@@ -63,7 +63,7 @@ getUnschedFrac <- function(prob, msgSizes)
 unschedFracFrame <- data.frame(Unsched=c(), CumUnschedFrac=c(), Workload=c())
 
 predefProb <- read.table("FacebookKeyValueMsgSizeDist.txt", col.names=c('msgSize', 'CDF'), skip=1)
-x<-10^(seq(log10(tail(predefProb$msgSize, 1) + 1), log10(1000000), length.out=100))
+x<-10^(seq(log10(tail(predefProb$msgSize, 1) + 1), log10(100000), length.out=300))
 sigma <- 214.476
 k <- 0.348238
 y0 <- 0.47
