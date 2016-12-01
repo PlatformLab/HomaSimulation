@@ -160,7 +160,7 @@ def getMinMct(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArrivals=None):
     return totalDelay, pktArrivalsAtHops
 
 if __name__ == '__main__':
-    flowFile = os.environ['HOME'] + '/Research/RpcTransportDesign/ns2_Simulations/logs/1115-heavymiddle-pfabric/008-empirical_heavymiddle_pfabric-s16-x1-q24-load0.8-avesize2567.292-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto4.5e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr'
+    flowFile = os.environ['HOME'] + '/Research/RpcTransportDesign/ns2_Simulations/logs/1121-heavymiddle-pfabric/008-empirical_heavymiddle_pfabric-s16-x1-q13-load0.8-avesize2770.732-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr'
     fd = open(flowFile)
     stretchs = dict()
     N = 0.0

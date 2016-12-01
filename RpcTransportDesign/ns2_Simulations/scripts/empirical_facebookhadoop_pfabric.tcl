@@ -55,7 +55,7 @@ set pktSize 1460
 set queueSamplingInterval 0.0001
 
 puts "Simulation input:"
-puts "Dynamic Flow - Fabricated Heavy Middle"
+puts "Dynamic Flow - Facebook Hadoop"
 puts "topology: spines server per rack = $topology_spt, x = $topology_x"
 puts "sim_end $sim_end"
 puts "link_rate $link_rate Gbps"
@@ -230,7 +230,7 @@ for {set i 0} {$i < $topology_tors} {incr i} {
 #set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/1460*1500)]
 set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0)]
 puts "Arrival: Poisson with inter-arrival [expr 1/$lambda * 1000] ms"
-puts "FlowSize: Fabricated Heavy Middle with mean = $meanFlowSize"
+puts "FlowSize: Facebook Hadoop with mean = $meanFlowSize"
 
 puts "Setting up connections ..."; flush stdout
 
@@ -249,7 +249,7 @@ for {set j 0} {$j < $S } {incr j} {
 
 	    puts -nonewline "($i,$j) "
 
-	    $agtagr($i,$j) set_PCarrival_process  [expr $lambda/($S - 1)] "Fabricated_Heavy_Middle.tcl" [expr 17*$i+1244*$j] [expr 33*$i+4369*$j]
+	    $agtagr($i,$j) set_PCarrival_process  [expr $lambda/($S - 1)] "Facebook_HadoopDist_All.tcl" [expr 17*$i+1244*$j] [expr 33*$i+4369*$j]
 
 	    $ns at 0.1 "$agtagr($i,$j) warmup 0.5 5"
 	    $ns at 1 "$agtagr($i,$j) init_schedule"

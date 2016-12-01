@@ -9,7 +9,7 @@ $host_delay = 0.0000005;
 @load = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8);
 
 $connections_per_pair = 1;
-$meanFlowSize = 2770.732;
+$meanFlowSize = 134847;
 
 $enableMultiPath = 1;
 @perflowMP = (0);
@@ -43,7 +43,7 @@ $trial = 1;
 $user = "behnamm";
 $top_dir = "/home/behnamm/Research/RpcTransportDesign/ns2_Simulations";
 ###########################################
-$tcl_script = "empirical_heavymiddle_pfabric";
+$tcl_script = "empirical_facebookhadoop_pfabric";
 $work_dir = "$top_dir/work_dir";
 ###########################################
 # ns source code server
