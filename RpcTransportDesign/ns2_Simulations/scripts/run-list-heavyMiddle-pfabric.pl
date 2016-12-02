@@ -44,21 +44,21 @@ $user = "behnamm";
 $top_dir = "/home/behnamm/Research/RpcTransportDesign/ns2_Simulations";
 ###########################################
 $tcl_script = "empirical_heavymiddle_pfabric";
-$work_dir = "$top_dir/work_dir";
+$work_dir = "/scratch/behnamm/pfabric/rc30/work_dir";
 ###########################################
 # ns source code server
-$ns_source_server = "localhost";
+$ns_source_server = "rc30";
 # ns source code path
 $ns_source_path = "$top_dir"; # we expect tree /ns-allinone-2.34 to be at this directory
                               # for now, this also needs to be the same as $top_dir
 ###########################################
 # worker server List
-@server_list = ("localhost");
+@server_list = ("rc30");
 $server_loop_first = 1;  # First loop across servers, than cores
 ###########################################
 # log destination server
-$log_server = "localhost";
-$log_dir = "$top_dir/logs";
+$log_server = "rcmaster";
+$log_dir = "/scratch/behnamm/pfabric/rc30/logs";
 
 ###########################################
 # Prepare servers
@@ -86,11 +86,11 @@ foreach (@server_list) {
     `ssh $user\@$server 'killall ns'`;
     sleep(1);
 
-    `ssh $user\@$server 'mkdir $work_dir'`;
+    `ssh $user\@$server 'mkdir -p $work_dir'`;
     `ssh $user\@$server 'rm -rf $work_dir/proc*'`;
 }
 
-`ssh $user\@$log_server 'mkdir $log_dir'`;
+`ssh $user\@$log_server 'mkdir -p $log_dir'`;
 `ssh $user\@$log_server 'mkdir $log_dir/logs'`;
 
 
