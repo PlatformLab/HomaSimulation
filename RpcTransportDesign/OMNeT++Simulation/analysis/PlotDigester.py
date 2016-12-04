@@ -62,15 +62,15 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
-        loadFactor = float(parsedStats.generalInfo.loadFactor) * len(xmlParsedDic.senderIds)
-        if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
-            loadFactor = loadFactor/0.75
-        if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_MIDDLE'):
-            loadFactor = loadFactor/0.92
-        if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_HEAD'):
-            loadFactor = loadFactor/0.85
+        loadFactor = float(parsedStats.generalInfo.lf) * len(xmlParsedDic.senderIds)
+        #if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
+        #    loadFactor = loadFactor/0.75
+        #if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_MIDDLE'):
+        #    loadFactor = loadFactor/0.92
+        #if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_HEAD'):
+        #    loadFactor = loadFactor/0.85
 
-        loadFactor = roundLoadFactor(loadFactor)
+        #loadFactor = roundLoadFactor(loadFactor)
         workLoad = parsedStats.generalInfo.workloadType
         avgStretch = 0.0
 
@@ -142,15 +142,15 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
-        loadFactor = float(parsedStats.generalInfo.loadFactor) * len(xmlParsedDic.senderIds)
-        if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
-            loadFactor = loadFactor/0.75
-        if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_MIDDLE'):
-            loadFactor = loadFactor/0.92
-        if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_HEAD'):
-            loadFactor = loadFactor/0.85
+        loadFactor = float(parsedStats.generalInfo.lf) * len(xmlParsedDic.senderIds)
+        #if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
+        #    loadFactor = loadFactor/0.75
+        #if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_MIDDLE'):
+        #    loadFactor = loadFactor/0.92
+        #if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_HEAD'):
+        #    loadFactor = loadFactor/0.85
 
-        loadFactor = roundLoadFactor(loadFactor)
+        #loadFactor = roundLoadFactor(loadFactor)
         workLoad = parsedStats.generalInfo.workloadType
         avgStretch = 0.0
         try:

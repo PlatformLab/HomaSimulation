@@ -228,7 +228,7 @@ WorkloadSynthesizer::initialize()
         distSelector =
             MsgSizeDistributions::DistributionChoice::GOOGLE_SEARCH_RPC;
         distFileName = std::string("../../sizeDistributions/"
-                " Google_AllRPC.txt");
+                "Google_SearchRPC.txt");
     } else if (strcmp(workLoadType, "FABRICATED_HEAVY_HEAD")
             == 0) {
         distSelector =

@@ -55,6 +55,14 @@ WorkloadEstimator::WorkloadEstimator(HomaConfigDepot* homaConfig)
                 == 0) {
             distFileName = std::string("../../sizeDistributions/"
                     "Fabricated_Heavy_Head.txt");
+        } else if (strcmp(workloadType, "GOOGLE_SEARCH_RPC")
+                == 0) {
+            distFileName = std::string("../../sizeDistributions/"
+                    "Google_SearchRPC.txt");
+        } else if (strcmp(workloadType, "GOOGLE_ALL_RPC")
+                == 0) {
+            distFileName = std::string("../../sizeDistributions/"
+                    "Google_AllRPC.txt");
         } else if (strcmp(workloadType, "PRESET_IN_FILE") == 0) {
             distFileName = std::string("../../sizeDistributions/"
                     "Fabricated_Heavy_Middle.txt");

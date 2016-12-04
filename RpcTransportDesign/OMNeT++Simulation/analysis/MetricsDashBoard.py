@@ -669,7 +669,7 @@ def printGenralInfo(xmlParsedDic, generalInfo):
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
     print('Servers Per TOR:'.ljust(tw) + '{0}'.format(generalInfo.numServersPerTor).center(fw) + 'Sender Hosts:'.ljust(tw) +
-        '{0}'.format(len(xmlParsedDic.senderIds)).center(fw) + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.loadFactor)*100))).center(fw))
+        '{0}'.format(len(xmlParsedDic.senderIds)).center(fw) + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.lf)*100))).center(fw))
     print('TORs:'.ljust(tw) + '{0}'.format(generalInfo.numTors).center(fw) + 'Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw)
         + 'Start Time:'.ljust(tw) + '{0}'.format(generalInfo.startTime).center(fw))
     print('Host Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.nicLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) +
