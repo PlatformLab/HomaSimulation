@@ -111,7 +111,7 @@ def masterMain():
             runNum = runIdentity[1]
             homaCmd = ('../homatransport -u Cmdenv -c Workload%s -r %d -n '
                 '..:../../simulations:../../../inet/examples:../../../inet/src '
-                '-l ../../../inet/src/INET omnetpp.ini\n' % (workLoad, runNum,))
+                '-l ../../../inet/src/INET %s\n' % (workLoad, runNum, omnetConfigFile,))
             f.write(homaCmd)
         f.close()
         time.sleep(2)
