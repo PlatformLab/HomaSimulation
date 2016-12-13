@@ -18,6 +18,7 @@ from pprint import pprint
 import bisect
 import pdb
 import textwrap
+import time
 
 spt = 16 # servers per tor
 tors = 9 # num tors per pod
@@ -92,7 +93,7 @@ def serverIdToIp(id):
     ipInt = 10*(1<<24) + podId*(1<<16) + torId*(1<<8) + serverIdInTor
     return ipInt
 
-def getMinMct(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArrivals=None):
+def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArrivals=None):
     """
     For a train of txPkts as [pkt0.byteOnWire, pkt1.byteOnWire,.. ] that start transmission
     at sender at time txStart, this method returns the arrival time of last bit of this
@@ -200,6 +201,84 @@ def getMinMct(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArrivals=None):
 
     return totalDelay, pktArrivalsAtHops
 
+def getMinMct_simplified(txStart, firstPkt, totalBytes, sendrIntIp, recvrIntIp):
+    """
+    For a train of txPkts as with total bytes on wire equal to totalBytes and
+    first pakcet size of the train equal to firstPkt, this method returns the
+    arrival time of last bit of this train at the receiver. This method assumes
+    all packets except the last one are full-packet size and the core link
+    speeds are greater than edge link speeds.
+    """
+    if recvrIntIp == sendrIntIp:
+        # When sender and receiver are the same machine
+        return txStart
+
+    edgeSwitchFixDelay = switchFixDelay
+    fabricSwitchFixDelay = switchFixDelay
+    linkDelays = []
+    switchFixDelays = []
+    linkSpeeds = []
+    totalDelay = totalBytes * 8.0 * 1e-9 / nicLinkSpeed
+
+    if ((sendrIntIp >> 8) & 255) == ((recvrIntIp >> 8) & 255):
+        # receiver and sender are in same rack
+
+        switchFixDelays += [edgeSwitchFixDelay]
+        linkDelays += [edgeLinkDelay] * 2
+
+        if isFabricCutThrough:
+            pass
+        else:
+            linkSpeeds = [nicLinkSpeed]
+
+        totalDelay +=\
+            sum(firstPkt* 8.0 * 1e-9 / linkSpeed for linkSpeed in linkSpeeds)
+
+    elif ((sendrIntIp >> 16) & 255) == ((recvrIntIp >> 16) & 255):
+        # receiver and sender are in same pod
+
+        switchFixDelays += [edgeSwitchFixDelay, fabricSwitchFixDelay,
+                            edgeSwitchFixDelay]
+        linkDelays += [edgeLinkDelay, fabricLinkDelay, fabricLinkDelay,
+                       edgeLinkDelay]
+
+        if isFabricCutThrough:
+            linkSpeeds = [nicLinkSpeed]
+        else:
+            linkSpeeds = [nicLinkSpeed, fabricLinkSpeed, fabricLinkSpeed,
+                          nicLinkSpeed]
+        totalDelay +=\
+            sum(firstPkt* 8.0 * 1e-9 / linkSpeed for linkSpeed in linkSpeeds)
+
+    elif ((sendrIntIp >> 24) & 255) == ((recvrIntIp >> 24) & 255):
+        # receiver and sender in two different pod
+
+        switchFixDelays += [edgeSwitchFixDelay, fabricSwitchFixDelay,
+                            fabricSwitchFixDelay, fabricSwitchFixDelay,
+                            edgeSwitchFixDelay]
+        linkDelays += [edgeLinkDelay, fabricLinkDelay, fabricLinkDelay,
+                       fabricLinkDelay, fabricLinkDelay, edgeLinkDelay]
+
+        if isFabricCutThrough:
+            linkSpeeds = [nicLinkSpeed]
+        else:
+            linkSpeeds = [nicLinkSpeed, fabricLinkSpeed, fabricLinkSpeed,
+                          fabricLinkSpeed, fabricLinkSpeed, nicLinkSpeed]
+        totalDelay +=\
+            sum(firstPkt[0]* 8.0 * 1e-9 / linkSpeed for linkSpeed in linkSpeeds)
+
+
+    else:
+        raise Exception, 'Sender and receiver IPs dont abide the rules in config.xml file.'
+
+    # Add fixed delays:
+    totalDelay +=\
+        hostSwTurnAroundTime * 2 + hostNicSxThinkTime +\
+        sum(linkDelays) + sum(switchFixDelays)
+
+    return totalDelay
+
+
 if __name__ == '__main__':
     fileList =\
     """
@@ -222,6 +301,7 @@ if __name__ == '__main__':
 
     resultFd = open("StretchVsTransport.txt", 'w')
     for flowFile in textwrap.dedent(fileList).splitlines():
+        t0 = time.time()
         if flowFile == '':
             continue
         match = re.match('.*empirical_(\S+)_pfabric.*load(0?\.\d+).*', flowFile)
@@ -252,7 +332,9 @@ if __name__ == '__main__':
 
             mesgPkts = [1500 for i in range(mesgBytes/1460)] +\
                     ([(mesgBytes%1460) + 40] if (mesgBytes%1460) else [])
-            minMct, pktArrivalsAtHops = getMinMct(0, mesgPkts, srcIp, destIp)
+            #minMct, pktArrivalsAtHops = getMinMct_generalized(0, mesgPkts, srcIp, destIp)
+            minMct = getMinMct_simplified(
+                0, mesgPkts[0], sum(mesgPkts), srcIp, destIp)
             stretch = mct/minMct
             msgrangeInd = bisect.bisect_left(ranges, mesgBytes)
             msgrange = 'inf' if msgrangeInd==len(ranges) else ranges[msgrangeInd]
@@ -292,5 +374,7 @@ if __name__ == '__main__':
                 'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
                 unschedBytes, 'NA', 'NA', stretch[ninety9Ind])
             resultFd.write(recordLine)
+        t1 = time.time()
+        print "total processing time: {0}, for flow file:\n\t{1}".format(t1-t0, flowFile)
 
     resultFd.close()
