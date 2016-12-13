@@ -236,11 +236,16 @@ if __name__ == '__main__':
         sumBytes = dict()
         for line in fd :
             words = line.split()
-            mesgBytes = int(float(words[0])) # message size in bytes
-            mct = float(words[1]) # message completion time
-            rttimes = int(words[2]) # retransmission times
-            srcId = int(words[3]) # id of source node
-            destId = int(words[4]) # id of destination node
+            try:
+                outputs = [float(word) for word in words[0:5]]
+            except:
+                print line
+                continue
+            mesgBytes = int(outputs[0]) # message size in bytes
+            mct = outputs[1] # message completion time
+            rttimes = int(outputs[2]) # retransmission times
+            srcId = int(outputs[3]) # id of source node
+            destId = int(outputs[4]) # id of destination node
 
             srcIp = serverIdToIp(srcId)
             destIp = serverIdToIp(destId)
@@ -271,20 +276,20 @@ if __name__ == '__main__':
             bytesPerc = sumBytes[msgrange] / B * 100
             recordLine =\
                 '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-                'PseudoIdeal', loadFactor, workload, msgrange, sizePerc, bytesPerc,
+                'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
                 unschedBytes, mean(stretch), 'NA', 'NA')
             resultFd.write(recordLine)
 
             recordLine =\
                 '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-                'PseudoIdeal', loadFactor, workload, msgrange, sizePerc, bytesPerc,
+                'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
                 unschedBytes, 'NA', stretch[medianInd], 'NA')
             resultFd.write(recordLine)
 
 
             recordLine =\
                 '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-                'PseudoIdeal', loadFactor, workload, msgrange, sizePerc, bytesPerc,
+                'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
                 unschedBytes, 'NA', 'NA', stretch[ninety9Ind])
             resultFd.write(recordLine)
 
