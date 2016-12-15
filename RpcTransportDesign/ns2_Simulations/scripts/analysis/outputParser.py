@@ -344,13 +344,15 @@ if __name__ == '__main__':
             if msgrange not in stretchs:
                 stretchs[msgrange] = []
                 sumBytes[msgrange] = 0.0
-            bisect.insort(stretchs[msgrange], stretch)
+            #bisect.insort(stretchs[msgrange], stretch)
+            stretchs[msgrange].append(stretch)
             sumBytes[msgrange] += sum(mesgPkts)
             #print(str(N) + "\n")
         fd.close()
 
         #resultFd = open("StretchVsTransport_{0}_{1}.txt".format(workload, loadFactor), 'w')
-        for msgrange,stretch in sorted(stretchs.iteritems()):
+        for msgrange,stretchList in sorted(stretchs.iteritems()):
+            stretch = sorted(stretchList)
             n = len(stretch)
             medianInd = int(floor(n*0.5))
             ninety9Ind = int(floor(n*0.99))
