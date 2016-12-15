@@ -226,6 +226,7 @@ for {set i 0} {$i < $topology_tors} {incr i} {
     }
 }
 
+
 #############  Agents  #########################
 #set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/1460*1500)]
 set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0)]
@@ -236,6 +237,15 @@ puts "Setting up connections ..."; flush stdout
 
 set flow_gen 0
 set flow_fin 0
+
+###############stability metric recording###############
+proc printNumActive {} {
+    global flow_gen flow_fin ns
+    set tNow [$ns now]
+    puts "## sim time: $tNow, #active flows: [expr $flow_gen-$flow_fin] "
+    set tRecNext [expr $tNow+0.010]
+    $ns at $tRecNext "printNumActive"
+}
 
 set flowlog [open flow.tr w]
 set init_fid 0
@@ -259,6 +269,7 @@ for {set j 0} {$j < $S } {incr j} {
     }
 }
 
+$ns at 1 "printNumActive"
 puts "Initial agent creation done";flush stdout
 puts "Simulation started!"
 

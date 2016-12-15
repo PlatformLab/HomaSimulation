@@ -6,10 +6,11 @@ $link_delay = 0.000000250;
 $host_delay = 0.0000005;
 @queueSize = (13);
 
-@load = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8);
+@load = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85);
 
 $connections_per_pair = 1;
-$meanFlowSize = 134847;
+#$meanFlowSize = 134847;
+$meanFlowSize = 127796.6;
 
 $enableMultiPath = 1;
 @perflowMP = (0);
