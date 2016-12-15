@@ -65,7 +65,16 @@ def adjustedMesgSize(size, protoType, withGrantsOrAcks):
         return sizeOnWire
 
     if (protoType == ProtoType.phost):
-        return size
+        capability_init = 7
+        mss = 1460
+        hdrSize = 40
+        sizeInPkt = int(size/mss) + (1 if (size % mss) else 0)
+        sizeOnWire = size + sizeInPkt*hdrSize
+        sizeOnWire += hdrSize # for rts pkt
+        sizeOnWire += hdrSize # for the last ack pkt
+        if sizeInPkt > capability_init:
+            sizeOnWire += sizeInPkt*hdrSize # for capability tokens
+        return sizeOnWire
 
     raise Exception('Unknown protoType')
 
@@ -83,6 +92,9 @@ def adjustedLoad(load, distFile, withGrantsOrAcks = True):
         avgSizeOnWire.homa += sizeOnWire*(cdf-prevCdf)
         sizeOnWire = adjustedMesgSize(size, ProtoType.pfabric, withGrantsOrAcks)
         avgSizeOnWire.pfabric += sizeOnWire*(cdf-prevCdf)
+        sizeOnWire = adjustedMesgSize(size, ProtoType.phost, withGrantsOrAcks)
+        avgSizeOnWire.phost += sizeOnWire*(cdf-prevCdf)
+
         prevCdf = cdf
 
     if (distFile == 'FacebookKeyValueMsgSizeDist.txt'):
@@ -97,6 +109,8 @@ def adjustedLoad(load, distFile, withGrantsOrAcks = True):
             avgSizeOnWire.homa += sizeOnWire*(cdf-prevCdf)
             sizeOnWire = adjustedMesgSize(size, ProtoType.pfabric, withGrantsOrAcks)
             avgSizeOnWire.pfabric += sizeOnWire*(cdf-prevCdf)
+            sizeOnWire = adjustedMesgSize(size, ProtoType.phost, withGrantsOrAcks)
+            avgSizeOnWire.phost += sizeOnWire*(cdf-prevCdf)
             prevCdf = cdf
 
     fd.close()
@@ -111,6 +125,13 @@ def adjustedLoad(load, distFile, withGrantsOrAcks = True):
         " nominal load: {3}, real load on network: {4}\n".format(distFile,\
         avgSize, avgSizeOnWire.pfabric, load*avgSize/avgSizeOnWire.pfabric, load)
     print(printStr)
+
+    print('-'*80+"\n****phost Transport****")
+    printStr = "Workload: {0}, avg mesg size: {1}, avg mesg size on wire: {2},"\
+        " nominal load: {3}, real load on network: {4}\n".format(distFile,\
+        avgSize, avgSizeOnWire.pfabric, load*avgSize/avgSizeOnWire.phost, load)
+    print(printStr)
+
 
 
 if __name__ == '__main__':
