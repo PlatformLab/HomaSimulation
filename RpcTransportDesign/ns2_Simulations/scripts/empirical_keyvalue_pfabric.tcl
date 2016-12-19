@@ -242,7 +242,7 @@ proc printNumActive {} {
     global flow_gen flow_fin ns
     set tNow [$ns now]
     puts "## sim time: $tNow, #active flows: [expr $flow_gen-$flow_fin] "
-    set tRecNext [expr $tNow+0.010]
+    set tRecNext [expr $tNow+0.001]
     $ns at $tRecNext "printNumActive"
 }
 

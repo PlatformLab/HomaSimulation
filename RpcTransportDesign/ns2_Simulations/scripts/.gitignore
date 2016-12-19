@@ -1,1 +1,5 @@
 **/*.txt
+analysis/
+!analysis/workerSpecsFile
+!analysis/ns2FlowTraces
+!analysis/outputParser.py

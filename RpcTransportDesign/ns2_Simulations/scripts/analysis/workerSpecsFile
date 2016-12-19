@@ -1,0 +1,8 @@
+# list of worker machines and cores
+# worker_name   num_available_cores
+
+rc35    8
+rc36    8
+rc37    8
+rc38    8
+rc39    8

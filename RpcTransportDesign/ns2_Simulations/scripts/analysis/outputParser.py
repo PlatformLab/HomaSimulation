@@ -6,11 +6,11 @@ stretch statistics for different message size ranges from the information
 provided in the flow.tr.
 """
 
+from __future__ import print_function
 import sys
 import signal
 import os
 import re
-from heapq import *
 from numpy import *
 from glob import glob
 from optparse import OptionParser
@@ -19,6 +19,13 @@ import bisect
 import pdb
 import textwrap
 import time
+import random
+import socket
+import subprocess
+import threading
+import multiprocessing
+
+
 
 spt = 16 # servers per tor
 tors = 9 # num tors per pod
@@ -33,6 +40,9 @@ hostSwTurnAroundTime = 5e-7 # seconds
 hostNicSxThinkTime = 5e-7 # seconds
 isFabricCutThrough = False
 unschedBytes = 10000
+# directory under which output files of this script will be stored
+targetDir = '/home/behnamm/Research/RpcTransportDesign/ns2_Simulations/scripts/analysis'
+
 rangesDic = {\
     "FABRICATED_HEAVY_MIDDLE" : [51, 52, 53, 54, 55, 56, 57, 58, 59, 60,\
     61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 75, 76, 77, 79, 81,\
@@ -269,7 +279,8 @@ def getMinMct_simplified(txStart, firstPkt, totalBytes, sendrIntIp, recvrIntIp):
 
 
     else:
-        raise Exception, 'Sender and receiver IPs dont abide the rules in config.xml file.'
+        raise Exception, 'Sender and receiver IPs dont abide the rules \
+            in config.xml file.'
 
     # Add fixed delays:
     totalDelay +=\
@@ -278,105 +289,252 @@ def getMinMct_simplified(txStart, firstPkt, totalBytes, sendrIntIp, recvrIntIp):
 
     return totalDelay
 
+def workerProcessResultFile(flowFile, outputDir, semaphore):
+    """
+    process result file from pfabric simulation, compute stretch for different
+    ranges of message sizes, and record statistics measures of stretch in output
+    files.
+    """
+    semaphore.acquire()
+    #t0 = time.time()
+    match = re.match('.*empirical_(\S+)_pfabric.*load(0?\.\d+).*', flowFile)
+    wltype = match.group(1)
+    loadFactor = float(match.group(2))
+    workload = Workloads[wltype]
+    ranges = rangesDic[workload]
+    fd = open(flowFile)
+    stretchs = dict()
+    N = 0.0
+    B = 0.0
+    sumBytes = dict()
+    for line in fd :
+        words = line.split()
+        try:
+            outputs = [float(word) for word in words[0:5]]
+        except:
+            print(line)
+            continue
+        mesgBytes = int(outputs[0]) # message size in bytes
+        mct = outputs[1] # message completion time
+        rttimes = int(outputs[2]) # retransmission times
+        srcId = int(outputs[3]) # id of source node
+        destId = int(outputs[4]) # id of destination node
+
+        srcIp = serverIdToIp(srcId)
+        destIp = serverIdToIp(destId)
+
+        mesgPkts = [1500 for i in range(mesgBytes/1460)] +\
+                ([(mesgBytes%1460) + 40] if (mesgBytes%1460) else [])
+        #minMct, pktArrivalsAtHops = getMinMct_generalized(
+        #    0, mesgPkts, srcIp, destIp)
+        minMct = getMinMct_simplified(
+            0, mesgPkts[0], sum(mesgPkts), srcIp, destIp)
+        stretch = mct/minMct
+        msgrangeInd = bisect.bisect_left(ranges, mesgBytes)
+        msgrange = 'inf' if msgrangeInd==len(ranges) else ranges[msgrangeInd]
+
+        N += 1
+        B += sum(mesgPkts)
+        if msgrange not in stretchs:
+            stretchs[msgrange] = []
+            sumBytes[msgrange] = 0.0
+        #bisect.insort(stretchs[msgrange], stretch)
+        stretchs[msgrange].append(stretch)
+        sumBytes[msgrange] += sum(mesgPkts)
+        #print(str(N) + "\n")
+    fd.close()
+
+    # find the statistical metrics for stretches of different message ranges
+    recordLines = []
+    for msgrange,stretchList in sorted(stretchs.iteritems()):
+        stretch = sorted(stretchList)
+        n = len(stretch)
+        medianInd = int(floor(n*0.5))
+        ninety9Ind = int(floor(n*0.99))
+        sizePerc = n / N * 100
+        bytesPerc = sumBytes[msgrange] / B * 100
+        recordLine =\
+            '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
+            'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
+            unschedBytes, mean(stretch), 'NA', 'NA')
+        recordLines.append(recordLine)
+
+        recordLine =\
+            '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
+            'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
+            unschedBytes, 'NA', stretch[medianInd], 'NA')
+        recordLines.append(recordLine)
+
+        recordLine =\
+            '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
+            'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
+            unschedBytes, 'NA', 'NA', stretch[ninety9Ind])
+        recordLines.append(recordLine)
+    #t1 = time.time()
+    #print "total processing time: {0}, for flow file:\n\t{1}".format(t1-t0, flowFile)
+
+    # use number of files in the directory as suffix to the result file name
+    # and write the stretch metrics in the file
+    numFiles = subprocess.check_output('ls %s -1| wc -l'%outputDir, shell=True)
+    numFiles = int(numFiles.strip())
+    resultFile = os.path.join(outputDir, 'StretchVsTransport_%d.txt'%numFiles)
+    resultFd = open(resultFile, 'w')
+    [resultFd.write(recordLine) for recordLine in recordLines]
+    resultFd.flush()
+    resultFd.close()
+
+    semaphore.release()
+
+def workerMain():
+    """
+    For the host this script is running on, this function reads tasks info
+    specified in workerInfo file and then creates threads to run the tasks.
+    """
+
+    fd = open(os.path.join(targetDir, 'workerInfo'))
+    hostName = socket.gethostname()
+    numcores = ''
+    workerName = ''
+    while True:
+        line = fd.readline().rstrip('\n')
+        if line == "":
+            break
+        if line[0] == '#':
+            line = fd.readline().split()
+            assert(line[0] == 'hostname')
+            workerName = line[1]
+            if workerName == hostName:
+                line = fd.readline().split()
+                assert(line[0] == 'numcores')
+                numcores = line[1]
+                break
+    if not(workerName) or not(numcores):
+        return
+        fd.close()
+    flowFiles = []
+    while True:
+        line = textwrap.dedent(fd.readline()).rstrip('\n')
+        if line == '' or line == '#':
+            break
+        flowFiles.append(line)
+
+    fd.close()
+    localtime = time.localtime()
+    outputDir = os.path.join(targetDir, '%.4d%.2d%.2d_%.2d%.2d' % (
+        localtime.tm_year, localtime.tm_mon, localtime.tm_mday, 
+        localtime.tm_hour,localtime.tm_min))
+    devNull = open(os.devnull,"w")
+    subprocess.check_call('mkdir -p %s' % (outputDir),
+        shell=True, stdout=devNull)
+    devNull.close()
+
+    semaphore = multiprocessing.Semaphore(
+        min(multiprocessing.cpu_count, int(numcores)))
+    processes = [multiprocessing.Process(target=workerProcessResultFile, args=(
+        flowFileName, outputDir, semaphore)) for flowFileName in flowFiles] 
+
+    [p.start() for p in processes]
+    [p.join() for t in processes]
 
 if __name__ == '__main__':
-    fileList =\
-    """
-    /scratch/behnamm/pfabric/rcmonster/logs/1201-keyvalue-pfabric/001-empirical_keyvalue_pfabric-s16-x1-q13-load0.1-avesize267.2-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rcmonster/logs/1201-keyvalue-pfabric/005-empirical_keyvalue_pfabric-s16-x1-q13-load0.5-avesize267.2-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rcmonster/logs/1201-keyvalue-pfabric/008-empirical_keyvalue_pfabric-s16-x1-q13-load0.8-avesize267.2-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc31/logs/122-searchrpc-pfabric/001-empirical_googlerpc_pfabric-s16-x1-q13-load0.1-avesize530.61-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc31/logs/122-searchrpc-pfabric/005-empirical_googlerpc_pfabric-s16-x1-q13-load0.5-avesize530.61-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc31/logs/122-searchrpc-pfabric/008-empirical_googlerpc_pfabric-s16-x1-q13-load0.8-avesize530.61-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc30/logs/122-heavymiddle-pfabric/001-empirical_heavymiddle_pfabric-s16-x1-q13-load0.1-avesize2770.732-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc30/logs/122-heavymiddle-pfabric/005-empirical_heavymiddle_pfabric-s16-x1-q13-load0.5-avesize2770.732-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc30/logs/122-heavymiddle-pfabric/008-empirical_heavymiddle_pfabric-s16-x1-q13-load0.8-avesize2770.732-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc33/logs/129-searchallrpc-pfabric/001-empirical_googleallrpc_pfabric-s16-x1-q13-load0.1-avesize3150.3-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc33/logs/129-searchallrpc-pfabric/005-empirical_googleallrpc_pfabric-s16-x1-q13-load0.5-avesize3150.3-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc33/logs/129-searchallrpc-pfabric/008-empirical_googleallrpc_pfabric-s16-x1-q13-load0.8-avesize3150.3-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc32/logs/123-hadoop-pfabric/001-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.1-avesize134847-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc32/logs/123-hadoop-pfabric/005-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.5-avesize134847-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    /scratch/behnamm/pfabric/rc32/logs/123-hadoop-pfabric/008-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.8-avesize134847-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-    """
+    parser = OptionParser(description='This script distributes processing of\
+        ns2\'s flowfiles among multiple worker servers. Each worker server\
+        processes the files assigned to it and records the results in output\
+        files. The script blocks until all servers finish their job, at which\
+        point this script merges all the result files into one single output\
+        file and return.')
 
-    resultFd = open("StretchVsTransport.txt", 'w')
-    for flowFile in textwrap.dedent(fileList).splitlines():
-        t0 = time.time()
-        if flowFile == '':
+    parser.add_option('-r', '--resultListFile', metavar='FILENAME',
+        help='the file containing names of ns2 flow.tr result files.',
+        dest='resultListFile', default='')
+
+    parser.add_option('-s', '--workerSpecsFile', metavar='FILENAME',
+        help='the file containing the information about worker that are to\
+        process the ns2 flow.tr result files.',
+        dest='workerSpecsFile', default='')
+    parser.add_option('-w', '--workerMode', action='store_true',
+        dest='workerMode', default=False,
+        help='run the script for worker mode.')
+
+    options, args = parser.parse_args()
+    resultListFile = options.resultListFile
+    workerSpecsFile = options.workerSpecsFile
+    if options.workerMode:
+        workerMain()
+        exit('worker done') 
+
+    if not resultListFile or not workerSpecsFile:
+        exit('options --resultListFile and --workerSpecsFile are required.')
+
+    # read and store all flowfiles
+    flowFd = open(resultListFile)
+    flowFiles = []
+    for flowFile in flowFd:
+        flowFile = textwrap.dedent(flowFile).rstrip('\n')
+        if flowFile == '' or flowFile[0] == '#':
             continue
-        match = re.match('.*empirical_(\S+)_pfabric.*load(0?\.\d+).*', flowFile)
-        wltype = match.group(1)
-        loadFactor = float(match.group(2))
-        workload = Workloads[wltype]
-        ranges = rangesDic[workload]
+        # check if we can open flowfile and it's good
         fd = open(flowFile)
-        stretchs = dict()
-        N = 0.0
-        B = 0.0
-        sumBytes = dict()
-        for line in fd :
-            words = line.split()
-            try:
-                outputs = [float(word) for word in words[0:5]]
-            except:
-                print line
-                continue
-            mesgBytes = int(outputs[0]) # message size in bytes
-            mct = outputs[1] # message completion time
-            rttimes = int(outputs[2]) # retransmission times
-            srcId = int(outputs[3]) # id of source node
-            destId = int(outputs[4]) # id of destination node
-
-            srcIp = serverIdToIp(srcId)
-            destIp = serverIdToIp(destId)
-
-            mesgPkts = [1500 for i in range(mesgBytes/1460)] +\
-                    ([(mesgBytes%1460) + 40] if (mesgBytes%1460) else [])
-            #minMct, pktArrivalsAtHops = getMinMct_generalized(0, mesgPkts, srcIp, destIp)
-            minMct = getMinMct_simplified(
-                0, mesgPkts[0], sum(mesgPkts), srcIp, destIp)
-            stretch = mct/minMct
-            msgrangeInd = bisect.bisect_left(ranges, mesgBytes)
-            msgrange = 'inf' if msgrangeInd==len(ranges) else ranges[msgrangeInd]
-
-            N += 1
-            B += sum(mesgPkts)
-            if msgrange not in stretchs:
-                stretchs[msgrange] = []
-                sumBytes[msgrange] = 0.0
-            #bisect.insort(stretchs[msgrange], stretch)
-            stretchs[msgrange].append(stretch)
-            sumBytes[msgrange] += sum(mesgPkts)
-            #print(str(N) + "\n")
         fd.close()
+        flowFiles.append(flowFile)
+    flowFd.close()
 
-        #resultFd = open("StretchVsTransport_{0}_{1}.txt".format(workload, loadFactor), 'w')
-        for msgrange,stretchList in sorted(stretchs.iteritems()):
-            stretch = sorted(stretchList)
-            n = len(stretch)
-            medianInd = int(floor(n*0.5))
-            ninety9Ind = int(floor(n*0.99))
-            sizePerc = n / N * 100
-            bytesPerc = sumBytes[msgrange] / B * 100
-            recordLine =\
-                '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-                'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
-                unschedBytes, mean(stretch), 'NA', 'NA')
-            resultFd.write(recordLine)
+    if flowFiles == []:
+        exit("no flow files specified in resultListFile")
 
-            recordLine =\
-                '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-                'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
-                unschedBytes, 'NA', stretch[medianInd], 'NA')
-            resultFd.write(recordLine)
+    # read worker information from file
+    workerFd = open(workerSpecsFile)
+    workerList = []
+    for line in workerFd:
+        line = textwrap.dedent(line).rstrip('\n')
+        if line == '' or line[0] == '#':
+            continue
+        workerInfo = line.split()
+        workerName = workerInfo[0]
+        cores = int(workerInfo[1])
+        workerList.append([workerName, cores])
 
+    if workerList == {}:
+        exit("no worker specified in the workerListFile")
 
-            recordLine =\
-                '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-                'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
-                unschedBytes, 'NA', 'NA', stretch[ninety9Ind])
-            resultFd.write(recordLine)
-        t1 = time.time()
-        print "total processing time: {0}, for flow file:\n\t{1}".format(t1-t0, flowFile)
+    # Distribute the jobs among the workers and
+    # create a file for workers to read their assigned jobs
+    fd = open(os.path.join(targetDir,'workerInfo'), 'w')
+    random.shuffle(flowFiles)
+    i = 0
+    while flowFiles:
+        flowFile = flowFiles.pop()
+        workerList[i%len(workerList)].append(flowFile)
+        i += 1
 
-    resultFd.close()
+    for wrkrInfo in workerList:
+        workerInfo = list(wrkrInfo)
+        fd.write('#\n')
+        fd.write('hostname  {}\n'.format(workerInfo.pop(0)))
+        fd.write('numcores  {}\n'.format(workerInfo.pop(0)))
+        while workerInfo:
+            fd.write(workerInfo.pop(0)+'\n')
+    fd.flush()
+    fd.close()
+    time.sleep(5)
+
+    # ssh into workers and run the script in the worker mode to
+    # execute their jobs
+    for i in range(len(workerList)):
+        hostName = workerList[i][0]
+        try:
+            devNull = open(os.devnull,"w")
+            scriptAbsName = os.path.abspath(__file__)
+            scriptPath = os.path.dirname(scriptAbsName)
+            scriptName = os.path.basename(scriptAbsName)
+            cmdToRun = './%s --workerMode ' % (scriptName)
+            sshCmd = ("""ssh -n -f %s "sh -c 'cd %s; nohup %s > /dev/null"""
+                """ 2>&1 &'" """ % (hostName, scriptPath, cmdToRun))
+            print(sshCmd)
+            subprocess.check_call(sshCmd, shell=True, stdout=devNull)
+            devNull.close()
+            time.sleep(5)
+        except Exception as e:
+            devNull.close()
+            print('Can not ssh to worker node: {}'.format(hostName), file=sys.stderr)
+            exit()

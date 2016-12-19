@@ -1,0 +1,11 @@
+#list of ns2 flow.tr file names, one file per file with absolute path
+
+/scratch/behnamm/pfabric/rc31/logs/122-searchrpc-pfabric/001-empirical_googlerpc_pfabric-s16-x1-q13-load0.1-avesize530.61-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc31/logs/122-searchrpc-pfabric/005-empirical_googlerpc_pfabric-s16-x1-q13-load0.5-avesize530.61-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc31/logs/122-searchrpc-pfabric/008-empirical_googlerpc_pfabric-s16-x1-q13-load0.8-avesize530.61-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc33/logs/129-searchallrpc-pfabric/001-empirical_googleallrpc_pfabric-s16-x1-q13-load0.1-avesize3150.3-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc33/logs/129-searchallrpc-pfabric/005-empirical_googleallrpc_pfabric-s16-x1-q13-load0.5-avesize3150.3-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc33/logs/129-searchallrpc-pfabric/008-empirical_googleallrpc_pfabric-s16-x1-q13-load0.8-avesize3150.3-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc32/logs/123-hadoop-pfabric/001-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.1-avesize134847-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc32/logs/123-hadoop-pfabric/005-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.5-avesize134847-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/rc32/logs/123-hadoop-pfabric/008-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.8-avesize134847-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
