@@ -239,11 +239,13 @@ set flow_fin 0
 
 ###############stability metric recording###############
 proc printNumActive {} {
-    global flow_gen flow_fin ns
+    global flow_gen flow_fin ns sim_end
     set tNow [$ns now]
     puts "## sim time: $tNow, #active flows: [expr $flow_gen-$flow_fin] "
     set tRecNext [expr $tNow+0.001]
-    $ns at $tRecNext "printNumActive"
+    if {$flow_gen < $sim_end} {
+        $ns at $tRecNext "printNumActive"
+    }
 }
 
 set flowlog [open flow.tr w]

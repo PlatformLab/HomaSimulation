@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
-$sim_end = 10000000;
+$sim_end = 100000000;
 
 $cap = 10;
 $link_delay = 0.000000250;
 $host_delay = 0.0000005;
 @queueSize = (13);
 
-@load = (0.1, 0.3, 0.4, 0.5, 0.6);
+@load = (0.1, 0.3, 0.4, 0.45, 0.5, 0.6);
 
 $connections_per_pair = 1;
 #$meanFlowSize = 267.2;
