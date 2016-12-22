@@ -29,6 +29,7 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     adaptiveSchedPrioLevels = (uint16_t) ownerTransport->par("adaptiveSchedPrioLevels");
     numSendersToKeepGranted = (uint16_t) ownerTransport->par("numSendersToKeepGranted");
     ASSERT(numSendersToKeepGranted <= adaptiveSchedPrioLevels);
+    signalEmitPeriod = (double) ownerTransport->par("signalEmitPeriod");
     prioResolverPrioLevels =
         (uint16_t) ownerTransport->par("prioResolverPrioLevels");
     schedPrioAssignMode = ownerTransport->par("schedPrioAssignMode");

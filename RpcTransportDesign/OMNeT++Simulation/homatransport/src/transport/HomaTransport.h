@@ -619,7 +619,8 @@ class HomaTransport : public cSimpleModule
         START = 1,  // Timer type when the transport is in initialization phase.
         GRANT = 2,  // Timer type for common state of a grant timer.
         SEND  = 3,  // Timer type for common state of a send timer.
-        STOP  = 4   // Timer type when the transport is in cleaning phase.
+        EMITTER = 4,// Timer type for common state of emitSignalTimer.
+        STOP  = 5   // Timer type when the transport is in cleaning phase.
     };
 
     /**
@@ -627,6 +628,12 @@ class HomaTransport : public cSimpleModule
      */
     // Signal for number of incomplete TX msgs received from the application.
     static simsignal_t msgsLeftToSendSignal;
+
+    // This signal is priodically emitted and carries number of remaining
+    // messages yet to be transmitted. This signal is intended to be receveid
+    // by GlobalSignalListener which record stability metrics at the top
+    // simulation level. 
+    static simsignal_t stabilitySignal;
 
     // Signal for total number of msg bytes yet to be sent for all msgs.
     static simsignal_t bytesLeftToSendSignal;
@@ -700,6 +707,10 @@ class HomaTransport : public cSimpleModule
     // sender this will be used to schedule next send after the current send is
     // completed.
     cMessage* sendTimer;
+
+    // This timer is used to priodically emit signals that are received at the
+    // global simulation level by the GlobalSignalListener.
+    cMessage* emitSignalTimer;
 
     // Tracks the total outstanding grant bytes which will be used for stats
     // collection and recording.

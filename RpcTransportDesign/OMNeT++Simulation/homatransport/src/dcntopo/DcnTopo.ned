@@ -20,6 +20,7 @@ import inet.node.inet.StandardHost;
 import ned.DatarateChannel;
 import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
 import homatransport.common.HostBase;
+import homatransport.common.GlobalSignalListener;
 
 network DcnTopo
 {
@@ -95,6 +96,7 @@ network DcnTopo
         }
 
     submodules:
+        globalListener: GlobalSignalListener{}
         aggRouter[numAggSwitches]: Router {
             @display("i=abstract/router2");
             **.promiscuous = true;

@@ -28,10 +28,11 @@
  * An near optimal priority based transport scheme for minimizing the average
  * completion time of messages. For every packet of a message, it sets the
  * message size field and a priority field equal to the remaining bytes of the
- * message not yet send. This transport will only be near optimal if the
- * network has priority queues. The scheduling mechanism for the priority
- * queues in the network would always choose the lowest priority packet that
- * belongs to shortes message among all packets in the queue.
+ * message not yet send. This transport will only be near optimal if the network
+ * has priority queues and only for many-senders/single-receiver scenario. The
+ * scheduling mechanism for the priority queues in the network would always
+ * choose the lowest priority packet that belongs to shortes message among all
+ * packets in the queue.
  */
 
 class PseudoIdealPriorityTransport : public cSimpleModule

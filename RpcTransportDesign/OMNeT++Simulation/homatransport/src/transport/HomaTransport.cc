@@ -27,6 +27,8 @@ Define_Module(HomaTransport);
  */
 simsignal_t HomaTransport::msgsLeftToSendSignal =
         registerSignal("msgsLeftToSend");
+simsignal_t HomaTransport::stabilitySignal =
+        registerSignal("stabilitySignal");
 simsignal_t HomaTransport::bytesLeftToSendSignal =
         registerSignal("bytesLeftToSend");
 simsignal_t HomaTransport::bytesNeedGrantSignal =
@@ -60,6 +62,7 @@ HomaTransport::HomaTransport()
     , prioResolver(NULL)
     , distEstimator(NULL)
     , sendTimer(NULL)
+    , emitSignalTimer(NULL) 
 {}
 
 /**
@@ -105,6 +108,7 @@ HomaTransport::initialize()
     }
     sendTimer = new cMessage("SendTimer");
     sendTimer->setKind(SelfMsgKind::START);
+    emitSignalTimer = new cMessage("SignalEmitionTimer");
     registerTemplatedStats(homaConfig->allPrio);
     distEstimator = new WorkloadEstimator(homaConfig);
     prioResolver = new PriorityResolver(homaConfig, distEstimator);
@@ -121,6 +125,8 @@ HomaTransport::processStart()
     socket.setOutputGate(gate("udpOut"));
     socket.bind(homaConfig->localPort);
     sendTimer->setKind(SelfMsgKind::SEND);
+    emitSignalTimer->setKind(SelfMsgKind::EMITTER);
+    scheduleAt(simTime(), emitSignalTimer);
 }
 
 void
@@ -138,6 +144,12 @@ HomaTransport::handleMessage(cMessage *msg)
                 ASSERT(msg == sendTimer);
                 sxController.handlePktTransmitEnd();
                 sxController.sendOrQueue(msg);
+                break;
+            case SelfMsgKind::EMITTER:
+                ASSERT(msg == emitSignalTimer);
+                emit(stabilitySignal, sxController.outboundMsgMap.size());
+                scheduleAt(simTime() + homaConfig->signalEmitPeriod,
+                    emitSignalTimer);
                 break;
         }
     } else {

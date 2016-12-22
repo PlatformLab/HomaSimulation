@@ -71,6 +71,11 @@ class HomaConfigDepot {
     // sending. This number is at most as large as adaptiveSchedPrioLevels
     uint16_t numSendersToKeepGranted;
 
+    // priod intervals at which the transport fires signals that are
+    // collected by GlobalSignalListener.
+    double signalEmitPeriod;
+
+
     // Total number of priorities that PrioResolver would use to resolve
     // priorities.
     uint16_t prioResolverPrioLevels;

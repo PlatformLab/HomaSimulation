@@ -42,6 +42,10 @@ simple HomaTransport like ITransportScheme
         int numSendersToKeepGranted; // total number of most preffered senders that
                                      // receiver concurrently sends grants for.
 
+        // priod intervals at which the transport fires signals that are
+        //collected by GlobalSignalListener.
+        double signalEmitPeriod @unit(s) = default(0.001s);
+
         // Could be any of PrioPaceMode values defined in TrafficPacer.h
         string schedPrioAssignMode = default("NO_OVER_COMMIT");
 
@@ -63,6 +67,7 @@ simple HomaTransport like ITransportScheme
         string workloadType = default("");
 
         @signal[msgsLeftToSend](type=long);
+        @signal[stabilitySignal](type=unsigned long);
         @signal[bytesLeftToSend](type=long);
         @signal[totalOutstandingBytes](type=long);
         @signal[totalOutstandingBytes](type=long);
