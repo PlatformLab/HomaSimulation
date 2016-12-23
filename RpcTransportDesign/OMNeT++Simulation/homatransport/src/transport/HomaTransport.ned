@@ -84,7 +84,7 @@ simple HomaTransport like ITransportScheme
         @statistic[bytesNeedGrant](title="num total sched bytes left to send"; source=bytesNeedGrant; record=stats, histogram; interpolationmode=none);
         @statistic[totalOutstandingBytes](title="total bytes in flight"; source=totalOutstandingBytes; record=stats, histogram; interpolationmode=none);
         @statistic[outstandingGrantBytes](title="num total bytes left to send"; source=outstandingGrantBytes; record=stats, histogram; interpolationmode=none);
-        @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes); interpolationmode=none);
+        @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes), stats(homaGrantPktBytes); interpolationmode=none);
         @statistic[rxActiveTime](title="Time periods receiver expects to get bytes"; source=rxActiveTime; record=stats, histogram; interpolationmode=none);
         @statistic[rxActiveBytes](title="Bytes received during each active period"; source=rxActiveBytes; record=stats, histogram; interpolationmode=none);
         @statistic[sxActiveTime](title="Time periods sender has bytes to send"; source=sxActiveTime; record=stats, histogram; interpolationmode=none);

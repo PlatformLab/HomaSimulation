@@ -62,7 +62,7 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
-        loadFactor = float(parsedStats.generalInfo.lf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
+        loadFactor = float(parsedStats.generalInfo.rlf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
         #if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
         #    loadFactor = loadFactor/0.75
         #if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_MIDDLE'):
@@ -142,7 +142,7 @@ def prepE2EStretchVsTransport(resultDir, resultFiles=[]):
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
-        loadFactor = float(parsedStats.generalInfo.lf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
+        loadFactor = float(parsedStats.generalInfo.rlf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
         #if (parsedStats.generalInfo.workloadType == 'FACEBOOK_KEY_VALUE'):
         #    loadFactor = loadFactor/0.75
         #if (parsedStats.generalInfo.workloadType == 'FABRICATED_HEAVY_MIDDLE'):

@@ -899,18 +899,8 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 {
     uint32_t pktLenOnWire = HomaPkt::getBytesOnWire(rxPkt->getDataBytes(),
         (PktType)rxPkt->getPktType());
-    //uint64_t msgLen = rxPkt->getUnschedFields().msgByteLen;
-    //double ctime = rxPkt->getCreationTime().dbl();
-    //double currentTime = simTime().dbl();
-    //if (currentTime > 1.675159207 && msgLen == 80903) {
-    //    std::cout << "haha" << std::endl;
-    //}
-    //if (currentTime > 1.6752336216 ) {
-    //    std::cout << "haha" << std::endl;
-    //}
-
     if (getInflightBytes() == 0) {
-        // We are not in a active period prior to this packet but entered in
+        // We were not in an active period prior to this packet but entered in
         // a active period starting this packet.
         activePeriodStart = simTime() - SimTime(1e-9 * (pktLenOnWire * 8.0 /
             homaConfig->nicLinkSpeed));
@@ -944,6 +934,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     int sInd = ret.first;
     int headInd = ret.second;
     schedSenders->handleGrantRequest(s, sInd, headInd);
+
     // Check if should dump stats for wasted bandwidth
     if (getInflightBytes() == 0) {
         // This is end of a active period, so we should dump the stats and reset

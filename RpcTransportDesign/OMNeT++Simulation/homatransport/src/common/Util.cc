@@ -13,6 +13,7 @@
 Register_ResultFilter("homaMsgSize", HomaMsgSizeFilter);
 Register_ResultFilter("homaPktBytes", HomaPktBytesFilter);
 Register_ResultFilter("homaUnschedPktBytes", HomaUnschedPktBytesFilter);
+Register_ResultFilter("homaGrantPktBytes", HomaGrantPktBytesFilter);
 
 void
 HomaMsgSizeFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
@@ -76,4 +77,19 @@ HomaUnschedPktBytesFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
             return;
     }
 
+}
+
+void
+HomaGrantPktBytesFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t,
+        cObject *object)
+{
+    HomaPkt* homaPkt = check_and_cast<HomaPkt*>(object);
+    switch (homaPkt->getPktType()) {
+        case PktType::GRANT:
+            fire(this, t, (double)HomaPkt::getBytesOnWire(
+                homaPkt->getDataBytes(), (PktType)homaPkt->getPktType()));
+            return;
+        default:
+            return;
+    }
 }

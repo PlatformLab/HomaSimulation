@@ -86,7 +86,6 @@ def digestModulesStats(modulesStatsList):
         statsDigest.threeQuartile = 0
         statsDigest.ninety9Percentile = 0
 
-
     return statsDigest
 
 
@@ -364,68 +363,6 @@ def printQueueTimeStats(queueWaitTimeDigest, unit):
     printStatsLine(torsDownStats, 'RX TORs Down NICs:', tw, fw, unit, printKeys)
     print('_'*2*tw + '\n' + 'Total'.ljust(tw) + '{0:.2f}'.format(meanSum*1e6).center(fw) + '{0:.2f}'.format(meanFracSum).center(fw))
 
-def printPrioUsageStats(prioUsageStatsDigest):
-    printKeys = ['msgMinSize', 'msgMaxSize', 'totalBytesPerc', 'unschedBytesPerc', 'totalPktsPerc', 'unschedPktsPerc']
-    tw = 12
-    fw = 12
-    lineMax = 85
-    title = 'Bytes and Packets Received On Different Priority Levels'
-    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' '))
-
-    print("="*lineMax)
-    print("Priority".ljust(tw) + 'Min Mesg'.center(fw) + 'Max Mesg'.center(fw) + 'TotalBytes'.center(fw) +
-            'UnschedByte'.center(fw) + 'TotalPkts'.center(fw) + 'UnschedPkts'.center(fw))
-    print(''.ljust(tw) + 'Size(B)'.center(fw) + 'Size(B)'.center(fw) + '%'.center(fw) +
-            '% In Prio'.center(fw) + '%'.center(fw) + '% In Prio'.center(fw))
-    print("_"*lineMax)
-
-    for prioStats in prioUsageStatsDigest:
-        printStatsLine(prioStats, 'prio {0}'.format(prioStats.priority), tw, fw, '', printKeys)
-
-    return
-
-def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
-    receiverIds = xmlParsedDic.receiverIds
-    numPrioLevels = int(generalInfo.prioLevels)
-    totalBytes = 0
-    totalPkts = 0
-    seterr(divide='ignore')
-    for prio in range(numPrioLevels):
-        prioUsageStats = AttrDict()
-        prioUsageStats.priority = prio
-        prioUsageStats.msgMinSize = inf
-        prioUsageStats.msgMaxSize = 0
-        prioUsageStats.totalBytes = 0
-        prioUsageStats.totalPkts = 0
-        prioUsageStats.unschedBytes = 0
-        prioUsageStats.unschedBytesPerc = 0
-        prioUsageStats.unschedPkts = 0
-        prioUsageStats.unschedPktsPerc = 0
-        for i in receiverIds:
-            msgSizeStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaMsgSize)'.format(i, prio)
-            pktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaPktBytes)'.format(i, prio)
-            unschedPktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaUnschedPktBytes)'.format(i, prio)
-            msgSizeStats = hosts.access(msgSizeStatsKey)
-            prioUsageStats.msgMinSize = min(prioUsageStats.msgMinSize, msgSizeStats.min)
-            prioUsageStats.msgMaxSize = max(prioUsageStats.msgMaxSize, msgSizeStats.max)
-            pktByteStats = hosts.access(pktBytesStatsKey)
-            prioUsageStats.totalBytes += pktByteStats.sum
-            totalBytes += pktByteStats.sum
-            prioUsageStats.totalPkts += pktByteStats.count
-            totalPkts += pktByteStats.count
-            unschedPktByteStats = hosts.access(unschedPktBytesStatsKey)
-            prioUsageStats.unschedBytes += unschedPktByteStats.sum
-            prioUsageStats.unschedPkts += unschedPktByteStats.count
-        prioUsageStats.unschedBytesPerc = 100 * divide(prioUsageStats.unschedBytes, prioUsageStats.totalBytes)
-        prioUsageStats.unschedPktsPerc = 100 * divide(prioUsageStats.unschedPkts, prioUsageStats.totalPkts)
-        prioUsageStatsDigest.append(prioUsageStats)
-
-    for prioUsageStats in prioUsageStatsDigest:
-        prioUsageStats.totalBytesPerc = 100 * divide(prioUsageStats.totalBytes, totalBytes)
-        prioUsageStats.totalPktsPerc = 100 * divide(prioUsageStats.totalPkts, totalPkts)
-    return
-
 def printE2EStretchAndDelay(e2eStretchAndDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent', 'bytes', 'bytesPercent']
     tw = 19
@@ -669,7 +606,7 @@ def printGenralInfo(xmlParsedDic, generalInfo):
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
     print('Servers Per TOR:'.ljust(tw) + '{0}'.format(generalInfo.numServersPerTor).center(fw) + 'Sender Hosts:'.ljust(tw) +
-        '{0}'.format(len(xmlParsedDic.senderIds)).center(fw) + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.lf)*100))).center(fw))
+        '{0}'.format(len(xmlParsedDic.senderIds)).center(fw) + 'Load Factor:'.ljust(tw) + '{0}'.format('%'+str((float(generalInfo.rlf)*100))).center(fw))
     print('TORs:'.ljust(tw) + '{0}'.format(generalInfo.numTors).center(fw) + 'Receiver Hosts:'.ljust(tw) + '{0}'.format(len(xmlParsedDic.receiverIds)).center(fw)
         + 'Start Time:'.ljust(tw) + '{0}'.format(generalInfo.startTime).center(fw))
     print('Host Link Speed:'.ljust(tw) + '{0}'.format(generalInfo.nicLinkSpeed).center(fw) + 'InterArrival Dist:'.ljust(tw) +
@@ -1088,6 +1025,155 @@ def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
         '{0:.2f}'.format(activeAndWasted.sx.schedDelayFrac).center(fw) +  '{0:.2f}'.format(activeAndWasted.sx.unschedDelayFrac).center(fw) +
         '{0:.2f}'.format(activeAndWasted.sx.delayFrac).center(fw))
 
+def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
+    receiverIds = xmlParsedDic.receiverIds
+    numPrioLevels = int(generalInfo.prioLevels)
+    nicLinkSpeed = int(generalInfo.nicLinkSpeed.strip('Gbps'))
+    rxTimes = AttrDict()
+    rxTimes.total.totalTime = 0.0
+    rxTimes.total.activeTime = 0.0
+    rxTimes.total.activelyRecvTime = 0.0
+    rxTimes.total.activelyRecvSchedTime = 0.0
+    rxTimes.total.activelyRecvUnschedTime = 0.0
+    rxTimes.total.activelyRecvGrantTime = 0.0
+
+    # loop over all receiver and find: 1)total time, 2) total active time, 3)
+    # total actively receiving time, 4) total time receiving scheduled bytes,
+    # 5) total time receiving unscheduled bytes.
+
+    allBytesList = [] #for debugging and verification
+    grantBytesAll = 0 #for debugging and verification
+    for i in receiverIds:
+        rxTimes[i] = AttrDict()
+        totalTime = float(hosts.access('host[{0}].eth[0].mac.\"simulated time\".value'.format(i)))
+        rxTimes[i].totalTime = totalTime
+
+        activeTimeStats = hosts.access('host[{0}].transportScheme.rxActiveTime:stats'.format(i))
+        activeTime = activeTimeStats.sum
+        rxTimes[i].activeTime = activeTime
+
+        receivedBytesStats = hosts.access('host[{0}].transportScheme.rxActiveBytes:stats'.format(i))
+        activelyRecvTime = 8.0 * receivedBytesStats.sum / (nicLinkSpeed*1e9)
+
+        rxTimes[i].activelyRecvTime = activelyRecvTime
+        allBytes = 0.0
+        unschedBytes = 0.0
+        grantBytes = 0.0
+        schedBytes = 0.0
+        for prio in range(numPrioLevels):
+            pktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaPktBytes)'.format(i, prio)
+            pktByteStats = hosts.access(pktBytesStatsKey)
+            allBytes += pktByteStats.sum
+
+            unschedPktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaUnschedPktBytes)'.format(i, prio)
+            unschedPktByteStats = hosts.access(unschedPktBytesStatsKey)
+            unschedBytes += unschedPktByteStats.sum
+
+            grantPktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaGrantPktBytes)'.format(i, prio)
+            grantPktByteStats = hosts.access(grantPktBytesStatsKey)
+            grantBytes += grantPktByteStats.sum
+
+        allBytesList.append((receivedBytesStats.sum, allBytes)) #for debugging and verification 
+        grantBytesAll += grantBytes  #for debugging and verification
+        schedBytes = allBytes - unschedBytes - grantBytes
+        rxTimes[i].activelyRecvSchedTime = 8.0 * schedBytes / (nicLinkSpeed*1e9)
+        rxTimes[i].activelyRecvUnschedTime = 8.0 * unschedBytes / (nicLinkSpeed*1e9)
+        rxTimes[i].activelyRecvGrantTime = 8.0 * grantBytes / (nicLinkSpeed*1e9)
+
+        rxTimes.total.totalTime += totalTime
+        rxTimes.total.activeTime += activeTime
+        rxTimes.total.activelyRecvTime += activelyRecvTime
+        rxTimes.total.activelyRecvSchedTime += rxTimes[i].activelyRecvSchedTime
+        rxTimes.total.activelyRecvUnschedTime += rxTimes[i].activelyRecvUnschedTime 
+        rxTimes.total.activelyRecvGrantTime += rxTimes[i].activelyRecvGrantTime
+
+    #print(allBytesList) #for debugging and verification 
+    #print(grantBytesAll)
+
+    totalBytes = 0
+    totalPkts = 0
+    seterr(divide='ignore')
+    for prio in range(numPrioLevels):
+        prioUsageStats = AttrDict()
+        prioUsageStats.priority = prio
+        prioUsageStats.msgMinSize = inf
+        prioUsageStats.msgMaxSize = 0
+        prioUsageStats.totalBytes = 0
+        prioUsageStats.totalPkts = 0
+        prioUsageStats.unschedBytes = 0
+        prioUsageStats.unschedBytesPerc = 0
+        prioUsageStats.unschedPkts = 0
+        prioUsageStats.unschedPktsPerc = 0
+        for i in receiverIds:
+            # find bytes and pkts on the prio level
+            msgSizeStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaMsgSize)'.format(i, prio)
+            pktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaPktBytes)'.format(i, prio)
+            unschedPktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaUnschedPktBytes)'.format(i, prio)
+            grantPktBytesStatsKey = 'host[{0}].transportScheme.homaPktPrio{1}Signal:stats(homaGrantPktBytes)'.format(i, prio)
+            msgSizeStats = hosts.access(msgSizeStatsKey)
+            prioUsageStats.msgMinSize = min(prioUsageStats.msgMinSize, msgSizeStats.min)
+            prioUsageStats.msgMaxSize = max(prioUsageStats.msgMaxSize, msgSizeStats.max)
+            pktByteStats = hosts.access(pktBytesStatsKey)
+            prioUsageStats.totalBytes += pktByteStats.sum
+            totalBytes += pktByteStats.sum
+            prioUsageStats.totalPkts += pktByteStats.count
+            totalPkts += pktByteStats.count
+            unschedPktByteStats = hosts.access(unschedPktBytesStatsKey)
+            prioUsageStats.unschedBytes += unschedPktByteStats.sum
+            prioUsageStats.unschedPkts += unschedPktByteStats.count
+
+        prioUsageStats.unschedBytesPerc = 100 * divide(prioUsageStats.unschedBytes , prioUsageStats.totalBytes)
+        prioUsageStats.unschedPktsPerc = 100 * divide(prioUsageStats.unschedPkts , prioUsageStats.totalPkts)
+        prioUsageStats.usageTimePct.total = 100 * divide(prioUsageStats.totalBytes * 8.0 , nicLinkSpeed * 1e9 * rxTimes.total.totalTime)
+        prioUsageStats.usageTimePct.active = 100 * divide(prioUsageStats.totalBytes * 8.0 , nicLinkSpeed * 1e9 * rxTimes.total.totalTime)
+        prioUsageStats.usageTimePct.activelyRecv = 100 * divide(prioUsageStats.totalBytes * 8.0 , nicLinkSpeed * 1e9 * rxTimes.total.activelyRecvTime)
+        prioUsageStats.usageTimePct.activelyRecvSched = 100 * divide(prioUsageStats.totalBytes * 8.0 , nicLinkSpeed * 1e9 * rxTimes.total.activelyRecvSchedTime)
+
+        prioUsageStatsDigest.append(prioUsageStats)
+
+    for prioUsageStats in prioUsageStatsDigest:
+        prioUsageStats.totalBytesPerc = 100 * divide(prioUsageStats.totalBytes, totalBytes)
+        prioUsageStats.totalPktsPerc = 100 * divide(prioUsageStats.totalPkts, totalPkts)
+    return
+
+def printPrioUsageStats(prioUsageStatsDigest):
+    printKeys = ['msgMinSize', 'msgMaxSize', 'totalBytesPerc', 'unschedBytesPerc', 'totalPktsPerc', 'unschedPktsPerc']
+    tw = 12
+    fw = 12
+    lineMax = 85
+    title = 'Bytes and Packets Received On Different Priority Levels'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+
+    print("="*lineMax)
+    print("Priority".ljust(tw) + 'Min Mesg'.center(fw) + 'Max Mesg'.center(fw) + 'TotalBytes'.center(fw) +
+            'UnschedByte'.center(fw) + 'TotalPkts'.center(fw) + 'UnschedPkts'.center(fw))
+    print(''.ljust(tw) + 'Size(B)'.center(fw) + 'Size(B)'.center(fw) + '%'.center(fw) +
+            '% In Prio'.center(fw) + '%'.center(fw) + '% In Prio'.center(fw))
+    print("_"*lineMax)
+
+    for prioStats in prioUsageStatsDigest:
+        printStatsLine(prioStats, 'prio {0}'.format(prioStats.priority), tw, fw, '', printKeys)
+
+
+    printKeys = ['total', 'active', 'activelyRecv', 'activelyRecvSched']
+    tw = 12
+    fw = 18 
+    lineMax = 85
+    title = 'Time Usage Percentages Of Different Priority Levels '
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+
+    print("="*lineMax)
+    print("Priority".ljust(tw) + '% of Total Time'.center(fw) + '% of Active Time'.center(fw) +
+        '% of Active'.center(fw) + '% of Active'.center(fw))
+    print(''.ljust(tw) + ''.center(fw) + ''.center(fw) + ' Recv Time'.center(fw) + 'Recv Sched Time'.center(fw))
+    print("_"*lineMax)
+
+    for prioStats in prioUsageStatsDigest:
+        printStatsLine(prioStats.usageTimePct, 'prio {0}'.format(prioStats.priority), tw, fw, '', printKeys)
+
+    return
 
 def printQueueLength(parsedStats, xmlParsedDic):
     printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
@@ -1267,7 +1353,6 @@ def printQueueLength(parsedStats, xmlParsedDic):
     digestQueueLenInfo(queueLen.tors.down.nic, 'All TORs Down')
     printStatsLine(queueLen.tors.down.nic.queueLenDigest, queueLen.tors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
 
-
 def main():
     parser = OptionParser()
     options, args = parser.parse_args()
@@ -1278,10 +1363,10 @@ def main():
 
     if len(args) > 1:
         xmlConfigFile = args[1]
-    else: 
+    else:
         xmlConfigFile = 'homatransport/src/dcntopo/config.xml'
 
-    sp = ScalarParser(scalarResultFile) 
+    sp = ScalarParser(scalarResultFile)
     parsedStats = AttrDict()
     parsedStats.hosts = sp.hosts
     parsedStats.tors = sp.tors
@@ -1291,6 +1376,7 @@ def main():
 
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile, parsedStats.generalInfo)
+
     queueWaitTimeDigest = AttrDict()
     hostQueueWaitTimes(parsedStats.hosts, xmlParsedDic, queueWaitTimeDigest)
     torsQueueWaitTime(parsedStats.tors, parsedStats.generalInfo, xmlParsedDic, queueWaitTimeDigest)
@@ -1302,15 +1388,15 @@ def main():
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         activeAndWasted = calculateWastedTimesAndBw(parsedStats, xmlParsedDic)
         printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted)
+    if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
+        prioUsageStatsDigest = list()
+        getPrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
+        printPrioUsageStats(prioUsageStatsDigest)
     printBytesAndRates(parsedStats, xmlParsedDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     msgBytesOnWireDigest = AttrDict()
     msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
-    if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
-        prioUsageStatsDigest = list()
-        getPrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
-        printPrioUsageStats(prioUsageStatsDigest)
     transportSchedDelayDigest = AttrDict()
     transportSchedDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest)
     printTransportSchedDelay(transportSchedDelayDigest, 'us')

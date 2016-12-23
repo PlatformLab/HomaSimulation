@@ -35,4 +35,13 @@ class SIM_API HomaUnschedPktBytesFilter : public cObjectResultFilter
         cObject *object);
 };
 
+class SIM_API HomaGrantPktBytesFilter : public cObjectResultFilter
+{
+  PUBLIC:
+    HomaGrantPktBytesFilter() {}
+    virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t,
+        cObject *object);
+};
+
+
 #endif /* UTIL_H_ */
