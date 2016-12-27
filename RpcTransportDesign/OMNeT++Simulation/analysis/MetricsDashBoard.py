@@ -956,6 +956,8 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
         hostStats = parsedStats.hosts[host]
         simTime = float(hostStats.access('eth[0].mac.\"simulated time\".value'))
         totalSimTime += simTime
+        lastSxTime = hostStats.access('eth[0].mac.\"last transmission time\".value')
+        lastRxTime = hostStats.access('eth[0].mac.\"last reception time\".value')
         if hostId in receiverHostIds:
             rxActiveTimeStats = hostStats.access('transportScheme.rxActiveTime:stats')
             rxBytesStats = hostStats.access('transportScheme.rxActiveBytes:stats')
@@ -968,7 +970,7 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
             activeAndWasted.rx.expectedBytes += expectedBytes
             activeAndWasted.rx.realBytes += realBytes
             activeAndWasted.rx.wastedTime += wastedTime
-            activeAndWasted.rx.totalTime += simTime
+            activeAndWasted.rx.totalTime += lastRxTime
 
         if hostId in senderHostIds:
             sxActiveTimeStats = hostStats.access('transportScheme.sxActiveTime:stats')
@@ -987,7 +989,7 @@ def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
             activeAndWasted.sx.expectedBytes += expectedBytes
             activeAndWasted.sx.realBytes += realBytes
             activeAndWasted.sx.wastedTime += wastedTime
-            activeAndWasted.sx.totalTime += simTime
+            activeAndWasted.sx.totalTime += lastSxTime
             activeAndWasted.sx.schedDelayFrac += schedDelayFrac
             activeAndWasted.sx.unschedDelayFrac += unschedDelayFrac
             activeAndWasted.sx.delayFrac += sumDelayFrac
@@ -1046,7 +1048,8 @@ def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
     for i in receiverIds:
         rxTimes[i] = AttrDict()
         totalTime = float(hosts.access('host[{0}].eth[0].mac.\"simulated time\".value'.format(i)))
-        rxTimes[i].totalTime = totalTime
+        totalRxTime = float(hosts.access('host[{0}].eth[0].mac.\"last reception time\".value'.format(i)))
+        rxTimes[i].totalTime = totalRxTime
 
         activeTimeStats = hosts.access('host[{0}].transportScheme.rxActiveTime:stats'.format(i))
         activeTime = activeTimeStats.sum
@@ -1080,7 +1083,7 @@ def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
         rxTimes[i].activelyRecvUnschedTime = 8.0 * unschedBytes / (nicLinkSpeed*1e9)
         rxTimes[i].activelyRecvGrantTime = 8.0 * grantBytes / (nicLinkSpeed*1e9)
 
-        rxTimes.total.totalTime += totalTime
+        rxTimes.total.totalTime += totalRxTime
         rxTimes.total.activeTime += activeTime
         rxTimes.total.activelyRecvTime += activelyRecvTime
         rxTimes.total.activelyRecvSchedTime += rxTimes[i].activelyRecvSchedTime

@@ -148,6 +148,7 @@ class INET_API EtherMACBase : public MACBase
     MACTransmitState transmitState;    // "transmit state" of the MAC
     MACReceiveState receiveState;    // "receive state" of the MAC
     simtime_t lastTxFinishTime;    // time of finishing the last transmission
+    simtime_t lastRxTime;    // time of reception of the last packet
     int pauseUnitsRequested;    // requested pause duration, or zero -- examined at endTx
     EtherFrame *curTxFrame;    // frame being transmitted
 
@@ -189,7 +190,8 @@ class INET_API EtherMACBase : public MACBase
     class HomaByteCounter {
       public:
         HomaByteCounter();
-        void recordThroughputs(cComponent* macBase, simtime_t duration);
+        void recordThroughputs(cComponent* macBase,
+             simtime_t sendDuration, simtime_t recvDuration);
 
         
       public:

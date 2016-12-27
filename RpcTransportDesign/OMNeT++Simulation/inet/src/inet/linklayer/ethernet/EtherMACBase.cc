@@ -141,6 +141,7 @@ simsignal_t EtherMACBase::frameSentTimeStamptAtMACSignal = registerSignal("frame
 EtherMACBase::EtherMACBase()
 {
     lastTxFinishTime = -1.0;    // never equals to current simtime
+    lastRxTime = -1.0;
     curEtherDescr = &nullEtherDescr;
     transmissionChannel = NULL;
     physInGate = NULL;
@@ -179,6 +180,7 @@ void EtherMACBase::initialize(int stage)
         initializeStatistics();
 
         lastTxFinishTime = -1.0;    // not equals with current simtime.
+        lastRxTime = -1.0;
 
         // initialize self messages
         endTxMsg = new cMessage("EndTransmission", ENDTRANSMISSION);
@@ -379,6 +381,7 @@ void EtherMACBase::processConnectDisconnect()
             delete curTxFrame;
             curTxFrame = NULL;
             lastTxFinishTime = -1.0;    // so that it never equals to the current simtime, used for Burst mode detection.
+            lastRxTime = -1.0;
         }
 
         if (txQueue.extQueue) {
@@ -586,15 +589,22 @@ void EtherMACBase::finish()
     if (!disabled) {
         simtime_t t = simTime();
         recordScalar("simulated time", t);
+        recordScalar("last transmission time", lastTxFinishTime);
+        recordScalar("last reception time", lastRxTime);
         recordScalar("full-duplex", duplexMode);
+        
+        simtime_t sendDuration = lastTxFinishTime > 0 ? lastTxFinishTime : t;
+        simtime_t recvDuration = lastRxTime > 0 ? lastRxTime : t;
+        if (sendDuration > 0) {
+            recordScalar("frames/sec sent", numFramesSent / sendDuration);
+            recordScalar("bits/sec sent", (8.0 * numBytesSent) / sendDuration);
 
-        if (t > 0) {
-            recordScalar("frames/sec sent", numFramesSent / t);
-            recordScalar("frames/sec rcvd", numFramesReceivedOK / t);
-            recordScalar("bits/sec sent", (8.0 * numBytesSent) / t);
-            recordScalar("bits/sec rcvd", (8.0 * numBytesReceivedOK) / t);
-            homaBytesCounter.recordThroughputs(this, t);
         }
+        if (recvDuration > 0) {
+            recordScalar("frames/sec rcvd", numFramesReceivedOK / recvDuration);
+            recordScalar("bits/sec rcvd", (8.0 * numBytesReceivedOK) / recvDuration);
+        }
+        homaBytesCounter.recordThroughputs(this, sendDuration, recvDuration);
     }
 }
 
@@ -741,43 +751,46 @@ EtherMACBase::HomaByteCounter::HomaByteCounter()
 {}
 
 void
-EtherMACBase::HomaByteCounter::recordThroughputs(cComponent* macBase, simtime_t duration)
+EtherMACBase::HomaByteCounter::recordThroughputs(cComponent* macBase,
+    simtime_t sendDuration, simtime_t recvDuration)
 {
-    if (duration > 0) {
+    if (sendDuration > 0) {
         macBase->recordScalar("Homa Req bits/sec sent", 
-                (8.0 * numReqBytesSent) / duration);
+                (8.0 * numReqBytesSent) / sendDuration);
         macBase->recordScalar("Homa Req frames/sec sent", 
-                (1.0 * numReqPktSent)/ duration);
-        macBase->recordScalar("Homa Req bits/sec rcvd", 
-                (8.0 * numReqBytesRecvOK) / duration);
-        macBase->recordScalar("Homa Req frames/sec rcvd", 
-                (1.0 * numReqPktRecvOK) / duration);
+                (1.0 * numReqPktSent)/ sendDuration);
         macBase->recordScalar("Homa  Grant bits/sec sent", 
-                (8.0 * numGrantBytesSent) / duration);
+                (8.0 * numGrantBytesSent) / sendDuration);
         macBase->recordScalar("Homa  Grant frames/sec sent", 
-                (1.0 * numGrantPktSent) / duration);
-        macBase->recordScalar("Homa Grant bits/sec rcvd", 
-                (8.0 * numGrantBytesRecvOK) / duration);
-        macBase->recordScalar("Homa Grant frames/sec rcvd", 
-                (1.0 * numGrantPktRecvOK) / duration);
+                (1.0 * numGrantPktSent) / sendDuration);
         macBase->recordScalar("Homa Sched bits/sec sent", 
-                (8.0 * numSchedBytesSent) / duration);
+                (8.0 * numSchedBytesSent) / sendDuration);
         macBase->recordScalar("Homa Sched frames/sec sent", 
-                (1.0 * numSchedPktSent) / duration);
-        macBase->recordScalar("Homa Sched bits/sec rcvd", 
-                (8.0 * numSchedBytesRecvOK) / duration);
-        macBase->recordScalar("Homa Sched frames/sec rcvd", 
-                (1.0 * numSchedPktRecvOK) / duration);
+                (1.0 * numSchedPktSent) / sendDuration);
         macBase->recordScalar("Homa Unsched bits/sec sent", 
-                (8.0 * numUnschedBytesSent) / duration);
+                (8.0 * numUnschedBytesSent) / sendDuration);
         macBase->recordScalar("Homa Unsched frames/sec sent", 
-                (1.0 * numUnschedPktSent) / duration);
-        macBase->recordScalar("Homa Unsched bits/sec rcvd", 
-                (8.0 * numUnschedBytesRecvOk) / duration);
-        macBase->recordScalar("Homa Unsched frames/sec rcvd", 
-                (1.0 * numUnschedPktRecvOk) / duration);
+                (1.0 * numUnschedPktSent) / sendDuration);
     }
 
+    if (recvDuration > 0) {
+        macBase->recordScalar("Homa Req bits/sec rcvd", 
+                (8.0 * numReqBytesRecvOK) / recvDuration);
+        macBase->recordScalar("Homa Req frames/sec rcvd", 
+                (1.0 * numReqPktRecvOK) / recvDuration);
+        macBase->recordScalar("Homa Grant bits/sec rcvd", 
+                (8.0 * numGrantBytesRecvOK) / recvDuration);
+        macBase->recordScalar("Homa Grant frames/sec rcvd", 
+                (1.0 * numGrantPktRecvOK) / recvDuration);
+        macBase->recordScalar("Homa Sched bits/sec rcvd", 
+                (8.0 * numSchedBytesRecvOK) / recvDuration);
+        macBase->recordScalar("Homa Sched frames/sec rcvd", 
+                (1.0 * numSchedPktRecvOK) / recvDuration);
+        macBase->recordScalar("Homa Unsched bits/sec rcvd", 
+                (8.0 * numUnschedBytesRecvOk) / recvDuration);
+        macBase->recordScalar("Homa Unsched frames/sec rcvd", 
+                (1.0 * numUnschedPktRecvOk) / recvDuration);
+    }
 }
 
 } // namespace inet

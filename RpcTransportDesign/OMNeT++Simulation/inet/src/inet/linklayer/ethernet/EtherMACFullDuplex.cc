@@ -241,6 +241,7 @@ void EtherMACFullDuplex::processMsgFromNetwork(EtherTraffic *msg)
             processReceivedDataFrame((EtherFrame *)frame);
         }
     }
+    lastRxTime = simTime(); 
 }
 
 void EtherMACFullDuplex::handleEndIFGPeriod()
