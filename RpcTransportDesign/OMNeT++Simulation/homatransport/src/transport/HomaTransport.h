@@ -607,6 +607,7 @@ class HomaTransport : public cSimpleModule
     virtual void finish();
     void sendPktAndScheduleNext(HomaPkt* sxPkt);
     void processStart();
+    void testAndEmitStabilitySignal();
     void registerTemplatedStats(uint16_t numPrio);
     const inet::L3Address& getLocalAddr() {return localAddr;}
 
@@ -711,6 +712,9 @@ class HomaTransport : public cSimpleModule
     // This timer is used to priodically emit signals that are received at the
     // global simulation level by the GlobalSignalListener.
     cMessage* emitSignalTimer;
+
+    // Tracks the next schedule time for emitSignalTimer and initialized to zero
+    simtime_t nextEmitSignalTime;
 
     // Tracks the total outstanding grant bytes which will be used for stats
     // collection and recording.

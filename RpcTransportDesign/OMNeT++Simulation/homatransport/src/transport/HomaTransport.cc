@@ -63,6 +63,7 @@ HomaTransport::HomaTransport()
     , distEstimator(NULL)
     , sendTimer(NULL)
     , emitSignalTimer(NULL) 
+    , nextEmitSignalTime(SIMTIME_ZERO)
 {}
 
 /**
@@ -109,6 +110,7 @@ HomaTransport::initialize()
     sendTimer = new cMessage("SendTimer");
     sendTimer->setKind(SelfMsgKind::START);
     emitSignalTimer = new cMessage("SignalEmitionTimer");
+    nextEmitSignalTime = SIMTIME_ZERO;
     registerTemplatedStats(homaConfig->allPrio);
     distEstimator = new WorkloadEstimator(homaConfig);
     prioResolver = new PriorityResolver(homaConfig, distEstimator);
@@ -130,6 +132,35 @@ HomaTransport::processStart()
 }
 
 void
+HomaTransport::testAndEmitStabilitySignal()
+{
+    if (!sxController.outboundMsgMap.size()) {
+        if (emitSignalTimer->isScheduled())
+            cancelEvent(emitSignalTimer);
+        return;
+    }
+
+    if (emitSignalTimer->isScheduled()) {
+        return;
+    }
+
+    simtime_t currentTime = simTime();
+
+    if (currentTime == nextEmitSignalTime) {
+        emit(stabilitySignal, sxController.outboundMsgMap.size());
+        nextEmitSignalTime = currentTime + homaConfig->signalEmitPeriod;
+
+    } else if (nextEmitSignalTime < currentTime) {
+        double offset = (currentTime - nextEmitSignalTime).dbl();
+        double intpart, fracpart;
+        fracpart = modf(offset / homaConfig->signalEmitPeriod, &intpart);
+        intpart = (fracpart == 0.0 ? intpart : intpart+1);
+        nextEmitSignalTime += intpart * homaConfig->signalEmitPeriod;
+    }
+    scheduleAt(nextEmitSignalTime, emitSignalTimer);
+}
+
+void
 HomaTransport::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
@@ -147,9 +178,7 @@ HomaTransport::handleMessage(cMessage *msg)
                 break;
             case SelfMsgKind::EMITTER:
                 ASSERT(msg == emitSignalTimer);
-                emit(stabilitySignal, sxController.outboundMsgMap.size());
-                scheduleAt(simTime() + homaConfig->signalEmitPeriod,
-                    emitSignalTimer);
+                testAndEmitStabilitySignal();
                 break;
         }
     } else {
@@ -213,6 +242,7 @@ void
 HomaTransport::finish()
 {
     cancelAndDelete(sendTimer);
+    cancelAndDelete(emitSignalTimer);
 }
 
 
@@ -334,6 +364,7 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
     OutboundMessage* outboundMsg = &(outboundMsgMap.at(msgId));
     rxAddrMsgMap[destAddr].insert(outboundMsg);
     bytesLeftToSend += outboundMsg->getBytesLeft();
+    transport->testAndEmitStabilitySignal();
     outboundMsg->prepareRequestAndUnsched();
     auto insResult = outbndMsgSet.insert(outboundMsg);
     ASSERT(insResult.second); // check insertion took place
@@ -478,6 +509,7 @@ HomaTransport::SendController::msgTransmitComplete(OutboundMessage* msg)
         rxAddrMsgMap.erase(destIp);
     }
     outboundMsgMap.erase(msg->getMsgId());
+    transport->testAndEmitStabilitySignal();
     return;
 }
 

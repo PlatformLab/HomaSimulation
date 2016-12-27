@@ -43,7 +43,7 @@ simple HomaTransport like ITransportScheme
                                      // receiver concurrently sends grants for.
 
         // priod intervals at which the transport fires signals that are
-        //collected by GlobalSignalListener.
+        // collected by GlobalSignalListener.
         double signalEmitPeriod @unit(s) = default(0.001s);
 
         // Could be any of PrioPaceMode values defined in TrafficPacer.h
