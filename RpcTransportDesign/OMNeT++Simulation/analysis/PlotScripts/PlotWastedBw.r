@@ -24,8 +24,6 @@ for (workload in unique(wastedBw$workload)) {
             plot.title = element_text(size = textSize)) +
         coord_cartesian(ylim=c(0,100), xlim=c(0,100)) +
         labs(title = plotTitle, x = xLab, y = yLab)
-
-
 }
 
 pdf("plots/wastedBW.pdf", width=15, height=5)

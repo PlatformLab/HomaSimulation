@@ -633,14 +633,7 @@ def digestTrafficInfo(trafficBytesAndRateDic, title):
         trafficDigest.minDutyCycle = min(trafficBytesAndRateDic.dutyCycles)
         trafficDigest.maxDutyCycle = max(trafficBytesAndRateDic.dutyCycles)
 
-def printBytesAndRates(parsedStats, xmlParsedDic):
-    printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate', 'cumBytes', 'avgDutyCycle', 'minDutyCycle', 'maxDutyCycle']
-    tw = 15
-    fw = 10
-    lineMax = 100
-    title = 'Traffic Characteristic (Rates, Bytes, and DutyCycle)'
-    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' '))
+def computeBytesAndRates(parsedStats, xmlParsedDic):
     trafficDic = AttrDict()
     txAppsBytes = trafficDic.sxHostsTraffic.apps.sx.bytes = []
     txAppsRates = trafficDic.sxHostsTraffic.apps.sx.rates = []
@@ -738,7 +731,16 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
                 upNicsTxBytes.append(nicSendBytes)
                 upNicsTxRates.append(nicSendRates)
                 upNicsTxDutyCycle.append(nicSendDutyCycle)
+    return trafficDic
 
+def printBytesAndRates(trafficDic):
+    printKeys = ['avgRate', 'cumRate', 'minRate', 'maxRate', 'cumBytes', 'avgDutyCycle', 'minDutyCycle', 'maxDutyCycle']
+    tw = 15
+    fw = 10
+    lineMax = 100
+    title = 'Traffic Characteristic (Rates, Bytes, and DutyCycle)'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print("="*lineMax)
     print("Measurement".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw) +
@@ -772,33 +774,14 @@ def printBytesAndRates(parsedStats, xmlParsedDic):
     digestTrafficInfo(trafficDic.rxHostsTraffic.apps.rx, 'RX Apps Recv:')
     printStatsLine(trafficDic.rxHostsTraffic.apps.rx.trafficDigest, trafficDic.rxHostsTraffic.apps.rx.trafficDigest.title, tw, fw, '', printKeys)
 
-def digestHomaRates(homaTrafficDic, title):
-    trafficDigest = homaTrafficDic.rateDigest
-    trafficDigest.title = title
-    if 'rates' in homaTrafficDic.keys():
-        trafficDigest.cumBitRate = sum([rate[0] for rate in homaTrafficDic.rates])
-        trafficDigest.avgBitRate = trafficDigest.cumBitRate/float(len(homaTrafficDic.rates))
-        trafficDigest.minBitRate = min([rate[0] for rate in homaTrafficDic.rates])
-        trafficDigest.maxBitRate = max([rate[0] for rate in homaTrafficDic.rates])
-        trafficDigest.cumFrameRate = sum([rate[1] for rate in homaTrafficDic.rates])
-        trafficDigest.avgFrameRate = trafficDigest.cumFrameRate/float(len(homaTrafficDic.rates))
-
-def printHomaRates(parsedStats, xmlParsedDic):
-    printKeys = ['avgFrameRate', 'cumFrameRate', 'avgBitRate', 'cumBitRate', 'minBitRate', 'maxBitRate']
-    tw = 25
-    fw = 11
-    lineMax = 90
-    title = 'Homa Packets Traffic Rates'
-    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' '))
+def computeHomaRates(parsedStats, xmlParsedDic):
     trafficDic = AttrDict()
-
     sxHostsNicUnschedRates = trafficDic.sxHostsTraffic.nics.sx.unschedPkts.rates = []
     sxHostsNicReqRates = trafficDic.sxHostsTraffic.nics.sx.reqPkts.rates = []
     sxHostsNicSchedRates = trafficDic.sxHostsTraffic.nics.sx.schedPkts.rates = []
     rxHostsNicGrantRates = trafficDic.rxHostsTraffic.nics.sx.grantPkts.rates = []
 
-    ethInterArrivalGapBit = 12*8.0
+    ethInterArrivalGapBit = 12*8.0 + 8.0*8
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
         hostStats = parsedStats.hosts[host]
@@ -834,7 +817,27 @@ def printHomaRates(parsedStats, xmlParsedDic):
 
         if hostId in xmlParsedDic.receiverIds:
             rxHostsNicGrantRates.append(nicSendGrantRate)
+    return trafficDic
 
+def digestHomaRates(homaTrafficDic, title):
+    trafficDigest = homaTrafficDic.rateDigest
+    trafficDigest.title = title
+    if 'rates' in homaTrafficDic.keys():
+        trafficDigest.cumBitRate = sum([rate[0] for rate in homaTrafficDic.rates])
+        trafficDigest.avgBitRate = trafficDigest.cumBitRate/float(len(homaTrafficDic.rates))
+        trafficDigest.minBitRate = min([rate[0] for rate in homaTrafficDic.rates])
+        trafficDigest.maxBitRate = max([rate[0] for rate in homaTrafficDic.rates])
+        trafficDigest.cumFrameRate = sum([rate[1] for rate in homaTrafficDic.rates])
+        trafficDigest.avgFrameRate = trafficDigest.cumFrameRate/float(len(homaTrafficDic.rates))
+
+def printHomaRates(trafficDic):
+    printKeys = ['avgFrameRate', 'cumFrameRate', 'avgBitRate', 'cumBitRate', 'minBitRate', 'maxBitRate']
+    tw = 25
+    fw = 11
+    lineMax = 90
+    title = 'Homa Packets Traffic Rates'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
     print("="*lineMax)
     print("Homa Packet Type".ljust(tw) + 'AvgRate'.center(fw) + 'CumRate'.center(fw) + 'AvgRate'.center(fw) +
         'CumRate'.center(fw) + 'MinRate'.center(fw) + 'MaxRate'.center(fw))
@@ -850,7 +853,6 @@ def printHomaRates(parsedStats, xmlParsedDic):
     printStatsLine(trafficDic.sxHostsTraffic.nics.sx.schedPkts.rateDigest, trafficDic.sxHostsTraffic.nics.sx.schedPkts.rateDigest.title, tw, fw, '', printKeys)
     digestHomaRates(trafficDic.rxHostsTraffic.nics.sx.grantPkts, 'RX NICs Grant SxRate:')
     printStatsLine(trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest, trafficDic.rxHostsTraffic.nics.sx.grantPkts.rateDigest.title, tw, fw, '', printKeys)
-
 
 def printHomaOutstandingBytes(parsedStats, xmlParsedDic, unit):
     tw = 25
@@ -921,7 +923,7 @@ def digestQueueLenInfo(queueLenDic, title):
         queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
         queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
 
-def calculateWastedTimesAndBw(parsedStats, xmlParsedDic):
+def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
     nicLinkSpeed = int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
     senderHostIds = xmlParsedDic.senderIds
     receiverHostIds = xmlParsedDic.receiverIds
@@ -1027,7 +1029,7 @@ def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
         '{0:.2f}'.format(activeAndWasted.sx.schedDelayFrac).center(fw) +  '{0:.2f}'.format(activeAndWasted.sx.unschedDelayFrac).center(fw) +
         '{0:.2f}'.format(activeAndWasted.sx.delayFrac).center(fw))
 
-def getPrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
+def computePrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest):
     receiverIds = xmlParsedDic.receiverIds
     numPrioLevels = int(generalInfo.prioLevels)
     nicLinkSpeed = int(generalInfo.nicLinkSpeed.strip('Gbps'))
@@ -1387,15 +1389,17 @@ def main():
     printGenralInfo(xmlParsedDic, parsedStats.generalInfo)
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         printHomaOutstandingBytes(parsedStats, xmlParsedDic, 'KB')
-    printHomaRates(parsedStats, xmlParsedDic)
+    trafficDic = computeHomaRates(parsedStats, xmlParsedDic)
+    printHomaRates(trafficDic)
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
-        activeAndWasted = calculateWastedTimesAndBw(parsedStats, xmlParsedDic)
+        activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
         printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted)
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         prioUsageStatsDigest = list()
-        getPrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
+        computePrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
         printPrioUsageStats(prioUsageStatsDigest)
-    printBytesAndRates(parsedStats, xmlParsedDic)
+    trafficDic = computeBytesAndRates(parsedStats, xmlParsedDic)
+    printBytesAndRates(trafficDic)
     printQueueLength(parsedStats, xmlParsedDic)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     msgBytesOnWireDigest = AttrDict()
