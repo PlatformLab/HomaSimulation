@@ -4,9 +4,9 @@ $sim_end = 100000000;
 $cap = 10;
 $link_delay = 0.000000250;
 $host_delay = 0.0000005;
-@queueSize = (13);
+@queueSize = (65);
 
-@load = (0.1, 0.3, 0.4, 0.45, 0.5, 0.6);
+@load = (0.3, 0.4, 0.45, 0.5, 0.55, 0.6);
 
 $connections_per_pair = 1;
 #$meanFlowSize = 267.2;
@@ -19,7 +19,7 @@ $enableMultiPath = 1;
 @ackratio = (1);
 @slowstartrestart = ("true");
 $DCTCP_g = 1.0/16.0;
-@min_rto = (0.000024);
+@min_rto = (0.0000858);
 
 $switchAlg = "DropTail";
 @DCTCP_K = (10000);
