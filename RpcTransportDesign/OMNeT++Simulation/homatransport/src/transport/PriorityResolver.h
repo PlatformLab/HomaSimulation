@@ -49,6 +49,13 @@ class PriorityResolver
     static void printCbfCdf(WorkloadEstimator::CdfVector* vec);
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
+    // Used for comparing double values. return true if a smaller than b, within
+    // an epsilon bound.
+    inline bool isLess(double a, double b)
+    {
+            return a+1e-6 < b;
+    }
+
   PRIVATE:
     uint32_t maxSchedPktDataBytes;
     uint32_t lastCbfCapMsgSize;

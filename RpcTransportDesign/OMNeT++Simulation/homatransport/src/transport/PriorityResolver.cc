@@ -221,7 +221,7 @@ PriorityResolver::setCdfPrioCutOffs()
     double probStep = probMax / homaConfig->prioResolverPrioLevels;
     size_t i = 0;
     uint32_t prevCutOffCdfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
+    for (double prob = probStep; isLess(prob, probMax); prob += probStep) {
         for (; i < cdf->size(); i++) {
             if (cdf->at(i).first == prevCutOffCdfSize) {
                 // Do not add duplicate sizes to cutOffSizes vector
@@ -249,7 +249,7 @@ PriorityResolver::setExpFromCdfPrioCutOffs()
         probMax / (2 - pow(2.0, 1-(int)(homaConfig->prioResolverPrioLevels)));
     size_t i = 0;
     uint32_t prevCutOffExpCdfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
+    for (double prob = probStep; isLess(prob, probMax); prob += probStep) {
         probStep /= 2.0;
         for (; i < cdf->size(); i++) {
             if (cdf->at(i).first == prevCutOffExpCdfSize) {
@@ -276,7 +276,7 @@ PriorityResolver::setCbfPrioCutOffs()
     double probStep = probMax / homaConfig->prioResolverPrioLevels;
     size_t j = 0;
     uint32_t prevCutOffCbfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
+    for (double prob = probStep; isLess(prob, probMax); prob += probStep) {
         for (; j < cbf->size(); j++) {
             if (cbf->at(j).first == prevCutOffCbfSize) {
                 // Do not add duplicate sizes to cutOffSizes vector
@@ -303,7 +303,7 @@ PriorityResolver::setExpFromCbfPrioCutOffs()
         probMax / (2 - pow(2.0, 1-(int)(homaConfig->prioResolverPrioLevels)));
     size_t i = 0;
     uint32_t prevCutOffExpCbfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
+    for (double prob = probStep; isLess(prob, probMax); prob += probStep) {
         probStep /= 2.0;
         for (; i < cbf->size(); i++) {
             if (cbf->at(i).first == prevCutOffExpCbfSize) {
@@ -329,7 +329,7 @@ PriorityResolver::setHeadTailFirstPrioCutOffs()
     double probStep = probMax / homaConfig->prioResolverPrioLevels;
     size_t j = 0;
     uint32_t prevCutOffCbfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
+    for (double prob = probStep; isLess(prob, probMax); prob += probStep) {
         for (; j < cbfLastCapBytes->size(); j++) {
             if (cbfLastCapBytes->at(j).first == prevCutOffCbfSize) {
                 // Do not add duplicate sizes to cutOffSizes vector
@@ -355,7 +355,7 @@ PriorityResolver::setExpHeadTailFirstPrioCutOffs()
         probMax / (2 - pow(2.0, 1-(int)(homaConfig->prioResolverPrioLevels)));
     size_t j = 0;
     uint32_t prevCutOffExpCbfSize = UINT32_MAX;
-    for (double prob = probStep; prob < probMax; prob += probStep) {
+    for (double prob = probStep; isLess(prob, probMax); prob += probStep) {
         probStep /= 2.0;
         for (; j < cbfLastCapBytes->size(); j++) {
             if (cbfLastCapBytes->at(j).first == prevCutOffExpCbfSize) {

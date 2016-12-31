@@ -936,6 +936,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
         // a active period starting this packet.
         activePeriodStart = simTime() - SimTime(1e-9 * (pktLenOnWire * 8.0 /
             homaConfig->nicLinkSpeed));
+        ASSERT(rcvdBytesPerActivePeriod == 0);
         rcvdBytesPerActivePeriod = 0;
     }
     rcvdBytesPerActivePeriod += pktLenOnWire;
@@ -960,8 +961,8 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     // can change and/or a mesg might need to get a new grant
     int sIndOld = schedSenders->remove(s);
     int mesgIdxInS = s->handleInboundPkt(rxPkt);
-    EV_INFO << "remove sender at ind " << sIndOld <<
-        "and handled mesg at ind " << mesgIdxInS;
+    EV_INFO << "remove sender at ind " << sIndOld << "and handled mesg at ind "
+        << mesgIdxInS;
     auto ret = schedSenders->insPoint(s);
     int sInd = ret.first;
     int headInd = ret.second;
