@@ -105,7 +105,7 @@ class HomaTransport : public cSimpleModule
         // Total byte size of the message received from application
         uint32_t msgSize;
 
-        // Total num bytes remained to be scheduled for transmission for this msg.
+        // Total num bytes remained to be scheduled for transmission in this msg
         uint32_t bytesToSched;
 
         // Index of the next byte to be transmitted for this msg. Always
@@ -200,7 +200,7 @@ class HomaTransport : public cSimpleModule
         typedef std::set<OutboundMessage*, OutbndMsgSorter> SortedOutboundMsg;
 
       PROTECTED:
-        void dataPktToSend(HomaPkt* sxPkt);
+        void sendPktAndScheduleNext(HomaPkt* sxPkt);
         void msgTransmitComplete(OutboundMessage* msg);
 
       PROTECTED:
@@ -605,11 +605,11 @@ class HomaTransport : public cSimpleModule
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
-    void sendPktAndScheduleNext(HomaPkt* sxPkt);
+    const inet::L3Address& getLocalAddr() {return localAddr;}
+    void handleRecvdPkt(cPacket* ptk);
     void processStart();
     void testAndEmitStabilitySignal();
     void registerTemplatedStats(uint16_t numPrio);
-    const inet::L3Address& getLocalAddr() {return localAddr;}
 
     /**
      * A self message essentially models a timer for this transport and can have
@@ -649,12 +649,13 @@ class HomaTransport : public cSimpleModule
     // unscheduled packets.
     static simsignal_t totalOutstandingBytesSignal;
 
-    // Signal for recording times during which receiver outstanding bytes is non zero.
+    // Signal for recording times during which receiver outstanding bytes is non
+    // zero.
     static simsignal_t rxActiveTimeSignal;
 
     // Signal for recording bytes received during each active time. Along with
-    // acitveTimeSignal, will help us to find receiver wasted bw as result of pkts
-    // delayed because of queuing or senders delaying scheduled pkts.
+    // acitveTimeSignal, will help us to find receiver wasted bw as result of
+    // pkts delayed because of queuing or senders delaying scheduled pkts.
     static simsignal_t rxActiveBytesSignal;
 
     // Signal for recording time periods during which sender has bytes awaiting

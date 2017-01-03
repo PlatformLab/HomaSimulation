@@ -193,49 +193,67 @@ HomaTransport::handleMessage(cMessage *msg)
             sxController.processSendMsgFromApp(outMsg);
 
         } else if (msg->arrivedOn("udpIn")) {
-            HomaPkt* rxPkt = check_and_cast<HomaPkt*>(msg);
-            // check and set the localAddr
-            if (localAddr == inet::L3Address()) {
-                localAddr = rxPkt->getDestAddr();
-            } else {
-                ASSERT(localAddr == rxPkt->getDestAddr());
-            }
-            // update the owner transport for this packet
-            rxPkt->ownerTransport = this;
-            emit(priorityStatsSignals[rxPkt->getPriority()], rxPkt);
-            switch (rxPkt->getPktType()) {
-                case PktType::REQUEST:
-                case PktType::UNSCHED_DATA:
-                case PktType::SCHED_DATA:
-                    rxScheduler.processReceivedPkt(rxPkt);
-                    break;
-
-                case PktType::GRANT:
-                    sxController.processReceivedGrant(rxPkt);
-                    break;
-
-                default:
-                    throw cRuntimeError(
-                        "Received packet type(%d) is not valid.",
-                        rxPkt->getPktType());
-            }
+            handleRecvdPkt(check_and_cast<cPacket*>(msg));
         }
     }
 }
 
 void
-HomaTransport::sendPktAndScheduleNext(HomaPkt* sxPkt)
+HomaTransport::handleRecvdPkt(cPacket* pkt)
 {
-    uint32_t pktLenOnWire =
-        HomaPkt::getBytesOnWire(sxPkt->getDataBytes(), (PktType)sxPkt->getPktType());
-    simtime_t currentTime = simTime();
-    simtime_t sxPktDuration =  SimTime(1e-9 * (pktLenOnWire * 8.0 /
-        homaConfig->nicLinkSpeed));
-    simtime_t nextSendTime = sxPktDuration + currentTime;
-    sxController.sentPkt = *sxPkt;
-    sxController.sentPktDuration = sxPktDuration;
-    socket.sendTo(sxPkt, sxPkt->getDestAddr(), homaConfig->destPort);
-    scheduleAt(nextSendTime, sendTimer);
+    HomaPkt* rxPkt = check_and_cast<HomaPkt*>(pkt);
+    // check and set the localAddr
+    if (localAddr == inet::L3Address()) {
+        localAddr = rxPkt->getDestAddr();
+    } else {
+        ASSERT(localAddr == rxPkt->getDestAddr());
+    }
+    // update the owner transport for this packet
+    rxPkt->ownerTransport = this;
+    emit(priorityStatsSignals[rxPkt->getPriority()], rxPkt);
+    
+    // update active period stats
+    uint32_t pktLenOnWire = HomaPkt::getBytesOnWire(rxPkt->getDataBytes(),
+        (PktType)rxPkt->getPktType());
+    if (rxScheduler.getInflightBytes() == 0) {
+        // We were not in an active period prior to this packet but entered in
+        // one starting this packet.
+        rxScheduler.activePeriodStart = simTime() - 
+            SimTime(1e-9 * (pktLenOnWire * 8.0 / homaConfig->nicLinkSpeed));
+        ASSERT(rxScheduler.rcvdBytesPerActivePeriod == 0);
+        rxScheduler.rcvdBytesPerActivePeriod = 0;
+    }
+    rxScheduler.rcvdBytesPerActivePeriod += pktLenOnWire;
+
+    // handle data or grant grant packets appropriately
+    switch (rxPkt->getPktType()) {
+        case PktType::REQUEST:
+        case PktType::UNSCHED_DATA:
+        case PktType::SCHED_DATA:
+            rxScheduler.processReceivedPkt(rxPkt);
+            break;
+
+        case PktType::GRANT:
+            sxController.processReceivedGrant(rxPkt);
+            break;
+
+        default:
+            throw cRuntimeError(
+                "Received packet type(%d) is not valid.",
+                rxPkt->getPktType());
+    }
+
+    // Check if this is the end of active period and we should dump stats for
+    // wasted bandwidth
+    if (rxScheduler.getInflightBytes() == 0) {
+        // This is end of a active period, so we should dump the stats and reset
+        // varibles that track next active period.
+        emit(rxActiveTimeSignal, simTime() - rxScheduler.activePeriodStart);
+        emit(rxActiveBytesSignal, rxScheduler.rcvdBytesPerActivePeriod);
+        rxScheduler.rcvdBytesPerActivePeriod = 0;
+        rxScheduler.activePeriodStart = simTime();
+    }
+
 }
 
 void
@@ -263,7 +281,7 @@ HomaTransport::SendController::SendController(HomaTransport* transport)
     , transport(transport)
     , homaConfig(NULL)
     , activePeriodStart(SIMTIME_ZERO)
-    , sentBytesPerActivePeriod()
+    , sentBytesPerActivePeriod(0)
 
 {}
 
@@ -348,12 +366,7 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
     transport->emit(msgsLeftToSendSignal, outboundMsgMap.size());
     transport->emit(bytesLeftToSendSignal, bytesLeftToSend);
     transport->emit(bytesNeedGrantSignal, bytesNeedGrant);
-    if (bytesLeftToSend == 0) {
-        activePeriodStart = simTime();
-        sentBytesPerActivePeriod = 0;
-    }
-    uint32_t destAddr =
-            sendMsg->getDestAddr().toIPv4().getInt();
+    uint32_t destAddr = sendMsg->getDestAddr().toIPv4().getInt();
     uint32_t msgSize = sendMsg->getByteLength();
     std::vector<uint16_t> reqUnschedDataVec =
         unschedByteAllocator->getReqUnschedDataPkts(destAddr, msgSize);
@@ -363,6 +376,13 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
             std::forward_as_tuple(sendMsg, this, msgId, reqUnschedDataVec));
     OutboundMessage* outboundMsg = &(outboundMsgMap.at(msgId));
     rxAddrMsgMap[destAddr].insert(outboundMsg);
+
+    if (bytesLeftToSend == 0) {
+        // We have just entered in an active transmit period.
+        activePeriodStart = simTime();
+        ASSERT(sentBytesPerActivePeriod == 0);
+        sentBytesPerActivePeriod = 0;
+    }
     bytesLeftToSend += outboundMsg->getBytesLeft();
     transport->testAndEmitStabilitySignal();
     outboundMsg->prepareRequestAndUnsched();
@@ -408,7 +428,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
         if (!outGrantQueue.empty()) {
             sxPkt = outGrantQueue.top();
             outGrantQueue.pop();
-            transport->sendPktAndScheduleNext(sxPkt);
+            sendPktAndScheduleNext(sxPkt);
             return;
         }
 
@@ -417,9 +437,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
             size_t numRemoved =  outbndMsgSet.erase(highPrioMsg);
             ASSERT(numRemoved == 1); // check only one msg is removed
             bool hasMoreReadyPkt = highPrioMsg->getTransmitReadyPkt(&sxPkt);
-            dataPktToSend(sxPkt);
-
-            transport->sendPktAndScheduleNext(sxPkt);
+            sendPktAndScheduleNext(sxPkt);
             if (highPrioMsg->getBytesLeft() <= 0) {
                 ASSERT(!hasMoreReadyPkt);
                 msgTransmitComplete(highPrioMsg);
@@ -442,7 +460,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
             return;
         } else {
             ASSERT(outGrantQueue.empty());
-            transport->sendPktAndScheduleNext(sxPkt);
+            sendPktAndScheduleNext(sxPkt);
             return;
         }
     }
@@ -457,8 +475,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     size_t numRemoved =  outbndMsgSet.erase(highPrioMsg);
     ASSERT(numRemoved == 1); // check the msg is removed
     bool hasMoreReadyPkt = highPrioMsg->getTransmitReadyPkt(&sxPkt);
-    dataPktToSend(sxPkt);
-    transport->sendPktAndScheduleNext(sxPkt);
+    sendPktAndScheduleNext(sxPkt);
     if (highPrioMsg->getBytesLeft() <= 0) {
         ASSERT(!hasMoreReadyPkt);
         msgTransmitComplete(highPrioMsg);
@@ -473,31 +490,59 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
 }
 
 void
-HomaTransport::SendController::dataPktToSend(HomaPkt* sxPkt)
+HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
 {
-    uint32_t numDataBytes = sxPkt->getDataBytes();
     PktType pktType = (PktType)sxPkt->getPktType();
-    if (pktType != PktType::SCHED_DATA && pktType != PktType::UNSCHED_DATA &&
-            pktType != PktType::REQUEST) {
-        throw cRuntimeError("SendController::dataPktToSend() must be called on"
-            " data packets only ");
-    }
-    bytesLeftToSend -= numDataBytes;
-    ASSERT(bytesLeftToSend >= 0);
+    uint32_t numDataBytes = sxPkt->getDataBytes();
     uint32_t bytesSentOnWire = HomaPkt::getBytesOnWire(numDataBytes, pktType);
-    sentBytesPerActivePeriod += bytesSentOnWire;
-    if (bytesLeftToSend == 0) {
-        // emit signals and record stats
-        simtime_t activePeriod = simTime() - activePeriodStart +
-            SimTime(1e-9 * (bytesSentOnWire * 8.0 / homaConfig->nicLinkSpeed));
-        transport->emit(sxActiveBytesSignal, sentBytesPerActivePeriod);
-        transport->emit(sxActiveTimeSignal, activePeriod);
+    simtime_t currentTime = simTime();
+    simtime_t sxPktDuration =  SimTime(1e-9 * (bytesSentOnWire * 8.0 /
+        homaConfig->nicLinkSpeed));
 
-        // reset stats tracking variables
-        sentBytesPerActivePeriod = 0;
-        activePeriodStart = simTime();
+    switch(pktType)
+    {
+        case PktType::REQUEST:
+        case PktType::UNSCHED_DATA:
+        case PktType::SCHED_DATA:
+            ASSERT(bytesLeftToSend >= numDataBytes);
+            bytesLeftToSend -= numDataBytes;
+            sentBytesPerActivePeriod += bytesSentOnWire;
+            if (bytesLeftToSend == 0) {
+                // This is end of the active period, so record stats
+                simtime_t activePeriod = currentTime - activePeriodStart +
+                    sxPktDuration;
+                transport->emit(sxActiveBytesSignal, sentBytesPerActivePeriod);
+                transport->emit(sxActiveTimeSignal, activePeriod);
+
+                // reset stats tracking variables
+                sentBytesPerActivePeriod = 0;
+                activePeriodStart = currentTime;
+            }
+            break;
+
+        case PktType::GRANT:
+            // Add the length of the grant packet to the bytes
+            // sent in active period.
+            if (bytesLeftToSend > 0) {
+                // SendController is already in an active period. No need to
+                // record stats.
+                sentBytesPerActivePeriod += bytesSentOnWire; 
+            } else {
+                transport->emit(sxActiveBytesSignal, bytesSentOnWire);
+                transport->emit(sxActiveTimeSignal, sxPktDuration);
+            }
+            break;
+
+        default:
+            throw cRuntimeError("SendController::sendPktAndScheduleNext: "
+                "packet to send has unknown pktType %d.", pktType);
     }
 
+    simtime_t nextSendTime = sxPktDuration + currentTime;
+    sentPkt = *sxPkt;
+    sentPktDuration = sxPktDuration;
+    transport->socket.sendTo(sxPkt, sxPkt->getDestAddr(), homaConfig->destPort);
+    transport->scheduleAt(nextSendTime, transport->sendTimer);
 }
 
 void
@@ -929,18 +974,6 @@ HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const
 void
 HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 {
-    uint32_t pktLenOnWire = HomaPkt::getBytesOnWire(rxPkt->getDataBytes(),
-        (PktType)rxPkt->getPktType());
-    if (getInflightBytes() == 0) {
-        // We were not in an active period prior to this packet but entered in
-        // a active period starting this packet.
-        activePeriodStart = simTime() - SimTime(1e-9 * (pktLenOnWire * 8.0 /
-            homaConfig->nicLinkSpeed));
-        ASSERT(rcvdBytesPerActivePeriod == 0);
-        rcvdBytesPerActivePeriod = 0;
-    }
-    rcvdBytesPerActivePeriod += pktLenOnWire;
-
     // Get the SenderState collection for the sender of this pkt
     inet::IPv4Address srcIp = rxPkt->getSrcAddr().toIPv4();
     auto iter = ipSendersMap.find(srcIp.getInt());
@@ -968,15 +1001,6 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     int headInd = ret.second;
     schedSenders->handleGrantRequest(s, sInd, headInd);
 
-    // Check if should dump stats for wasted bandwidth
-    if (getInflightBytes() == 0) {
-        // This is end of a active period, so we should dump the stats and reset
-        // varibles that track next active period.
-        transport->emit(rxActiveTimeSignal, simTime() - activePeriodStart);
-        transport->emit(rxActiveBytesSignal, rcvdBytesPerActivePeriod);
-        rcvdBytesPerActivePeriod = 0;
-        activePeriodStart = simTime();
-    }
     delete rxPkt;
 }
 
