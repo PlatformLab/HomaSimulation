@@ -143,8 +143,8 @@ class HomaTransport : public cSimpleModule
         // in the application.
         simtime_t msgCreationTime;
 
-        // Priority Queue containing all sched/unsched pkts set to be sent out for
-        // this message and are waiting for transmission.
+        // Priority Queue containing all sched/unsched pkts set to be sent out
+        // for this message and are waiting for transmission.
         OutbndPktQueue txPkts;
 
         // Set  of all sched pkts ready for transmission
@@ -449,7 +449,8 @@ class HomaTransport : public cSimpleModule
                 ReceiveScheduler* rxScheduler, cMessage* grantTimer,
                 HomaConfigDepot* homaConfig);
             ~SenderState(){}
-            simtime_t getNextGrantTime(simtime_t currentTime, uint32_t grantSize);
+            simtime_t getNextGrantTime(simtime_t currentTime,
+                uint32_t grantSize);
             int sendAndScheduleGrant(uint32_t grantPrio);
             int handleInboundPkt(HomaPkt* rxPkt);
 
@@ -503,7 +504,8 @@ class HomaTransport : public cSimpleModule
                         return false;
 
                     InboundMessage::CompareBytesToGrant cbg;
-                    return cbg(*lhs->mesgsToGrant.begin(), *rhs->mesgsToGrant.begin());
+                    return cbg(*lhs->mesgsToGrant.begin(),
+                        *rhs->mesgsToGrant.begin());
                 }
             };
 
@@ -569,6 +571,17 @@ class HomaTransport : public cSimpleModule
         // Tracks the bytes received during each active period.
         uint64_t rcvdBytesPerActivePeriod;
 
+        // Tracks the begining and end of time periods during which total number
+        // of senders with scheduled messages is larger than redundancy factor.
+        // This period is called an over subscription period.
+        simtime_t oversubPeriodStart, oversubPeriodStop;
+
+        // Only true when
+        bool inOversubPeriod;
+
+        // Tracks the bytes received during each over subscription period.
+        uint64_t rcvdBytesPerOversubPeriod;
+
       PROTECTED:
         void initialize(HomaConfigDepot* homaConfig,
             PriorityResolver* prioResolver);
@@ -633,7 +646,7 @@ class HomaTransport : public cSimpleModule
     // This signal is priodically emitted and carries number of remaining
     // messages yet to be transmitted. This signal is intended to be receveid
     // by GlobalSignalListener which record stability metrics at the top
-    // simulation level. 
+    // simulation level.
     static simsignal_t stabilitySignal;
 
     // Signal for total number of msg bytes yet to be sent for all msgs.
@@ -657,6 +670,15 @@ class HomaTransport : public cSimpleModule
     // acitveTimeSignal, will help us to find receiver wasted bw as result of
     // pkts delayed because of queuing or senders delaying scheduled pkts.
     static simsignal_t rxActiveBytesSignal;
+
+    // Signal for recording time during which the receiver is oversubscribed;
+    // ie. number of senders is larger than number of numSendersToKeepGranted.
+    static simsignal_t oversubTimeSignal;
+
+    // Signal for recording bytes received during each oversubscribed period.
+    // Along with oversubTimeSignal, will help us to find receiver wasted bw as
+    // result of not scheduling all the possible senders.
+    static simsignal_t oversubBytesSignal;
 
     // Signal for recording time periods during which sender has bytes awaiting
     // tranmission.

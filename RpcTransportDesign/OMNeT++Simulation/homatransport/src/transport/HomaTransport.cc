@@ -41,6 +41,10 @@ simsignal_t HomaTransport::rxActiveTimeSignal =
         registerSignal("rxActiveTime");
 simsignal_t HomaTransport::rxActiveBytesSignal =
         registerSignal("rxActiveBytes");
+simsignal_t HomaTransport::oversubTimeSignal =
+        registerSignal("oversubscriptionTime");
+simsignal_t HomaTransport::oversubBytesSignal =
+        registerSignal("oversubscriptionBytes");
 simsignal_t HomaTransport::sxActiveTimeSignal =
         registerSignal("sxActiveTime");
 simsignal_t HomaTransport::sxActiveBytesSignal =
@@ -62,7 +66,7 @@ HomaTransport::HomaTransport()
     , prioResolver(NULL)
     , distEstimator(NULL)
     , sendTimer(NULL)
-    , emitSignalTimer(NULL) 
+    , emitSignalTimer(NULL)
     , nextEmitSignalTime(SIMTIME_ZERO)
 {}
 
@@ -211,15 +215,16 @@ HomaTransport::handleRecvdPkt(cPacket* pkt)
     // update the owner transport for this packet
     rxPkt->ownerTransport = this;
     emit(priorityStatsSignals[rxPkt->getPriority()], rxPkt);
-    
+
     // update active period stats
     uint32_t pktLenOnWire = HomaPkt::getBytesOnWire(rxPkt->getDataBytes(),
         (PktType)rxPkt->getPktType());
+    simtime_t pktDuration =
+        SimTime(1e-9 * (pktLenOnWire * 8.0 / homaConfig->nicLinkSpeed));
     if (rxScheduler.getInflightBytes() == 0) {
         // We were not in an active period prior to this packet but entered in
         // one starting this packet.
-        rxScheduler.activePeriodStart = simTime() - 
-            SimTime(1e-9 * (pktLenOnWire * 8.0 / homaConfig->nicLinkSpeed));
+        rxScheduler.activePeriodStart = simTime() - pktDuration;
         ASSERT(rxScheduler.rcvdBytesPerActivePeriod == 0);
         rxScheduler.rcvdBytesPerActivePeriod = 0;
     }
@@ -526,7 +531,7 @@ HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
             if (bytesLeftToSend > 0) {
                 // SendController is already in an active period. No need to
                 // record stats.
-                sentBytesPerActivePeriod += bytesSentOnWire; 
+                sentBytesPerActivePeriod += bytesSentOnWire;
             } else {
                 transport->emit(sxActiveBytesSignal, bytesSentOnWire);
                 transport->emit(sxActiveTimeSignal, sxPktDuration);
@@ -754,11 +759,11 @@ HomaTransport::OutboundMessage::prepareRequestAndUnsched()
         unschedFields.prioUnschedBytes = prioUnschedBytes;
         for (size_t j = 0;
                 j < unschedFields.prioUnschedBytes.size(); j += 2) {
-            if (unschedFields.prioUnschedBytes[j] == unschedPkt->getPriority()) {
+            if (unschedFields.prioUnschedBytes[j]==unschedPkt->getPriority()) {
                 // find the two elements in this prioUnschedBytes vec that
                 // corresponds to the priority of this packet and subtract
                 // the bytes in this packet from prioUnschedBytes.
-                unschedFields.prioUnschedBytes[j+1] -= this->reqUnschedDataVec[i];
+                unschedFields.prioUnschedBytes[j+1]-=this->reqUnschedDataVec[i];
                 if (unschedFields.prioUnschedBytes[j+1] <= 0) {
                     // Delete this element if unsched bytes on this prio is
                     // zero
@@ -907,6 +912,10 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     , unschedBytesToRecv(0)
     , activePeriodStart(SIMTIME_ZERO)
     , rcvdBytesPerActivePeriod(0)
+    , oversubPeriodStart(SIMTIME_ZERO)
+    , oversubPeriodStop(SIMTIME_ZERO)
+    , inOversubPeriod(false)
+    , rcvdBytesPerOversubPeriod(0)
 {}
 
 void
@@ -974,6 +983,38 @@ HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const
 void
 HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 {
+    uint32_t pktLenOnWire = HomaPkt::getBytesOnWire(rxPkt->getDataBytes(),
+        (PktType)rxPkt->getPktType());
+    simtime_t pktDuration =
+        SimTime(1e-9 * (pktLenOnWire * 8.0 / homaConfig->nicLinkSpeed));
+
+    // check and update states for oversubscription time and bytes.
+    if (schedSenders->numSenders > schedSenders->numToGrant) {
+        // Already in an oversubcription period
+        ASSERT(inOversubPeriod && oversubPeriodStop==MAXTIME &&
+            oversubPeriodStart < simTime()-pktDuration);
+        rcvdBytesPerOversubPeriod += pktLenOnWire;
+    } else if (oversubPeriodStop != MAXTIME) {
+        // an oversubscription period has recently been marked ended and we need
+        // to emit signal to record the stats.
+        ASSERT(!inOversubPeriod && oversubPeriodStop <= simTime());
+        simtime_t oversubDuration = oversubPeriodStop-oversubPeriodStart;
+        simtime_t oversubOffset = oversubPeriodStop-simTime()+pktDuration;
+        if (oversubOffset > 0) {
+            oversubDuration += oversubOffset;
+            rcvdBytesPerOversubPeriod += (uint64_t)(
+                oversubOffset.dbl() * homaConfig->nicLinkSpeed * 1e9 / 8);
+        }
+        transport->emit(oversubTimeSignal, oversubDuration);
+        transport->emit(oversubBytesSignal, rcvdBytesPerOversubPeriod);
+
+        // reset the states and variables
+        rcvdBytesPerOversubPeriod = 0;
+        oversubPeriodStart = MAXTIME;
+        oversubPeriodStop = MAXTIME;
+        inOversubPeriod = false;
+    }
+
     // Get the SenderState collection for the sender of this pkt
     inet::IPv4Address srcIp = rxPkt->getSrcAddr().toIPv4();
     auto iter = ipSendersMap.find(srcIp.getInt());
@@ -1001,6 +1042,28 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     int headInd = ret.second;
     schedSenders->handleGrantRequest(s, sInd, headInd);
 
+    // check and update states for oversubscription time and bytes.
+    if (schedSenders->numSenders <= schedSenders->numToGrant) {
+        if (inOversubPeriod) {
+            // oversubscription period ended. emit signals and record stats.
+            transport->emit(oversubTimeSignal, simTime() - oversubPeriodStart);
+            transport->emit(oversubBytesSignal, rcvdBytesPerOversubPeriod);
+        }
+        // reset the states and variables
+        rcvdBytesPerOversubPeriod = 0;
+        inOversubPeriod = false;
+        oversubPeriodStart = MAXTIME;
+        oversubPeriodStop = MAXTIME;
+
+    } else if (!inOversubPeriod) {
+        // mark the start of a oversubcription period
+        ASSERT(rcvdBytesPerOversubPeriod == 0 &&
+            oversubPeriodStart == MAXTIME && oversubPeriodStop == MAXTIME);
+        inOversubPeriod = true;
+        oversubPeriodStart = simTime() - pktDuration;
+        oversubPeriodStop = MAXTIME;
+        rcvdBytesPerOversubPeriod += pktLenOnWire;
+    }
     delete rxPkt;
 }
 
@@ -1013,6 +1076,15 @@ HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
     int sInd = ret.first;
     int headInd = ret.second;
     schedSenders->handleGrantRequest(s, sInd, headInd);
+    if (inOversubPeriod &&
+            schedSenders->numSenders <= schedSenders->numToGrant) {
+        // Receiver was in an oversubscription period which is now ended after
+        // sending the most recent grant. Mark the end of oversubscription
+        // period.
+        inOversubPeriod = false;
+        oversubPeriodStop = simTime();
+    }
+
 }
 
 /**
@@ -1070,7 +1142,8 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
         for (size_t i = 0; i < prioUnschedBytes.size(); i += 2) {
             uint32_t prio = prioUnschedBytes[i];
             uint32_t unschedBytesInPrio = prioUnschedBytes[i+1];
-            rxScheduler->addPendingUnschedBytes(pktType, prio, unschedBytesInPrio);
+            rxScheduler->addPendingUnschedBytes(pktType, prio,
+                unschedBytesInPrio);
         }
         rxScheduler->transport->emit(totalOutstandingBytesSignal,
                 rxScheduler->getInflightBytes());
@@ -1084,7 +1157,8 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
         }
         // this is a packet that we expected to be received and has previously
         // accounted for in inflightBytes.
-        rxScheduler->pendingBytesArrived(pktType, rxPkt->getPriority(), pktData);
+        rxScheduler->pendingBytesArrived(pktType, rxPkt->getPriority(),
+            pktData);
         rxScheduler->transport->emit(
             totalOutstandingBytesSignal, rxScheduler->getInflightBytes());
 
@@ -1145,8 +1219,8 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
         rxScheduler->transport->prioResolver->strPrioModeToInt(
         homaConfig->schedPrioAssignMode);
 
-    if (schedPrioResMode ==
-            PriorityResolver::PrioResolutionMode::HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES ) {
+    if (schedPrioResMode == PriorityResolver::PrioResolutionMode::
+                            HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES ) {
 
         if (topMesg->bytesToGrant <= homaConfig->cbfCapMsgSize) {
             grantPrio = rxScheduler->transport->prioResolver->getSchedPktPrio(
@@ -1259,7 +1333,8 @@ HomaTransport::ReceiveScheduler::pendingBytesArrived(PktType pktType,
 /**
  * HomaTransport::ReceiveScheduler::SchedSenders
  */
-HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(HomaConfigDepot* homaConfig)
+HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
+        HomaConfigDepot* homaConfig)
     : senders()
     , schedPrios(homaConfig->adaptiveSchedPrioLevels)
     , numToGrant(homaConfig->numSendersToKeepGranted)
@@ -1277,8 +1352,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(HomaConfigDepot* hom
  *
  */
 void
-HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(SenderState* s,
-int sInd, int headInd)
+HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
+    SenderState* s, int sInd, int headInd)
 {
     if (sInd < 0)
         return;
@@ -1311,8 +1386,8 @@ int sInd, int headInd)
 }
 
 /**
- * negative value means the mesg didn't belong to the schedSenders. Otherwise, it
- * returns the index at which the s was removed from.
+ * negative value means the mesg didn't belong to the schedSenders. Otherwise,
+ * it returns the index at which the s was removed from.
  */
 int
 HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
@@ -1396,7 +1471,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::insert(SenderState* s)
     headIdx = newHeadIdx;
     //uint64_t mesgSize = (*s->mesgsToGrant.begin())->msgSize;
     //uint64_t toGrant = (*s->mesgsToGrant.begin())->bytesToGrant;
-    //std::cout << (*s->mesgsToGrant.begin())->msgSize << ", " <<(*s->mesgsToGrant.begin())->bytesToGrant << std::endl;
+    //std::cout << (*s->mesgsToGrant.begin())->msgSize << ", "
+    //<<(*s->mesgsToGrant.begin())->bytesToGrant << std::endl;
     senders.insert(senders.begin()+insIdx, s);
     return;
 }

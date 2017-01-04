@@ -53,7 +53,7 @@ simple HomaTransport like ITransportScheme
         string unschedPrioResolutionMode;
 
         // The kind of logic transport uses at sender for sending messages and pkts
-        string senderScheme = default("OBSERVE_PKT_PRIOS"); 
+        string senderScheme = default("OBSERVE_PKT_PRIOS");
 
         // Specifies that only first cbfCapMsgSize bytes of a message must
         // be used in computing the cbf function. This value is supposed to be uint32_t
@@ -74,6 +74,8 @@ simple HomaTransport like ITransportScheme
         @singal[homaPktPrio*Signal](type=HomaPkt);
         @signal[rxActiveTime](type=simtime_t);
         @signal[rxActiveBytes](type=long);
+        @signal[oversubscriptionTime](type=simtime_t);
+        @signal[oversubscriptionBytes](type=long);
         @signal[sxActiveTime](type=simtime_t);
         @signal[sxActiveBytes](type=long);
         @signal[sxSchedPktDelay](type=simtime_t);
@@ -87,6 +89,8 @@ simple HomaTransport like ITransportScheme
         @statisticTemplate[pktPrioStats](title="Per pkt priority statistics"; record=stats(homaMsgSize), stats(homaPktBytes), stats(homaUnschedPktBytes), stats(homaGrantPktBytes); interpolationmode=none);
         @statistic[rxActiveTime](title="Time periods receiver expects to get bytes"; source=rxActiveTime; record=stats, histogram; interpolationmode=none);
         @statistic[rxActiveBytes](title="Bytes received during each active period"; source=rxActiveBytes; record=stats, histogram; interpolationmode=none);
+        @statistic[oversubscriptionTime](title="Time periods receiver has more senders than it grants"; source=oversubscriptionTime; record=stats, histogram; interpolationmode=none);
+        @statistic[oversubscriptionBytes](title="Bytes received during each oversubscription time"; source=oversubscriptionBytes; record=stats, histogram; interpolationmode=none);
         @statistic[sxActiveTime](title="Time periods sender has bytes to send"; source=sxActiveTime; record=stats, histogram; interpolationmode=none);
         @statistic[sxActiveBytes](title="Bytes sent during each active period"; source=sxActiveBytes; record=stats, histogram; interpolationmode=none);
         @statistic[sxSchedPktDelay](title="Sender delays for sched pkts"; source=sxSchedPktDelay; record=stats, histogram; interpolationmode=none);
