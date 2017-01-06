@@ -25,6 +25,7 @@ class WorkloadEstimator
 {
   PUBLIC:
     typedef std::vector<std::pair<uint32_t, double>> CdfVector;
+    typedef std::list<std::pair<uint32_t, double>> CdfList;
     explicit WorkloadEstimator(HomaConfigDepot* homaConfig);
     void recomputeRxWorkload(uint32_t msgSize, simtime_t timeMsgArrived);
     void recomputeSxWorkload(uint32_t msgSize, simtime_t timeMsgSent);
@@ -32,15 +33,24 @@ class WorkloadEstimator
   PUBLIC:
     CdfVector cdfFromFile;
     CdfVector cbfFromFile;
+    CdfVector remainSizeCdf;
+    CdfVector remainSizeCbf;
     CdfVector cbfLastCapBytesFromFile;
-    CdfVector rxCdfComputed;
-    CdfVector sxCdfComputed;
     double avgSizeFromFile;
     uint32_t lastCbfCapMsgSize;
+
+    CdfVector rxCdfComputed;
+    CdfVector sxCdfComputed;
+
     HomaConfigDepot* homaConfig;
 
   PROTECTED:
-    void getCbfFromCdf(CdfVector& cdf, uint32_t cbfCapMsgSize = UINT32_MAX);
+    void getRemainSizeCdfCbf(CdfVector& cdf,
+        uint32_t cbfCapMsgSize = UINT32_MAX, uint32_t useLastMesgBytes = 0);
+
+    void getCbfFromCdf(CdfVector& cdf,
+        uint32_t cbfCapMsgSize = UINT32_MAX, uint32_t useLastMesgBytes = 0);
+
     class CompCdfPairs {
       PUBLIC:
         CompCdfPairs() {}
