@@ -118,7 +118,8 @@ HomaTransport::initialize()
     registerTemplatedStats(homaConfig->allPrio);
     distEstimator = new WorkloadEstimator(homaConfig);
     prioResolver = new PriorityResolver(homaConfig, distEstimator);
-    prioResolver->recomputeCbf(homaConfig->cbfCapMsgSize);
+    //prioResolver->recomputeCbf(homaConfig->cbfCapMsgSize,
+    //    homaConfig->boostTailBytesPrio);
     rxScheduler.initialize(homaConfig, prioResolver);
     sxController.initSendController(homaConfig, prioResolver);
     outstandingGrantBytes = 0;
@@ -713,12 +714,8 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
 void
 HomaTransport::OutboundMessage::prepareRequestAndUnsched()
 {
-    PriorityResolver::PrioResolutionMode unschedPrioResMode =
-        sxController->prioResolver->strPrioModeToInt(
-        homaConfig->unschedPrioResolutionMode);
     std::vector<uint16_t> unschedPrioVec =
-        sxController->prioResolver->getUnschedPktsPrio(
-        unschedPrioResMode, this);
+        sxController->prioResolver->getUnschedPktsPrio(this);
 
     uint32_t totalUnschedBytes = 0;
     std::vector<uint32_t> prioUnschedBytes = {};
@@ -1212,22 +1209,13 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     ASSERT(topMesgIt != mesgsToGrant.end());
     InboundMessage* topMesg = *topMesgIt;
     ASSERT(topMesg->bytesToGrant > 0);
-
     uint32_t newIdx = grantPrio - homaConfig->allPrio +
         homaConfig->adaptiveSchedPrioLevels;
-    PriorityResolver::PrioResolutionMode schedPrioResMode =
-        rxScheduler->transport->prioResolver->strPrioModeToInt(
-        homaConfig->schedPrioAssignMode);
-
-    if (schedPrioResMode == PriorityResolver::PrioResolutionMode::
-                            HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES ) {
-
-        if (topMesg->bytesToGrant <= homaConfig->cbfCapMsgSize) {
-            grantPrio = rxScheduler->transport->prioResolver->getSchedPktPrio(
-                schedPrioResMode, topMesg);
-        }
-    }
-
+    
+    // if prioresolver gives a better prio, use that one
+    uint16_t resolverPrio =
+        rxScheduler->transport->prioResolver->getSchedPktPrio(topMesg);
+    grantPrio = std::min(grantPrio, (uint32_t)resolverPrio);
     if (grantTimer->isScheduled()){
         if (lastGrantPrio <= grantPrio) {
             return 0;

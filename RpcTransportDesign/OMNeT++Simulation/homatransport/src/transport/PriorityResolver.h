@@ -20,59 +20,49 @@ class PriorityResolver
     typedef HomaTransport::InboundMessage InboundMessage;
     typedef HomaTransport::OutboundMessage OutboundMessage;
     enum PrioResolutionMode {
-        STATIC_FROM_CDF = 0,
-        STATIC_FROM_CBF,
-        STATIC_EXP_CDF,
-        STATIC_EXP_CBF,
+        STATIC_CDF_UNIFORM,
+        STATIC_CBF_UNIFORM,
+        STATIC_CBF_GRADUATED,
         FIXED_UNSCHED,
-        FIXED_SCHED,
-        SIMULATED_SRBF,
-        SMF_CBF_BASED,
-        HEAD_TAIL_BYTES_FIRST_EQUAL_BYTES,
-        HEAD_TAIL_BYTES_FIRST_EQUAL_COUNTS,
-        HEAD_TAIL_BYTES_FIRST_EXP_BYTES,
-        HEAD_TAIL_BYTES_FIRST_EXP_COUNTS,
         INVALID_PRIO_MODE        // Always the last value
     };
+
     explicit PriorityResolver(HomaConfigDepot* homaConfig,
         WorkloadEstimator* distEstimator);
-    std::vector<uint16_t> getUnschedPktsPrio(PrioResolutionMode prioMode,
-        const OutboundMessage* outbndMsg);
-    uint16_t getSchedPktPrio(PrioResolutionMode prioMode,
-        const InboundMessage* inbndMsg);
-    void setCdfPrioCutOffs();
-    void setCbfPrioCutOffs();
-    void setExpFromCdfPrioCutOffs();
-    void setExpFromCbfPrioCutOffs();
-    void setHeadTailFirstPrioCutOffs();
-    void setExpHeadTailFirstPrioCutOffs();
+    std::vector<uint16_t> getUnschedPktsPrio(const OutboundMessage* outbndMsg);
+    uint16_t getSchedPktPrio(const InboundMessage* inbndMsg);
+    void setPrioCutOffs();
     static void printCbfCdf(WorkloadEstimator::CdfVector* vec);
     PrioResolutionMode strPrioModeToInt(const char* prioResMode);
 
-    // Used for comparing double values. return true if a smaller than b, within
-    // an epsilon bound.
+    // Used for comparing double values. returns true if a smaller than b,
+    // within an epsilon bound.
     inline bool isLess(double a, double b)
     {
             return a+1e-6 < b;
     }
 
+    // Used for comparing double values. returns true if a and b are only within
+    // some epsilon value from each other.
+    inline bool isEqual(double a, double b)
+    {
+        return fabs(a-b) < 1e-6;
+    }
+
   PRIVATE:
     uint32_t maxSchedPktDataBytes;
-    uint32_t lastCbfCapMsgSize;
     const WorkloadEstimator::CdfVector* cdf;
     const WorkloadEstimator::CdfVector* cbf;
     const WorkloadEstimator::CdfVector* cbfLastCapBytes;
-    std::vector<uint32_t> prioCutOffsFromCdf;
-    std::vector<uint32_t> prioCutOffsFromCbf;
-    std::vector<uint32_t> prioCutOffsExpCbf;
-    std::vector<uint32_t> prioCutOffsExpCdf;
-    std::vector<uint32_t> prioCutOffsHeadTailFirst;
-    std::vector<uint32_t> prioCutOffsHeadTailFirstExp;
+    const WorkloadEstimator::CdfVector* remainSizeCbf;
+    std::vector<uint32_t> prioCutOffs;
     WorkloadEstimator* distEstimator;
+    PrioResolutionMode prioResMode;
     HomaConfigDepot* homaConfig;
 
   PROTECTED:
-    void recomputeCbf(uint32_t cbfCapMsgSize);
+    void recomputeCbf(uint32_t cbfCapMsgSize, uint32_t boostTailBytesPrio);
+    uint16_t getMesgPrio(uint32_t size);
     friend class HomaTransport;
 };
 #endif /* PRIORITYRESOLVER_H_ */

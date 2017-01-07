@@ -20,7 +20,6 @@ WorkloadEstimator::WorkloadEstimator(HomaConfigDepot* homaConfig)
     , remainSizeCbf()
     , cbfLastCapBytesFromFile()
     , avgSizeFromFile(0.0)
-    , lastCbfCapMsgSize(0)
     , rxCdfComputed()
     , sxCdfComputed()
     , homaConfig(homaConfig)
@@ -128,44 +127,45 @@ WorkloadEstimator::WorkloadEstimator(HomaConfigDepot* homaConfig)
             }
             cdfFromFile.back().second = 1.0;
         }
-        getCbfFromCdf(cdfFromFile, UINT32_MAX);
-        getRemainSizeCdfCbf(cdfFromFile);
     }
 }
 
 void
 WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
-    uint32_t useLastMesgBytes)
+    uint32_t boostTailBytesPrio)
 {
+    remainSizeCdf.clear();
+    remainSizeCbf.clear();
     uint32_t req = homaConfig->defaultReqBytes;
     uint32_t unsched = homaConfig->defaultUnschedBytes;
-    uint32_t hdrs = ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE +
-        ETHERNET_HDR_SIZE + INTER_PKT_GAP + IP_HEADER_SIZE + UDP_HEADER_SIZE;
+    //uint32_t hdrs = ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE +
+    //    ETHERNET_HDR_SIZE + INTER_PKT_GAP + IP_HEADER_SIZE + UDP_HEADER_SIZE;
 
-    HomaPkt homaReqPkt = HomaPkt();
-    homaReqPkt.setPktType(PktType::REQUEST);
-    uint32_t reqHdr = hdrs + homaReqPkt.headerSize();
+    //HomaPkt homaReqPkt = HomaPkt();
+    //homaReqPkt.setPktType(PktType::REQUEST);
+    //uint32_t reqHdr = hdrs + homaReqPkt.headerSize();
 
     HomaPkt homaUnschedPkt = HomaPkt();
     homaUnschedPkt.setPktType(PktType::UNSCHED_DATA);
     uint32_t unschedPerPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE -
         UDP_HEADER_SIZE - homaUnschedPkt.headerSize();
-    uint32_t unschedHdr = hdrs + homaUnschedPkt.headerSize();
+    //uint32_t unschedHdr = hdrs + homaUnschedPkt.headerSize();
 
     HomaPkt homaSchedPkt = HomaPkt();
     homaSchedPkt.setPktType(PktType::SCHED_DATA);
     uint32_t schedPerPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE -
         UDP_HEADER_SIZE - homaSchedPkt.headerSize();
-    uint32_t schedHdr = hdrs + homaSchedPkt.headerSize();
+    //uint32_t schedHdr = hdrs + homaSchedPkt.headerSize();
 
-    HomaPkt homaGrantPkt = HomaPkt();
-    homaGrantPkt.setPktType(PktType::GRANT);
-    uint32_t grantHdr = hdrs + homaGrantPkt.headerSize();
+    //HomaPkt homaGrantPkt = HomaPkt();
+    //homaGrantPkt.setPktType(PktType::GRANT);
+    //uint32_t grantHdr = hdrs + homaGrantPkt.headerSize();
 
     CdfList remSizePdf;
     CdfList remSizePbf;
     double prevProb = 0.0;
     double cumPktBytes = 0.0;
+    double cumGrantBytes = 0.0;
     double cumPkts = 0.0;
     for (auto& sizeProbPair : cdf) {
         double prob = sizeProbPair.second - prevProb;
@@ -176,7 +176,7 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
         std::list<std::pair<uint32_t, uint32_t>> packets;
         uint32_t sizeRemain = size;
         uint32_t sizeOnWire = 0;
-        uint32_t sizeWithGrants = 0;
+        uint32_t allGrantBytes = 0;
         uint32_t pktedSize = 0;
         uint32_t totalUnsched = std::min(req+unsched, size);
         while (sizeRemain) {
@@ -194,15 +194,16 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
                 pkt = std::min(schedPerPkt, sizeRemain);
                 //pktOnWire = pkt+schedHdr;
                 pktOnWire = HomaPkt::getBytesOnWire(pkt, PktType::SCHED_DATA);
-                sizeWithGrants += HomaPkt::getBytesOnWire(0, PktType::GRANT);
+                //allGrantBytes += grantHdr;
+                allGrantBytes += HomaPkt::getBytesOnWire(0, PktType::GRANT);
             }
             packets.push_back(std::make_pair(pkt, pktOnWire));
             sizeOnWire += pktOnWire;
-            sizeWithGrants += pktOnWire;
             sizeRemain -= pkt;
             pktedSize += pkt;
         }
 
+        cumGrantBytes += prob * allGrantBytes; 
         // fill in pdf list of remaining sizes
         CdfList::iterator it = remSizePdf.end(); 
         CdfList::iterator itt = remSizePbf.end(); 
@@ -211,15 +212,18 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
         uint32_t pktedOnWire = 0;
         for (auto pktPair : packets) {
             if (pktedOnWire >= cbfCapMsgSize &&
-                    toSendOnWire >= useLastMesgBytes) {
+                    toSendOnWire >= boostTailBytesPrio) {
                 // We should only account the first cbfCapMsgSize and
-                // useLastMesgBytes bytes of the message in calculating cbf if
+                // boostTailBytesPrio bytes of the message in calculating cbf if
                 // these conditions are specified. So skip loop iteration if
                 // these conditions are specified but not met. 
+                pktedOnWire += pktPair.second;
+                toSendOnWire -= pktPair.second;
                 continue;
             }
             pktedOnWire += pktPair.second;
             toSendOnWire -= pktPair.second;
+
             for ( ;it != remSizePdf.begin(); ) {
                 it--;
                 itt--;
@@ -264,6 +268,15 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
     // fill in remainSizeCdf and remainSizeCbf
     double cumsumPkts = 0.0;
     double cumsumBytes = 0.0;
+    if (homaConfig->accountForGrantTraffic) {
+        cumPktBytes += cumGrantBytes;
+        cumsumBytes += cumGrantBytes/cumPktBytes;
+
+        // grant traffic included as a message of size zero at the begining of
+        // the cbf vector.
+        remainSizeCbf.push_back(std::make_pair(0, cumsumBytes));
+    }
+
     auto it = remSizePbf.begin();
     uint32_t prevRemSize = 0;
     for (auto cdfPair : remSizePdf) {
@@ -279,82 +292,145 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
 
 void
 WorkloadEstimator::getCbfFromCdf(CdfVector& cdf, uint32_t cbfCapMsgSize,
-    uint32_t useLastMesgBytes)
+    uint32_t boostTailBytesPrio)
 {
-    if (cbfCapMsgSize != lastCbfCapMsgSize) {
-        lastCbfCapMsgSize = cbfCapMsgSize;
-        // compute cbf from cdf and store it in the cbfFromFile
-        double prevProb = 0.0;
-        double cumBytes = 0.0;
-        double cumRttBytes = 0.0;
-        cbfFromFile.clear();
-        cbfLastCapBytesFromFile.clear();
-        CdfVector tempCbf = CdfVector();
-        for (auto& sizeProbPair : cdfFromFile) {
-            double prob = sizeProbPair.second - prevProb;
-            prevProb = sizeProbPair.second;
+    cbfFromFile.clear();
+    cbfLastCapBytesFromFile.clear();
+    uint32_t req = homaConfig->defaultReqBytes;
+    uint32_t unsched = homaConfig->defaultUnschedBytes;
+    uint32_t maxEthFrame = MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE +
+        ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE + INTER_PKT_GAP;
 
-            cumBytes += HomaPkt::getBytesOnWire(std::min(sizeProbPair.first,
-                cbfCapMsgSize), PktType::UNSCHED_DATA) * prob;
-            cbfFromFile.push_back(std::make_pair(sizeProbPair.first,
-                cumBytes));
+    HomaPkt homaUnschedPkt = HomaPkt();
+    homaUnschedPkt.setPktType(PktType::UNSCHED_DATA);
+    uint32_t unschedPerPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE -
+        UDP_HEADER_SIZE - homaUnschedPkt.headerSize();
 
-            double bytesOnSize;
-            if (sizeProbPair.first <= cbfCapMsgSize) {
-                bytesOnSize = HomaPkt::getBytesOnWire(sizeProbPair.first,
-                    PktType::UNSCHED_DATA) * prob;
-                cumRttBytes += bytesOnSize;
-                tempCbf.push_back(
-                    std::make_pair(sizeProbPair.first, bytesOnSize));
-            } else if (sizeProbPair.first < 2 * cbfCapMsgSize) {
-                bytesOnSize = HomaPkt::getBytesOnWire(cbfCapMsgSize,
-                    PktType::UNSCHED_DATA) * prob;
-                tempCbf.push_back(
-                    std::make_pair(sizeProbPair.first, bytesOnSize));
-                cumRttBytes += bytesOnSize;
+    HomaPkt homaSchedPkt = HomaPkt();
+    homaSchedPkt.setPktType(PktType::SCHED_DATA);
+    uint32_t schedPerPkt = MAX_ETHERNET_PAYLOAD_BYTES - IP_HEADER_SIZE -
+        UDP_HEADER_SIZE - homaSchedPkt.headerSize();
 
-                uint32_t remainBytes = sizeProbPair.first - cbfCapMsgSize;
-                bytesOnSize = HomaPkt::getBytesOnWire(remainBytes,
-                    PktType::UNSCHED_DATA) * prob;
-                cumRttBytes += bytesOnSize;
-                std::pair<uint32_t, double> pairToInsert =
-                    std::make_pair(remainBytes, bytesOnSize);
-                CdfVector::iterator it = std::lower_bound(
-                    tempCbf.begin(), tempCbf.end(),
-                    pairToInsert, CompCdfPairs());
-                tempCbf.insert(it, pairToInsert);
+    if (homaConfig->accountForGrantTraffic) {
+        // grant traffic included as a message of size zero at the begining of
+        // the two vectors.
+        cbfFromFile.push_back(std::make_pair(0, 0));
+        cbfLastCapBytesFromFile.push_back(std::make_pair(0, 0));
+    }
+
+    // compute cbf from cdf and store it in the cbfFromFile
+    double prevProb = 0.0;
+    double cumBytes = 0.0;
+    double cumRttBytes = 0.0;
+    double cumGrants = 0.0;
+    CdfVector tempCbf = CdfVector();
+    for (auto& sizeProbPair : cdfFromFile) {
+        double prob = sizeProbPair.second - prevProb;
+        uint32_t size = sizeProbPair.first;
+        prevProb = sizeProbPair.second;
+
+        // compute cbf
+        uint32_t reqOnWire = 0;
+        uint32_t unschedOnWire = 0;
+        uint32_t schedOnWire = 0;
+        uint32_t sizeOnWire = 0;
+        uint32_t grantsOnWire = 0;
+        if (size < req) {
+            reqOnWire = HomaPkt::getBytesOnWire(std::min(req, size),
+                PktType::REQUEST);
+        } else if (size < req+unsched) {
+            reqOnWire = HomaPkt::getBytesOnWire(req, PktType::REQUEST);
+            unschedOnWire = HomaPkt::getBytesOnWire(std::min(size-req, unsched),
+                PktType::UNSCHED_DATA);
+        } else {
+            reqOnWire = HomaPkt::getBytesOnWire(req, PktType::REQUEST);
+            unschedOnWire = HomaPkt::getBytesOnWire(unsched,
+                PktType::UNSCHED_DATA);
+            schedOnWire = HomaPkt::getBytesOnWire(size-req-unsched,
+                PktType::SCHED_DATA);
+            uint32_t numGrants = (uint32_t)ceil((1.0*schedOnWire)/maxEthFrame);
+            grantsOnWire = numGrants*HomaPkt::getBytesOnWire(0, PktType::GRANT);
+        }
+        sizeOnWire = reqOnWire + unschedOnWire + schedOnWire;
+        cumGrants += grantsOnWire * prob;
+        cumBytes += sizeOnWire * prob;
+        cbfFromFile.push_back(std::make_pair(sizeProbPair.first,
+            sizeOnWire*prob));
+
+        // compute cbfLastCapBytesFromFile 
+        // packetize the message size
+        std::list<std::pair<uint32_t, uint32_t>> packets;
+        sizeOnWire = 0;
+        uint32_t allGrantBytes = 0;
+        uint32_t pktedSize = 0;
+        uint32_t totalUnsched = std::min(req+unsched, size);
+        uint32_t sizeRemain = size;
+        while (sizeRemain) {
+            uint32_t pkt;
+            uint32_t pktOnWire;
+            if (sizeRemain == size) {
+                pkt = std::min(req, sizeRemain);
+                //pktOnWire = pkt+reqHdr;
+                pktOnWire = HomaPkt::getBytesOnWire(pkt, PktType::REQUEST);
+            } else if (pktedSize < totalUnsched) {
+                pkt = std::min(totalUnsched - pktedSize, unschedPerPkt);
+                //pktOnWire = pkt+unschedHdr;
+                pktOnWire = HomaPkt::getBytesOnWire(pkt, PktType::UNSCHED_DATA);
             } else {
-                bytesOnSize = HomaPkt::getBytesOnWire(cbfCapMsgSize,
-                    PktType::UNSCHED_DATA) * prob;
-                tempCbf.push_back(
-                    std::make_pair(sizeProbPair.first, bytesOnSize));
-                cumRttBytes += bytesOnSize;
-
-                std::pair<uint32_t, double> pairToInsert =
-                    std::make_pair(cbfCapMsgSize, bytesOnSize);
-                CdfVector::iterator it = std::lower_bound(
-                    tempCbf.begin(), tempCbf.end(),
-                    pairToInsert, CompCdfPairs());
-                if (it->first == cbfCapMsgSize) {
-                    tempCbf[it-tempCbf.begin()].second += bytesOnSize;
-                } else {
-                    tempCbf.insert(it, pairToInsert);
-                }
-                cumRttBytes += bytesOnSize;
+                pkt = std::min(schedPerPkt, sizeRemain);
+                //pktOnWire = pkt+schedHdr;
+                pktOnWire = HomaPkt::getBytesOnWire(pkt, PktType::SCHED_DATA);
+                //allGrantBytes += grantHdr;
+                allGrantBytes += HomaPkt::getBytesOnWire(0, PktType::GRANT);
             }
+            packets.push_back(std::make_pair(pkt, pktOnWire));
+            sizeOnWire += pktOnWire;
+            sizeRemain -= pkt;
+            pktedSize += pkt;
         }
 
-        for (auto& sizeProbPair : cbfFromFile) {
-            sizeProbPair.second /= cbfFromFile.back().second;
+        sizeRemain = size;
+        uint32_t toSendOnWire = sizeOnWire;
+        uint32_t pktedOnWire = 0;
+        uint32_t onWire = 0;
+        for (auto& pktPair : packets) {
+            if (pktedOnWire >= cbfCapMsgSize &&
+                    toSendOnWire >= boostTailBytesPrio) {
+                // We should only account the first cbfCapMsgSize and
+                // boostTailBytesPrio bytes of the message in calculating cbf if
+                // these conditions are specified. So skip loop iteration if
+                // these conditions are specified but not met. 
+                pktedOnWire += pktPair.second;
+                toSendOnWire -= pktPair.second;
+                continue;
+            }
+            pktedOnWire += pktPair.second;
+            toSendOnWire -= pktPair.second;
+            onWire += pktPair.second;
+            cumRttBytes += pktPair.second*prob;
         }
-        
-        double rollingSum = 0;
-        for (auto& sizeProbStr : tempCbf) {
-            rollingSum += sizeProbStr.second;
-            cbfLastCapBytesFromFile.push_back(std::make_pair(sizeProbStr.first,
-                rollingSum/cumRttBytes));
-        }
-        cbfLastCapBytesFromFile.back().second = 1.00;
+        cbfLastCapBytesFromFile.push_back(std::make_pair(size, onWire*prob));
+    }
+
+    double rollingSum1 = 0;
+    double rollingSum2 = 0;
+    if (homaConfig->accountForGrantTraffic) {
+        cumBytes += cumGrants;
+        cumRttBytes += cumGrants;
+        cbfFromFile[0].second = cumGrants;
+        cbfLastCapBytesFromFile[0].second = cumGrants;
+    }
+
+    size_t i = 0;
+    for (auto& sizeProbPair : cbfFromFile) {
+        i++;
+        rollingSum1 += sizeProbPair.second;
+        sizeProbPair.second = rollingSum1 / cumBytes;
+    }
+    
+    for (auto& sizeProbStr : cbfLastCapBytesFromFile) {
+        rollingSum2 += sizeProbStr.second;
+        sizeProbStr.second = rollingSum2 / cumRttBytes;
     }
 }
 

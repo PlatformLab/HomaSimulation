@@ -75,18 +75,22 @@ class HomaConfigDepot {
     // collected by GlobalSignalListener.
     double signalEmitPeriod;
 
+    // If true, network traffic bytes from grant packets will be accounted in
+    // when computing CBF and unscheduled priority cutoff sizes.
+    bool accountForGrantTraffic;
 
     // Total number of priorities that PrioResolver would use to resolve
     // priorities.
     uint16_t prioResolverPrioLevels;
 
-    // Specifies which priority resolution mode should be used for scheduled
-    // packets. The pace modes are defined in TrafficPacer.
-    const char* schedPrioAssignMode;
-
     // Specifies which priority resolution mode should be used for unscheduled
     // packets. Resolution modes are defined in PrioResolver class.
     const char* unschedPrioResolutionMode;
+
+    // Specifies for the unsched prio level, how many times prio p_i will be
+    // used comparing to p_i-1 (p_i is higher prio). Cutoff weight are used
+    // in PrioResolver class.
+    double unschedPrioUsageWeight;
 
     // Defines the type of logic sender uses for transmitting messages and pkts
     const char* senderScheme;
@@ -98,6 +102,11 @@ class HomaConfigDepot {
     // Specifies that only first cbfCapMsgSize bytes of a message must be used
     // in computing the cbf function.
     uint32_t cbfCapMsgSize;
+
+    // This value is in bytes and determines that this number of last scheduled
+    // bytes of the message will be send at priority equal to unscheduled
+    // priorites. The default is 0 bytes.
+    uint32_t boostTailBytesPrio;
 
     // Number data bytes to be packed in request packet.
     uint32_t defaultReqBytes;

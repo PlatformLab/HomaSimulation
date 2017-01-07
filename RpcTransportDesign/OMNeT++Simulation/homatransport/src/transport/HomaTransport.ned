@@ -46,11 +46,17 @@ simple HomaTransport like ITransportScheme
         // collected by GlobalSignalListener.
         double signalEmitPeriod @unit(s) = default(0.001s);
 
-        // Could be any of PrioPaceMode values defined in TrafficPacer.h
-        string schedPrioAssignMode = default("NO_OVER_COMMIT");
+        // If true, network traffic bytes from grant packets will be accounted in                   
+        // when computing CBF and unscheduled priority cutoff sizes.        
+        bool accountForGrantTraffic = default(true);  
 
         // Coulde be any of PrioResolutionMode values in PriorityResolver.h
         string unschedPrioResolutionMode;
+
+        // Specifies for the unsched prio level, how many times prio p_i will be
+        // used comparing to p_i-1 (p_i is higher prio). Cutoff weight are used
+        // in PrioResolver class.
+        double unschedPrioUsageWeight = default(1.0);
 
         // The kind of logic transport uses at sender for sending messages and pkts
         string senderScheme = default("OBSERVE_PKT_PRIOS");
@@ -59,7 +65,12 @@ simple HomaTransport like ITransportScheme
         // be used in computing the cbf function. This value is supposed to be uint32_t
         // type, but since NED don't support 'unsigned int',
         // we enter integers in the string form.
-        string cbfCapMsgSize = default("0xFFFFFFFF");
+        string cbfCapMsgSize = default("0x100000000");
+
+        // This value is in bytes and determines that this number of last scheduled
+        // bytes of the message will be send at priority equal to unscheduled
+        // priorites. The default is 0 bytes.
+        string boostTailBytesPrio = default("0x0");    
 
         // Only for simulation purpose, we allow the transport to be aware of
         // workload type. The value must be similar to WorkloadSynthesizer

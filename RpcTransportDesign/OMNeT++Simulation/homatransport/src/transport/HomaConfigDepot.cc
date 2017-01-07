@@ -26,20 +26,27 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
         (uint32_t)ownerTransport->par("maxOutstandingRecvBytes");
     grantMaxBytes = (uint32_t) ownerTransport->par("grantMaxBytes");
     allPrio = (uint16_t) ownerTransport->par("prioLevels");
-    adaptiveSchedPrioLevels = (uint16_t) ownerTransport->par("adaptiveSchedPrioLevels");
-    numSendersToKeepGranted = (uint16_t) ownerTransport->par("numSendersToKeepGranted");
+    adaptiveSchedPrioLevels =
+        (uint16_t) ownerTransport->par("adaptiveSchedPrioLevels");
+    numSendersToKeepGranted =
+        (uint16_t) ownerTransport->par("numSendersToKeepGranted");
     ASSERT(numSendersToKeepGranted <= adaptiveSchedPrioLevels);
     signalEmitPeriod = (double) ownerTransport->par("signalEmitPeriod");
+    accountForGrantTraffic =
+        ownerTransport->par("accountForGrantTraffic").boolValue();
     prioResolverPrioLevels =
         (uint16_t) ownerTransport->par("prioResolverPrioLevels");
-    schedPrioAssignMode = ownerTransport->par("schedPrioAssignMode");
     unschedPrioResolutionMode =
         ownerTransport->par("unschedPrioResolutionMode");
+    unschedPrioUsageWeight=
+        (double) ownerTransport->par("unschedPrioUsageWeight");
     senderScheme = ownerTransport->par("senderScheme");
     isRoundRobinScheduler =
         ownerTransport->par("isRoundRobinScheduler").boolValue();
     cbfCapMsgSize = std::stoul(
         ownerTransport->par("cbfCapMsgSize").stdstringValue(), nullptr, 16);
+    boostTailBytesPrio = std::stoul(
+        ownerTransport->par("boostTailBytesPrio").stdstringValue(),nullptr, 16);
     defaultReqBytes = (uint32_t) ownerTransport->par("defaultReqBytes");
     defaultUnschedBytes = (uint32_t) ownerTransport->par("defaultUnschedBytes");
     useUnschRateInScheduler =

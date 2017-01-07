@@ -31,25 +31,23 @@ class WorkloadEstimator
     void recomputeSxWorkload(uint32_t msgSize, simtime_t timeMsgSent);
 
   PUBLIC:
-    CdfVector cdfFromFile;
+    CdfVector cdfFromFile; // This has no practical use or meaning
     CdfVector cbfFromFile;
     CdfVector remainSizeCdf;
     CdfVector remainSizeCbf;
     CdfVector cbfLastCapBytesFromFile;
     double avgSizeFromFile;
-    uint32_t lastCbfCapMsgSize;
 
     CdfVector rxCdfComputed;
     CdfVector sxCdfComputed;
-
     HomaConfigDepot* homaConfig;
 
   PROTECTED:
     void getRemainSizeCdfCbf(CdfVector& cdf,
-        uint32_t cbfCapMsgSize = UINT32_MAX, uint32_t useLastMesgBytes = 0);
+        uint32_t cbfCapMsgSize = UINT32_MAX, uint32_t boostTailBytesPrio = 0);
 
     void getCbfFromCdf(CdfVector& cdf,
-        uint32_t cbfCapMsgSize = UINT32_MAX, uint32_t useLastMesgBytes = 0);
+        uint32_t cbfCapMsgSize = UINT32_MAX, uint32_t boostTailBytesPrio = 0);
 
     class CompCdfPairs {
       PUBLIC:
