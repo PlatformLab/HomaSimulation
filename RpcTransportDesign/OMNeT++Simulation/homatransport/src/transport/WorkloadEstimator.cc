@@ -215,14 +215,14 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
                     toSendOnWire >= boostTailBytesPrio) {
                 // We should only account the first cbfCapMsgSize and
                 // boostTailBytesPrio bytes of the message in calculating cbf if
-                // these conditions are specified. So skip loop iteration if
-                // these conditions are specified but not met. 
+                // these conditions are specified. So update loop states and
+                // skip loop iteration if these conditions are specified but not
+                // met. 
                 pktedOnWire += pktPair.second;
                 toSendOnWire -= pktPair.second;
+                sizeRemain -= pktPair.first;
                 continue;
             }
-            pktedOnWire += pktPair.second;
-            toSendOnWire -= pktPair.second;
 
             for ( ;it != remSizePdf.begin(); ) {
                 it--;
@@ -258,7 +258,10 @@ WorkloadEstimator::getRemainSizeCdfCbf(CdfVector& cdf, uint32_t cbfCapMsgSize,
                     std::make_pair(sizeRemain, prob*pktPair.second));
 
             }
+            pktedOnWire += pktPair.second;
+            toSendOnWire -= pktPair.second;
             sizeRemain -= pktPair.first;
+
             cumPktBytes += prob * pktPair.second;
             cumPkts += prob;
         }

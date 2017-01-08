@@ -80,19 +80,20 @@ uint16_t
 PriorityResolver::getSchedPktPrio(const InboundMessage* inbndMsg)
 {
     uint32_t msgSize = inbndMsg->msgSize;
+    uint32_t bytesToGrantOnWire = inbndMsg->bytesToGrantOnWire;
     uint32_t bytesToGrant = inbndMsg->bytesToGrant;
     uint32_t bytesTreatedUnsched = homaConfig->boostTailBytesPrio;
     switch (prioResMode) {
         case PrioResolutionMode::STATIC_CBF_GRADUATED: {
-            if (bytesToGrant < bytesTreatedUnsched) {
+            if (bytesToGrantOnWire < bytesTreatedUnsched) {
                 return getMesgPrio(bytesToGrant);
             } else {
                 return homaConfig->allPrio-1;
             }
         }
-        case PrioResolutionMode::STATIC_CBF_UNIFORM:
         case PrioResolutionMode::STATIC_CDF_UNIFORM: {
-            if (bytesToGrant < bytesTreatedUnsched) {
+        case PrioResolutionMode::STATIC_CBF_UNIFORM:
+            if (bytesToGrantOnWire < bytesTreatedUnsched) {
                 return getMesgPrio(msgSize);
             } else {
                 return homaConfig->allPrio-1;

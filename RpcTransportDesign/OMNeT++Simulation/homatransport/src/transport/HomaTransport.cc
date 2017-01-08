@@ -1607,6 +1607,7 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , destAddr(rxPkt->getDestAddr())
     , msgIdAtSender(rxPkt->getMsgId())
     , bytesToGrant(0)
+    , bytesToGrantOnWire(0)
     , bytesGrantedInFlight(0)
     , totalBytesInFlight(0)
     , bytesToReceive(0)
@@ -1626,6 +1627,10 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
         case PktType::UNSCHED_DATA:
             bytesToGrant = rxPkt->getUnschedFields().msgByteLen -
                 rxPkt->getUnschedFields().totalUnschedBytes;
+            if (bytesToGrant > 0) {
+                bytesToGrantOnWire = HomaPkt::getBytesOnWire(bytesToGrant,
+                    PktType::SCHED_DATA);
+            }
             bytesToReceive = rxPkt->getUnschedFields().msgByteLen;
             msgSize = rxPkt->getUnschedFields().msgByteLen;
             totalUnschedBytes = rxPkt->getUnschedFields().totalUnschedBytes;
@@ -1714,6 +1719,8 @@ HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize,
 
     // update internal structure
     this->bytesToGrant -= grantSize;
+    this->bytesToGrantOnWire -= grantedBytesOnWire;
+    ASSERT(bytesToGrantOnWire >= 0);
     this->bytesGrantedInFlight += grantSize;
     this->lastGrantTime = simTime();
     this->totalBytesInFlight += grantedBytesOnWire;
@@ -1798,6 +1805,7 @@ HomaTransport::InboundMessage::copy(const InboundMessage& other)
     this->destAddr = other.destAddr;
     this->msgIdAtSender = other.msgIdAtSender;
     this->bytesToGrant = other.bytesToGrant;
+    this->bytesToGrantOnWire = other.bytesToGrantOnWire;
     this->bytesGrantedInFlight = other.bytesGrantedInFlight;
     this->totalBytesInFlight = other.totalBytesInFlight;
     this->bytesToReceive = other.bytesToReceive;

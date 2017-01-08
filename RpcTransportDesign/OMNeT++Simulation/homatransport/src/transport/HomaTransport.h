@@ -338,6 +338,9 @@ class HomaTransport : public cSimpleModule
         // send for this message.
         uint32_t bytesToGrant;
 
+        // Adds the scheduled packet overhead header bytes to bytesToGrant. 
+        uint32_t bytesToGrantOnWire;
+
         // Tracks the total number of data bytes scheduled (granted) for this
         // messages but has not yet been received.
         uint32_t bytesGrantedInFlight;
