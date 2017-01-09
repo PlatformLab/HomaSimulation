@@ -311,15 +311,15 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
         words = line.split()
         try:
             outputs = [float(word) for word in words[0:5]]
+            mesgBytes = int(outputs[0]) # message size in bytes
+            mct = outputs[1] # message completion time
+            rttimes = int(outputs[2]) # retransmission times
+            srcId = int(outputs[3]) # id of source node
+            destId = int(outputs[4]) # id of destination node
+
         except:
             print(line)
             continue
-        mesgBytes = int(outputs[0]) # message size in bytes
-        mct = outputs[1] # message completion time
-        rttimes = int(outputs[2]) # retransmission times
-        srcId = int(outputs[3]) # id of source node
-        destId = int(outputs[4]) # id of destination node
-
         srcIp = serverIdToIp(srcId)
         destIp = serverIdToIp(destId)
 
@@ -377,7 +377,8 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
     # and write the stretch metrics in the file
     numFiles = subprocess.check_output('ls %s -1| wc -l'%outputDir, shell=True)
     numFiles = int(numFiles.strip())
-    resultFile = os.path.join(outputDir, 'StretchVsTransport_%d.txt'%numFiles)
+    resultFile = os.path.join(outputDir,\
+        'StretchVsTransport%d-%s-%.2f.txt'%(numFiles, wltype, loadFactor))
     resultFd = open(resultFile, 'w')
     [resultFd.write(recordLine) for recordLine in recordLines]
     resultFd.flush()
