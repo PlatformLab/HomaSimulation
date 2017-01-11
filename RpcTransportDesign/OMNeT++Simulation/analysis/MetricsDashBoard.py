@@ -929,13 +929,20 @@ def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
     receiverHostIds = xmlParsedDic.receiverIds
 
     activeAndWasted = AttrDict()
+    activeAndWasted.rx.totalTime = 0
     activeAndWasted.rx.activeTime = 0
     activeAndWasted.rx.wastedTime = 0
     activeAndWasted.rx.expectedBytes = 0
     activeAndWasted.rx.realBytes = 0
-    activeAndWasted.rx.totalTime = 0
     activeAndWasted.rx.fracTotalTime = 0
     activeAndWasted.rx.fracActiveTime = 0
+
+    activeAndWasted.rx.oversubTime = 0
+    activeAndWasted.rx.oversubByte = 0
+    activeAndWasted.rx.oversubWastedTime = 0
+    activeAndWasted.rx.oversubWastedFracTotalTime = 0
+    activeAndWasted.rx.oversubWastedFracOversubTime = 0
+
 
     activeAndWasted.sx.activeTime = 0
     activeAndWasted.sx.wastedTime = 0
@@ -974,6 +981,20 @@ def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
             activeAndWasted.rx.wastedTime += wastedTime
             activeAndWasted.rx.totalTime += lastRxTime
 
+
+            rxOversubTimeStats = hostStats.access('transportScheme.oversubscriptionTime:stats')
+            rxOversubByteStats = hostStats.access('transportScheme.oversubscriptionBytes:stats')
+            oversubTime = rxOversubTimeStats.sum
+            oversubExpectedBytes = (rxOversubTimeStats.sum)*nicLinkSpeed*1e9/8.0
+            oversubRealBytes = 1.0 * rxOversubByteStats.sum
+            wastedOversubTime = (oversubExpectedBytes-oversubRealBytes)*8.0/(nicLinkSpeed*1e9)
+
+
+            activeAndWasted.rx.oversubTime +=  oversubTime
+            activeAndWasted.rx.oversubByte += oversubRealBytes
+            activeAndWasted.rx.oversubWastedTime += wastedOversubTime
+
+
         if hostId in senderHostIds:
             sxActiveTimeStats = hostStats.access('transportScheme.sxActiveTime:stats')
             sxBytesStats = hostStats.access('transportScheme.sxActiveBytes:stats')
@@ -998,6 +1019,9 @@ def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
 
     activeAndWasted.rx.fracTotalTime = 100*activeAndWasted.rx.wastedTime/activeAndWasted.rx.totalTime
     activeAndWasted.rx.fracActiveTime = 100*divideNoneZero(activeAndWasted.rx.wastedTime, activeAndWasted.rx.activeTime)
+    activeAndWasted.rx.oversubWastedFracTotalTime = 100*activeAndWasted.rx.oversubWastedTime/activeAndWasted.rx.totalTime
+    activeAndWasted.rx.oversubWastedFracOversubTime = 100*divideNoneZero(activeAndWasted.rx.oversubWastedTime, activeAndWasted.rx.oversubTime)
+
 
     activeAndWasted.sx.fracTotalTime = 100*activeAndWasted.sx.wastedTime/activeAndWasted.sx.totalTime
     activeAndWasted.sx.fracActiveTime = 100*divideNoneZero(activeAndWasted.sx.wastedTime, activeAndWasted.sx.activeTime)
@@ -1009,23 +1033,34 @@ def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
     return activeAndWasted
 
 def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
-    tw = 14
-    fw = 14
     lineMax = 90
-    title = 'Average Wasted Time and Bandwidth at Senders and Receivers'
-    printKeys =['sx.fracTotalTime', 'rx.fracActiveTime', 'rx.fracTotalTime', 'sx.schedDelayFrac', 'sx.unschedDelayFrac', 'sx.delayFrac']
+    tw = 22
+    fw = 22
+    title = 'Average Wasted Time and Bandwidth at Receivers'
 
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
             '\n' + ('-'*len(title)).center(lineMax,' '))
 
     print("="*lineMax)
-    print("Sx Wasted ".ljust(tw) + 'Sx Wasted '.center(fw) + 'Rx Wasted'.center(fw) + 'Rx Wasted'.center(fw) +
-            'Sx Sched'.center(fw) + 'Sx Unsched'.center(fw) + 'Sx Total'.center(fw))
-    print("Active BW %".ljust(tw) + 'Total BW %'.center(fw) + 'Active BW %'.center(fw) + 'Total BW %'.center(fw) +
-            'Delay %'.center(fw) + 'Delay %'.center(fw) + 'Delay %'.center(fw) )
+    print('Wasted BW'.ljust(tw) + 'Wasted BW'.center(fw) + "Oversub Wasted BW".center(fw) + 'Oversub Wasted BW '.center(fw))
+    print("% of Active".ljust(tw) + '% of Total'.center(fw) + '% of Oversub'.center(fw) + '% of Total'.center(fw))
+    print("_"*lineMax)
+    print('{0:.2f}'.format(activeAndWasted.rx.fracActiveTime).ljust(tw) + '{0:.2f}'.format(activeAndWasted.rx.fracTotalTime).center(fw) +
+          '{0:.2f}'.format(activeAndWasted.rx.oversubWastedFracOversubTime).center(fw) +
+          '{0:.2f}'.format(activeAndWasted.rx.oversubWastedFracTotalTime).center(fw))
+
+    tw = 14
+    fw = 14
+    title = 'Average Wasted Time and Bandwidth at Senders'
+
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+
+    print("="*lineMax)
+    print("Sx Wasted ".ljust(tw) + 'Sx Wasted '.center(fw) + 'Sx Sched'.center(fw) + 'Sx Unsched'.center(fw) + 'Sx Total'.center(fw))
+    print("Active BW %".ljust(tw) + 'Total BW %'.center(fw) + 'Delay %'.center(fw) + 'Delay %'.center(fw) + 'Delay %'.center(fw) )
     print("_"*lineMax)
     print('{0:.2f}'.format(activeAndWasted.sx.fracActiveTime).ljust(tw) + '{0:.2f}'.format(activeAndWasted.sx.fracTotalTime).center(fw) +
-        '{0:.2f}'.format(activeAndWasted.rx.fracActiveTime).center(fw) + '{0:.2f}'.format(activeAndWasted.rx.fracTotalTime).center(fw) +
         '{0:.2f}'.format(activeAndWasted.sx.schedDelayFrac).center(fw) +  '{0:.2f}'.format(activeAndWasted.sx.unschedDelayFrac).center(fw) +
         '{0:.2f}'.format(activeAndWasted.sx.delayFrac).center(fw))
 

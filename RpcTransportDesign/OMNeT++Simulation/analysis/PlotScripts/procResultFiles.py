@@ -98,21 +98,23 @@ if __name__ == '__main__':
             prioLevels = int(eval(parsedStats.generalInfo.prioLevels))
             for prioStats in prioUsageStatsDigest:
                 priority = prioStats.priority
-                #record results only for scheduled priorities
-                if priority < prioLevels-adaptiveSchedPrioLevels:
-                    continue
+                ##record results only for scheduled priorities
+                #if priority < prioLevels-adaptiveSchedPrioLevels:
+                #    continue
                 usageTimePct = prioStats.usageTimePct
                 prioTimeUsagesPct.append((prioLevels, adaptiveSchedPrioLevels,
-                    workloadType, redundancyFactor, loadFactor,
-                    nominalLoadFactor, priority, usageTimePct.activelyRecv,
+                    workloadType, redundancyFactor, loadFactor, nominalLoadFactor,
+                    prioLevels-priority, usageTimePct.activelyRecv,
                     usageTimePct.activelyRecvSched))
 
         if outputType.wastedBw:
             activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
             wastedBw.append((workloadType, redundancyFactor, loadFactor,
                 nominalLoadFactor, activeAndWasted.rx.fracTotalTime,
-                activeAndWasted.rx.fracActiveTime))
-
+                activeAndWasted.rx.fracActiveTime,
+                activeAndWasted.rx.oversubWastedFracTotalTime,
+                activeAndWasted.rx.oversubWastedFracOversubTime))
+                                                                      
     tw_h = 40
     tw_l = 40
 
@@ -148,7 +150,8 @@ if __name__ == '__main__':
         fdWasted.write('workload'.center(tw_l) +
             'redundancyFactor'.center(tw_h) + 'loadFactor'.center(tw_l) +
             'nominalLoadFactor'.center(tw_l) + 'wastedBw'.center(tw_l) +
-            'activeWastedBw'.center(tw_l) + '\n')
+            'activeWastedBw'.center(tw_l) + 'totalWastedOversubBw'.center(tw_l) +
+            'oversubWastedOversubBw'.center(tw_l) + '\n')
         # dump the results in outputfiles
         for wasteTuple in wastedBw:
             fdWasted.write(
@@ -157,6 +160,8 @@ if __name__ == '__main__':
                 '{0}'.format(wasteTuple[2]).center(tw_l) +
                 '{0}'.format(wasteTuple[3]).center(tw_l) +
                 '{0}'.format(wasteTuple[4]).center(tw_l) +
-                '{0}'.format(wasteTuple[5]).center(tw_l) + '\n')
+                '{0}'.format(wasteTuple[5]).center(tw_l) +
+                '{0}'.format(wasteTuple[6]).center(tw_l) +
+                '{0}'.format(wasteTuple[7]).center(tw_l) + '\n')
         fdWasted.close()
 
