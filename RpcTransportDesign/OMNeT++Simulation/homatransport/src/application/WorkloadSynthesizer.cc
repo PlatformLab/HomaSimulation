@@ -25,6 +25,7 @@
 Define_Module(WorkloadSynthesizer);
 
 simsignal_t WorkloadSynthesizer::sentMsgSignal = registerSignal("sentMsg");
+simsignal_t WorkloadSynthesizer::recvrAddrSignal = registerSignal("recvrAddr");
 simsignal_t WorkloadSynthesizer::rcvdMsgSignal = registerSignal("rcvdMsg");
 simsignal_t WorkloadSynthesizer::msgE2EDelaySignal =
         registerSignal("msgE2EDelay");
@@ -420,7 +421,9 @@ WorkloadSynthesizer::sendMsg()
     appMessage->setTransportSchedDelay(appMessage->getCreationTime());
     appMessage->setTransportSchedPreemptionLag(appMessage->getCreationTime());
     emit(sentMsgSignal, appMessage);
-    send(appMessage, "transportOut");
+    emit(recvrAddrSignal, appMessage->getDestAddr().toIPv4().getInt());
+    delete appMessage;
+    //send(appMessage, "transportOut");
     numSent++;
 }
 
@@ -447,7 +450,7 @@ WorkloadSynthesizer::processStart()
         throw cRuntimeError("Can't find an interface with IPv4 address");
     }
     srcAddress = inet::L3Address(srcIPv4Data->getIPAddress());
-
+    recordScalar("Host IPv4 address", srcAddress.toIPv4().getInt());
     // call parseXml to complete intialization based on the config.xml file
     parseAndProcessXMLConfig();
 

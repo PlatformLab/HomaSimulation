@@ -51,10 +51,12 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @display("i=block/app");
 
         @signal[sentMsg](type=cPacket);
+        @signal[recvrAddr](type=long);
         @signal[rcvdMsg](type=cPacket);
         @signal[msgE2EDelay](type=simtime_t);
 
         @statistic[sentMsg](title="messages sent"; source=sentMsg; record=count,"last(sumPerDuration(packetBytes))","sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
+        @statistic[recvrAddr](title="Destination IP address for sent mesgs"; source=recvrAddr; record=vector; interpolationMode=none);
         @statistic[rcvdMsg](title="received messages"; source=rcvdMsg; record=count,"last(sumPerDuration(packetBytes))","sum(packetBytes)","vector(packetBytes)"; interpolationMode=none);
         @statistic[msgE2EDelay](title="Message lifetime (end to end latency)"; source="msgE2EDelay"; unit=s; record=count,stats,histogram,vector; interpolationmode=none);
 

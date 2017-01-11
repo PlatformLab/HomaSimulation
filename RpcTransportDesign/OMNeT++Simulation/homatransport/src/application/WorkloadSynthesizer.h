@@ -80,6 +80,7 @@ class WorkloadSynthesizer : public cSimpleModule
     int numReceived;
 
     static simsignal_t sentMsgSignal;
+    static simsignal_t recvrAddrSignal;
     static simsignal_t rcvdMsgSignal;
 
     // Signal for end to end to delay every received messages
