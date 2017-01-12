@@ -424,20 +424,20 @@ class Mesg():
         return totalDelay, arrivalStart, pktArrivalsAtHops
 
 class TrafficData:
-    def __init__(self, trafficData, hostIdIpAddr):
+    def __init__(self, trafficData, hostIdIpAddr, maxMesgs = sys.maxint):
         self.trafficData = trafficData
         self.hostIdIpAddr = hostIdIpAddr
-        self.size = sum(
+        self.numInitialMesgs = sum(
             [len(hostTraffic) for hostTraffic in trafficData.values()])
 
-        self.numInitialMesgs = self.size
+        self.size = min(self.numInitialMesgs, maxMesgs)
         self.onDueMesgs = []
         for hostId in trafficData.keys():
             # Populate onDueMesgs with one mesg from each sender
             self.addToOnDueMesgs(hostId)
 
     def addToOnDueMesgs(self, hostId):
-        if not(self.trafficData[hostId]):
+        if not(self.trafficData[hostId]) or not(self.size):
             del self.trafficData[hostId]
             return
         nextMesg = self.trafficData[hostId].pop(0)
@@ -445,7 +445,7 @@ class TrafficData:
         heappush(self.onDueMesgs, nextMesg)
 
     def getOnDueMesg(self):
-        if not(self.onDueMesgs):
+        if not(self.onDueMesgs) or not(self.size):
             return None
         onDueMesg = heappop(self.onDueMesgs)
         self.size -= 1
@@ -458,7 +458,7 @@ class TrafficData:
                                 # recvrIntIp, sendrIntIp)
 
     def getNextDueTime(self):
-        if not(self.onDueMesgs):
+        if not(self.onDueMesgs) or not(self.size):
             return sys.float_info.max
         onDueMesg = heappop(self.onDueMesgs)
         dueTime = onDueMesg[0]
@@ -514,6 +514,7 @@ class RecvrState:
         allRecvdBytes = 0.0
         for pktsData in mesg.pktsRecvd:
             allRecvdBytes += sum(pktsData[4])
+        assert allRecvdBytes == mesg.sizeOnWire
 
         self.allRecvdBytes += allRecvdBytes
         self.activePeriodBytes += allRecvdBytes
@@ -537,14 +538,15 @@ class RecvrState:
             self.activePeriodBytes = 0
 
 class GreedySRPTOracleScheduler():
-    def __init__(self, mesgTx, ipHostId, hostIdIpAddr, simParams):
+    def __init__(self, mesgTx, ipHostId, hostIdIpAddr, simParams,
+            maxMesgs = sys.maxint):
         self.mesgTx = mesgTx
         self.ipHostId = ipHostId
         self.hostIdIpAddr = hostIdIpAddr
         self.simParams = simParams
         self.t = 0.0 # tracks the global wall clock time in the system
         self.msgId = 0 # monotonically increasing global id for messages
-        self.trafficData = TrafficData(mesgTx, hostIdIpAddr)
+        self.trafficData = TrafficData(mesgTx, hostIdIpAddr, maxMesgs)
         self.numHosts = len(ipHostId)
         self.hostTxStates = [prf.AttrDict() for hostId in range(self.numHosts)]
         self.simResults = []
@@ -633,21 +635,22 @@ class GreedySRPTOracleScheduler():
         totalRecvBytes = 0.0
         for recvrId, recvrState in self.recvrStates.iteritems():
             recvrState.simFinished()
-            wastedTime = recvrStates.sumActivePriods -\
-                recvrState.allRecvdBytes * 8.0 / self.simParams.nicLinkSpeed
+            wastedTime = recvrState.sumActivePriods - recvrState.allRecvdBytes\
+                * 8.0 / (1e9 * self.simParams.nicLinkSpeed)
             if wastedTime < 0:
-                print("wasted bw is negative for receiver {0}".format(
-                    recvrState.recvrId))
+                print("wasted bw {0} is negative for receiver {1}".format(
+                    wastedTime/recvrState.totalSimTime, recvrState.recvrId))
             else:
                 totalActiveWastedTime += wastedTime
             totalRecvBytes += recvrState.allRecvdBytes
             totalSimTime += recvrState.totalSimTime
             totalActiveTime += recvrState.sumActivePriods
 
-        self.resultFd.write("## avgRecvBw:{0}, wasted active bw (fraction"
-            " of total time, fraction of active time): ({1}, {2})".format(
-            totalRecvBytes*8.0/totalSimTime, totalActiveWastedTime/totalSimTime,
-            totalActiveWastedTime/totalActiveTime))
+        self.resultFd.write("# avgRecvBw: {0}Gbps, wasted active bw (Percentage"
+            " of total time, Percentage of active time): ({1}, {2})".format(
+            totalRecvBytes*8.0/totalSimTime/1e9,
+            totalActiveWastedTime*100.0/totalSimTime,
+            totalActiveWastedTime*100.0/totalActiveTime))
         self.resultFd.close()
 
     def scheduleTransmission(self):
@@ -762,11 +765,17 @@ if __name__ == '__main__':
     parser.add_option('--sca', metavar='SCALAR_RESULT_FILE', default = '',
             dest='scaFile',
             help='Mandatory argument. Full address to scalar result file')
+    parser.add_option('--maxMesgs', metavar='INT', default = sys.maxint,
+            dest='maxMesgs',
+            help='A arbitrary upper limit on the number of total messages to'\
+            'run the simulation for.')
 
     options, args = parser.parse_args()
     vecFile = options.vecFile
     vciFile = options.vciFile
     scaFile = options.scaFile
+    maxMesgs = int(options.maxMesgs)
+
     if not(vecFile):
         raise Exception, 'Vector result file name not provided!'
     if not(scaFile):
@@ -777,6 +786,6 @@ if __name__ == '__main__':
     trafficData, ipHostId , hostIdIpAddr, simParams =\
         preprocInputData(vecFile, vciFile, scaFile)
     srptOracle = GreedySRPTOracleScheduler(trafficData,
-        ipHostId, hostIdIpAddr, simParams)
+        ipHostId, hostIdIpAddr, simParams, maxMesgs)
 
     srptOracle.runSimulation()
