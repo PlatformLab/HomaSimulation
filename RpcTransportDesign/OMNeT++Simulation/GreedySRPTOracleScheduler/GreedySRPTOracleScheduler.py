@@ -18,7 +18,8 @@ from pprint import pprint
 import bisect
 import pdb
 
-sys.path.insert(0, os.environ['HOME'] + '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
+sys.path.insert(0, os.environ['HOME'] +
+    '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
 sys.setrecursionlimit(10000)
 import parseResultFiles as prf
 
@@ -42,9 +43,10 @@ def ipIntToStr(ipInt):
 
 def parseSimParams(simParams):
     """
-    Input arg is simulation paramter dic parsed out by the parseResultFile module.
-    Returns simulation parameter list such that its usable by the components of
-    GreedySRPTOracleScheduler module (ie. component defined in this file.)
+    Input arg is simulation paramter dic parsed out by the parseResultFile
+    module.  Returns simulation parameter list such that its usable by the
+    components of GreedySRPTOracleScheduler module (ie. component defined in
+    this file.)
     """
     paramDic = prf.AttrDict()
     paramDic.nicLinkSpeed = int(simParams.nicLinkSpeed.strip('Gpbs'))
@@ -53,13 +55,21 @@ def parseSimParams(simParams):
     paramDic.numServersPerTor = int(simParams.numServersPerTor)
     paramDic.edgeLinkDelay = float(simParams.edgeLinkDelay.strip('us'))*1e-6
     paramDic.fabricLinkDelay = float(simParams.fabricLinkDelay.strip('us'))*1e-6
-    paramDic.hostNicSxThinkTime = float(simParams.hostNicSxThinkTime.strip('us'))*1e-6
-    paramDic.hostSwTurnAroundTime = float(simParams.hostSwTurnAroundTime.strip('us'))*1e-6
+    paramDic.hostNicSxThinkTime = float(
+        simParams.hostNicSxThinkTime.strip('us'))*1e-6
+
+    paramDic.hostSwTurnAroundTime = float(
+        simParams.hostSwTurnAroundTime.strip('us'))*1e-6
+
     paramDic.isFabricCutThrough = simParams.isFabricCutThrough == 'true'
     paramDic.switchFixDelay = float(simParams.switchFixDelay.strip('us'))*1e-6
-    paramDic.msgSizeRanges = [float(strSizeBound) for strSizeBound in simParams.msgSizeRanges.strip('\"').split()]
-    paramDic.workloadType = simParams.workloadType 
-    paramDic.loadFactor = 100*float(simParams.loadFactor)
+    paramDic.msgSizeRanges = [float(strSizeBound) for strSizeBound in\
+        simParams.msgSizeRanges.strip('\"').split()]
+
+    paramDic.workloadType = simParams.workloadType
+    paramDic.realLoadFactor = 100*float(simParams.rlf)    # network load factor
+    paramDic.loadFactor = 100*float(eval(simParams.loadFactor)) # good put at
+                                                                # the app
     return paramDic
 
 def preprocInputData(vecFile, vciFile, scaFile):
@@ -70,7 +80,8 @@ def preprocInputData(vecFile, vciFile, scaFile):
     for this module.
     """
     sp = prf.ScalarParser(scaFile)
-    numHosts = int(sp.generalInfo.numTors) * int(sp.generalInfo.numServersPerTor)
+    numHosts =\
+        int(sp.generalInfo.numTors) * int(sp.generalInfo.numServersPerTor)
 
     # IP addr of host with id equal to 'i' is at index i of the list. IPs are
     # recorded as tuples of int and string values: (int, 'YYY.YYY.YYY.YYY')
@@ -80,7 +91,9 @@ def preprocInputData(vecFile, vciFile, scaFile):
     ipHostId = dict()
 
     for hostId in range(numHosts):
-         ipInt = int(sp.hosts.access('host[{0}].trafficGeneratorApp[0]."Host IPv4 address".value'.format(hostId)))
+         ipInt = int(sp.hosts.access('host[{0}].trafficGeneratorApp[0].'
+            '"Host IPv4 address".value'.format(hostId)))
+
          ipStr = ipIntToStr(ipInt)
          hostIdIpAddr.append((ipInt, ipStr))
          ipHostId[ipInt] = hostId
@@ -93,7 +106,9 @@ def preprocInputData(vecFile, vciFile, scaFile):
     recvrAddrVecDescs = vp.getVecDicRecursive(vp.vecDesc, recvrAddrVecName)
     assert len(recvrAddrVecDescs) == len(msgSizeVecDescs)
 
-    hostVecInfo = {hostId : prf.AttrDict() for hostId in range(len(msgSizeVecDescs))}
+    hostVecInfo = {hostId : prf.AttrDict() for hostId in
+        range(len(msgSizeVecDescs))}
+
     for i in hostVecInfo:
         msgSizeDesc = msgSizeVecDescs[i]
         moduleName = msgSizeDesc[0]
@@ -119,7 +134,8 @@ def preprocInputData(vecFile, vciFile, scaFile):
         for i in range(len(sizeVecData)):
             sizeSample = sizeVecData[i]
             addrSample = recvrAddrVecData[i]
-            assert sizeSample[0] == addrSample[0] and sizeSample[1] == addrSample[1]
+            assert sizeSample[0] == addrSample[0] and\
+                sizeSample[1] == addrSample[1]
             arrivalTime = sizeSample[1]
             msgSize = int(sizeSample[2])
             recvrAddr = int(addrSample[2])
@@ -130,7 +146,8 @@ def preprocInputData(vecFile, vciFile, scaFile):
 
 class Mesg():
 
-    def __init__(self, msgId, tCreation, sendrIntIp, recvrIntIp, size, simParams):
+    def __init__(self, msgId, tCreation, sendrIntIp, recvrIntIp, size,
+            simParams):
         self.msgId = msgId
         self.tCreation = tCreation
         self.size = size
@@ -141,18 +158,21 @@ class Mesg():
         self.bytesToRecv = size
         self.simParams = simParams
 
-        # Each element in this list corresponds to a train of packets sent together
-        # [(txStart, txStop, arrivalTimeAtRecvr, totalDataBytesInPkts, [pkt1BytesOneWire, pkt2BytesOnWire, ...]), ...]
+        # Each element in this list corresponds to a train of packets sent
+        # together [(txStart, txStop, arrivalTimeAtRecvr, totalDataBytesInPkts,
+        # [pkt1BytesOneWire, pkt2BytesOnWire, ...]), ...]
         self.pktsInflight = []
         self.pktsRecvd = []
-        self.recvTime = tCreation
-        self.minRecvTime, pktArrivalsAtHops =\
+        self.recvTime = tCreation # tracks when the last byte is received
+        self.receptionStart = sys.float_info.max # tracks when the
+                                                 # first bit is received
+        self.minRecvTime, minReceptionStart, pktArrivalsAtHops =\
             self.pktsRecvTime(self.tCreation, [sum(pkt) for pkt in self.txPkts])
 
     def __lt__(self, other):
         return ((self.bytesToSend, self.size, self.tCreation, self.sendrIntIp,\
-        self.recvrIntIp, self.msgId) < (other.bytesToSend, other.size, other.tCreation,\
-        other.sendrIntIp, other.recvrIntIp, other.msgId))
+        self.recvrIntIp, self.msgId) < (other.bytesToSend, other.size,\
+            other.tCreation, other.sendrIntIp, other.recvrIntIp, other.msgId))
 
     def __eq__(self, other):
         return (not(self.__lt__(other)) and not(other.__lt__(self)))
@@ -186,7 +206,9 @@ class Mesg():
                 ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP
 
         bytesOnWire += numPartialBytesOnWire
-        pktsOnWire.append((partialHdrBytes, numPartialBytesOnWire-partialHdrBytes))
+        pktsOnWire.append((partialHdrBytes,
+            numPartialBytesOnWire-partialHdrBytes))
+
         return bytesOnWire, pktsOnWire
 
     def transmitBytes(self, tStart, tStop):
@@ -198,7 +220,9 @@ class Mesg():
         assert txDuration >= 0
         assert self.bytesToSend > 0
         # For txDuration time, get how many bytes will be transmitted
-        bytesAllowedToSend =  int(round(txDuration * self.simParams.nicLinkSpeed * 1e9 / 8.0))
+        bytesAllowedToSend = int(round(
+            txDuration * self.simParams.nicLinkSpeed * 1e9 / 8.0))
+
         inflightPkts = []
         dataBytesSent = 0
         for i in range(len(self.txPkts)):
@@ -226,14 +250,19 @@ class Mesg():
                 # append this new train of packets to the previous train
                 lastInflight = self.pktsInflight[-1]
                 prevTxPkts = lastInflight[3]
-                newTxPkts = \
-                    prevTxPkts[0:-1] + [(prevTxPkts[-1] + inflightPkts[0])] + inflightPkts[1:]
-                newInflight =\
-                    (lastInflight[0], tStop, lastInflight[2] + dataBytesSent, newTxPkts)
+                newTxPkts =  prevTxPkts[0:-1] +\
+                    [(prevTxPkts[-1] + inflightPkts[0])] + inflightPkts[1:]
+
+                newInflight = (lastInflight[0], tStop,
+                    lastInflight[2] + dataBytesSent, newTxPkts)
+
                 self.pktsInflight.pop() # remove previous pkts
-                self.pktsInflight.append(newInflight) # append new pkts comprised of previous one and new one
+                self.pktsInflight.append(newInflight) # append new pkts
+                                                      # comprised of previous
+                                                      # one and new one
             else:
-                self.pktsInflight.append((tStart, tStop, dataBytesSent, inflightPkts))
+                self.pktsInflight.append(
+                    (tStart, tStop, dataBytesSent, inflightPkts))
 
 
         # Remove transmitted packets from txPkts
@@ -245,7 +274,7 @@ class Mesg():
 
     def recvTransmittedPkts(self):
         # For a fully transmitted message, return time at which the message is
-        # fully delivered at receiver.
+        # fully delivered at the receiver.
         assert self.bytesToSend == 0
         dataBytesRecvd = 0
         pktsRecvTimeAtRecvr = self.tCreation
@@ -253,16 +282,22 @@ class Mesg():
         for i, pktTrain in enumerate(self.pktsInflight):
             tStart = pktTrain[0]
             tStop = pktTrain[1]
-            dataBytesSentInPkt = pktTrain[2] 
+            dataBytesSentInPkt = pktTrain[2]
             inflightPkts = pktTrain[3]
             dataBytesRecvd += dataBytesSentInPkt
-            pktsRecvTimeAtRecvr, pktsArrivalsAtHops =\
+            pktsRecvTimeAtRecvr, receptionStart, pktsArrivalsAtHops =\
                 self.pktsRecvTime(tStart, inflightPkts, pktsArrivalsAtHops)
-            self.pktsRecvd.append((tStart, tStop, pktsRecvTimeAtRecvr, dataBytesSentInPkt, inflightPkts))
+
+            if self.receptionStart == sys.float_info.max:
+                self.receptionStart = receptionStart
+
+            assert self.receptionStart <= receptionStart
+            self.pktsRecvd.append((tStart, tStop, pktsRecvTimeAtRecvr,
+                dataBytesSentInPkt, inflightPkts))
 
         self.recvTime = pktsRecvTimeAtRecvr
         assert self.bytesToRecv == dataBytesRecvd
-        self.bytesToRecv -= dataBytesRecvd 
+        self.bytesToRecv -= dataBytesRecvd
 
     def getTxDuration(self):
         # return how long does it take to transmit all bytes of this mesg
@@ -271,16 +306,17 @@ class Mesg():
 
     def pktsRecvTime(self, txStart, txPkts, prevPktArrivals=None):
         """
-        For a train of txPkts as [pkt0.byteOnWire, pkt1.byteOnWire,.. ] that start transmission
-        at sender at time txStart, this method returns the arrival time of last bit of this
-        train at the receiver. prevPktArrivals is the arrival times of
-        txPkts train prior this one for this message.
+        For a train of txPkts as [pkt0.byteOnWire, pkt1.byteOnWire,.. ] that
+        start transmission at sender at time txStart, this method returns the
+        arrival time of last bit of this train at the receiver. prevPktArrivals
+        is the arrival times of txPkts train prior this one for this message.
         """
-        # Returns the arrival time of last pkt in pkts list when pkts are going
-        # across the network through links with speeds in linkSpeeds list
+        # Returns the arrival time of last bit of last pkt and first bit of
+        # first pakcet in pkts list when pkts are going across the network
+        # through links with speeds in linkSpeeds list
         def pktsDeliveryTime(linkSpeeds, pkts):
             K = len(linkSpeeds) # index of hops starts at zero for sender
-                                # host and K for receiver host 
+                                # host and K for receiver host
             N = len(pkts) # number of packets
 
             # arrivals[n][k] gives arrival time of pkts[n-1] at hop k.
@@ -302,7 +338,10 @@ class Mesg():
                     arrivals[n][k] = pkts[n-1] * 8.0 * 1e-9 / linkSpeeds[k-1] +\
                         max(arrivals[n-1][k], arrivals[n][k-1])
 
-            return arrivals[-1][:]
+            firstBitArrival =\
+                arrivals[1][-1] - pkts[0] * 8.0 * 1e-9 / linkSpeeds[-1]
+            assert firstBitArrival >= 0
+            return arrivals[-1][:], firstBitArrival
 
         if self.recvrIntIp == self.sendrIntIp:
             # When sender and receiver are the same machine
@@ -324,9 +363,9 @@ class Mesg():
             if not(self.simParams.isFabricCutThrough):
                 linkSpeeds = [self.simParams.nicLinkSpeed] * 2
             else:
-                # In order to abuse the pktsDeliveryTime function for finding network
-                # serializaiton delay when switches are cut through, we need to
-                # define linkSpeeds like below
+                # In order to abuse the pktsDeliveryTime function for finding
+                # network serializaiton delay when switches are cut through, we
+                # need to define linkSpeeds like below
                 linkSpeeds = [self.simParams.nicLinkSpeed]
 
         elif ((self.sendrIntIp >> 16) & 255) == ((self.recvrIntIp >> 16) & 255):
@@ -339,49 +378,58 @@ class Mesg():
                 self.simParams.fabricLinkDelay, self.simParams.edgeLinkDelay]
 
             if not(self.simParams.isFabricCutThrough):
-                linkSpeeds =\
-                    [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed,\
+                linkSpeeds = [self.simParams.nicLinkSpeed,\
+                    self.simParams.fabricLinkSpeed,\
                     self.simParams.fabricLinkSpeed, self.simParams.nicLinkSpeed]
             else:
-                linkSpeeds = [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed]
+                linkSpeeds = [self.simParams.nicLinkSpeed,
+                    self.simParams.fabricLinkSpeed]
 
         elif ((self.sendrIntIp >> 24) & 255) == ((self.recvrIntIp >> 24) & 255):
             # receiver and sender in two different pod
 
-            switchFixDelays +=\
-                [edgeSwitchFixDelay, fabricSwitchFixDelay, fabricSwitchFixDelay,\
-                fabricSwitchFixDelay, edgeSwitchFixDelay]
+            switchFixDelays += [edgeSwitchFixDelay, fabricSwitchFixDelay,\
+                fabricSwitchFixDelay, fabricSwitchFixDelay, edgeSwitchFixDelay]
+
             linkDelays +=\
                 [self.simParams.edgeLinkDelay, self.simParams.fabricLinkDelay,\
                 self.simParams.fabricLinkDelay, self.simParams.fabricLinkDelay,\
                 self.simParams.fabricLinkDelay, self.simParams.edgeLinkDelay]
 
             if not(self.simParams.isFabricCutThrough):
-                linkSpeeds =\
-                    [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed,\
-                    self.simParams.fabricLinkSpeed, self.simParams.fabricLinkSpeed,\
+                linkSpeeds = [self.simParams.nicLinkSpeed,\
+                    self.simParams.fabricLinkSpeed,\
+                    self.simParams.fabricLinkSpeed,\
+                    self.simParams.fabricLinkSpeed,\
                     self.simParams.fabricLinkSpeed, self.simParams.nicLinkSpeed]
             else:
-                linkSpeeds = [self.simParams.nicLinkSpeed, self.simParams.fabricLinkSpeed]
+                linkSpeeds = [self.simParams.nicLinkSpeed,\
+                    self.simParams.fabricLinkSpeed]
         else:
-            raise Exception, 'Sender and receiver IPs dont abide the rules in config.xml file.'
+            raise Exception, 'Sender and receiver IPs dont abide the rules'
+            ' in config.xml file.'
 
         # Add network serialization delays at switches and sender nic
-        pktArrivalsAtHops = pktsDeliveryTime(linkSpeeds, txPkts)
+        pktArrivalsAtHops, arrivalStart = pktsDeliveryTime(linkSpeeds, txPkts)
         totalDelay += pktArrivalsAtHops[-1]
 
         # Add fixed delays:
-        totalDelay +=\
-            self.simParams.hostSwTurnAroundTime * 2 + self.simParams.hostNicSxThinkTime +\
+        fixedDelays = self.simParams.hostSwTurnAroundTime * 2 +\
+            self.simParams.hostNicSxThinkTime +\
             sum(linkDelays) + sum(switchFixDelays)
 
-        return totalDelay, pktArrivalsAtHops
+        totalDelay += fixedDelays
+        arrivalStart +=  fixedDelays
+
+        return totalDelay, arrivalStart, pktArrivalsAtHops
 
 class TrafficData:
     def __init__(self, trafficData, hostIdIpAddr):
         self.trafficData = trafficData
         self.hostIdIpAddr = hostIdIpAddr
-        self.size = sum([len(hostTraffic) for hostTraffic in trafficData.values()])
+        self.size = sum(
+            [len(hostTraffic) for hostTraffic in trafficData.values()])
+
         self.numInitialMesgs = self.size
         self.onDueMesgs = []
         for hostId in trafficData.keys():
@@ -403,9 +451,11 @@ class TrafficData:
         self.size -= 1
         senderId = onDueMesg[3]
         onDueMesg = list(onDueMesg)
-        onDueMesg[3] = self.hostIdIpAddr[senderId][0] # replace senderId with senderIp in the mesg
+        onDueMesg[3] = self.hostIdIpAddr[senderId][0] # replace senderId with
+                                                      # senderIp in the mesg
         self.addToOnDueMesgs(senderId)
-        return tuple(onDueMesg) #(mesgCreationTime, msgSize, recvrIntIp, sendrIntIp)
+        return tuple(onDueMesg) #(mesgCreationTime, msgSize,
+                                # recvrIntIp, sendrIntIp)
 
     def getNextDueTime(self):
         if not(self.onDueMesgs):
@@ -419,6 +469,73 @@ class TrafficData:
         assert self.size >= 0
         return not(self.size)
 
+class RecvrState:
+    def __init__(self, recvrIntIp, recvrId):
+        self.recvrIntIp = recvrIntIp
+        self.recvrId = recvrId
+        self.numIncompleteMesgs = 0
+        self.dataToRecv = 0
+
+        self.activePeriodStart = sys.float_info.max
+        self.activePeriodStop = 0.0
+        self.activePeriodBytes = 0
+        self.sumActivePriods = 0.0
+
+        self.totalSimTime = 0.0
+        self.allRecvdBytes = 0
+        self.recvdData = 0
+
+    def mesgCreated(self, mesg):
+        tCurrent = mesg.tCreation
+        if self.numIncompleteMesgs == 0 and self.activePeriodStop != 0.0 and\
+                tCurrent > self.activePeriodStop:
+            # We have finished an active period, so aggregate the stats and
+            # reset the variables for tracking next active period
+            assert self.activePeriodStart < self.activePeriodStop and\
+                self.dataToRecv == 0 and self.activePeriodBytes > 0 and\
+                self.totalSimTime < self.activePeriodStop
+
+            #pdb.set_trace()
+            self.sumActivePriods +=\
+                (self.activePeriodStop - self.activePeriodStart)
+            self.totalSimTime = self.activePeriodStop
+
+            self.activePeriodStart = sys.float_info.max
+            self.activePeriodStop = 0.0
+            self.activePeriodBytes = 0
+
+        self.numIncompleteMesgs += 1
+        self.dataToRecv += mesg.size
+
+    def mesgRecvCompleted(self, mesg):
+        self.numIncompleteMesgs -= 1
+        self.dataToRecv -= mesg.size
+        self.recvdData += mesg.size
+        allRecvdBytes = 0.0
+        for pktsData in mesg.pktsRecvd:
+            allRecvdBytes += sum(pktsData[4])
+
+        self.allRecvdBytes += allRecvdBytes
+        self.activePeriodBytes += allRecvdBytes
+        self.activePeriodStart =\
+            min(self.activePeriodStart, mesg.receptionStart)
+
+        self.activePeriodStop = max(self.activePeriodStop, mesg.recvTime)
+
+    def simFinished(self):
+        assert self.numIncompleteMesgs == 0 and self.dataToRecv == 0
+        if self.activePeriodStop != 0.0:
+            assert self.activePeriodStart < self.activePeriodStop and\
+                self.totalSimTime < self.activePeriodStop
+
+            self.sumActivePriods +=\
+                (self.activePeriodStop - self.activePeriodStart)
+
+            self.totalSimTime = self.activePeriodStop
+            self.activePeriodStart = sys.float_info.max
+            self.activePeriodStop = 0.0
+            self.activePeriodBytes = 0
+
 class GreedySRPTOracleScheduler():
     def __init__(self, mesgTx, ipHostId, hostIdIpAddr, simParams):
         self.mesgTx = mesgTx
@@ -431,6 +548,10 @@ class GreedySRPTOracleScheduler():
         self.numHosts = len(ipHostId)
         self.hostTxStates = [prf.AttrDict() for hostId in range(self.numHosts)]
         self.simResults = []
+        self.recvrStates = {}
+        for hostId in range(self.numHosts):
+            recvrIntIp = self.hostIdIpAddr[hostId][0]
+            self.recvrStates[recvrIntIp] = RecvrState(recvrIntIp, hostId)
 
         for hostId, txState in enumerate(self.hostTxStates):
             # all mesgs that need to transmit bytes at host i
@@ -449,25 +570,27 @@ class GreedySRPTOracleScheduler():
         self.completedTxMesgs = {}
 
         self.resultFd =\
-            open('results/' + self.simParams.workloadType + '__{0:.2f}'.format(self.simParams.loadFactor), 'w')
-        self.resultFd.write('msgSize\tmsgSizeOnWire\tsizeHistBin\tcreationTime\tcompletionTime\tstretch'
-            '\tmsgId\tsendrId\tsenderIp\trecvrId\trecvrIp\n')
+            open('results/' + self.simParams.workloadType +\
+            '__{0:.2f}'.format(self.simParams.loadFactor), 'w')
+        self.resultFd.write('msgSize\tmsgSizeOnWire\tsizeHistBin\t'
+            'creationTime\tcompletionTime\tstretch\tmsgId\tsendrId'
+            '\tsenderIp\trecvrId\trecvrIp\n')
 
     def runSimulation(self):
         nextPrintTime = 0
         while not(self.trafficData.empty()) or self.hasBytesToTransmit():
-            
+
             if int(self.t*1e3) == nextPrintTime:
                 # every 10ms print a progress report
                 nextPrintTime += 10
                 activeMesgs = len(self.activeTxMesgs) + len(self.schedMesgs)
                 mesgsRemained = self.trafficData.size + activeMesgs
-                print('time:{0}, no. mesgs trasmitted: {1}, no. active mesgs: {2}'
-                    ' no. future mesgs: {3}'.format(self.t,
-                    self.trafficData.numInitialMesgs - mesgsRemained, activeMesgs,
-                    self.trafficData.size))
+                print('time:{0}, no. mesgs trasmitted: {1},'\
+                    ' no. active mesgs: {2}, no. future mesgs: {3}'.format(self.t,
+                    self.trafficData.numInitialMesgs - mesgsRemained,
+                    activeMesgs, self.trafficData.size))
 
-            # Find next time to run scheduling
+            # Find next time to run scheduler
             nextMsgTime = self.trafficData.getNextDueTime()
             nextSchedTime = min(nextMsgTime, self.earliestTxCompletion(self.t))
             assert nextSchedTime >= self.t
@@ -479,23 +602,52 @@ class GreedySRPTOracleScheduler():
             # Update current time
             self.t = nextSchedTime
             if nextSchedTime == nextMsgTime:
-                # create new message and push to the active transmitting messages
+                # create new message and push to the active transmitting
+                # messages
                 onDueMesg = self.trafficData.getOnDueMesg()
                 assert onDueMesg[0] == self.t
                 sendrIntIp = onDueMesg[3]
                 recvrIntIp = onDueMesg[2]
                 mesgSize = onDueMesg[1]
-                newMesg = Mesg(self.msgId, self.t, sendrIntIp, recvrIntIp, mesgSize, self.simParams)
+                newMesg = Mesg(self.msgId, self.t, sendrIntIp, recvrIntIp,
+                    mesgSize, self.simParams)
+
+                # Get the reciever state and call mesgCreated() for it
+                recvrState = self.recvrStates[recvrIntIp]
+                recvrState.mesgCreated(newMesg)
+
                 self.msgId += 1
                 self.pushActiveTxMesg(newMesg)
 
             # calculate new schedule
             self.scheduleTransmission()
 
-            # Let all inflight bytes belong to fully transmitted messages to drain out
-            # of network and get delivered at receivers
+            # Let all inflight bytes belong to fully transmitted messages to
+            # drain out of network and get delivered at receivers
             self.recvTransmittedMesgs()
-        
+
+        # find wasted bandwidth at the receivers
+        totalActiveWastedTime = 0.0
+        totalActiveTime = 0.0
+        totalSimTime = 0.0
+        totalRecvBytes = 0.0
+        for recvrId, recvrState in self.recvrStates.iteritems():
+            recvrState.simFinished()
+            wastedTime = recvrStates.sumActivePriods -\
+                recvrState.allRecvdBytes * 8.0 / self.simParams.nicLinkSpeed
+            if wastedTime < 0:
+                print("wasted bw is negative for receiver {0}".format(
+                    recvrState.recvrId))
+            else:
+                totalActiveWastedTime += wastedTime
+            totalRecvBytes += recvrState.allRecvdBytes
+            totalSimTime += recvrState.totalSimTime
+            totalActiveTime += recvrState.sumActivePriods
+
+        self.resultFd.write("## avgRecvBw:{0}, wasted active bw (fraction"
+            " of total time, fraction of active time): ({1}, {2})".format(
+            totalRecvBytes*8.0/totalSimTime, totalActiveWastedTime/totalSimTime,
+            totalActiveWastedTime/totalActiveTime))
         self.resultFd.close()
 
     def scheduleTransmission(self):
@@ -510,7 +662,9 @@ class GreedySRPTOracleScheduler():
                 break
             recvrIp = mesg.recvrIntIp
             sendrIp = mesg.sendrIntIp
-            if recvrIp in attainableRecvrsIPs and sendrIp in attainableSendrsIPs:
+            if recvrIp in attainableRecvrsIPs and\
+                    sendrIp in attainableSendrsIPs:
+
                 self.schedMesgs.append(mesg)
                 attainableSendrsIPs.remove(sendrIp)
                 attainableRecvrsIPs.remove(recvrIp)
@@ -542,14 +696,15 @@ class GreedySRPTOracleScheduler():
     def earliestTxCompletion(self, currentTime):
         earliestTxCompletionTime = sys.float_info.max
         for mesg in self.schedMesgs:
-             earliestTxCompletionTime =\
-                min(earliestTxCompletionTime, mesg.getTxDuration() + currentTime)
+             earliestTxCompletionTime = min(earliestTxCompletionTime,
+                mesg.getTxDuration() + currentTime)
+
         return earliestTxCompletionTime
 
     def transmitSchedMesgs(self, currentTime, txStopTime):
         # Transmit from currently scheduled messages starting at currentTime
         # for txDuration time period. The side effect of this call is that,
-        # messages whose transmission is not finished, will be unscheduled and
+        # messages whose transmission is not finished, will be descheduled and
         # added to the list of all messages waiting for transmission.
         incompleteTxMesgs = []
         while self.schedMesgs:
@@ -566,15 +721,23 @@ class GreedySRPTOracleScheduler():
         recvdMesgIds = []
         for mesgId, mesg in self.completedTxMesgs.iteritems():
             mesg.recvTransmittedPkts()
-            histBinInd = bisect.bisect_left(self.simParams.msgSizeRanges, mesg.size)
+            # find recvr of this message and call mesgRecvComplete for it
+            recvrState = self.recvrStates[mesg.recvrIntIp]
+            recvrState.mesgRecvCompleted(mesg)
+
+            histBinInd =\
+                bisect.bisect_left(self.simParams.msgSizeRanges, mesg.size)
             histBin =\
                 'inf' if histBinInd==len(self.simParams.msgSizeRanges)\
                 else self.simParams.msgSizeRanges[histBinInd]
             recordLine =\
-                '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\t\t{10}\n'.format(
-                mesg.size, mesg.sizeOnWire, histBin, mesg.tCreation, mesg.recvTime,
-                (mesg.recvTime-mesg.tCreation)/(mesg.minRecvTime-mesg.tCreation),
-                mesg.msgId, self.ipHostId[mesg.sendrIntIp], ipIntToStr(mesg.sendrIntIp),
+                '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}'\
+                '\t\t{8}\t\t{9}\t\t{10}\n'.format(mesg.size, mesg.sizeOnWire,
+                histBin, mesg.tCreation, mesg.recvTime,
+                (mesg.recvTime-mesg.tCreation)/
+                (mesg.minRecvTime-mesg.tCreation),
+                mesg.msgId, self.ipHostId[mesg.sendrIntIp],
+                ipIntToStr(mesg.sendrIntIp),
                 self.ipHostId[mesg.recvrIntIp], ipIntToStr(mesg.recvrIntIp))
             self.simResults.append(recordLine)
 
@@ -613,5 +776,7 @@ if __name__ == '__main__':
 
     trafficData, ipHostId , hostIdIpAddr, simParams =\
         preprocInputData(vecFile, vciFile, scaFile)
-    srptOracle = GreedySRPTOracleScheduler(trafficData, ipHostId, hostIdIpAddr, simParams)
+    srptOracle = GreedySRPTOracleScheduler(trafficData,
+        ipHostId, hostIdIpAddr, simParams)
+
     srptOracle.runSimulation()
