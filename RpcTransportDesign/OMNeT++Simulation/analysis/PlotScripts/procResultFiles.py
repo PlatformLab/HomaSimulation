@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
         if outputType.wastedBw:
             activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
-            wastedBw.append((workloadType, redundancyFactor, loadFactor,
+            wastedBw.append(('Homa', workloadType, redundancyFactor, loadFactor,
                 nominalLoadFactor, activeAndWasted.rx.fracTotalTime,
                 activeAndWasted.rx.fracActiveTime,
                 activeAndWasted.rx.oversubWastedFracTotalTime,
@@ -147,7 +147,7 @@ if __name__ == '__main__':
         # create output file
         fdWasted = open(os.environ['HOME'] + "/Research/RpcTransportDesign" +
             "/OMNeT++Simulation/analysis/PlotScripts/" + wastedBwFile, 'w')
-        fdWasted.write('workload'.center(tw_l) +
+        fdWasted.write('transport' +'workload'.center(tw_l) +
             'redundancyFactor'.center(tw_h) + 'loadFactor'.center(tw_l) +
             'nominalLoadFactor'.center(tw_l) + 'wastedBw'.center(tw_l) +
             'activeWastedBw'.center(tw_l) + 'totalWastedOversubBw'.center(tw_l) +
@@ -162,6 +162,7 @@ if __name__ == '__main__':
                 '{0}'.format(wasteTuple[4]).center(tw_l) +
                 '{0}'.format(wasteTuple[5]).center(tw_l) +
                 '{0}'.format(wasteTuple[6]).center(tw_l) +
-                '{0}'.format(wasteTuple[7]).center(tw_l) + '\n')
+                '{0}'.format(wasteTuple[7]).center(tw_l) +
+                '{0}'.format(wasteTuple[8]).center(tw_l) + '\n')
         fdWasted.close()
 

@@ -81,12 +81,17 @@ stretch <- merge(sizeStats, stretchStats)
 stretch <- stretch[order(stretch$sizeHistBin),]
 
 # Save the data in a file
-fileConn<-file(sprintf("%s/stretchVsTransport.txt", opt$outpath))
+fileName <- basename(opt$infile)
+fileConn<-file(sprintf("%s/stretchVsTransport_%s.txt", opt$outpath,
+    fileName))
 lineContent <- c('TransportType      LoadFactor      WorkLoad        MsgSizeRange        SizeCntPercent      BytesPercent        UnschedBytes        MeanStretch     MedianStretch       99PercentStretch')
 
-matched <- regexpr("[A-Za-z]+.+[A-Za-z]+", opt$infile)
-wl <- substr(opt$infile, matched[1], attr(matched, "match.length"))
-lf <- 0.8
+matched <- regexpr("[A-Za-z]+.+[A-Za-z]+", fileName)
+wl <- substr(fileName, matched[1], attr(matched, "match.length"))
+matched<-regexpr("[0-9]+\\.[0-9]+", fileName)
+lf <- substr(fileName, matched[1],
+    attr(matched, "match.length") + matched[1])
+lf <- as.double(lf)
 
 for (i in 1:nrow(stretch)) {
     stretchLine = stretch[i,]
@@ -143,7 +148,7 @@ for (statName in names(stretchStats)[-1]) {
         labs(title = plotTitle, x = "Cumulative Mesg Bytes Fraction", y = statName)
 }
 
-pdf(sprintf("%s/Stretch.pdf", opt$outpath), width=40*2, height=15*i/2)
+pdf(sprintf("%s/Stretch_%s.pdf", opt$outpath, fileName), width=40*2, height=15*i/2)
 args.list <- c(plotList, list(ncol=2))
 do.call(grid.arrange, args.list)
 dev.off()

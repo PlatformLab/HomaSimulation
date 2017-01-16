@@ -22,7 +22,7 @@ for (wl in workloads) {
         i <- i+1
         plotTitle = sprintf("Workload: %s, LoadFactor= %f", wl, nominalLoad)
         tmp = subset(prioUsagePct, workload==wl & nominalLoadFactor==nominalLoad)
-        plotList[[i]] <- ggplot(tmp, aes(x=priority, y=prioUsagePct_activelyRecvSched)) +
+        plotList[[i]] <- ggplot(tmp, aes(x=priority, y=prioUsagePct_activelyRecv)) +
             geom_bar(stat="identity") +
             theme(text = element_text(size=textSize, face="bold"), legend.position="top",
                 strip.text.x = element_text(size = textSize), strip.text.y = element_text(size = textSize),
