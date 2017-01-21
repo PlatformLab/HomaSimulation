@@ -88,6 +88,7 @@ if __name__ == '__main__':
         loadFactor =  100 *\
             trafficDic.rxHostsTraffic.nics.rx.trafficDigest.avgRate /\
             int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
+        prioLevels = int(eval(parsedStats.generalInfo.prioLevels))
       
         if outputType.prioUsage:
             prioUsageStatsDigest = []
@@ -95,7 +96,6 @@ if __name__ == '__main__':
                 xmlParsedDic, prioUsageStatsDigest)
             adaptiveSchedPrioLevels = int(eval(
                 parsedStats.generalInfo.adaptiveSchedPrioLevels))
-            prioLevels = int(eval(parsedStats.generalInfo.prioLevels))
             for prioStats in prioUsageStatsDigest:
                 priority = prioStats.priority
                 ##record results only for scheduled priorities
@@ -109,11 +109,11 @@ if __name__ == '__main__':
 
         if outputType.wastedBw:
             activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
-            wastedBw.append(('Homa', workloadType, redundancyFactor, loadFactor,
-                nominalLoadFactor, activeAndWasted.rx.fracTotalTime,
-                activeAndWasted.rx.fracActiveTime,
-                activeAndWasted.rx.oversubWastedFracTotalTime,
-                activeAndWasted.rx.oversubWastedFracOversubTime))
+            wastedBw.append(('Homa', workloadType, prioLevels, redundancyFactor,
+            loadFactor, nominalLoadFactor, activeAndWasted.rx.fracTotalTime,
+            activeAndWasted.rx.fracActiveTime,
+            activeAndWasted.rx.oversubWastedFracTotalTime,
+            activeAndWasted.rx.oversubWastedFracOversubTime))
                                                                       
     tw_h = 40
     tw_l = 40
@@ -147,10 +147,11 @@ if __name__ == '__main__':
         # create output file
         fdWasted = open(os.environ['HOME'] + "/Research/RpcTransportDesign" +
             "/OMNeT++Simulation/analysis/PlotScripts/" + wastedBwFile, 'w')
-        fdWasted.write('transport' +'workload'.center(tw_l) +
-            'redundancyFactor'.center(tw_h) + 'loadFactor'.center(tw_l) +
-            'nominalLoadFactor'.center(tw_l) + 'wastedBw'.center(tw_l) +
-            'activeWastedBw'.center(tw_l) + 'totalWastedOversubBw'.center(tw_l) +
+        fdWasted.write('transport' + 'workload'.center(tw_h) +
+            'prioLevels'.center(tw_l) + 'redundancyFactor'.center(tw_l) +
+            'loadFactor'.center(tw_l) + 'nominalLoadFactor'.center(tw_l) +
+            'wastedBw'.center(tw_l) + 'activeWastedBw'.center(tw_l) +
+            'totalWastedOversubBw'.center(tw_l) +
             'oversubWastedOversubBw'.center(tw_l) + '\n')
         # dump the results in outputfiles
         for wasteTuple in wastedBw:
@@ -163,6 +164,7 @@ if __name__ == '__main__':
                 '{0}'.format(wasteTuple[5]).center(tw_l) +
                 '{0}'.format(wasteTuple[6]).center(tw_l) +
                 '{0}'.format(wasteTuple[7]).center(tw_l) +
-                '{0}'.format(wasteTuple[8]).center(tw_l) + '\n')
+                '{0}'.format(wasteTuple[8]).center(tw_l) +
+                '{0}'.format(wasteTuple[9]).center(tw_l) + '\n')
         fdWasted.close()
 
