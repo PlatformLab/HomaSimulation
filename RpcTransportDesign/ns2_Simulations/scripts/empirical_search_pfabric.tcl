@@ -202,8 +202,8 @@ for {set i 0} {$i < $topology_spines} {incr i} {
 for {set i 0} {$i < $S} {incr i} {
     set j [expr $i/$topology_spt]
     #set tmpr [expr $link_rate * 1.1]
-    $ns simplex-link $s($i) $n($j) [set link_rate]Gb [expr $host_delay + $mean_link_delay] $switchAlg
-    $ns simplex-link $n($j) $s($i) [set link_rate]Gb [expr $host_delay + $mean_link_delay] $switchAlg
+    $ns simplex-link $s($i) $n($j) [set link_rate]Gb [expr 2*$host_delay + $mean_link_delay] $switchAlg
+    $ns simplex-link $n($j) $s($i) [set link_rate]Gb [expr $host_delay] $switchAlg
     #if {$i == 0} {
     #    set flowmon [$ns makeflowmon Fid]
     #    $ns attach-fmon [$ns link $n($j) $s($i)] $flowmon
@@ -227,7 +227,8 @@ for {set i 0} {$i < $topology_tors} {incr i} {
 }
 
 #############  Agents          #########################
-set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/1460*1500)]
+#set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/1460*1500)]
+set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0)]
 puts "Arrival: Poisson with inter-arrival [expr 1/$lambda * 1000] ms"
 puts "FlowSize: Web Search (DCTCP) with mean = $meanFlowSize"
 
@@ -235,6 +236,17 @@ puts "Setting up connections ..."; flush stdout
 
 set flow_gen 0
 set flow_fin 0
+
+###############stability metric recording###############
+proc printNumActive {} {
+    global flow_gen flow_fin ns sim_end
+    set tNow [$ns now]
+    puts "## sim time: $tNow, #active flows: [expr $flow_gen-$flow_fin] "
+    set tRecNext [expr $tNow+0.001]
+    if {$flow_gen < $sim_end} {
+        $ns at $tRecNext "printNumActive"
+    }
+}
 
 set flowlog [open flow.tr w]
 set init_fid 0
@@ -258,6 +270,7 @@ for {set j 0} {$j < $S } {incr j} {
     }
 }
 
+$ns at 1 "printNumActive"
 puts "Initial agent creation done";flush stdout
 puts "Simulation started!"
 

@@ -1,15 +1,15 @@
 #!/usr/bin/perl -w
-$sim_end = 100000;
+$sim_end = 1000000;
 
 $cap = 10;
-$link_delay = 0.0000002;
-$host_delay = 0.0000025;
-@queueSize = (24);
+$link_delay = 0.000000250;
+$host_delay = 0.0000005;
+@queueSize = (13);
 
-@load = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8);
+@load = (0.1, 0.5, 0.7, 0.75, 0.8);
 
 $connections_per_pair = 1;
-$meanFlowSize = 1138 * 1460;
+$meanFlowSize = 1623 * 1460;
 
 $enableMultiPath = 1;
 @perflowMP = (0);
@@ -18,7 +18,7 @@ $enableMultiPath = 1;
 @ackratio = (1);
 @slowstartrestart = ("true");
 $DCTCP_g = 1.0/16.0;
-@min_rto = (0.000045);
+@min_rto = (0.000024);
 
 $switchAlg = "DropTail";
 @DCTCP_K = (10000);
@@ -44,21 +44,21 @@ $user = "behnamm";
 $top_dir = "/home/behnamm/Research/RpcTransportDesign/ns2_Simulations";
 ###########################################
 $tcl_script = "empirical_search_pfabric";
-$work_dir = "$top_dir/work_dir";
+$work_dir = "/scratch/behnamm/pfabric/rc34/work_dir";
 ###########################################
 # ns source code server
-$ns_source_server = "localhost";
+$ns_source_server = "rc34";
 # ns source code path
 $ns_source_path = "$top_dir"; # we expect tree /ns-allinone-2.34 to be at this directory
                               # for now, this also needs to be the same as $top_dir
 ###########################################
 # worker server List
-@server_list = ("localhost");
+@server_list = ("rc34");
 $server_loop_first = 1;  # First loop across servers, than cores
 ###########################################
 # log destination server
-$log_server = "localhost";
-$log_dir = "$top_dir/logs";
+$log_server = "rcmaster";
+$log_dir = "/scratch/behnamm/pfabric/rc34/logs";
 
 ###########################################
 # Prepare servers
@@ -86,11 +86,11 @@ foreach (@server_list) {
     `ssh $user\@$server 'killall ns'`;
     sleep(1);
 
-    `ssh $user\@$server 'mkdir $work_dir'`;
+    `ssh $user\@$server 'mkdir -p $work_dir'`;
     `ssh $user\@$server 'rm -rf $work_dir/proc*'`;
 }
 
-`ssh $user\@$log_server 'mkdir $log_dir'`;
+`ssh $user\@$log_server 'mkdir -p $log_dir'`;
 `ssh $user\@$log_server 'mkdir $log_dir/logs'`;
 
 
