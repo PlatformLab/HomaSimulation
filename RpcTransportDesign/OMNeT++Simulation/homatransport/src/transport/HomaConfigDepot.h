@@ -92,6 +92,11 @@ class HomaConfigDepot {
     // in PrioResolver class.
     double unschedPrioUsageWeight;
 
+    // If unschedPrioResolutionMode is set to EXPLICIT, then this string defines
+    // the priority cutoff points of unsched bytes for the remaining message
+    // sizes. Example would be "100 1500 9000"
+    std::vector<uint32_t> explicitUnschedPrioCutoff;
+
     // Defines the type of logic sender uses for transmitting messages and pkts
     const char* senderScheme;
 

@@ -53,6 +53,7 @@ PriorityResolver::getUnschedPktsPrio(const OutboundMessage* outbndMsg)
                 outbndMsg->reqUnschedDataVec.size(), 0);
             return unschedPktsPrio;
         }
+        case PrioResolutionMode::EXPLICIT:
         case PrioResolutionMode::STATIC_CBF_GRADUATED: {
             std::vector<uint16_t> unschedPktsPrio;
             for (auto& pkt : outbndMsg->reqUnschedDataVec) {
@@ -84,6 +85,7 @@ PriorityResolver::getSchedPktPrio(const InboundMessage* inbndMsg)
     uint32_t bytesToGrant = inbndMsg->bytesToGrant;
     uint32_t bytesTreatedUnsched = homaConfig->boostTailBytesPrio;
     switch (prioResMode) {
+        case PrioResolutionMode::EXPLICIT:
         case PrioResolutionMode::STATIC_CBF_GRADUATED: {
             if (bytesToGrantOnWire < bytesTreatedUnsched) {
                 return getMesgPrio(bytesToGrant);
@@ -123,6 +125,14 @@ PriorityResolver::setPrioCutOffs()
 {
     prioCutOffs.clear();
     const WorkloadEstimator::CdfVector* vecToUse = NULL;
+    if (prioResMode == PrioResolutionMode::EXPLICIT) {
+        prioCutOffs = homaConfig->explicitUnschedPrioCutoff;
+        if (prioCutOffs.back() != UINT32_MAX) {
+            prioCutOffs.push_back(UINT32_MAX);
+        }
+        return;
+    }
+
     if (prioResMode == PrioResolutionMode::STATIC_CDF_UNIFORM) {
         vecToUse = cdf;
     } else if (prioResMode == PrioResolutionMode::STATIC_CBF_UNIFORM) {
@@ -173,6 +183,8 @@ PriorityResolver::strPrioModeToInt(const char* prioResMode)
         return PrioResolutionMode::STATIC_CBF_UNIFORM;
     } else if (strcmp(prioResMode, "STATIC_CBF_GRADUATED") == 0) {
         return PrioResolutionMode::STATIC_CBF_GRADUATED;
+    } else if (strcmp(prioResMode, "EXPLICIT") == 0) {
+        return PrioResolutionMode::EXPLICIT;
     } else if (strcmp(prioResMode, "FIXED_UNSCHED") == 0) {
         return PrioResolutionMode::STATIC_CBF_GRADUATED;
     } else {

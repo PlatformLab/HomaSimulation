@@ -23,6 +23,7 @@ class PriorityResolver
         STATIC_CDF_UNIFORM,
         STATIC_CBF_UNIFORM,
         STATIC_CBF_GRADUATED,
+        EXPLICIT,
         FIXED_UNSCHED,
         INVALID_PRIO_MODE        // Always the last value
     };

@@ -44,7 +44,7 @@ if __name__ == '__main__':
         if char=='w':
             outputType.wastedBw = True
             hasValidType = True
-            wastedBwFile = 'wastedBw.txt'
+            wastedBwFile = 'wastedBw_prio2.txt'
         if char=='p':
             hasValidType = True
             outputType.prioUsage = True

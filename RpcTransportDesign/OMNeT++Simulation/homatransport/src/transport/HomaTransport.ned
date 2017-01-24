@@ -53,6 +53,11 @@ simple HomaTransport like ITransportScheme
         // Coulde be any of PrioResolutionMode values in PriorityResolver.h
         string unschedPrioResolutionMode;
 
+        // If unschedPrioResolutionMode is set to EXPLICIT,
+        // then this string defines the priority cutoff points of unsched
+        // bytes for the remaining message sizes. Example would be "100 1500 9000"
+        string explicitUnschedPrioCutoff = default("");
+
         // Specifies for the unsched prio level, how many times prio p_i will be
         // used comparing to p_i-1 (p_i is higher prio). Cutoff weight are used
         // in PrioResolver class.

@@ -13,6 +13,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sstream>
 #include "HomaConfigDepot.h"
 
 
@@ -54,6 +55,14 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     xmlConfig = ownerTransport->par("transportConfig").xmlValue();
     workloadType = ownerTransport->par("workloadType").stringValue();
     paramToEnum();
+
+    // read in explicitUnschedPrioCutoff
+    std::istringstream ss(
+        ownerTransport->par("explicitUnschedPrioCutoff").stdstringValue());
+    uint32_t cutoffSize;
+    while (ss >> cutoffSize) {
+        explicitUnschedPrioCutoff.push_back(cutoffSize);
+    }
 }
 
 void

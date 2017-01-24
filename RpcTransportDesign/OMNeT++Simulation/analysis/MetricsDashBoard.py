@@ -894,35 +894,6 @@ def printHomaOutstandingBytes(parsedStats, xmlParsedDic, unit):
     printStatsLine(outstandingBytes.grantBytes, 'Outstanding Grant Bytes:', tw, fw, unit, printKeys)
     printStatsLine(outstandingBytes.totalBytes, 'Outstanding Total Bytes:', tw, fw, unit, printKeys)
 
-def digestQueueLenInfo(queueLenDic, title):
-    queueLenDigest = queueLenDic.queueLenDigest
-    totalCount = sum(queueLenDic.count) * 1.0
-    keyList = ['meanCnt', 'empty', 'onePkt', 'stddevCnt', 'meanBytes', 'stddevBytes']
-    for key in queueLenDic.keys():
-        if len(queueLenDic[key]) > 0 and key in keyList:
-            queueLenDigest[key] = 0
-
-    if totalCount != 0:
-        for i,cnt in enumerate(queueLenDic.count):
-            for key in queueLenDigest.keys():
-                if not math.isnan(queueLenDic.access(key)[i]):
-                    queueLenDigest[key] += queueLenDic.access(key)[i] * cnt
-
-        for key in queueLenDigest.keys():
-                queueLenDigest[key] /= totalCount
-
-    for key in queueLenDic.keys():
-        if len(queueLenDic[key]) == 0 and key in keyList:
-            queueLenDigest[key] = nan
-
-    queueLenDigest.title = title
-    if len(queueLenDic.minCnt) > 0:
-        queueLenDigest.minCnt = min(queueLenDic.minCnt)
-        queueLenDigest.minBytes = min(queueLenDic.minBytes)
-    if len(queueLenDic.maxCnt) > 0:
-        queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
-        queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
-
 def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
     nicLinkSpeed = int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
     senderHostIds = xmlParsedDic.senderIds
@@ -1215,21 +1186,37 @@ def printPrioUsageStats(prioUsageStatsDigest):
 
     return
 
-def printQueueLength(parsedStats, xmlParsedDic):
-    printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
-    tw = 15
-    fw = 9
-    lineMax = 105
-    title = 'Queue Length (Stats Collected At Pkt Arrivals)'
-    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' '))
-    print("="*lineMax)
-    print("Queue Location".ljust(tw) + 'Mean'.center(fw) + 'StdDev'.center(fw) + 'Mean'.center(fw) + 'StdDev'.center(fw) +
-             'Empty'.center(fw) + 'OnePkt'.center(fw) + 'Min'.center(fw) + 'Min'.center(fw) + 'Max'.center(fw) + 'Max'.center(fw))
-    print("".ljust(tw) + '(Pkts)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(KB)'.center(fw) +
-             '%'.center(fw) + '%'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw))
-    print("_"*lineMax)
+def digestQueueLenInfo(queueLenDic, title):
+    queueLenDigest = queueLenDic.queueLenDigest
+    totalCount = sum(queueLenDic.count) * 1.0
+    keyList = ['meanCnt', 'empty', 'onePkt', 'stddevCnt', 'meanBytes', 'stddevBytes']
+    for key in queueLenDic.keys():
+        if len(queueLenDic[key]) > 0 and key in keyList:
+            queueLenDigest[key] = 0
 
+    if totalCount != 0:
+        for i,cnt in enumerate(queueLenDic.count):
+            for key in queueLenDigest.keys():
+                if not math.isnan(queueLenDic.access(key)[i]):
+                    queueLenDigest[key] += queueLenDic.access(key)[i] * cnt
+
+        for key in queueLenDigest.keys():
+                queueLenDigest[key] /= totalCount
+
+    for key in queueLenDic.keys():
+        if len(queueLenDic[key]) == 0 and key in keyList:
+            queueLenDigest[key] = nan
+
+    queueLenDigest.title = title
+    if len(queueLenDic.minCnt) > 0:
+        queueLenDigest.minCnt = min(queueLenDic.minCnt)
+        queueLenDigest.minBytes = min(queueLenDic.minBytes)
+    if len(queueLenDic.maxCnt) > 0:
+        queueLenDigest.maxCnt = max(queueLenDic.maxCnt)
+        queueLenDigest.maxBytes = max(queueLenDic.maxBytes)
+
+def computeQueueLength(parsedStats, xmlParsedDic):
+    printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
     queueLen = AttrDict()
     keysAll = printKeys[:]
     keysAll.append('count')
@@ -1241,6 +1228,7 @@ def printQueueLength(parsedStats, xmlParsedDic):
         queueLen.sxTors.up.nic[key] = []
         queueLen.tors.down.nic[key] = []
         queueLen.rxTors.down.nic[key] = []
+        queueLen.aggrs.nic[key] = []
 
     for host in parsedStats.hosts.keys():
         hostId = int(re.match('host\[([0-9]+)]', host).group(1))
@@ -1378,19 +1366,66 @@ def printQueueLength(parsedStats, xmlParsedDic):
                     queueLen.sxTors.up.nic.meanBytes.append(nicQueueBytesMean)
                     queueLen.sxTors.up.nic.stddevBytes.append(nicQueueBytesStddev)
 
+    for aggrKey in parsedStats.aggrs.keys():
+        aggr = parsedStats.aggrs[aggrKey]
+        aggrId = int(re.match('aggRouter\[([0-9]+)]', aggrKey).group(1))
+        for ifaceId in range(0, int(parsedStats.generalInfo.numTors)):
+            nicQueueLenEmpty = aggr.access('eth[{0}].queue.dataQueue.\"queue empty (%)\".value'.format(ifaceId))
+            nicQueueLenOnePkt = aggr.access('eth[{0}].queue.dataQueue.\"queue length one (%)\".value'.format(ifaceId))
+            nicQueueLenMin = aggr.access('eth[{0}].queue.dataQueue.queueLength:stats.min'.format(ifaceId))
+            nicQueueLenCnt = aggr.access('eth[{0}].queue.dataQueue.queueLength:stats.count'.format(ifaceId))
+            nicQueueLenMax = aggr.access('eth[{0}].queue.dataQueue.queueLength:stats.max'.format(ifaceId))
+            nicQueueLenMean = aggr.access('eth[{0}].queue.dataQueue.queueLength:stats.mean'.format(ifaceId))
+            nicQueueLenStddev = aggr.access('eth[{0}].queue.dataQueue.queueLength:stats.stddev'.format(ifaceId))
+            nicQueueBytesMin = aggr.access('eth[{0}].queue.dataQueue.queueByteLength:stats.min'.format(ifaceId))/2**10
+            nicQueueBytesMax = aggr.access('eth[{0}].queue.dataQueue.queueByteLength:stats.max'.format(ifaceId))/2**10
+            nicQueueBytesMean = aggr.access('eth[{0}].queue.dataQueue.queueByteLength:stats.mean'.format(ifaceId))/2**10
+            nicQueueBytesStddev = aggr.access('eth[{0}].queue.dataQueue.queueByteLength:stats.stddev'.format(ifaceId))/2**10
+
+            queueLen.aggrs.nic.minCnt.append(nicQueueLenMin)
+            queueLen.aggrs.nic.count.append(nicQueueLenCnt)
+            queueLen.aggrs.nic.empty.append(nicQueueLenEmpty)
+            queueLen.aggrs.nic.onePkt.append(nicQueueLenOnePkt)
+            queueLen.aggrs.nic.maxCnt.append(nicQueueLenMax)
+            queueLen.aggrs.nic.meanCnt.append(nicQueueLenMean)
+            queueLen.aggrs.nic.stddevCnt.append(nicQueueLenStddev)
+            queueLen.aggrs.nic.minBytes.append(nicQueueBytesMin)
+            queueLen.aggrs.nic.maxBytes.append(nicQueueBytesMax)
+            queueLen.aggrs.nic.meanBytes.append(nicQueueBytesMean)
+            queueLen.aggrs.nic.stddevBytes.append(nicQueueBytesStddev)
+
     digestQueueLenInfo(queueLen.sxHosts.transport, 'SX Transports')
-    printStatsLine(queueLen.sxHosts.transport.queueLenDigest, queueLen.sxHosts.transport.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.sxHosts.nic, 'SX NICs')
-    printStatsLine(queueLen.sxHosts.nic.queueLenDigest, queueLen.sxHosts.nic.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.hosts.nic, 'All NICs')
-    printStatsLine(queueLen.hosts.nic.queueLenDigest, queueLen.hosts.nic.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.sxTors.up.nic, 'SX TORs Up')
-    printStatsLine(queueLen.sxTors.up.nic.queueLenDigest, queueLen.sxTors.up.nic.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.tors.up.nic, 'All TORs Up')
-    printStatsLine(queueLen.tors.up.nic.queueLenDigest, queueLen.tors.up.nic.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.rxTors.down.nic, 'RX TORs Down')
-    printStatsLine(queueLen.rxTors.down.nic.queueLenDigest, queueLen.rxTors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
     digestQueueLenInfo(queueLen.tors.down.nic, 'All TORs Down')
+    digestQueueLenInfo(queueLen.aggrs.nic, 'All AGGRs')
+    return  queueLen
+
+def printQueueLength(queueLen):
+    printKeys = ['meanCnt', 'stddevCnt', 'meanBytes', 'stddevBytes', 'empty', 'onePkt', 'minCnt', 'minBytes', 'maxCnt', 'maxBytes']
+    tw = 15
+    fw = 9
+    lineMax = 105
+    title = 'Queue Length (Stats Collected At Pkt Arrivals)'
+    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
+            '\n' + ('-'*len(title)).center(lineMax,' '))
+    print("="*lineMax)
+    print("Queue Location".ljust(tw) + 'Mean'.center(fw) + 'StdDev'.center(fw) + 'Mean'.center(fw) + 'StdDev'.center(fw) +
+             'Empty'.center(fw) + 'OnePkt'.center(fw) + 'Min'.center(fw) + 'Min'.center(fw) + 'Max'.center(fw) + 'Max'.center(fw))
+    print("".ljust(tw) + '(Pkts)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(KB)'.center(fw) +
+             '%'.center(fw) + '%'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw) + '(Pkts)'.center(fw) + '(KB)'.center(fw))
+    print("_"*lineMax)
+
+    printStatsLine(queueLen.sxHosts.transport.queueLenDigest, queueLen.sxHosts.transport.queueLenDigest.title, tw, fw, '', printKeys)
+    printStatsLine(queueLen.sxHosts.nic.queueLenDigest, queueLen.sxHosts.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    printStatsLine(queueLen.hosts.nic.queueLenDigest, queueLen.hosts.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    printStatsLine(queueLen.sxTors.up.nic.queueLenDigest, queueLen.sxTors.up.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    printStatsLine(queueLen.tors.up.nic.queueLenDigest, queueLen.tors.up.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    printStatsLine(queueLen.aggrs.nic.queueLenDigest, queueLen.aggrs.nic.queueLenDigest.title, tw, fw, '', printKeys)
+    printStatsLine(queueLen.rxTors.down.nic.queueLenDigest, queueLen.rxTors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
     printStatsLine(queueLen.tors.down.nic.queueLenDigest, queueLen.tors.down.nic.queueLenDigest.title, tw, fw, '', printKeys)
 
 def main():
@@ -1435,7 +1470,8 @@ def main():
         printPrioUsageStats(prioUsageStatsDigest)
     trafficDic = computeBytesAndRates(parsedStats, xmlParsedDic)
     printBytesAndRates(trafficDic)
-    printQueueLength(parsedStats, xmlParsedDic)
+    queueLen = computeQueueLength(parsedStats, xmlParsedDic)
+    printQueueLength(queueLen)
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     msgBytesOnWireDigest = AttrDict()
     msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
