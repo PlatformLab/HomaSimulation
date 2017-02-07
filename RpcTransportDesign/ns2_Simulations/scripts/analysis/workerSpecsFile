@@ -1,7 +1,4 @@
 # list of worker machines and cores
 # worker_name   num_available_cores
 
-rc30    8
-rc31    8
-rc32    8
-rc33    8
+rcmonster    8

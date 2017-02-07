@@ -1,8 +1,3 @@
 #list of ns2 flow.tr file names, one file per file with absolute path
 
-/scratch/behnamm/pfabric/rc34/logs/125-search-pfabric/logs/004-empirical_search_pfabric-s16-x1-q65-load0.7-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto8.58e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-/scratch/behnamm/pfabric/rc34/logs/125-search-pfabric/logs/002-empirical_search_pfabric-s16-x1-q65-load0.5-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto8.58e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-/scratch/behnamm/pfabric/rc34/logs/125-search-pfabric/logs/006-empirical_search_pfabric-s16-x1-q65-load0.8-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto8.58e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-/scratch/behnamm/pfabric/rc34/logs/125-search-pfabric/logs/005-empirical_search_pfabric-s16-x1-q65-load0.75-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto8.58e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-/scratch/behnamm/pfabric/rc34/logs/125-search-pfabric/logs/001-empirical_search_pfabric-s16-x1-q65-load0.1-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto8.58e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
-/scratch/behnamm/pfabric/rc34/logs/125-search-pfabric/logs/003-empirical_search_pfabric-s16-x1-q65-load0.6-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto8.58e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/test/22-search-pfabric/006-empirical_search_pfabric-s16-x1-q13-load0.8-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr

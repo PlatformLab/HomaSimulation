@@ -41,7 +41,8 @@ hostNicSxThinkTime = 5e-7 # seconds
 isFabricCutThrough = False
 unschedBytes = 10000
 # directory under which output files of this script will be stored
-targetDir = '/home/behnamm/Research/RpcTransportDesign/ns2_Simulations/scripts/analysis'
+targetDir = '/home/behnamm/Research/RpcTransportDesign/'\
+    'ns2_Simulations/scripts/analysis'
 
 rangesDic = {\
     "FABRICATED_HEAVY_MIDDLE" : [51, 52, 53, 54, 55, 56, 57, 58, 59, 60,\
@@ -114,12 +115,13 @@ def serverIdToIp(id):
     ipInt = 10*(1<<24) + podId*(1<<16) + torId*(1<<8) + serverIdInTor
     return ipInt
 
-def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArrivals=None):
+def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp,
+        prevPktArrivals=None):
     """
-    For a train of txPkts as [pkt0.byteOnWire, pkt1.byteOnWire,.. ] that start transmission
-    at sender at time txStart, this method returns the arrival time of last bit of this
-    train at the receiver. prevPktArrivals is the arrival times of
-    txPkts train prior this one for this message.
+    For a train of txPkts as [pkt0.byteOnWire, pkt1.byteOnWire,.. ] that start
+    transmission at sender at time txStart, this method returns the arrival time
+    of last bit of this train at the receiver. prevPktArrivals is the arrival
+    times of txPkts train prior this one for this message.
     """
     # Returns the arrival time of last pkt in pkts list when pkts are going
     # across the network through links with speeds in linkSpeeds list
@@ -169,9 +171,9 @@ def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArriva
         if not(isFabricCutThrough):
             linkSpeeds = [nicLinkSpeed] * 2
         else:
-            # In order to abuse the pktsDeliveryTime function for finding network
-            # serializaiton delay when switches are cut through, we need to
-            # define linkSpeeds like below
+            # In order to abuse the pktsDeliveryTime function for finding
+            # network serializaiton delay when switches are cut through, we need
+            # to define linkSpeeds like below
             linkSpeeds = [nicLinkSpeed]
 
     elif ((sendrIntIp >> 16) & 255) == ((recvrIntIp >> 16) & 255):
@@ -209,7 +211,8 @@ def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp, prevPktArriva
         else:
             linkSpeeds = [nicLinkSpeed, fabricLinkSpeed]
     else:
-        raise Exception, 'Sender and receiver IPs dont abide the rules in config.xml file.'
+        raise Exception, 'Sender and receiver IPs dont abide the rules in'\
+            ' config.xml file.'
 
     # Add network serialization delays at switches and sender nic
     pktArrivalsAtHops = pktsDeliveryTime(linkSpeeds, txPkts)
@@ -318,6 +321,7 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
     N = 0.0
     B = 0.0
     sumBytes = dict()
+    sumStretch = 0.0
     for line in fd :
         words = line.split()
         try:
@@ -336,11 +340,12 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
 
         mesgPkts = [1500 for i in range(mesgBytes/1460)] +\
                 ([(mesgBytes%1460) + 40] if (mesgBytes%1460) else [])
-        #minMct, pktArrivalsAtHops = getMinMct_generalized(
-        #    0, mesgPkts, srcIp, destIp)
-        minMct = getMinMct_simplified(
-            0, mesgPkts[0], sum(mesgPkts), srcIp, destIp)
+        minMct, pktArrivalsAtHops = getMinMct_generalized(
+            0, mesgPkts, srcIp, destIp)
+        #minMct = getMinMct_simplified(
+        #    0, mesgPkts[0], sum(mesgPkts), srcIp, destIp)
         stretch = mct/minMct
+        sumStretch += stretch
         msgrangeInd = bisect.bisect_left(ranges, mesgBytes)
         msgrange = 'inf' if msgrangeInd==len(ranges) else ranges[msgrangeInd]
 
@@ -364,25 +369,26 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
         ninety9Ind = int(floor(n*0.99))
         sizePerc = n / N * 100
         bytesPerc = sumBytes[msgrange] / B * 100
-        recordLine =\
-            '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-            'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
-            unschedBytes, mean(stretch), 'NA', 'NA')
+        recordLine = '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t'\
+            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format('pfabric', loadFactor,
+            workload, msgrange, sizePerc, bytesPerc, unschedBytes,
+            mean(stretch), 'NA', 'NA')
         recordLines.append(recordLine)
 
-        recordLine =\
-            '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-            'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
-            unschedBytes, 'NA', stretch[medianInd], 'NA')
+        recordLine = '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t'\
+            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format('pfabric', loadFactor,
+            workload, msgrange, sizePerc, bytesPerc, unschedBytes, 'NA',
+            stretch[medianInd], 'NA')
         recordLines.append(recordLine)
 
-        recordLine =\
-            '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format(
-            'pfabric', loadFactor, workload, msgrange, sizePerc, bytesPerc,
-            unschedBytes, 'NA', 'NA', stretch[ninety9Ind])
+        recordLine = '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t'\
+            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format( 'pfabric', loadFactor,
+            workload, msgrange, sizePerc, bytesPerc, unschedBytes, 'NA', 'NA',
+            stretch[ninety9Ind])
         recordLines.append(recordLine)
     #t1 = time.time()
-    #print "total processing time: {0}, for flow file:\n\t{1}".format(t1-t0, flowFile)
+    #print "total processing time: {0}, for flow file:\n\t{1}".format(
+    #t1-t0, flowFile)
 
     # use number of files in the directory as suffix to the result file name
     # and write the stretch metrics in the file
@@ -392,6 +398,9 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
         'StretchVsTransport%d-%s-%.2f.txt'%(numFiles, wltype, loadFactor))
     resultFd = open(resultFile, 'w')
     [resultFd.write(recordLine) for recordLine in recordLines]
+    resultFd.write("## Average Stretch: {0}, Average Size: {1}".format(
+        sumStretch/N, sum(
+        [sumbytes for msgrange, sumbytes in sumBytes.iteritems()])/N))
     resultFd.flush()
     resultFd.close()
 
