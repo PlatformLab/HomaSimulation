@@ -2756,7 +2756,7 @@ step6:
 
 				//printf("flow_remaining before dec = %d\n" , flow_remaining_);
 				if (flow_remaining_ > 0)
-				       flow_remaining_ -= datalen; // Mohammad
+				       flow_remaining_ -= (rcv_nxt_ - rcv_nxt_old_); // Mohammad
 
 				if (flow_remaining_ == 0) {
 				       flags_ |= TF_ACKNOW;
