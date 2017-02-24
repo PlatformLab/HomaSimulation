@@ -38,7 +38,9 @@ edgeLinkDelay = 0 # seconds
 fabricLinkDelay = 0 # seconds
 hostSwTurnAroundTime = 5e-7 # seconds
 hostNicSxThinkTime = 5e-7 # seconds
+ackSize = 40 #in bytes
 isFabricCutThrough = False
+twoWayStretch = False # if true, stretch is computed by completion at sender
 unschedBytes = 10000
 # directory under which output files of this script will be stored
 targetDir = '/home/behnamm/Research/RpcTransportDesign/'\
@@ -192,6 +194,7 @@ def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp,
         else:
             linkSpeeds = [nicLinkSpeed, fabricLinkSpeed]
 
+
     elif ((sendrIntIp >> 24) & 255) == ((recvrIntIp >> 24) & 255):
         # receiver and sender in two different pod
 
@@ -210,6 +213,7 @@ def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp,
                 fabricLinkSpeed, nicLinkSpeed]
         else:
             linkSpeeds = [nicLinkSpeed, fabricLinkSpeed]
+
     else:
         raise Exception, 'Sender and receiver IPs dont abide the rules in'\
             ' config.xml file.'
@@ -218,10 +222,17 @@ def getMinMct_generalized(txStart, txPkts, sendrIntIp, recvrIntIp,
     pktArrivalsAtHops = pktsDeliveryTime(linkSpeeds, txPkts)
     totalDelay += pktArrivalsAtHops[-1]
 
+    # fixed delays
+    fixedDelays =  [hostSwTurnAroundTime] * 2 + [hostNicSxThinkTime] +\
+        linkDelays + switchFixDelays
+
+    if twoWayStretch:
+        fixedDelays *= 2
+        ackArrivalAtSender = pktsDeliveryTime(linkSpeeds, [ackSize])
+        totalDelay += ackArrivalAtSender[-1]
+
     # Add fixed delays:
-    totalDelay +=\
-        hostSwTurnAroundTime * 2 + hostNicSxThinkTime +\
-        sum(linkDelays) + sum(switchFixDelays)
+    totalDelay += sum(fixedDelays)
 
     return totalDelay, pktArrivalsAtHops
 
@@ -289,17 +300,24 @@ def getMinMct_simplified(txStart, firstPkt, totalBytes, sendrIntIp, recvrIntIp):
             linkSpeeds = [nicLinkSpeed, fabricLinkSpeed, fabricLinkSpeed,
                           fabricLinkSpeed, fabricLinkSpeed, nicLinkSpeed]
         totalDelay +=\
-            sum(firstPkt[0]* 8.0 * 1e-9 / linkSpeed for linkSpeed in linkSpeeds)
-
+            sum(firstPkt* 8.0 * 1e-9 / linkSpeed for linkSpeed in linkSpeeds)
 
     else:
         raise Exception, 'Sender and receiver IPs dont abide the rules \
             in config.xml file.'
 
+    # fixed delays
+    fixedDelays =  [hostSwTurnAroundTime] * 2 + [hostNicSxThinkTime] +\
+        linkDelays + switchFixDelays
+
+    if twoWayStretch:
+        fixedDelays *= 2
+        totalDelay += ackSize * 8.0 * 1e-9 / nicLinkSpeed
+        totalDelay +=\
+            sum(ackSize * 8.0 * 1e-9 / linkSpeed for linkSpeed in linkSpeeds)
+
     # Add fixed delays:
-    totalDelay +=\
-        hostSwTurnAroundTime * 2 + hostNicSxThinkTime +\
-        sum(linkDelays) + sum(switchFixDelays)
+    totalDelay += sum(fixedDelays)
 
     return totalDelay
 

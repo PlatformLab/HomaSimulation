@@ -1,3 +1,5 @@
 #list of ns2 flow.tr file names, one file per file with absolute path
 
-/scratch/behnamm/pfabric/test/22-search-pfabric/006-empirical_search_pfabric-s16-x1-q13-load0.8-avesize2547700-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/test/googleAllRpc/212-searchallrpc-pfabric/001-empirical_googleallrpc_pfabric-s16-x1-q13-load0.8-avesize2927.354-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/test/hadoop/1216-hadoop-pfabric/004-empirical_facebookhadoop_pfabric-s16-x1-q13-load0.8-avesize127796.6-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr
+/scratch/behnamm/pfabric/test/googleSearchRpc/212-searchrpc-pfabric/004-empirical_googlerpc_pfabric-s16-x1-q13-load0.8-avesize440.79-mp0-DCTCP-Sack-ar1-SSRtrue-DropTail10000-minrto2.4e-05-droptrue-prio2-dqtrue-prob5-kotrue/flow.tr

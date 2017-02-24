@@ -227,8 +227,7 @@ for {set i 0} {$i < $topology_tors} {incr i} {
 }
 
 #############  Agents          #########################
-#set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/1460*1500)]
-set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0)]
+set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/2547262*2686844)]
 puts "Arrival: Poisson with inter-arrival [expr 1/$lambda * 1000] ms"
 puts "FlowSize: Web Search (DCTCP) with mean = $meanFlowSize"
 
