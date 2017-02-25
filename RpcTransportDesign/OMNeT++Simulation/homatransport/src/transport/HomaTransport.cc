@@ -1585,7 +1585,6 @@ HomaTransport::InboundMessage::InboundMessage()
     , msgCreationTime(SIMTIME_ZERO)
     , reqArrivalTime(simTime())
     , lastGrantTime(simTime())
-    , highPrioSchedDelayBytes(0)
     , bytesRecvdPerPrio()
     , scheduledBytesPerPrio()
     , unschedToRecvPerPrio()
@@ -1617,7 +1616,6 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , msgCreationTime(SIMTIME_ZERO)
     , reqArrivalTime(simTime())
     , lastGrantTime(simTime())
-    , highPrioSchedDelayBytes(0)
     , bytesRecvdPerPrio()
     , scheduledBytesPerPrio()
     , unschedToRecvPerPrio()
@@ -1684,38 +1682,9 @@ HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize,
     grantPkt->setByteLength(grantPkt->headerSize());
     grantPkt->setPriority(0);
 
-    int allHighPrioInflightBytes = 0;
-    int grantedBytesOnWire =
-        HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
+    int grantedBytesOnWire = HomaPkt::getBytesOnWire(grantSize,
+        PktType::SCHED_DATA);
     rxScheduler->transport->outstandingGrantBytes += grantedBytesOnWire;
-
-    // Calculate the high priority sched. delay
-    if (bytesToGrant == msgSize-totalUnschedBytes) {
-
-        // This is the first grant we're sending for this message. If the
-        // outstanding bytes at req. arrival has been more than
-        // maxOutstandingRecvBytes, then the receiver obviously has delayed the
-        // grant for this message. So we need to account how much of that delay
-        // has been because of high prio messages.
-        for (size_t i = 0; i <= schedPrio; i++) {
-            allHighPrioInflightBytes += sumInflightUnschedPerPrio[i];
-            allHighPrioInflightBytes += sumInflightSchedPerPrio[i];
-        }
-
-        if (allHighPrioInflightBytes + grantedBytesOnWire >
-                (int)homaConfig->maxOutstandingRecvBytes) {
-            highPrioSchedDelayBytes +=
-                (allHighPrioInflightBytes + grantedBytesOnWire -
-                homaConfig->maxOutstandingRecvBytes);
-        }
-    }
-
-    for (size_t i = 0; i <= schedPrio; i++) {
-        highPrioSchedDelayBytes += (rxScheduler->scheduledBytesPerPrio[i] -
-            this->scheduledBytesPerPrio[i]);
-        highPrioSchedDelayBytes += (rxScheduler->unschedToRecvPerPrio[i] -
-            this->unschedToRecvPerPrio[i]);
-    }
 
     // update internal structure
     this->bytesToGrant -= grantSize;
@@ -1767,8 +1736,6 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
         }
         simtime_t schedDelay = totalSchedTime - minPossibleSchedTime;
         rxMsg->setTransportSchedDelay(schedDelay);
-        rxMsg->setTransportSchedPreemptionLag(schedDelay.dbl() -
-            highPrioSchedDelayBytes*8*1e-9/homaConfig->nicLinkSpeed);
     }
     return rxMsg;
 }
@@ -1815,7 +1782,6 @@ HomaTransport::InboundMessage::copy(const InboundMessage& other)
     this->msgCreationTime = other.msgCreationTime;
     this->reqArrivalTime = other.reqArrivalTime;
     this->lastGrantTime = other.lastGrantTime;
-    this->highPrioSchedDelayBytes = other.highPrioSchedDelayBytes;
     this->bytesRecvdPerPrio = other.bytesRecvdPerPrio;
     this->scheduledBytesPerPrio = other.scheduledBytesPerPrio;
     this->unschedToRecvPerPrio = other.unschedToRecvPerPrio;

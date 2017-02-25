@@ -68,7 +68,6 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @statisticTemplate[msgRangesE2EStretch](title="msg stretch"; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesQueuingDelay](title="msg queuing delay";unit=s; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesTransportSchedDelay](title="transport scheduling delay";unit=s; record=count,stats,histogram; interpolationmode=none);
-        @statisticTemplate[msgRangesTransportSchedPreemptionLag](title="transport scheduling preemption lag";unit=s; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesBytesOnWire](title="total bytes on wire";record=stats; interpolationmode=none);
 
     gates:

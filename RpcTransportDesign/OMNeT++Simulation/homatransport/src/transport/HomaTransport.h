@@ -37,10 +37,10 @@ class PriorityResolver;
 
 /**
  * A grant based, receiver driven, congection control transport protocol over
- * UDP datagram. For every message transmission, the sender side sends a req.
- * pkt defining the length of the message. The reciever on the other side send a
- * grant every packet time for the shortest remaining outstanding message among
- * all outstanding messages.
+ * UDP datagrams. For every message transmission, the sender side sends a req.
+ * pkt defining the length of the message. The reciever on the other side sends
+ * a grant every packet time for the shortest remaining outstanding message
+ * among all outstanding messages.
  */
 class HomaTransport : public cSimpleModule
 {
@@ -380,11 +380,6 @@ class HomaTransport : public cSimpleModule
         // the constructor and must only be updated by the prepareGrant()
         // method.
         simtime_t lastGrantTime;
-
-        // Tracks the amoung of time this message has been delayed because of
-        // other high priority grants or unsched bytes that preempted this
-        // message.
-        double highPrioSchedDelayBytes;
 
         //***************************************************************//
         //****Below variables are snapshots, first after construction****//

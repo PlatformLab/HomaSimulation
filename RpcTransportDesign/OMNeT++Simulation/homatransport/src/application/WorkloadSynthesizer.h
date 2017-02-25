@@ -93,7 +93,6 @@ class WorkloadSynthesizer : public cSimpleModule
     std::vector<simsignal_t> msgE2EStretchSignalVec;
     std::vector<simsignal_t> msgQueueDelaySignalVec;
     std::vector<simsignal_t> msgTransprotSchedDelaySignalVec;
-    std::vector<simsignal_t> msgTransprotSchedPreemptionLagSignalVec;
 
   PROTECTED:
     virtual void initialize();

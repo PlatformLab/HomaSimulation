@@ -531,48 +531,20 @@ def printTransportSchedDelay(transportSchedDelayDigest, unit):
         printStatsLine(delay, '({0}, {1}]'.format(sizeLowBound[i], delay.sizeUpBound), tw, fw, 'us', printKeys)
 
 
-    title = 'Receiver Scheduler Preemption Lag For Different Ranges of Message Sizes'
-    print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
-            '\n' + ('-'*len(title)).center(lineMax,' '))
-
-    print("="*lineMax)
-    print("Msg Size Range".ljust(tw) + 'mean'.center(fw) + 'stddev'.center(fw) + 'min'.center(fw) +
-            'median'.center(fw) + '75%ile'.center(fw) + '99%ile'.center(fw) +
-            'max'.center(fw) + 'count'.center(fw) + 'count'.center(fw) + 'bytes'.center(fw) + 'bytes'.center(fw))
-    print("".ljust(tw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
-            '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) + '({0})'.format(unit).center(fw) +
-            '({0})'.format(unit).center(fw) + ''.center(fw) + '(%)'.center(fw) + '(KB)'.center(fw) + '(%)'.center(fw))
-    print("_"*lineMax)
-
-    delays = transportSchedDelayDigest.preemptionLag
-    sizeLowBound = ['0'] + [delay.sizeUpBound for delay in delays[0:len(delays)-1]]
-    for i, delay in enumerate(delays):
-        printStatsLine(delay, '({0}, {1}]'.format(sizeLowBound[i], delay.sizeUpBound), tw, fw, 'us', printKeys)
-
-
-
 def transportSchedDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest):
     receiverHostIds = xmlParsedDic.receiverIds
     sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:]
     sizes.append('Huge')
     transportSchedDelayDigest.totalDelay = []
-    transportSchedDelayDigest.preemptionLag = []
 
     for size in sizes:
         delayList = list()
-        lagList = list()
         for id in receiverHostIds:
             delayHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:histogram.bins'.format(id, size)
             delayStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedDelay:stats'.format(id, size)
             delayForSize = AttrDict()
             delayForSize = getInterestingModuleStats(hosts, delayStatsKey, delayHistogramKey)
             delayList.append(delayForSize)
-
-            preemptLagHistogramKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedPreemptionLag:histogram.bins'.format(id, size)
-            preemptLagStatsKey = 'host[{0}].trafficGeneratorApp[0].msg{1}TransportSchedPreemptionLag:stats'.format(id, size)
-            preemptLagForSize = AttrDict()
-            preemptLagForSize = getInterestingModuleStats(hosts, preemptLagStatsKey, preemptLagHistogramKey)
-            lagList.append(preemptLagForSize)
 
         delayDigest = AttrDict()
         delayDigest = digestModulesStats(delayList)
@@ -581,20 +553,9 @@ def transportSchedDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, 
         delayDigest.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
         transportSchedDelayDigest.totalDelay.append(delayDigest)
 
-        lagDigest = AttrDict()
-        lagDigest = digestModulesStats(lagList)
-        lagDigest.sizeUpBound = '{0}'.format(size)
-        lagDigest.bytesPercent = msgBytesOnWireDigest[size].bytesPercent
-        lagDigest.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
-        transportSchedDelayDigest.preemptionLag.append(lagDigest)
-
-
     totalDelayCnt = sum([delay.count for delay in transportSchedDelayDigest.totalDelay])
-    totalLagCnt = sum([delay.count for delay in transportSchedDelayDigest.preemptionLag])
     for sizedDelay in transportSchedDelayDigest.totalDelay:
         sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt
-    for sizedLag in transportSchedDelayDigest.preemptionLag:
-        sizedLag.cntPercent = sizedLag.count * 100.0 / totalLagCnt
 
     return transportSchedDelayDigest
 
