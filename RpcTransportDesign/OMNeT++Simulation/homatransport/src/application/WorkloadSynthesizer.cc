@@ -552,7 +552,6 @@ WorkloadSynthesizer::idealMsgEndToEndDelay(AppMessage* rcvdMsg)
     uint32_t lastPartialFrameData =
             rcvdMsg->getByteLength() % maxDataBytesPerEthFrame;
 
-
     totalBytesTranmitted = numFullEthFrame *
             (MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_HDR_SIZE +
             ETHERNET_CRC_SIZE + ETHERNET_PREAMBLE_SIZE + INTER_PKT_GAP);

@@ -143,11 +143,11 @@ class HomaTransport : public cSimpleModule
         // in the application.
         simtime_t msgCreationTime;
 
-        // Priority Queue containing all sched/unsched pkts set to be sent out
+        // Priority Queue containing all sched/unsched pkts are to be sent out
         // for this message and are waiting for transmission.
         OutbndPktQueue txPkts;
 
-        // Set  of all sched pkts ready for transmission
+        // Set of all sched pkts ready for transmission
         std::unordered_set<HomaPkt*> txSchedPkts;
 
         // The SendController that manages the transmission of this msg.
@@ -226,7 +226,7 @@ class HomaTransport : public cSimpleModule
         // The hash map from the msgId to outstanding messages.
         OutboundMsgMap outboundMsgMap;
 
-        // Each entry (ie. map value) of is a sorted set of all outbound
+        // Each entry (ie. map value) is a sorted set of all outbound
         // messages for a specific receiver mapped to the ip address of that
         // receiver (ie. map key).
         std::unordered_map<uint32_t, std::unordered_set<OutboundMessage*>>
@@ -563,7 +563,7 @@ class HomaTransport : public cSimpleModule
         uint64_t unschedBytesToRecv;
 
         // Tracks the begining of time periods during which outstanding bytes is
-        // nonzero.
+        // nonzero. Such periods are defined as active periods.
         simtime_t activePeriodStart;
 
         // Tracks the bytes received during each active period.
@@ -620,7 +620,7 @@ class HomaTransport : public cSimpleModule
     void handleRecvdPkt(cPacket* ptk);
     void processStart();
     void testAndEmitStabilitySignal();
-    void registerTemplatedStats(uint16_t numPrio);
+    void registerTemplatedStats();
 
     /**
      * A self message essentially models a timer for this transport and can have
@@ -628,11 +628,11 @@ class HomaTransport : public cSimpleModule
      */
     enum SelfMsgKind
     {
-        START = 1,  // Timer type when the transport is in initialization phase.
-        GRANT = 2,  // Timer type for common state of a grant timer.
-        SEND  = 3,  // Timer type for common state of a send timer.
-        EMITTER = 4,// Timer type for common state of emitSignalTimer.
-        STOP  = 5   // Timer type when the transport is in cleaning phase.
+        START = 1,   // When the transport is in initialization phase.
+        GRANT = 2,   // For the grant timer when it's sending grants.
+        SEND  = 3,   // For the send timer, under normal transmit state.
+        EMITTER = 4, // When emitSignalTimer is ready to be scheduled.
+        STOP  = 5    // When trasnport shutting down and in the cleaning phase.
     };
 
     /**
@@ -687,15 +687,15 @@ class HomaTransport : public cSimpleModule
     // because of not receiving timely grants from receiver.
     static simsignal_t sxActiveBytesSignal;
 
-    // Signal for recording sender delay in transmitting sched. packets. This
-    // delay can translate to bubbles in receiver's link.
+    // Signal for recording sender's delay in transmitting sched. packets. This
+    // delay may translate to bubbles in the receiver's link.
     static simsignal_t sxSchedPktDelaySignal;
 
     // Signal for recording sender delay in transmitting unsched. packets that
     // might translate to bubbles in receiver's link.
     static simsignal_t sxUnschedPktDelaySignal;
 
-    // Signal for tracking the statistics on how priorities are being used.
+    // Templated signals for tracking priority usage statistics.
     std::vector<simsignal_t> priorityStatsSignals;
 
     // Handles the transmission of outbound messages based on the logic of

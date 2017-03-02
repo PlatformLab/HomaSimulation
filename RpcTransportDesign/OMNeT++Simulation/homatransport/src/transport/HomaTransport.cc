@@ -20,6 +20,7 @@
 #include "transport/PriorityResolver.h"
 #include "HomaTransport.h"
 
+// Required by OMNeT++ for all simple modules.
 Define_Module(HomaTransport);
 
 /**
@@ -80,9 +81,18 @@ HomaTransport::~HomaTransport()
     delete homaConfig;
 }
 
+/**
+ * This functions is used to subscribe HomaTransport's vector signals
+ * and stats to the core omnet++ simulator. Vector signals are usually defined
+ * for the set of signals that have a common signal name pattern with one part
+ * of the name being wildcarded.
+ */
 void
-HomaTransport::registerTemplatedStats(uint16_t numPrio)
+HomaTransport::registerTemplatedStats()
 {
+
+    // Registering signals and stats for priority usage percentages.
+    uint32_t numPrio = homaConfig->allPrio;
     for (size_t i = 0; i < numPrio; i++) {
         char prioSignalName[50];
         sprintf(prioSignalName, "homaPktPrio%luSignal", i);
@@ -98,12 +108,20 @@ HomaTransport::registerTemplatedStats(uint16_t numPrio)
 }
 
 /**
- *
+ * This method is a virtual method defined for every simple module in omnet++
+ * simulator. OMNeT++ core simulator automatically calles this function at the
+ * early stage of the simulator, after simulation objects are constructed and as
+ * a part of the steps for the simlation setup.
  */
 void
 HomaTransport::initialize()
 {
+    // Read in config parameters for HomaTransport from config files and store
+    // the parameters in a depot container.
     homaConfig = new HomaConfigDepot(this);
+
+    // If grantMaxBytes is given too large in the config file, we should correct
+    // for it.
     HomaPkt dataPkt = HomaPkt();
     dataPkt.setPktType(PktType::SCHED_DATA);
     uint32_t maxDataBytes = MAX_ETHERNET_PAYLOAD_BYTES -
@@ -111,24 +129,35 @@ HomaTransport::initialize()
     if (homaConfig->grantMaxBytes > maxDataBytes) {
         homaConfig->grantMaxBytes = maxDataBytes;
     }
+
+    // Setting up the timer objects associated with this transport.
     sendTimer = new cMessage("SendTimer");
-    sendTimer->setKind(SelfMsgKind::START);
     emitSignalTimer = new cMessage("SignalEmitionTimer");
     nextEmitSignalTime = SIMTIME_ZERO;
-    registerTemplatedStats(homaConfig->allPrio);
+
+    registerTemplatedStats();
     distEstimator = new WorkloadEstimator(homaConfig);
     prioResolver = new PriorityResolver(homaConfig, distEstimator);
-    //prioResolver->recomputeCbf(homaConfig->cbfCapMsgSize,
-    //    homaConfig->boostTailBytesPrio);
-    rxScheduler.initialize(homaConfig, prioResolver);
     sxController.initSendController(homaConfig, prioResolver);
     outstandingGrantBytes = 0;
+
+    // set sendTimer state to START and schedule the timer at the simulation
+    // start-time. When this timer fires, the rest of intializations steps will
+    // be done ( ie. those step that are needed to be done after simulation
+    // setup is complete.)
+    sendTimer->setKind(SelfMsgKind::START);
     scheduleAt(simTime(), sendTimer);
 }
 
+/**
+ * This method performs initialization steps that are needed to be done after
+ * the simulation object is created. It's only invoked when timer state is set
+ * to START.
+ */
 void
 HomaTransport::processStart()
 {
+    // initialized udp socket
     socket.setOutputGate(gate("udpOut"));
     socket.bind(homaConfig->localPort);
     sendTimer->setKind(SelfMsgKind::SEND);
@@ -136,6 +165,14 @@ HomaTransport::processStart()
     scheduleAt(simTime(), emitSignalTimer);
 }
 
+/**
+ * This method is the single place to emit stability signal to the
+ * GlobalSignalListener. At the events of a new message arrival from
+ * application, transmission comletion of a message at sender, or
+ * emitSignalTimer firing, this method is called and decides if it's time to
+ * emit stability signal to the GlobalSignalListener. It further setup next
+ * signal emission if necessary.
+ */
 void
 HomaTransport::testAndEmitStabilitySignal()
 {
@@ -154,7 +191,6 @@ HomaTransport::testAndEmitStabilitySignal()
     if (currentTime == nextEmitSignalTime) {
         emit(stabilitySignal, sxController.outboundMsgMap.size());
         nextEmitSignalTime = currentTime + homaConfig->signalEmitPeriod;
-
     } else if (nextEmitSignalTime < currentTime) {
         double offset = (currentTime - nextEmitSignalTime).dbl();
         double intpart, fracpart;
@@ -165,6 +201,17 @@ HomaTransport::testAndEmitStabilitySignal()
     scheduleAt(nextEmitSignalTime, emitSignalTimer);
 }
 
+/**
+ * The single dispatch method for handling all messages (both self messages, ie.
+ * timers, or messages from other modules) arriving at this transport. This
+ * function is called by OMNeT++ main scheulder loop.
+ *
+ * \param msg
+ *     A typical OMNeT++ message that needs to be handled. It could be either a
+ *     packet arriving from network, a message from applications that needs to
+ *     be transmitted or even a timer for this transport instance that needs to
+ *     be handled.
+ */
 void
 HomaTransport::handleMessage(cMessage *msg)
 {
@@ -189,20 +236,28 @@ HomaTransport::handleMessage(cMessage *msg)
     } else {
         if (msg->arrivedOn("appIn")) {
             AppMessage* outMsg = check_and_cast<AppMessage*>(msg);
-            // check and set the localAddr
+            // check and set the localAddr of this transport if this is the
+            // first message arriving from applications.
             if (localAddr == inet::L3Address()) {
                 localAddr = outMsg->getSrcAddr();
             } else {
                 ASSERT(localAddr == outMsg->getSrcAddr());
             }
             sxController.processSendMsgFromApp(outMsg);
-
         } else if (msg->arrivedOn("udpIn")) {
             handleRecvdPkt(check_and_cast<cPacket*>(msg));
         }
     }
 }
 
+/**
+ * This method is called for packets that arrive from the network. It updates
+ * the high level states and stats of the transport and dispatches the packet to
+ * sender or receiver logics of the transport depending on the packet type.
+ *
+ * \param pkt
+ *      pointer to the packet just arrived from the network.
+ */
 void
 HomaTransport::handleRecvdPkt(cPacket* pkt)
 {
@@ -213,6 +268,7 @@ HomaTransport::handleRecvdPkt(cPacket* pkt)
     } else {
         ASSERT(localAddr == rxPkt->getDestAddr());
     }
+
     // update the owner transport for this packet
     rxPkt->ownerTransport = this;
     emit(priorityStatsSignals[rxPkt->getPriority()], rxPkt);
@@ -250,7 +306,7 @@ HomaTransport::handleRecvdPkt(cPacket* pkt)
     }
 
     // Check if this is the end of active period and we should dump stats for
-    // wasted bandwidth
+    // wasted bandwidth.
     if (rxScheduler.getInflightBytes() == 0) {
         // This is end of a active period, so we should dump the stats and reset
         // varibles that track next active period.
@@ -259,9 +315,12 @@ HomaTransport::handleRecvdPkt(cPacket* pkt)
         rxScheduler.rcvdBytesPerActivePeriod = 0;
         rxScheduler.activePeriodStart = simTime();
     }
-
 }
 
+/**
+ * This method is called by OMNeT++ infrastructure whenever simulation is
+ * ended normally or terminated.
+ */
 void
 HomaTransport::finish()
 {
@@ -271,7 +330,11 @@ HomaTransport::finish()
 
 
 /**
- * HomaTransport::SendController
+ * Constructor for HomaTransport::SendController.
+ *
+ * \param transport
+ *      Back pointer to the HomaTransport instance that owns this
+ *      SendController.
  */
 HomaTransport::SendController::SendController(HomaTransport* transport)
     : bytesLeftToSend(0)
@@ -291,6 +354,17 @@ HomaTransport::SendController::SendController(HomaTransport* transport)
 
 {}
 
+/**
+ * Initializing the SendController after the simulation network is setup. This
+ * function is to be called by HomaTransport::intialize() method.
+ *
+ * \param homaConfig
+ *      Homa config container that keeps user specified parameters for the
+ *      transport.
+ * \param prioResolver
+ *      This class is used to assign priorities of unscheduled packets this
+ *      sender needs to send.
+ */
 void
 HomaTransport::SendController::initSendController(HomaConfigDepot* homaConfig,
     PriorityResolver* prioResolver)
@@ -306,6 +380,9 @@ HomaTransport::SendController::initSendController(HomaConfigDepot* homaConfig,
     unschedByteAllocator = new UnschedByteAllocator(homaConfig);
 }
 
+/**
+ * Destructor of the HomaTransport::SendController.
+ */
 HomaTransport::SendController::~SendController()
 {
     delete unschedByteAllocator;
@@ -317,11 +394,20 @@ HomaTransport::SendController::~SendController()
 
 }
 
+/**
+ * This method is called after a packet is fully serialized onto the network
+ * from sender's NIC. It is the place to perform the logics related to
+ * the packet serialization end.
+ */
 void
 HomaTransport::SendController::handlePktTransmitEnd()
 {
+    // When there are more than one packet ready for transmission and the sender
+    // chooses one for transmission over the others, the sender has imposed a
+    // delay in transmitting the other packets. Here we collect the statistics
+    // related those trasmssion delays.
+    uint32_t lastDestAddr = sentPkt.getDestAddr().toIPv4().getInt();
     for (auto it = rxAddrMsgMap.begin(); it != rxAddrMsgMap.end(); ++it) {
-        uint32_t lastDestAddr = sentPkt.getDestAddr().toIPv4().getInt();
         uint32_t rxAddr = it->first;
         if (rxAddr != lastDestAddr) {
             auto allMsgToRxAddr = it->second;
@@ -346,26 +432,33 @@ HomaTransport::SendController::handlePktTransmitEnd()
                 }
             }
 
-            simtime_t bubbleCausedAtRecvr;
+            simtime_t transmitDelay;
             if (totalTrailingUnsched > 0) {
                 simtime_t totalUnschedTxTimeLeft = SimTime(1e-9 * (
                     HomaPkt::getBytesOnWire(totalTrailingUnsched,
                     PktType::UNSCHED_DATA) * 8.0 / homaConfig->nicLinkSpeed));
-                bubbleCausedAtRecvr = sentPktDuration < totalUnschedTxTimeLeft
+                transmitDelay = sentPktDuration < totalUnschedTxTimeLeft
                     ? sentPktDuration : totalUnschedTxTimeLeft;
-                transport->emit(sxUnschedPktDelaySignal, bubbleCausedAtRecvr);
+                transport->emit(sxUnschedPktDelaySignal, transmitDelay);
             }
 
             if (oldestSchedPkt != currentTime) {
-                bubbleCausedAtRecvr =
+                transmitDelay =
                     sentPktDuration < currentTime - oldestSchedPkt
                     ? sentPktDuration : currentTime - oldestSchedPkt;
-                transport->emit(sxSchedPktDelaySignal, bubbleCausedAtRecvr);
+                transport->emit(sxSchedPktDelaySignal, transmitDelay);
             }
         }
     }
 }
 
+/**
+ * This method handles new messages from the application that needs to be
+ * transmitted over the network.
+ *
+ * \param sendMsg
+ *      Application messsage that needs to be transmitted by the transport.
+ */
 void
 HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
 {
@@ -400,6 +493,13 @@ HomaTransport::SendController::processSendMsgFromApp(AppMessage* sendMsg)
     sendOrQueue();
 }
 
+/**
+ * For every new grant that arrives from the receiver, this method is called to
+ * handle that grant (ie. send scheduled packet for that grant).
+ *
+ * \param rxPkt
+ *      receiverd grant packet from the network.
+ */
 void
 HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
 {
@@ -425,13 +525,32 @@ HomaTransport::SendController::processReceivedGrant(HomaPkt* rxPkt)
     sendOrQueue();
 }
 
+/**
+ * This method is the single interface for transmitting packets. It is called by
+ * the Transport::ReceiveScheduler to send grant packets or by the
+ * HomaTransport::SendController when a new data packet is ready for
+ * transmission. If the NIC tx link is idle, this method sends a packet out.
+ * Otherwise, to avoid buffer build up in the NIC queue, it will wait until
+ * until the NIC link goes idle. This method always prioritize sending grants
+ * over the data packets.
+ *
+ * \param msg
+ *      Any of the three cases: 1. a grant packet to be transmitted out to the
+ *      network. 2. The send timer that signals the NIC tx link has gone idle
+ *      and we should send next ready packet.  3. NULL if a data packet has
+ *      become ready and buffered in the HomaTransport::SendController queue and
+ *      we want to check if we can send the packet immediately in case tx link
+ *      is idle.
+ */
 void
 HomaTransport::SendController::sendOrQueue(cMessage* msg)
 {
     HomaPkt* sxPkt = NULL;
     if (msg == transport->sendTimer) {
+        // Send timer fired and it's time to check if we can send a data packet.
         ASSERT(msg->getKind() == SelfMsgKind::SEND);
         if (!outGrantQueue.empty()) {
+            // send queued grant packets if there is any.
             sxPkt = outGrantQueue.top();
             outGrantQueue.pop();
             sendPktAndScheduleNext(sxPkt);
@@ -458,10 +577,13 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
         }
         return;
     }
+
+    // When this function is called to send a grant packet.
     sxPkt = dynamic_cast<HomaPkt*>(msg);
     if (sxPkt) {
         ASSERT(sxPkt->getPktType() == PktType::GRANT);
         if (transport->sendTimer->isScheduled()) {
+            // NIC tx link is busy sending another packet
             outGrantQueue.push(sxPkt);
             return;
         } else {
@@ -471,6 +593,8 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
         }
     }
 
+    // When a data packet has become ready and we should check if we can send it
+    // out.
     ASSERT(!msg);
     if (transport->sendTimer->isScheduled()) {
         return;
@@ -479,7 +603,7 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     ASSERT(outGrantQueue.empty() && outbndMsgSet.size() == 1);
     OutboundMessage* highPrioMsg = *(outbndMsgSet.begin());
     size_t numRemoved =  outbndMsgSet.erase(highPrioMsg);
-    ASSERT(numRemoved == 1); // check the msg is removed
+    ASSERT(numRemoved == 1); // check that the message is removed
     bool hasMoreReadyPkt = highPrioMsg->getTransmitReadyPkt(&sxPkt);
     sendPktAndScheduleNext(sxPkt);
     if (highPrioMsg->getBytesLeft() <= 0) {
@@ -495,6 +619,13 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     }
 }
 
+/**
+ * The actual interface for transmitting packets to the network. This method is
+ * only called by the sendOrQueue() method.
+ *
+ * \param sxPkt
+ *      packet to be transmitted.
+ */
 void
 HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
 {
@@ -551,6 +682,12 @@ HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
     transport->scheduleAt(nextSendTime, transport->sendTimer);
 }
 
+/**
+ * This method cleans up a message whose tranmission is complete.
+ *
+ * \param msg
+ *      Message that's been completely transmitted.
+ */
 void
 HomaTransport::SendController::msgTransmitComplete(OutboundMessage* msg)
 {
@@ -571,12 +708,12 @@ HomaTransport::SendController::msgTransmitComplete(OutboundMessage* msg)
  * is always false)
  *
  * \param msg1
- *      first queue of outbound pkts for comparison
+ *      outbound message 1 to be compared.
  * \param msg2
- *      second queue of outbound pkts for comparison
+ *      outbound message 2 to be compared.
  * \return
- *      true if msg1 is compared greater than q2 (ie. pkts of msg1
- *      are in lower priority for transmission than pkts2 of msg2)
+ *      true if msg1 is compared greater than msg2 (ie. pkts of msg1
+ *      have higher priority for transmission than pkts of msg2)
  */
 bool
 HomaTransport::SendController::OutbndMsgSorter::operator()(
@@ -630,7 +767,16 @@ HomaTransport::SendController::OutbndMsgSorter::operator()(
 
 
 /**
- * HomaTransport::OutboundMessage
+ * Construcor for HomaTransport::OutboundMessage.
+ *
+ * \param outMsg
+ *      Application message that corresponds to this OutboundMessage.
+ * \param sxController
+ *      Back pointer to the SendController that handles transmission of packets
+ *      for every OutboundMessage in this transport..
+ * \param msgId
+ *      an message id to uniquely identify this OutboundMessage from every other
+ *      message in this transport.
  */
 HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
         SendController* sxController, uint64_t msgId,
@@ -652,6 +798,9 @@ HomaTransport::OutboundMessage::OutboundMessage(AppMessage* outMsg,
     , homaConfig(sxController->homaConfig)
 {}
 
+/**
+ * Default constructor for OutboundMessage.
+ */
 HomaTransport::OutboundMessage::OutboundMessage()
     : msgId(0)
     , msgSize(0)
@@ -671,6 +820,20 @@ HomaTransport::OutboundMessage::OutboundMessage()
 
 {}
 
+/**
+ * The copy constructor for this OutboundMessage.
+ *
+ * \param other
+ *      The OutboundMessage to make a copy of.
+ */
+HomaTransport::OutboundMessage::OutboundMessage(const OutboundMessage& other)
+{
+    copy(other);
+}
+
+/**
+ * Destructor for OutboundMessage.
+ */
 HomaTransport::OutboundMessage::~OutboundMessage()
 {
     while (!txPkts.empty()) {
@@ -680,11 +843,15 @@ HomaTransport::OutboundMessage::~OutboundMessage()
     }
 }
 
-HomaTransport::OutboundMessage::OutboundMessage(const OutboundMessage& other)
-{
-    copy(other);
-}
-
+/**
+ * Assignment operator for OutboundMessage.
+ *
+ * \prama other
+ *      Assignment OutboundMessage source.
+ *
+ * \return
+ *      A reference to the destination OutboundMessage variable.
+ */
 HomaTransport::OutboundMessage&
 HomaTransport::OutboundMessage::operator=(const OutboundMessage& other)
 {
@@ -693,6 +860,12 @@ HomaTransport::OutboundMessage::operator=(const OutboundMessage& other)
     return *this;
 }
 
+/**
+ * The copy method
+ *
+ * \param other
+ *      The source OutboundMessage to be copied over.
+ */
 void
 HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
 {
@@ -709,8 +882,15 @@ HomaTransport::OutboundMessage::copy(const OutboundMessage& other)
     this->destAddr = other.destAddr;
     this->srcAddr = other.srcAddr;
     this->msgCreationTime = other.msgCreationTime;
+    this->txPkts = other.txPkts;
+    this->txSchedPkts = other.txSchedPkts;
 }
 
+/**
+ * For every newly created OutboundMessage, calling this method will construct
+ * request and unscheduled packets to be transmitted for the message and set the
+ * appropriate priority for the packets.
+ */
 void
 HomaTransport::OutboundMessage::prepareRequestAndUnsched()
 {
@@ -789,6 +969,17 @@ HomaTransport::OutboundMessage::prepareRequestAndUnsched()
     } while (i < reqUnschedDataVec.size());
 }
 
+/**
+ * Creates a new scheduled packet for this message and stores it in the set
+ * scheduled packets ready to be transmitted for this message.
+ *
+ * \param numBytes
+ *      number of data bytes in the scheduled packet.
+ * \param schedPrio
+ *      priority value assigned to this sched packet by the receiver.
+ * \return
+ *      remaining scheduled bytes to be sent for this message.
+ */
 uint32_t
 HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t numBytes,
     uint16_t schedPrio)
@@ -825,7 +1016,7 @@ HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t numBytes,
 /**
  * Among all packets ready for transmission for this message, this function
  * retrieves highest priority packet from sender's perspective for this message.
- * Call this function only when ready to send the packet out.
+ * Call this function only when ready to send the packet out onto the wire.
  *
  * \return outPkt
  *      The packet to be transmitted for this message
@@ -889,7 +1080,10 @@ HomaTransport::OutboundMessage::OutbndPktSorter::operator()(const HomaPkt* pkt1,
 }
 
 /**
- * HomaTransport::ReceiveScheduler
+ * Constructor for HomaTransport::ReceiveScheduler.
+ *
+ * \param transport
+ *      back pointer to the transport that owns the ReceiveScheduler.
  */
 HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     : transport(transport)
@@ -915,6 +1109,18 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     , rcvdBytesPerOversubPeriod(0)
 {}
 
+/**
+ * This method is to perform setup steps ReceiveScheduler that are required to
+ * be done after the simulation network is setup. This should be called from
+ * the HomaTransport::initialize() function.
+ *
+ * \param homaConfig
+ *      Collection of all user specified parameters for the transport.
+ * \param prioResolver
+ *      Transport instance of PriorityResolver that is used for determining
+ *      scheduled packet priority that is specified in the grants that this
+ *      ReceiveScheduler sends.
+ */
 void
 HomaTransport::ReceiveScheduler::initialize(HomaConfigDepot* homaConfig,
     PriorityResolver* prioResolver)
@@ -935,6 +1141,9 @@ HomaTransport::ReceiveScheduler::initialize(HomaConfigDepot* homaConfig,
     std::fill(unschedToRecvPerPrio.begin(), unschedToRecvPerPrio.end(), 0);
 }
 
+/**
+ * ReceiveScheduler destructor.
+ */
 HomaTransport::ReceiveScheduler::~ReceiveScheduler()
 {
     // Iterate through all incomplete messages and delete them
@@ -955,6 +1164,18 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
     delete unschRateComp;
 }
 
+/**
+ * Given a data packet just receiver from the network, this method finds the
+ * associated receiving message that this packet belongs to.
+ *
+ * \param rxPkt
+ *      Received data packet for which this function finds the corresponding
+ *      inbound message.
+ * \return
+ *      The inbound message that rxPkt is sent for from the sender or NULL if
+ *      no such InboundMessage exists (ie. this is the first packet of that
+ *      message.)
+ */
 HomaTransport::InboundMessage*
 HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const
 {
@@ -975,7 +1196,10 @@ HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const
 }
 
 /**
+ * This method is to handle data packets arriving at the receiver's transport.
  *
+ * \param rxPkts
+ *      Received data packet (ie. REQUEST, UNSCHED_DATA, or SCHED_DATA).
  */
 void
 HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
@@ -1028,6 +1252,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     } else {
         s = iter->second;
     }
+
     // At each new pkt arrival, the order of senders in the schedSenders list
     // can change and/or a mesg might need to get a new grant
     int sIndOld = schedSenders->remove(s);
@@ -1064,6 +1289,15 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     delete rxPkt;
 }
 
+/**
+ * This method handles pacing grant transmissions. Every time a grant is sent
+ * for a sender, a grant timer specific to that sender is set to signal the next
+ * grant (if needed) at one packet serialization time later. This method
+ * dispatches next grant timer to the right message.
+ *
+ * \param grantTimer
+ *      Grant pacer that just fired and is to be handled.
+ */
 void
 HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
 {
@@ -1081,11 +1315,125 @@ HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
         inOversubPeriod = false;
         oversubPeriodStop = simTime();
     }
-
 }
 
 /**
- * HomaTransport::ReceiveScheduler::SenderState
+ * For every packet that arrives, this function is called to update
+ * stats-tracking variables in ReceiveScheduler.
+ *
+ * \param pktType
+ *      Which kind of packet has arrived: REQUEST, UNSCHED_DATA, SCHED_DATA,
+ *      GRANT.
+ * \param prio
+ *      priority of the received packet.
+ * \param dataBytesInPkt
+ *      lenght of the data portion of the packet in bytes.
+ */
+void
+HomaTransport::ReceiveScheduler::addArrivedBytes(PktType pktType, uint16_t prio,
+    uint32_t dataBytesInPkt)
+{
+    uint32_t arrivedBytesOnWire =
+        HomaPkt::getBytesOnWire(dataBytesInPkt, pktType);
+    allBytesRecvd += arrivedBytesOnWire;
+    bytesRecvdPerPrio.at(prio) += arrivedBytesOnWire;
+}
+
+/**
+ * For every grant packet sent to the sender, this function is called to update
+ * the variables tracking statistics fo outstanding grants, scheduled packets,
+ * and bytes.
+ *
+ * \param prio
+ *      Scheduled packet priority specified in the grant packet.
+ * \param grantedBytes
+ *      Scheduled bytes granted in this the grant packet.
+ */
+void
+HomaTransport::ReceiveScheduler::addPendingGrantedBytes(uint16_t prio,
+    uint32_t grantedBytes)
+{
+    uint32_t schedBytesOnWire =
+        HomaPkt::getBytesOnWire(grantedBytes, PktType::SCHED_DATA);
+    scheduledBytesPerPrio.at(prio) += schedBytesOnWire;
+    inflightSchedBytes += schedBytesOnWire;
+    inflightSchedPerPrio.at(prio) += schedBytesOnWire;
+}
+
+/**
+ * For every message that arrives at the receiver, this function is called to
+ * update the variables tracking the statistics of inflight unscheduled
+ * bytes to arrive.
+ *
+ * \param pktType
+ *      The king of the packet unscheduled data will arrive in. Either REQUEST
+ *      or UNSCHED_DATA.
+ * \param prio
+ *      Priority of the packet the unscheduled data arrive in.
+ * \param bytesToArrive
+ *      The size of unscheduled data in the packet carrying it.
+ */
+void
+HomaTransport::ReceiveScheduler::addPendingUnschedBytes(PktType pktType,
+    uint16_t prio, uint32_t bytesToArrive)
+{
+    uint32_t unschedBytesOnWire =
+        HomaPkt::getBytesOnWire(bytesToArrive, pktType);
+    unschedToRecvPerPrio.at(prio) += unschedBytesOnWire;
+    inflightUnschedBytes += unschedBytesOnWire;
+    inflightUnschedPerPrio.at(prio) += unschedBytesOnWire;
+}
+
+
+/**
+ * For every packet that we have expected to arrive and called either of
+ * addPendingUnschedBytes() or addPendingGrantedBytes() methods for them, we
+ * call this function to at the reception of the packet at receiver. Call to
+ * this function updates the variables that track statistics of outstanding
+ * bytes.
+ *
+ * \param pktType
+ *      Kind of the packet that has arrived.
+ * \param prio
+ *      Priority of the arrived packet.
+ * \param dataBytesInPkt
+ *      Length of the data delivered in the packet.
+ */
+void
+HomaTransport::ReceiveScheduler::pendingBytesArrived(PktType pktType,
+    uint16_t prio, uint32_t dataBytesInPkt)
+{
+    uint32_t arrivedBytesOnWire =
+        HomaPkt::getBytesOnWire(dataBytesInPkt, pktType);
+    switch(pktType)
+    {
+        case PktType::REQUEST:
+        case PktType::UNSCHED_DATA:
+            inflightUnschedBytes -= arrivedBytesOnWire;
+            inflightUnschedPerPrio.at(prio) -= arrivedBytesOnWire;
+            break;
+        case PktType::SCHED_DATA:
+            inflightSchedBytes -= arrivedBytesOnWire;
+            inflightSchedPerPrio.at(prio) -= arrivedBytesOnWire;
+            break;
+        default:
+            throw cRuntimeError("Unknown pktType %d", pktType);
+    }
+}
+
+
+/**
+ * Constructor of HomaTransport::ReceiveScheduler::SenderState.
+ *
+ * \param srcAddr
+ *      Address of the sender corresponding to this SenderState.
+ * \param rxScheduler
+ *      The ReceiveScheduler that handles received packets for this SenderState.
+ * \param grantTimer
+ *      The timer that paces grants for the sender corresponding to this
+ *      SenderState.
+ * \param homaConfig
+ *      Collection of user-specified config parameters for this transport
  */
 HomaTransport::ReceiveScheduler::SenderState::SenderState(
         inet::IPv4Address srcAddr, ReceiveScheduler* rxScheduler,
@@ -1100,6 +1448,15 @@ HomaTransport::ReceiveScheduler::SenderState::SenderState(
     , lastIdx(homaConfig->adaptiveSchedPrioLevels)
 {}
 
+/**
+ * Compute a lower bound for the next time that the receiver can send a grant
+ * for the sender of this SenderState.
+ *
+ * \param currentTime
+ *      Time at which the most recent grant packet is sent for the center.
+ * \param grantSize
+ *      Number of bytes granted in the most recent grant sent.
+ */
 simtime_t
 HomaTransport::ReceiveScheduler::SenderState::getNextGrantTime(
     simtime_t currentTime, uint32_t grantSize)
@@ -1113,10 +1470,18 @@ HomaTransport::ReceiveScheduler::SenderState::getNextGrantTime(
 }
 
 /**
- * return -1, if rxPkt belong to a mesg that doesn't need (anymore?) grant.
- * Returns 0 if rxPkt belongs to a the most preferred scheduled mesg of the
- * sender that needs grant. Return +1 if rxPkt belongs to a scheduled mesg of
- * sender but the mesg is not the most preffered scheduled mesg for the sender.
+ * This method handles packets received from the sender corresponding to
+ * SenderState. It finds the sender's InboundMessage that this belongs to and
+ * fills in the delivered packet data in the message.
+ *
+ * \param rxPkt
+ *      The data packet received from the sender.
+ * \return
+ *      return -1, if rxPkt belong to a mesg that doesn't need (anymore?) grant.
+ *      Returns 0 if rxPkt belongs to a the most preferred scheduled mesg of the
+ *      sender that needs more grants. Return +1 if rxPkt belongs to a scheduled
+ *      mesg of sender but the mesg is not the most preffered scheduled mesg for
+ *      the sender.
  */
 int
 HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
@@ -1200,6 +1565,23 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
     }
 }
 
+/**
+ * ReceiveScheduler calls this method to send a grant for a sender's highest
+ * priority message of this receiver. As a side effect, this method also
+ * schedules the next grant for that sender at one grant serialization time
+ * later in the future. This time is a lower bound for next grant time and
+ * ReceiveScheduler will decide if next grant should be sent at that time or
+ * not.
+ *
+ * \param grantPrio
+ *      Priority of the scheduled packet that sender will send for this grant.
+ * \return
+ *      1) Return 0 if a grant cannot be sent (ie. the outstanding bytes for this
+ *      sender are more than one RTTBytes or a grant timer is scheduled for the
+ *      future.). 2) Sends a grant and returns remaining bytes to grant for the
+ *      most preferred message of the sender. 3) Sends a grant and returns -1 if
+ *      the sender has no more outstanding messages that need grants.
+ */
 int
 HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
         uint32_t grantPrio)
@@ -1211,7 +1593,7 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     ASSERT(topMesg->bytesToGrant > 0);
     uint32_t newIdx = grantPrio - homaConfig->allPrio +
         homaConfig->adaptiveSchedPrioLevels;
-    
+
     // if prioresolver gives a better prio, use that one
     uint16_t resolverPrio =
         rxScheduler->transport->prioResolver->getSchedPktPrio(topMesg);
@@ -1232,6 +1614,7 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     HomaPkt* grantPkt = topMesg->prepareGrant(grantSize, grantPrio);
     lastGrantPrio = grantPrio;
     lastIdx = newIdx;
+
     // update stats and send grant
     grantSize = grantPkt->getGrantFields().grantBytes;
     uint16_t prio = grantPkt->getGrantFields().schedPrio;
@@ -1240,7 +1623,6 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     rxScheduler->transport->sxController.sendOrQueue(grantPkt);
     rxScheduler->transport->emit(outstandingGrantBytesSignal,
         rxScheduler->transport->outstandingGrantBytes);
-
     if (topMesg->bytesToGrant > 0) {
         if (topMesg->totalBytesInFlight < homaConfig->maxOutstandingRecvBytes) {
             rxScheduler->transport->scheduleAt(
@@ -1264,62 +1646,11 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     return newTopMesg->bytesToGrant;
 }
 
-void
-HomaTransport::ReceiveScheduler::addArrivedBytes(PktType pktType, uint16_t prio,
-    uint32_t dataBytesInPkt)
-{
-    uint32_t arrivedBytesOnWire =
-        HomaPkt::getBytesOnWire(dataBytesInPkt, pktType);
-    allBytesRecvd += arrivedBytesOnWire;
-    bytesRecvdPerPrio.at(prio) += arrivedBytesOnWire;
-}
-
-void
-HomaTransport::ReceiveScheduler::addPendingGrantedBytes(uint16_t prio,
-    uint32_t grantedBytes)
-{
-    uint32_t schedBytesOnWire =
-        HomaPkt::getBytesOnWire(grantedBytes, PktType::SCHED_DATA);
-    scheduledBytesPerPrio.at(prio) += schedBytesOnWire;
-    inflightSchedBytes += schedBytesOnWire;
-    inflightSchedPerPrio.at(prio) += schedBytesOnWire;
-}
-
-void
-HomaTransport::ReceiveScheduler::addPendingUnschedBytes(PktType pktType,
-    uint16_t prio, uint32_t bytesToArrive)
-{
-    uint32_t unschedBytesOnWire =
-        HomaPkt::getBytesOnWire(bytesToArrive, pktType);
-    unschedToRecvPerPrio.at(prio) += unschedBytesOnWire;
-    inflightUnschedBytes += unschedBytesOnWire;
-    inflightUnschedPerPrio.at(prio) += unschedBytesOnWire;
-}
-
-void
-HomaTransport::ReceiveScheduler::pendingBytesArrived(PktType pktType,
-    uint16_t prio, uint32_t dataBytesInPkt)
-{
-    uint32_t arrivedBytesOnWire =
-        HomaPkt::getBytesOnWire(dataBytesInPkt, pktType);
-    switch(pktType)
-    {
-        case PktType::REQUEST:
-        case PktType::UNSCHED_DATA:
-            inflightUnschedBytes -= arrivedBytesOnWire;
-            inflightUnschedPerPrio.at(prio) -= arrivedBytesOnWire;
-            break;
-        case PktType::SCHED_DATA:
-            inflightSchedBytes -= arrivedBytesOnWire;
-            inflightSchedPerPrio.at(prio) -= arrivedBytesOnWire;
-            break;
-        default:
-            throw cRuntimeError("Unknown pktType %d", pktType);
-    }
-}
-
 /**
- * HomaTransport::ReceiveScheduler::SchedSenders
+ * Constructor for HomaTransport::ReceiveScheduler::SchedSenders.
+ *
+ * \param homaConfig
+ *      Collection of all user specified config parameters for the transport
  */
 HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
         HomaConfigDepot* homaConfig)
@@ -1337,7 +1668,22 @@ HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
 }
 
 /**
+ * This function implements the logics of the receiver scheduler for sending
+ * grants to the senders. At every event, such as packet arrivals or grant
+ * transmission, that a sender's ranking changes in the view of the receiver,
+ * this method is called to check if a grant should be sent for that sender and
+ * this function then sends the grant if needed.
  *
+ * \param s
+ *      SenderState corresponding to the sender for which we want to test and
+ *      send a grant.
+ * \param sInd
+ *      The position of the sender in the senders list which determines the
+ *      ranking of the sender in the receiver's eye and if a grant should be
+ *      sent.
+ * \param headInd
+ *      The index of the top rank or most preferred sender in the receiver's
+ *      senders list.
  */
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
@@ -1374,8 +1720,14 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
 }
 
 /**
- * negative value means the mesg didn't belong to the schedSenders. Otherwise,
- * it returns the index at which the s was removed from.
+ * Removes a SenderState from sendrs list.
+ *
+ * \param s
+ *      SenderState to be removed.
+ * \return
+ *      negative value means the mesg didn't belong to the schedSenders so can't
+ *      be removed. Otherwise, it returns the index at which the s was removed
+ *      from.
  */
 int
 HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
@@ -1415,6 +1767,15 @@ HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
     }
 }
 
+/**
+ * Remove a SenderState at a specified index in senders list. 
+ *
+ * \param rmIdx
+ *      Index of SenderState instace in senders list that we want to remove.
+ * \return
+ *      Null if no element exists at rmIdx. Otherwise, it return the removed
+ *      element.
+ */
 HomaTransport::ReceiveScheduler::SenderState*
 HomaTransport::ReceiveScheduler::SchedSenders::removeAt(uint32_t rmIdx)
 {
@@ -1437,9 +1798,14 @@ HomaTransport::ReceiveScheduler::SchedSenders::removeAt(uint32_t rmIdx)
 }
 
 /**
- * If the element already exists in the list, insertion will not happen and
- * returns false. Otherwise, element will be inserted at the position
- * insId returned from insPoint method.
+ * Insert a SenderState into the senders list. The caller must make sure that the
+ * SenderState is not already in the list (ie. by calling remove) and s infact
+ * belong to the senders list (ie. sender of s has messages that need grant).
+ * Element s then will be inserted at the position insId returned from insPoint
+ * method and headIdx will be updated.
+ *
+ * \param s
+ *      SenderState to be inserted in the senders list.
  */
 void
 HomaTransport::ReceiveScheduler::SchedSenders::insert(SenderState* s)
@@ -1466,8 +1832,15 @@ HomaTransport::ReceiveScheduler::SchedSenders::insert(SenderState* s)
 }
 
 /**
- * returns a pair (insertIndex, headIndex). insertIndex negative, means s
- * doesn't belong to the schedSenders
+ * Given a SenderState s, this method find the index of senders list at which s
+ * should be inserted. The caller should make sure that s is not already in the
+ * list (ie. by calling remove()).
+ * 
+ * \param s
+ *      SenderState to be inserted.
+ * \return
+ *      returns a pair (insertedIndex, headIndex). insertedIndex negative, means
+ *      s doesn't belong to the schedSenders.
  */
 std::pair<int, int>
 HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
@@ -1503,7 +1876,15 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
 }
 
 /**
- * HomaTransport::ReceiveScheduler::UnschedRateComputer
+ * Constructor of HomaTransport::ReceiveScheduler::UnschedRateComputer.
+ *
+ * \param homaConfig
+ *      Collection of user specified config parameters for the transport.
+ * \param computeAvgUnschRate
+ *      True enables this modules.
+ * \param minAvgTimeWindow
+ *      Time interval over which this module computes the average unscheduled
+ *      rate.
  */
 HomaTransport::ReceiveScheduler::UnschedRateComputer::UnschedRateComputer(
         HomaConfigDepot* homaConfig, bool computeAvgUnschRate,
@@ -1516,8 +1897,11 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::UnschedRateComputer(
 {}
 
 /**
- * Returns the fraction of bw used by the unsched (eg. average unsched rate
- * divided by nic link speed.)
+ * Interface to receive computed average unscheduled bytes rate.
+ *
+ * \return
+ *      Returns the fraction of bw used by the unsched (eg. average unsched rate
+ *      divided by nic link speed.)
  */
 double
 HomaTransport::ReceiveScheduler::UnschedRateComputer::getAvgUnschRate(
@@ -1540,6 +1924,16 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::getAvgUnschRate(
     return avgUnschFractionRate;
 }
 
+/**
+ * Interface for accumulating the unsched bytes for rate calculation. This is
+ * called evertime an unscheduled packet arrives. 
+ *
+ * \param arrivalTime
+ *      Time at which unscheduled packet arrived.
+ * \param bytesRecvd
+ *      Total unsched bytes received including all headers and packet overhead
+ *      bytes on wire.
+ */
 void
 HomaTransport::ReceiveScheduler::UnschedRateComputer::updateUnschRate(
     simtime_t arrivalTime, uint32_t bytesRecvd)
@@ -1568,7 +1962,7 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::updateUnschRate(
 }
 
 /**
- * HomaTransport::InboundMessage
+ * Default Constructor of HomaTransport::InboundMessage.
  */
 HomaTransport::InboundMessage::InboundMessage()
     : rxScheduler(NULL)
@@ -1598,6 +1992,18 @@ HomaTransport::InboundMessage::InboundMessage(const InboundMessage& other)
     copy(other);
 }
 
+/**
+ * Constructor of InboundMessage.
+ *
+ * \param rxPkt
+ *      First packet received for a message at the receiver. The packet type is
+ *      either REQUEST or UNSCHED_DATA.
+ * \param rxScheduler
+ *      ReceiveScheduler that handles scheduling, priority assignment, and
+ *      reception of packets for this message.
+ * \param homaConfig
+ *      Collection of user provided config parameters for the transport.
+ */
 HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
         ReceiveScheduler* rxScheduler, HomaConfigDepot* homaConfig)
     : rxScheduler(rxScheduler)
@@ -1642,6 +2048,17 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     }
 }
 
+/**
+ * Add a received chunk of bytes to the message.
+ *
+ * \param byteStart
+ *      Offset index in the message at which the chunk of bytes should be added.
+ * \param byteEnd
+ *      Index of last byte of the chunk in the message. 
+ * \param pktType
+ *      Kind of the packet that has arrived at the receiver and carried the
+ *      chunck of data bytes.
+ */
 void
 HomaTransport::InboundMessage::fillinRxBytes(uint32_t byteStart,
         uint32_t byteEnd, PktType pktType)
@@ -1663,7 +2080,19 @@ HomaTransport::InboundMessage::fillinRxBytes(uint32_t byteStart,
             " bytes left to receive)" << endl;
 }
 
-
+/**
+ * Creates a grant packet for this message and update the internal structure of
+ * the message.
+ *
+ * \param grantSize
+ *      Size of the scheduled data bytes that will specified in the grant
+ *      packet.
+ * \param schedPrio
+ *      Priority of the scheduled packet that this grant packet is sent for.
+ * \return
+ *      Grant packet that is to be sent on the wire to the sender of this
+ *      message.
+ */
 HomaPkt*
 HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize,
     uint16_t schedPrio)
@@ -1696,6 +2125,13 @@ HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize,
     return grantPkt;
 }
 
+/**
+ * Create an application message once this InboundMessage is completely
+ * received.
+ *
+ * \return
+ *      Message constructed for the application and is to be passed to it.
+ */
 AppMessage*
 HomaTransport::InboundMessage::prepareRxMsgForApp()
 {
@@ -1740,6 +2176,10 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
     return rxMsg;
 }
 
+/**
+ * Copy over the statistics in the InboundMessge that mirror the corresponding
+ * stats in the ReceiveScheduler.
+ */
 void
 HomaTransport::InboundMessage::updatePerPrioStats()
 {
@@ -1750,12 +2190,26 @@ HomaTransport::InboundMessage::updatePerPrioStats()
     this->sumInflightSchedPerPrio = rxScheduler->getInflightSchedPerPrio();
 }
 
+/**
+ * Getter method of granted but not yet received bytes (ie. outstanding
+ * granted bytes) for this message.
+ *
+ * \return
+ *      Outstanding granted bytes.
+ */
 uint32_t
 HomaTransport::InboundMessage::schedBytesInFlight()
 {
     return bytesGrantedInFlight;
 }
 
+/**
+ * Getter method of bytes sent by the sender but not yet received bytes (ie.
+ * outstanding bytes) for this message.
+ *
+ * \return
+ *      Outstanding bytes.
+ */
 uint32_t
 HomaTransport::InboundMessage::unschedBytesInFlight()
 {
