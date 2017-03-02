@@ -440,7 +440,12 @@ class HomaTransport : public cSimpleModule
             double minAvgTimeWindow; // in seconds
             HomaConfigDepot* homaConfig;
         };
-
+        
+        /**
+         * Per sender object to manage the reception of messages from each
+         * sender. It also contains all per sender information that are needed
+         * to schedule messages of the corresponding sender.
+         */
         class SenderState {
           PUBLIC:
             SenderState(inet::IPv4Address srcAddr,
@@ -479,6 +484,12 @@ class HomaTransport : public cSimpleModule
             friend class HomaTransport::ReceiveScheduler;
         };
 
+        /**
+         * Container for all scheduled senders (ie. senders with at least one
+         * message that needs grants). This object also contains all information
+         * requiered for scheduling of the messages and implementing the
+         * scheduler logic.
+         */
         class SchedSenders {
           PUBLIC:
             SchedSenders(HomaConfigDepot* homaConfig);
@@ -508,11 +519,26 @@ class HomaTransport : public cSimpleModule
             };
 
           PROTECTED:
+
+            // Sorted list of all scheduled senders.
             std::vector<SenderState*> senders;
+
+            // Total number available priorities for the scheduled packets.
             uint16_t schedPrios;
+
+            // Total number of senders we allow to be scheduled and granted at
+            // the same time (ie. overcommittment level).
             uint16_t numToGrant;
+
+            // Index of the highest priority sender in the list. This could be
+            // non zero which means no sender will be located at indexes 0 to
+            // headIdx-1 of the senders list.
             uint32_t headIdx;
+
+            // Total number senders in the list.
             uint32_t numSenders;
+
+            //Collection of user provided config parameters for the transport.
             HomaConfigDepot* homaConfig;
             friend class HomaTransport::ReceiveScheduler;
         };
