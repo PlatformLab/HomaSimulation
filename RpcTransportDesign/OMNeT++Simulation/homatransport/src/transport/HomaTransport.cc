@@ -1165,7 +1165,7 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
 }
 
 /**
- * Given a data packet just receiver from the network, this method finds the
+ * Given a data packet just received from the network, this method finds the
  * associated receiving message that this packet belongs to.
  *
  * \param rxPkt
@@ -1173,8 +1173,8 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
  *      inbound message.
  * \return
  *      The inbound message that rxPkt is sent for from the sender or NULL if
- *      no such InboundMessage exists (ie. this is the first packet of that
- *      message.)
+ *      no such InboundMessage exists (ie. this is the first received packet of
+ *      the message.)
  */
 HomaTransport::InboundMessage*
 HomaTransport::ReceiveScheduler::lookupInboundMesg(HomaPkt* rxPkt) const
@@ -1254,7 +1254,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     }
 
     // At each new pkt arrival, the order of senders in the schedSenders list
-    // can change and/or a mesg might need to get a new grant
+    // can change and/or a mesg might need to get a new grant.
     int sIndOld = schedSenders->remove(s);
     int mesgIdxInS = s->handleInboundPkt(rxPkt);
     EV_INFO << "remove sender at ind " << sIndOld << "and handled mesg at ind "
@@ -1472,7 +1472,8 @@ HomaTransport::ReceiveScheduler::SenderState::getNextGrantTime(
 /**
  * This method handles packets received from the sender corresponding to
  * SenderState. It finds the sender's InboundMessage that this belongs to and
- * fills in the delivered packet data in the message.
+ * invoked InboundMessage methods to fills in the delivered packet data in the
+ * message.
  *
  * \param rxPkt
  *      The data packet received from the sender.
@@ -1555,7 +1556,7 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
         return -1;
     } else if (inboundMesg->bytesToGrant == 0) {
 
-        // no grant needed for this mesg but mesg is not complete yet byt we
+        // no grant needed for this mesg but mesg is not complete yet and we
         // still need to keep the message until all of its packets has arrived
         return -1;
     } else {
@@ -1669,10 +1670,13 @@ HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
 
 /**
  * This function implements the logics of the receiver scheduler for sending
- * grants to the senders. At every event, such as packet arrivals or grant
+ * grants to a sender. At every event such as packet arrival or grant
  * transmission, that a sender's ranking changes in the view of the receiver,
  * this method is called to check if a grant should be sent for that sender and
- * this function then sends the grant if needed.
+ * this function then sends the grant if needed. N.B. the sender must have been
+ * removed from schedSenders prior to the call to this method. The side effect
+ * of this method invokation is that it also inserts the SenderState into the
+ * schedSenders list if it needs more grants.
  *
  * \param s
  *      SenderState corresponding to the sender for which we want to test and
@@ -1707,8 +1711,12 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
         return;
     }
 
-    if (sIndNew > 0)
+    // The grant sent, was the last grant of the 1st preferred sched message of
+    // s. The 2nd top sched message of s, ranks s beyond number of senders we
+    // can grant.
+    if (sIndNew > 0) {
         insert(s);
+    }
     s = removeAt(headIdx + numToGrant - 1);
     if (!s)
         return;
@@ -1725,9 +1733,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
  * \param s
  *      SenderState to be removed.
  * \return
- *      negative value means the mesg didn't belong to the schedSenders so can't
- *      be removed. Otherwise, it returns the index at which the s was removed
- *      from.
+ *      Negative value means the mesg didn't belong to the schedSenders so can't
+ *      be removed. Otherwise, it returns the index at which s was removed from.
  */
 int
 HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
@@ -1741,6 +1748,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
         ASSERT(s->mesgsToGrant.empty());
         return -1;
     }
+
     if (s->mesgsToGrant.empty()) {
         return -1;
     }
@@ -1768,7 +1776,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::remove(SenderState* s)
 }
 
 /**
- * Remove a SenderState at a specified index in senders list. 
+ * Remove a SenderState at a specified index in senders list.
  *
  * \param rmIdx
  *      Index of SenderState instace in senders list that we want to remove.
@@ -1835,7 +1843,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::insert(SenderState* s)
  * Given a SenderState s, this method find the index of senders list at which s
  * should be inserted. The caller should make sure that s is not already in the
  * list (ie. by calling remove()).
- * 
+ *
  * \param s
  *      SenderState to be inserted.
  * \return
@@ -1926,7 +1934,7 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::getAvgUnschRate(
 
 /**
  * Interface for accumulating the unsched bytes for rate calculation. This is
- * called evertime an unscheduled packet arrives. 
+ * called evertime an unscheduled packet arrives.
  *
  * \param arrivalTime
  *      Time at which unscheduled packet arrived.
@@ -2054,7 +2062,7 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
  * \param byteStart
  *      Offset index in the message at which the chunk of bytes should be added.
  * \param byteEnd
- *      Index of last byte of the chunk in the message. 
+ *      Index of last byte of the chunk in the message.
  * \param pktType
  *      Kind of the packet that has arrived at the receiver and carried the
  *      chunck of data bytes.

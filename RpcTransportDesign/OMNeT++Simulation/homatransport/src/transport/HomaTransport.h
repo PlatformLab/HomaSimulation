@@ -338,7 +338,7 @@ class HomaTransport : public cSimpleModule
         // send for this message.
         uint32_t bytesToGrant;
 
-        // Adds the scheduled packet overhead header bytes to bytesToGrant. 
+        // Adds the scheduled packet overhead header bytes to bytesToGrant.
         uint32_t bytesToGrantOnWire;
 
         // Tracks the total number of data bytes scheduled (granted) for this
@@ -440,7 +440,7 @@ class HomaTransport : public cSimpleModule
             double minAvgTimeWindow; // in seconds
             HomaConfigDepot* homaConfig;
         };
-        
+
         /**
          * Per sender object to manage the reception of messages from each
          * sender. It also contains all per sender information that are needed
@@ -462,7 +462,7 @@ class HomaTransport : public cSimpleModule
             ReceiveScheduler* rxScheduler;
 
             // Timer object for sending grants for this sender. Will be used
-            // for sending grants for this sender if totalBytesInFlight for the
+            // to send grants for this sender if totalBytesInFlight for the
             // top mesg of this sender is less than RTT.
             cMessage* grantTimer;
             inet::IPv4Address senderAddr;
@@ -474,7 +474,7 @@ class HomaTransport : public cSimpleModule
             // Map of all incomplete inboundMsgs from the sender hashed by msgId
             std::unordered_map<uint64_t, InboundMessage*> incompleteMesgs;
 
-            // Priority of last sent grant
+            // Priority of last sent grant for this sender
             uint32_t lastGrantPrio;
 
             // Index of this sender in SchedSenders as of the last time
@@ -485,10 +485,10 @@ class HomaTransport : public cSimpleModule
         };
 
         /**
-         * Container for all scheduled senders (ie. senders with at least one
+         * Collection of all scheduled senders (ie. senders with at least one
          * message that needs grants). This object also contains all information
          * requiered for scheduling of the messages and implementing the
-         * scheduler logic.
+         * scheduler logic and sched prio assignment.
          */
         class SchedSenders {
           PUBLIC:
@@ -535,7 +535,7 @@ class HomaTransport : public cSimpleModule
             // headIdx-1 of the senders list.
             uint32_t headIdx;
 
-            // Total number senders in the list.
+            // Total number of senders in the list.
             uint32_t numSenders;
 
             //Collection of user provided config parameters for the transport.
@@ -544,18 +544,34 @@ class HomaTransport : public cSimpleModule
         };
 
       PROTECTED:
+
+        // Back pointer to the transport instance that owns this scheduler.
         HomaTransport* transport;
+
+        // Collection of user specified config parameters.
         HomaConfigDepot *homaConfig;
+
+        // Object for computing the average received rate of unscheduled bytes.
         UnschedRateComputer* unschRateComp;
+
+        // Hash container for accessing each sender's state collection using
+        // that sender's IP.
         std::unordered_map<uint32_t, SenderState*> ipSendersMap;
+
+        // Hash container for accessing each sender's state collection using
+        // from the grant timer object of the sender.
         std::unordered_map<cMessage*, SenderState*> grantTimersMap;
+
+        // Collection of all senders that have at least one message that is not
+        // fully granted.
         SchedSenders* schedSenders;
 
         //*******************************************************//
         //*****Below variables are for statistic collection******//
         //*******************************************************//
 
-        // These variables track inflight bytes at any point of time
+        // These variables track outstanding bytes (ie. not yet arrived bytes)
+        // that the receiver knows they must arrive in the future.
         std::vector<uint32_t> inflightUnschedPerPrio;
         std::vector<uint32_t> inflightSchedPerPrio;
         uint64_t inflightSchedBytes;
