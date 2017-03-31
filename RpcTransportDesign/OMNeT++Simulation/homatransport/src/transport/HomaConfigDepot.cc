@@ -54,6 +54,7 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
         ownerTransport->par("useUnschRateInScheduler").boolValue();
     xmlConfig = ownerTransport->par("transportConfig").xmlValue();
     workloadType = ownerTransport->par("workloadType").stringValue();
+    linkCheckBytes = (uint32_t)ownerTransport->par("linkCheckBytes");
     paramToEnum();
 
     // read in explicitUnschedPrioCutoff

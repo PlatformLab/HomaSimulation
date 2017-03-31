@@ -104,6 +104,11 @@ class HomaConfigDepot {
     // is for SRBF scheduler.
     bool isRoundRobinScheduler;
 
+    // If receiver inbound link is idle for longer than (link speed X
+    // bwCheckInterval), while there are senders waiting for grants, we consider
+    // receiver bw is wasted.
+    uint32_t linkCheckBytes;
+
     // Specifies that only first cbfCapMsgSize bytes of a message must be used
     // in computing the cbf function.
     uint32_t cbfCapMsgSize;

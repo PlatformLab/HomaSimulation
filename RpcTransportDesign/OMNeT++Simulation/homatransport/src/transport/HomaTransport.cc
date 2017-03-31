@@ -138,6 +138,7 @@ HomaTransport::initialize()
     registerTemplatedStats();
     distEstimator = new WorkloadEstimator(homaConfig);
     prioResolver = new PriorityResolver(homaConfig, distEstimator);
+    rxScheduler.initialize(homaConfig, prioResolver);
     sxController.initSendController(homaConfig, prioResolver);
     outstandingGrantBytes = 0;
 
@@ -231,6 +232,10 @@ HomaTransport::handleMessage(cMessage *msg)
             case SelfMsgKind::EMITTER:
                 ASSERT(msg == emitSignalTimer);
                 testAndEmitStabilitySignal();
+                break;
+            case SelfMsgKind::BW_CHECK:
+                ASSERT(msg == rxScheduler.schedBwUtilTimer);
+                rxScheduler.schedSenders->handleBwUtilTimerEvent(msg);
                 break;
         }
     } else {
@@ -1092,6 +1097,8 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     , ipSendersMap()
     , grantTimersMap()
     , schedSenders(NULL)
+    , schedBwUtilTimer(NULL)
+    , bwCheckInterval(0)
     , inflightUnschedPerPrio()
     , inflightSchedPerPrio()
     , inflightSchedBytes(0)
@@ -1128,7 +1135,7 @@ HomaTransport::ReceiveScheduler::initialize(HomaConfigDepot* homaConfig,
     this->homaConfig = homaConfig;
     this->unschRateComp = new UnschedRateComputer(homaConfig,
         homaConfig->useUnschRateInScheduler, 0.1);
-    this->schedSenders = new SchedSenders(homaConfig);
+    this->schedSenders = new SchedSenders(homaConfig, transport, this);
     inflightUnschedPerPrio.resize(this->homaConfig->allPrio);
     inflightSchedPerPrio.resize(this->homaConfig->allPrio);
     bytesRecvdPerPrio.resize(homaConfig->allPrio);
@@ -1139,6 +1146,10 @@ HomaTransport::ReceiveScheduler::initialize(HomaConfigDepot* homaConfig,
     std::fill(bytesRecvdPerPrio.begin(), bytesRecvdPerPrio.end(), 0);
     std::fill(scheduledBytesPerPrio.begin(), scheduledBytesPerPrio.end(), 0);
     std::fill(unschedToRecvPerPrio.begin(), unschedToRecvPerPrio.end(), 0);
+    schedBwUtilTimer = new cMessage("bwUtilChecker");
+    schedBwUtilTimer->setKind(SelfMsgKind::BW_CHECK);
+    bwCheckInterval = SimTime(homaConfig->linkCheckBytes * 8.0 /
+        (homaConfig->nicLinkSpeed * 1e9));
 }
 
 /**
@@ -1208,19 +1219,20 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
         (PktType)rxPkt->getPktType());
     simtime_t pktDuration =
         SimTime(1e-9 * (pktLenOnWire * 8.0 / homaConfig->nicLinkSpeed));
+    simtime_t timeNow = simTime();
 
     // check and update states for oversubscription time and bytes.
     if (schedSenders->numSenders > schedSenders->numToGrant) {
         // Already in an oversubcription period
         ASSERT(inOversubPeriod && oversubPeriodStop==MAXTIME &&
-            oversubPeriodStart < simTime()-pktDuration);
+            oversubPeriodStart < timeNow - pktDuration);
         rcvdBytesPerOversubPeriod += pktLenOnWire;
     } else if (oversubPeriodStop != MAXTIME) {
         // an oversubscription period has recently been marked ended and we need
         // to emit signal to record the stats.
-        ASSERT(!inOversubPeriod && oversubPeriodStop <= simTime());
+        ASSERT(!inOversubPeriod && oversubPeriodStop <= timeNow);
         simtime_t oversubDuration = oversubPeriodStop-oversubPeriodStart;
-        simtime_t oversubOffset = oversubPeriodStop-simTime()+pktDuration;
+        simtime_t oversubOffset = oversubPeriodStop - timeNow + pktDuration;
         if (oversubOffset > 0) {
             oversubDuration += oversubOffset;
             rcvdBytesPerOversubPeriod += (uint64_t)(
@@ -1254,21 +1266,35 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     }
 
     // At each new pkt arrival, the order of senders in the schedSenders list
-    // can change and/or a mesg might need to get a new grant.
+    // can change. So, remove s from the schedSender, create a SchedState for s,
+    // handle the packet.
+    SchedSenders::SchedState old;
+    old.setVar(schedSenders->numToGrant, schedSenders->headIdx,
+        schedSenders->numSenders, s, 0);
     int sIndOld = schedSenders->remove(s);
-    int mesgIdxInS = s->handleInboundPkt(rxPkt);
-    EV_INFO << "remove sender at ind " << sIndOld << "and handled mesg at ind "
-        << mesgIdxInS;
+    old.sInd = sIndOld;
+    EV_INFO << "remove sender at ind " << sIndOld << "and handled pkt";
+
+    // process received packet
+    auto msgCompHandle = s->handleInboundPkt(rxPkt);
+
+    // Handling a received packet can change the state of the scheduled senders.
+    // We need to check for message completion and see if new grant should be
+    // transmitted.
+    SchedSenders::SchedState cur;
     auto ret = schedSenders->insPoint(s);
-    int sInd = ret.first;
-    int headInd = ret.second;
-    schedSenders->handleGrantRequest(s, sInd, headInd);
+    cur.setVar(schedSenders->numToGrant, std::get<1>(ret), std::get<2>(ret),
+        s, std::get<0>(ret));
+
+    schedSenders->handleMesgRecvCompletionEvent(msgCompHandle, old, cur);
+    schedSenders->handlePktArrivalEvent(old, cur);
+    //schedSenders->handleGrantRequest(s, sInd, headInd);
 
     // check and update states for oversubscription time and bytes.
     if (schedSenders->numSenders <= schedSenders->numToGrant) {
         if (inOversubPeriod) {
             // oversubscription period ended. emit signals and record stats.
-            transport->emit(oversubTimeSignal, simTime() - oversubPeriodStart);
+            transport->emit(oversubTimeSignal, timeNow - oversubPeriodStart);
             transport->emit(oversubBytesSignal, rcvdBytesPerOversubPeriod);
         }
         // reset the states and variables
@@ -1282,11 +1308,35 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
         ASSERT(rcvdBytesPerOversubPeriod == 0 &&
             oversubPeriodStart == MAXTIME && oversubPeriodStop == MAXTIME);
         inOversubPeriod = true;
-        oversubPeriodStart = simTime() - pktDuration;
+        oversubPeriodStart = timeNow - pktDuration;
         oversubPeriodStop = MAXTIME;
         rcvdBytesPerOversubPeriod += pktLenOnWire;
+
     }
     delete rxPkt;
+
+    // Each new data packet arrival is a hint that recieve link is being
+    // utilized and we need to cancel/reset the schedBwUtilTimer. The code block
+    // below does this job.
+    if (!schedSenders->numSenders) {
+        // If no sender is waiting for grants, then there's no point to
+        // track sched bw utilization.
+        transport->cancelEvent(schedBwUtilTimer);
+        return;
+    }
+
+    if (!schedBwUtilTimer->isScheduled()) {
+        transport->scheduleAt(timeNow + bwCheckInterval,
+            schedBwUtilTimer);
+        return;
+    }
+
+    simtime_t schedTime = schedBwUtilTimer->getArrivalTime();
+    transport->cancelEvent(schedBwUtilTimer);
+    transport->scheduleAt(
+        std::max(schedTime, timeNow + bwCheckInterval),
+        schedBwUtilTimer);
+    return;
 }
 
 /**
@@ -1302,16 +1352,19 @@ void
 HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
 {
     SenderState* s = grantTimersMap[grantTimer];
-    schedSenders->remove(s);
-    auto ret = schedSenders->insPoint(s);
-    int sInd = ret.first;
-    int headInd = ret.second;
-    schedSenders->handleGrantRequest(s, sInd, headInd);
+    schedSenders->handleGrantTimerEvent(s);
+
+    //schedSenders->remove(s);
+    //auto ret = schedSenders->insPoint(s);
+    //int sInd = ret.first;
+    //int headInd = ret.second;
+    //schedSenders->handleGrantRequest(s, sInd, headInd);
     if (inOversubPeriod &&
             schedSenders->numSenders <= schedSenders->numToGrant) {
-        // Receiver was in an oversubscription period which is now ended after
+        // Receiver was in an oversubscriped period which is now ended after
         // sending the most recent grant. Mark the end of oversubscription
-        // period.
+        // period. Later we dump the statistics in the next packet arrival
+        // event.
         inOversubPeriod = false;
         oversubPeriodStop = simTime();
     }
@@ -1440,8 +1493,9 @@ HomaTransport::ReceiveScheduler::SenderState::SenderState(
         cMessage* grantTimer, HomaConfigDepot* homaConfig)
     : homaConfig(homaConfig)
     , rxScheduler(rxScheduler)
-    , grantTimer(grantTimer)
     , senderAddr(srcAddr)
+    , grantTimer(grantTimer)
+    , timePaceGrants(true)
     , mesgsToGrant()
     , incompleteMesgs()
     , lastGrantPrio(homaConfig->allPrio)
@@ -1478,15 +1532,32 @@ HomaTransport::ReceiveScheduler::SenderState::getNextGrantTime(
  * \param rxPkt
  *      The data packet received from the sender.
  * \return
- *      return -1, if rxPkt belong to a mesg that doesn't need (anymore?) grant.
- *      Returns 0 if rxPkt belongs to a the most preferred scheduled mesg of the
- *      sender that needs more grants. Return +1 if rxPkt belongs to a scheduled
- *      mesg of sender but the mesg is not the most preffered scheduled mesg for
- *      the sender.
+ *      returns a pair <scheduledMesg?, incompletMesg?>.
+ *      schedMesg is True if rxPkt belongs to a scheduled message (ie. a message
+ *      that needs at least one grant when the receiver first know about it).
+ *
+ *      schedMesg is False if rxPkt belongs to a fully unscheduled message (a
+ *      message that all of its bytes are received in unscheduled packets).
+ *
+ *      incompleteMesg is -1 if rxPkt is the last packet of an inbound message and
+ *      reception of the rxPkt completes the reception of the message.
+ *
+ *      incompleteMesg is 0 if scheduledMesg is True and the mesg rxPkt belongs to
+ *      is not complete (ie. has more inbound inflight packets) but it doesn't
+ *      any more grants.
+ *
+ *      incompleteMesg is a positive rank number if scheduledMesg is True and
+ *      the mesg rxPkt belongs to needs more grants. In which case the positive
+ *      rank number is 1 if the mesg is the most prefered mesg among all
+ *      scheduled message of the sender. Otherwise, rank number is 2.
+ *
+ *      incompleteMesg is the positive remaining bytes of the mesg yet to be
+ *      received if scheduledMesg is False.
  */
-int
+std::pair<bool, int>
 HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
 {
+    std::pair<bool, int> ret;
     uint32_t pktData =  rxPkt->getDataBytes();
     PktType pktType = (PktType)rxPkt->getPktType();
     InboundMessage* inboundMesg = NULL;
@@ -1543,6 +1614,13 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
         cRuntimeError("PktType %d is not recongnized", rxPkt->getPktType());
     }
 
+    bool isMesgSched =
+        (inboundMesg->msgSize - inboundMesg->totalUnschedBytes > 0);
+    ret.first = isMesgSched;
+    if (!isMesgSched) {
+        ASSERT(inboundMesg->msgSize == inboundMesg->totalUnschedBytes);
+    }
+
     if (inboundMesg->bytesToReceive == 0) {
         ASSERT(inboundMesg->bytesToGrant == 0);
 
@@ -1553,17 +1631,21 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
         // remove this message from the incompleteRxMsgs
         incompleteMesgs.erase(inboundMesg->msgIdAtSender);
         delete inboundMesg;
-        return -1;
+        ret.second = -1;
     } else if (inboundMesg->bytesToGrant == 0) {
-
-        // no grant needed for this mesg but mesg is not complete yet and we
-        // still need to keep the message until all of its packets has arrived
-        return -1;
+        // no grants needed for this mesg but mesg is not complete yet and we
+        // need to keep the message aroudn until all of its packets are arrived.
+        if (isMesgSched) {
+            ret.second = 0;
+        } else {
+            ret.second = inboundMesg->bytesToReceive;
+        }
     } else {
         auto resPair = mesgsToGrant.insert(inboundMesg);
         ASSERT(resPair.second);
-        return resPair.first == mesgsToGrant.begin() ? 0 : 1;
+        ret.second = (resPair.first == mesgsToGrant.begin()) ? 1 : 2;
     }
+    return ret;
 }
 
 /**
@@ -1616,7 +1698,7 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     lastGrantPrio = grantPrio;
     lastIdx = newIdx;
 
-    // update stats and send grant
+    // update stats and send a grant
     grantSize = grantPkt->getGrantFields().grantBytes;
     uint16_t prio = grantPkt->getGrantFields().schedPrio;
     rxScheduler->addPendingGrantedBytes(prio, grantSize);
@@ -1625,7 +1707,8 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     rxScheduler->transport->emit(outstandingGrantBytesSignal,
         rxScheduler->transport->outstandingGrantBytes);
     if (topMesg->bytesToGrant > 0) {
-        if (topMesg->totalBytesInFlight < homaConfig->maxOutstandingRecvBytes) {
+        if (topMesg->totalBytesInFlight < homaConfig->maxOutstandingRecvBytes &&
+                timePaceGrants) {
             rxScheduler->transport->scheduleAt(
             getNextGrantTime(currentTime, grantSize), grantTimer);
         }
@@ -1640,7 +1723,8 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
     InboundMessage* newTopMesg = *topMesgIt;
     ASSERT(newTopMesg->bytesToGrant > 0);
 
-    if (newTopMesg->totalBytesInFlight < homaConfig->maxOutstandingRecvBytes) {
+    if (newTopMesg->totalBytesInFlight < homaConfig->maxOutstandingRecvBytes &&
+            timePaceGrants) {
         rxScheduler->transport->scheduleAt(
             getNextGrantTime(simTime(), grantSize), grantTimer);
     }
@@ -1654,8 +1738,10 @@ HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
  *      Collection of all user specified config parameters for the transport
  */
 HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
-        HomaConfigDepot* homaConfig)
-    : senders()
+        HomaConfigDepot* homaConfig, HomaTransport* transport,
+        ReceiveScheduler* rxScheduler)
+    : transport(transport)
+    , senders()
     , schedPrios(homaConfig->adaptiveSchedPrioLevels)
     , numToGrant(homaConfig->numSendersToKeepGranted)
     , headIdx(schedPrios)
@@ -1689,6 +1775,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
  *      The index of the top rank or most preferred sender in the receiver's
  *      senders list.
  */
+/*
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
     SenderState* s, int sInd, int headInd)
@@ -1712,20 +1799,22 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
     }
 
     // The grant sent, was the last grant of the 1st preferred sched message of
-    // s. The 2nd top sched message of s, ranks s beyond number of senders we
-    // can grant.
+    // s. The 2nd preffered sched message of s, ranks s beyond number of senders
+    // we can grant.
     if (sIndNew > 0) {
         insert(s);
     }
-    s = removeAt(headIdx + numToGrant - 1);
+    int indToGrant = headIdx + numToGrant - 1;
+    s = removeAt(indToGrant);
     if (!s)
         return;
 
     auto retNew = insPoint(s);
-    int sIndNewNew = retNew.first;
+    int indToGrantNew = retNew.first;
     int headIndNewNew = retNew.second;
-    handleGrantRequest(s, sIndNewNew, headIndNewNew);
+    handleGrantRequest(s, indToGrantNew, headIndNewNew);
 }
+*/
 
 /**
  * Removes a SenderState from sendrs list.
@@ -1820,8 +1909,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::insert(SenderState* s)
 {
     ASSERT(!s->mesgsToGrant.empty());
     auto ins = insPoint(s);
-    size_t insIdx = ins.first;
-    size_t newHeadIdx = ins.second;
+    size_t insIdx = std::get<0>(ins);
+    size_t newHeadIdx = std::get<1>(ins);
 
     for (int i = 0; i < (int)headIdx - 1; i++) {
         ASSERT(!senders[i]);
@@ -1847,15 +1936,16 @@ HomaTransport::ReceiveScheduler::SchedSenders::insert(SenderState* s)
  * \param s
  *      SenderState to be inserted.
  * \return
- *      returns a pair (insertedIndex, headIndex). insertedIndex negative, means
- *      s doesn't belong to the schedSenders.
+ *      returns a tuple of (insertedIndex, headIndex, numSenders) as if s is
+ *      inserted in the list. insertedIndex negative, means s doesn't belong to
+ *      the schedSenders.
  */
-std::pair<int, int>
+std::tuple<int, int, int>
 HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
 {
     CompSched cmpSched;
     if (s->mesgsToGrant.empty()) {
-        return std::make_pair(-1, headIdx);
+        return std::make_tuple(-1, headIdx, numSenders);
     }
     std::vector<SenderState*>::iterator headIt = headIdx + senders.begin();
     auto insIt = std::upper_bound(headIt, headIt+numSenders, s, cmpSched);
@@ -1880,7 +1970,425 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
         hIdx -= leftShift;
         insIdx -= leftShift;
     }
-    return std::make_pair(insIdx, hIdx);
+    return std::make_tuple(insIdx, hIdx, numSxAfterIns);
+}
+
+/**
+ * Processes the schedBwUtilTimer triggers and implements the mechanism to
+ * properly react to wasted receiver bandwidth when scheduled senders don't send
+ * scheduled packets in a timely fashion.
+ *
+ * \param timer
+ *      Timer object that triggers when bw wastage is detected (ie. the receiver
+ *      expected scheduled packets but they weren't received as expected.)
+ */
+void
+HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
+        cMessage* timer) {
+    simtime_t timeNow = simTime();
+    if (numSenders < numToGrant) {
+        return;
+    }
+    
+    int indToGrant = headIdx + numToGrant - 1;
+    SenderState* lowPrioSx = senders[indToGrant];
+
+    // Runtime testing with asserts
+    auto topMesgIt = lowPrioSx->mesgsToGrant.begin();
+    ASSERT(topMesgIt != lowPrioSx->mesgsToGrant.end());
+    InboundMessage* topMesg = *topMesgIt;
+    ASSERT(topMesg->bytesToGrant > 0);
+    // End testing
+    
+    SchedState ss;
+    if (!lowPrioSx->timePaceGrants) {
+        // we have previously incremented overcommittment level
+        ss.setVar(numToGrant, headIdx, numSenders, lowPrioSx, indToGrant);
+        lowPrioSx->sendAndScheduleGrant(getPrioForMesg(ss));
+
+        if (topMesg->totalBytesInFlight >= homaConfig->maxOutstandingRecvBytes) {
+            lowPrioSx->timePaceGrants = true;
+        }
+
+        // enable timer for next bubble detection
+        transport->scheduleAt(timeNow + rxScheduler->bwCheckInterval,
+            rxScheduler->schedBwUtilTimer);
+        return;
+    }
+
+    // Bubble detected and no sender has been previously promoted, so promote
+    // next ungranted sched sender and send grants for it.
+    if (numSenders <= numToGrant) {
+        // all sched senders are currently being granted. No need to increase
+        // numToGrant
+        return;
+    }
+    numToGrant++;
+    if (headIdx) {
+        // Runtime testing with asserts
+        for (size_t i = 0; i < headIdx; i++) {
+            ASSERT(!senders[i]);
+        } // End testing
+        headIdx--;
+        senders.erase(senders.begin());
+    }
+
+    // enable timer for next bubble detection
+    transport->scheduleAt(timeNow + rxScheduler->bwCheckInterval,
+        rxScheduler->schedBwUtilTimer);
+    
+    indToGrant = headIdx + numToGrant - 1;
+    lowPrioSx = senders[indToGrant];
+
+    // Runtime testing with asserts
+    topMesgIt = lowPrioSx->mesgsToGrant.begin();
+    ASSERT(topMesgIt != lowPrioSx->mesgsToGrant.end());
+    topMesg = *topMesgIt;
+    ASSERT(topMesg->bytesToGrant > 0);
+    ASSERT(lowPrioSx->timePaceGrants);
+    // End testing
+    
+    lowPrioSx->timePaceGrants = false;
+    ss.setVar(numToGrant, headIdx, numSenders, lowPrioSx, indToGrant);
+    lowPrioSx->sendAndScheduleGrant(getPrioForMesg(ss));
+}
+
+
+void
+HomaTransport::ReceiveScheduler::SchedSenders::handlePktArrivalEvent(
+    SchedState& old, SchedState& cur)
+{
+    if (cur.sInd < 0) {
+
+        if (old.sInd < 0 || old.sInd >= (old.numToGrant + old.headIdx)) {
+            return;
+        }
+
+        if (old.sInd >= old.headIdx &&
+                old.sInd < old.numToGrant + old.headIdx) {
+            int indToGrant;
+            SenderState* sToGrant;
+            if (cur.numSenders < cur.numToGrant) {
+                indToGrant = cur.headIdx + cur.numSenders - 1;
+                sToGrant = removeAt(indToGrant);
+            } else {
+                indToGrant = cur.headIdx + cur.numToGrant - 1;
+                sToGrant = removeAt(indToGrant);
+            }
+
+            if (sToGrant->timePaceGrants) {
+                old = cur;
+                old.s = sToGrant;
+                old.sInd = indToGrant;
+
+                sToGrant->sendAndScheduleGrant(getPrioForMesg(old));
+
+                auto ret = insPoint(sToGrant);
+                cur.numToGrant = numToGrant;
+                cur.sInd = std::get<0>(ret);
+                cur.headIdx = std::get<1>(ret);
+                cur.numSenders = std::get<2>(ret);
+                cur.s = sToGrant;
+                handleGrantSentEvent(old, cur);
+            }
+
+            return;
+        }
+        throw cRuntimeError("invalid old position for sender in the receiver's"
+            " preference list");
+    }
+
+    if (cur.sInd >= cur.headIdx + cur.numToGrant) {
+        if (old.sInd < 0 || old.sInd >= old.headIdx + old.numToGrant) {
+            insert(cur.s);
+            return;
+        }
+
+        if (old.sInd >= old.headIdx && old.sInd < old.numToGrant + old.headIdx) {
+            insert(cur.s);
+            int indToGrant = cur.headIdx + cur.numToGrant - 1;
+            SenderState* sToGrant = removeAt(indToGrant);
+
+            if (sToGrant->timePaceGrants) {
+                old = cur;
+                old.s = sToGrant;
+                old.sInd = indToGrant;
+
+                sToGrant->sendAndScheduleGrant(getPrioForMesg(old));
+
+                auto ret = insPoint(sToGrant);
+                cur.numToGrant = numToGrant;
+                cur.sInd = std::get<0>(ret);
+                cur.headIdx = std::get<1>(ret);
+                cur.numSenders = std::get<2>(ret);
+                cur.s = sToGrant;
+                handleGrantSentEvent(old, cur);
+            }
+            return;
+        }
+        throw cRuntimeError("invalid old position for sender in the receiver's"
+            " preference list");
+    }
+
+    if (cur.sInd < cur.headIdx + cur.numToGrant) {
+        if (old.sInd < 0 || old.sInd >= old.numToGrant + old.sInd) {
+            if (cur.numSenders > cur.numToGrant) {
+                if (cur.sInd == cur.headIdx + cur.numToGrant - 1) {
+                    cur.s->timePaceGrants = senders[cur.sInd]->timePaceGrants;
+                    senders[cur.sInd]->timePaceGrants = true;
+                } else {
+                    auto premtdSndr1 = senders[cur.headIdx + cur.numToGrant - 1];
+                    auto premtdSndr2 = senders[cur.headIdx + cur.numToGrant - 2];
+                    premtdSndr2->timePaceGrants = premtdSndr1->timePaceGrants;
+                    premtdSndr1->timePaceGrants = true;
+                }
+            }
+        } else if (cur.numSenders >= cur.numToGrant) {
+            if (cur.sInd == cur.headIdx + cur.numToGrant - 1 &&
+                    old.sInd < old.headIdx + old.numToGrant -1) {
+                cur.s->timePaceGrants = senders[cur.sInd-1]->timePaceGrants;
+                senders[cur.sInd-1]->timePaceGrants = true;
+            } else if (old.sInd == old.headIdx + old.numToGrant - 1 &&
+                    cur.sInd < cur.headIdx + cur.numToGrant -1) {
+                senders[cur.sInd-1]->timePaceGrants = cur.s->timePaceGrants;
+                cur.s->timePaceGrants = true;
+            }
+        }
+
+        if (cur.s->timePaceGrants) {
+            old = cur;
+            cur.s->sendAndScheduleGrant(getPrioForMesg(old));
+            auto ret = insPoint(cur.s);
+            cur.sInd = std::get<0>(ret);
+            cur.headIdx = std::get<1>(ret);
+            cur.numSenders = std::get<2>(ret);
+            handleGrantSentEvent(old, cur);
+        }
+        return;
+    }
+
+    ASSERT(cur.sInd >= 0 && cur.sInd < cur.headIdx);
+    throw cRuntimeError("Error, sender has invalid position in receiver's "
+        "preference list.");
+}
+
+void
+HomaTransport::ReceiveScheduler::SchedSenders::handleGrantSentEvent(
+    SchedState& old, SchedState& cur)
+{
+    ASSERT(old.sInd >= old.headIdx && old.sInd < old.headIdx + old.numToGrant);
+    if (old.sInd == cur.sInd) {
+        ASSERT (cur.sInd < cur.headIdx + cur.numToGrant);
+        insert(cur.s);
+        return;
+    }
+
+    if (cur.sInd >= 0 && cur.sInd < cur.headIdx) {
+        throw cRuntimeError("Error, sender has invalid position in receiver's "
+            "preference list.");
+    }
+
+    if (cur.sInd < 0 || cur.sInd >= cur.numToGrant + cur.headIdx) {
+        if (old.numSenders > old.numToGrant) {
+            int ind = cur.headIdx + cur.numToGrant - 1;
+            if (old.sInd == old.headIdx + old.numToGrant - 1) {
+                senders[ind]->timePaceGrants = cur.s->timePaceGrants;
+            } else {
+                senders[ind]->timePaceGrants = senders[ind-1]->timePaceGrants;
+                senders[ind-1]->timePaceGrants = true;
+            }
+        }
+        cur.s->timePaceGrants = true;
+
+
+    } else {
+        if (old.sInd == old.numToGrant + old.headIdx - 1 &&
+                !old.s->timePaceGrants) {
+            senders[cur.headIdx + cur.numToGrant - 2]->timePaceGrants = false;
+            cur.s->timePaceGrants = true;
+        } else if (cur.sInd == cur.numToGrant + cur.headIdx - 1 &&
+                !senders[cur.numToGrant + cur.headIdx - 2]->timePaceGrants) {
+            cur.s->timePaceGrants = false;
+            senders[cur.numToGrant + cur.headIdx - 2]->timePaceGrants = true;
+        }
+    }
+
+    if (cur.sInd >= 0) {
+        insert(cur.s);
+    }
+
+    if ((cur.sInd < 0 || cur.sInd >= cur.numToGrant + cur.headIdx) &&
+            cur.numSenders >= cur.numToGrant) {
+        int indToGrant = cur.numToGrant + cur.headIdx - 1;
+        SenderState* sToGrant = removeAt(indToGrant);
+        if (sToGrant->timePaceGrants) {
+            old = cur;
+            old.s = sToGrant;
+            old.sInd = indToGrant;
+
+            sToGrant->sendAndScheduleGrant(getPrioForMesg(old));
+
+            auto ret = insPoint(sToGrant);
+            cur.numToGrant = numToGrant;
+            cur.sInd = std::get<0>(ret);
+            cur.headIdx = std::get<1>(ret);
+            cur.numSenders = std::get<2>(ret);
+            cur.s = sToGrant;
+            handleGrantSentEvent(old, cur);
+        }
+        return;
+    }
+}
+
+void
+HomaTransport::ReceiveScheduler::SchedSenders::handleGrantTimerEvent(
+    SenderState* s)
+{
+    remove(s);
+    auto ret = insPoint(s);
+    int sInd = std::get<0>(ret);
+    int headInd = std::get<1>(ret);
+    int sendersNum = std::get<2>(ret);
+
+    if (sInd < 0)
+        return;
+
+    if (sInd - headInd >= numToGrant) {
+        insert(s);
+        return;
+    }
+
+    SchedState old;
+    SchedState cur;
+    if (s->timePaceGrants) {
+        old.numToGrant = numToGrant;
+        old.headIdx = headInd;
+        old.numSenders = sendersNum;
+        old.s = s;
+        old.sInd = sInd;
+
+        s->sendAndScheduleGrant(getPrioForMesg(old));
+
+        auto ret = insPoint(s);
+        cur.numToGrant = numToGrant;
+        cur.s = s;
+        cur.sInd = std::get<0>(ret);
+        cur.headIdx = std::get<1>(ret);
+        cur.numSenders = std::get<2>(ret);
+        handleGrantSentEvent(old, cur);
+        return;
+    }
+}
+
+void
+HomaTransport::ReceiveScheduler::SchedSenders::handleMesgRecvCompletionEvent(
+    const std::pair<bool, int>& msgCompHandle, SchedState& old, SchedState& cur)
+{
+    bool schedMesgFin = msgCompHandle.first;
+    int mesgRemain = msgCompHandle.second;
+    if (!schedMesgFin || mesgRemain >= 0) {
+        // if a scheduled mesg is not completed before the call to this method,
+        // there's nothing to do here; just return;
+        return;
+    }
+
+    ASSERT(cur.numToGrant == numToGrant && old.numToGrant == numToGrant);
+    if (numToGrant == homaConfig->numSendersToKeepGranted) {
+        // if numToGrant is at its lowest possible value, there's nothing to do
+        // here; just return;
+        return;
+    }
+
+    if (cur.sInd < 0) {
+        // s is not a schedSender
+        cur.s->timePaceGrants = true;
+        if (old.sInd < 0 ) {
+            // s either has been fully granted in the past or not eligible for
+            // grants, and one of its granted mesgs is completed.
+            if (cur.numSenders > numToGrant) {
+                auto premtdSndr = senders[cur.headIdx + cur.numToGrant - 1];
+                premtdSndr->timePaceGrants = true;
+            }
+            numToGrant--;
+            cur.numToGrant--;
+            return;
+
+        } else if (old.sInd >= old.headIdx + old.numToGrant - 1) {
+            if (cur.numSenders > numToGrant) {
+                auto premtdSndr = senders[cur.headIdx + cur.numToGrant - 1];
+                premtdSndr->timePaceGrants = true;
+            }
+
+            numToGrant--;
+            cur.numToGrant--;
+            return;
+        } else {
+            // s was among preferred mesgs for granting, but not any more
+            numToGrant--;
+            cur.numToGrant--;
+            if (cur.numSenders >= cur.numToGrant) {
+                auto premtdSndr = senders[cur.headIdx + cur.numToGrant - 1];
+                premtdSndr->timePaceGrants = true;
+            }
+            return;
+        }
+
+    } else if (cur.sInd >= cur.numToGrant + cur.headIdx - 1) {
+        cur.s->timePaceGrants = true;
+        if (old.sInd >= old.numToGrant + old.headIdx - 1 || old.sInd < 0) {
+            if (cur.numSenders > cur.numToGrant) {
+                auto premtdSndr = senders[cur.headIdx + cur.numToGrant - 1];
+                premtdSndr->timePaceGrants = true;
+            }
+            numToGrant--;
+            cur.numToGrant--;
+            return;
+        } else {
+            // s was among preferred mesgs for granting, but not any more
+            numToGrant--;
+            cur.numToGrant--;
+            if (cur.numSenders >= cur.numToGrant) {
+                auto premtdSndr = senders[cur.headIdx + cur.numToGrant - 1];
+                premtdSndr->timePaceGrants = true;
+            }
+            return;
+        }
+    } else {
+        // s is among the senders to be granted
+        cur.s->timePaceGrants = true;
+        if (old.sInd < 0 || old.sInd >= old.numToGrant + old.headIdx - 1) {
+            if (cur.numSenders > cur.numToGrant) {
+                auto premtdSndr = senders[old.headIdx + old.numToGrant - 1];
+                premtdSndr->timePaceGrants = true;
+            }
+            numToGrant--;
+            cur.numToGrant--;
+            return;
+        } else {
+            numToGrant--;
+            cur.numToGrant--;
+            if (cur.numSenders > cur.numToGrant) {
+                int premtdInd; 
+                if (old.sInd == old.headIdx) {
+                    ASSERT(old.headIdx == cur.headIdx);
+                    premtdInd = old.headIdx + cur.numToGrant;
+                } else {
+                    premtdInd = old.headIdx + cur.numToGrant - 1;
+                }
+                auto premtdSndr = senders[premtdInd];
+                premtdSndr->timePaceGrants = true;
+            }
+            return;
+        }
+    }
+}
+
+uint16_t
+HomaTransport::ReceiveScheduler::SchedSenders::getPrioForMesg(SchedState& st)
+{
+    int grantPrio =
+        st.sInd + homaConfig->allPrio - homaConfig->adaptiveSchedPrioLevels;
+    return std::min(homaConfig->allPrio - 1, grantPrio);
 }
 
 /**
@@ -1933,8 +2441,8 @@ HomaTransport::ReceiveScheduler::UnschedRateComputer::getAvgUnschRate(
 }
 
 /**
- * Interface for accumulating the unsched bytes for rate calculation. This is
- * called evertime an unscheduled packet arrives.
+ * Interface for accumulating the unsched bytes for unsched rate calculation.
+ * This is called evertime an unscheduled packet arrives.
  *
  * \param arrivalTime
  *      Time at which unscheduled packet arrived.

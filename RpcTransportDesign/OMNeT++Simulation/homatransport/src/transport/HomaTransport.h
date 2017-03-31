@@ -405,7 +405,8 @@ class HomaTransport : public cSimpleModule
 
       PROTECTED:
         void copy(const InboundMessage& other);
-        void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd, PktType pktType);
+        void fillinRxBytes(uint32_t byteStart, uint32_t byteEnd,
+            PktType pktType);
         uint32_t schedBytesInFlight();
         uint32_t unschedBytesInFlight();
         HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
@@ -455,17 +456,21 @@ class HomaTransport : public cSimpleModule
             simtime_t getNextGrantTime(simtime_t currentTime,
                 uint32_t grantSize);
             int sendAndScheduleGrant(uint32_t grantPrio);
-            int handleInboundPkt(HomaPkt* rxPkt);
+            std::pair<bool, int> handleInboundPkt(HomaPkt* rxPkt);
 
           PROTECTED:
             HomaConfigDepot* homaConfig;
             ReceiveScheduler* rxScheduler;
+            inet::IPv4Address senderAddr;
 
             // Timer object for sending grants for this sender. Will be used
-            // to send grants for this sender if totalBytesInFlight for the
-            // top mesg of this sender is less than RTT.
+            // to send timer paced grants for this sender if totalBytesInFlight
+            // for the top mesg of this sender is less than RTT.
             cMessage* grantTimer;
-            inet::IPv4Address senderAddr;
+
+            // Only if ture, receiver uses grantTimer to pace grants for sender.
+            // True by default.
+            bool timePaceGrants;
 
             // A sorted list of sched messages that need grants from the sender.
             std::set<InboundMessage*, InboundMessage::CompareBytesToGrant>
@@ -487,19 +492,14 @@ class HomaTransport : public cSimpleModule
         /**
          * Collection of all scheduled senders (ie. senders with at least one
          * message that needs grants). This object also contains all information
-         * requiered for scheduling of the messages and implementing the
-         * scheduler logic and sched prio assignment.
+         * requiered for scheduling messages and implementing the scheduler's
+         * logic and the sched prio assignment.
          */
         class SchedSenders {
           PUBLIC:
-            SchedSenders(HomaConfigDepot* homaConfig);
+            SchedSenders(HomaConfigDepot* homaConfig, HomaTransport* transport,
+                ReceiveScheduler* rxScheduler);
             ~SchedSenders();
-            std::pair<int, int> insPoint(SenderState* s);
-            void insert(SenderState* s);
-            int remove(SenderState* s);
-            SenderState* removeAt(uint32_t rmInd);
-            void handleGrantRequest(SenderState* s, int sInd, int headInd);
-
             class CompSched {
               PUBLIC:
                 CompSched(){}
@@ -518,7 +518,59 @@ class HomaTransport : public cSimpleModule
                 }
             };
 
+            class SchedState {
+              PUBLIC:
+                // Total number of senders we allow to be scheduled and granted
+                // at the same time (ie. overcommittment level).
+                int numToGrant;
+
+                // Index of the highest priority sender in the list. This could
+                // be non zero which means no sender will be located at indexes
+                // 0 to headIdx-1 of the senders list.
+                int headIdx;
+
+                // Total number of senders in the list.
+                int numSenders;
+
+                // SenderState for which we have handled one of the events
+                SenderState* s;
+
+                // Index of s in the senders list
+                int sInd;
+
+              PUBLIC:
+                void setVar(uint16_t numToGrant, uint32_t headIdx,
+                    uint32_t numSenders, SenderState* s, int sInd)
+                {
+                    this->numToGrant = numToGrant;
+                    this->headIdx = headIdx;
+                    this->numSenders = numSenders;
+                    this->s = s;
+                    this->sInd = sInd;
+                }
+            };
+
+            std::tuple<int, int, int> insPoint(SenderState* s);
+            void insert(SenderState* s);
+            int remove(SenderState* s);
+            SenderState* removeAt(uint32_t rmInd);
+
+            //void handleGrantRequest(SenderState* s, int sInd, int headInd);
+            uint16_t getPrioForMesg(SchedState& cur);
+            void handleBwUtilTimerEvent(cMessage* timer);
+            void handlePktArrivalEvent(SchedState& old, SchedState& cur);
+            void handleGrantSentEvent(SchedState& old, SchedState& cur);
+            void handleMesgRecvCompletionEvent(
+                const std::pair<bool, int>& msgCompHandle,
+                SchedState& old, SchedState& cur);
+            void handleGrantTimerEvent(SenderState* s);
+
           PROTECTED:
+            // Back pointer to the transport module. 
+            HomaTransport* transport;
+
+            // Back pointer to the ReceiveScheduler managing this container
+            ReceiveScheduler* rxScheduler;
 
             // Sorted list of all scheduled senders.
             std::vector<SenderState*> senders;
@@ -537,6 +589,8 @@ class HomaTransport : public cSimpleModule
 
             // Total number of senders in the list.
             uint32_t numSenders;
+
+            //
 
             //Collection of user provided config parameters for the transport.
             HomaConfigDepot* homaConfig;
@@ -565,6 +619,14 @@ class HomaTransport : public cSimpleModule
         // Collection of all senders that have at least one message that is not
         // fully granted.
         SchedSenders* schedSenders;
+
+        // Timer for detecting if the receiver's scheduled bandwidth is being
+        // wasted. ie. the senders are delaying sending the grants back.
+        cMessage* schedBwUtilTimer;
+
+        // The lenght of time interval during which if we don't receive a
+        // packet, receive bw is considered wasted.
+        simtime_t bwCheckInterval;
 
         //*******************************************************//
         //*****Below variables are for statistic collection******//
@@ -616,7 +678,7 @@ class HomaTransport : public cSimpleModule
         // This period is called an over subscription period.
         simtime_t oversubPeriodStart, oversubPeriodStop;
 
-        // Only true when
+        // Only true when an over subscription period has started not yet ended.
         bool inOversubPeriod;
 
         // Tracks the bytes received during each over subscription period.
@@ -651,6 +713,7 @@ class HomaTransport : public cSimpleModule
         void pendingBytesArrived(PktType pktType, uint16_t prio,
             uint32_t dataBytesInPkt);
         friend class HomaTransport;
+        friend class SchedSenders;
         friend class InboundMessage;
     };
 
@@ -674,7 +737,8 @@ class HomaTransport : public cSimpleModule
         GRANT = 2,   // For the grant timer when it's sending grants.
         SEND  = 3,   // For the send timer, under normal transmit state.
         EMITTER = 4, // When emitSignalTimer is ready to be scheduled.
-        STOP  = 5    // When trasnport shutting down and in the cleaning phase.
+        BW_CHECK = 5,// For schedBwUtilTimer, when it's active.
+        STOP  = 6    // When trasnport shutting down and in the cleaning phase.
     };
 
     /**
