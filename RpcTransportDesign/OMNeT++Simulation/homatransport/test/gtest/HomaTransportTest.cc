@@ -10,7 +10,7 @@ class HomaTransportTest : public ::testing::Test {
     {
         cModuleType* transportType =
             cModuleType::get("homatransport.transport.HomaTransport");
-        (cModule*) transport = transportType->create("transport", this);
+        transport = (HomaTransport*)transportType->create("transport", NULL);
         transport->finalizeParameters();
         transport->buildInside();
         transport->scheduleStart(simTime());

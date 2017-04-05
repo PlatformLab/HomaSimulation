@@ -14,6 +14,7 @@ SOURCE=TestMain.cc \
 	HomaTransportTest.cc \
 	../../src/application/MsgSizeDistributions.cc \
 	../../src/application/WorkloadSynthesizer.cc \
+	../../src/common/GlobalSignalListener.cc \
 	../../src/common/Lagger.cc \
 	../../src/common/Util.cc \
     ../../src/transport/HomaConfigDepot.cc \
@@ -21,7 +22,6 @@ SOURCE=TestMain.cc \
 	../../src/transport/HomaTransport.cc \
 	../../src/transport/PriorityResolver.cc \
 	../../src/transport/PseudoIdealPriorityTransport.cc \
-	../../src/transport/TrafficPacer.cc \
 	../../src/transport/UnschedByteAllocator.cc \
 	../../src/transport/WorkloadEstimator.cc \
 	../../src/application/AppMessage_m.cc \

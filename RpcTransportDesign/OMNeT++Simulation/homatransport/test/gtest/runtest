@@ -28,13 +28,13 @@ OBJS=\
 "$O/application/MsgSizeDistributions.o "\
 "$O/application/WorkloadSynthesizer.o "\
 "$O/common/Lagger.o "\
+"$O/common/GlobalSignalListener.o "\
 "$O/common/Util.o "\
 "$O/transport/HomaConfigDepot.o "\
 "$O/transport/HomaPkt.o "\
 "$O/transport/HomaTransport.o "\
 "$O/transport/PriorityResolver.o "\
 "$O/transport/PseudoIdealPriorityTransport.o "\
-"$O/transport/TrafficPacer.o "\
 "$O/transport/UnschedByteAllocator.o "\
 "$O/transport/WorkloadEstimator.o "\
 "$O/application/AppMessage_m.o "\
