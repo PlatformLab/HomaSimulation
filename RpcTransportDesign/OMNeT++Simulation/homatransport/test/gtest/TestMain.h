@@ -13,12 +13,14 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <gtest/gtest.h>
-#include "TestUtil.h"
-#include "TestMain.h"
+#include <omnetpp.h>
+
+extern cModule* netModule;
+
+#ifndef __HOMATRANSPORT_HOMATRANSPORT_H_
+#define __HOMATRANSPORT_HOMATRANSPORT_H_
 
 int
-testMain(int argc, char *argv[]) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+testMain(int argc, char *argv[]);
+
+#endif //__HOMATRANSPORT_HOMATRANSPORT_H_

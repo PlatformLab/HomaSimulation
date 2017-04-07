@@ -158,6 +158,7 @@ HomaTransport::initialize()
 void
 HomaTransport::processStart()
 {
+    //std::cout << "processStart() init called" << std::endl;
     // initialized udp socket
     socket.setOutputGate(gate("udpOut"));
     socket.bind(homaConfig->localPort);
