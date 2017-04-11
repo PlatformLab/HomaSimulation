@@ -1,3 +1,4 @@
+TESTINTG=0
 all: checkmakefiles
 	cd src && $(MAKE)
 
@@ -10,7 +11,7 @@ cleanall: checkmakefiles
 	rm -f src/Makefile
 
 makefiles:
-	cd src && opp_makemake -f --deep -X dcntopo/results -I../../inet/src -L../../inet/out/$$\(CONFIGNAME\)/src -lINET -DINET_IMPORT -KINET_PROJ=../../inet
+	cd src && opp_makemake -f --deep -X dcntopo/results -I../../inet/src -L../../inet/out/$$\(CONFIGNAME\)/src -lINET -DTESTING=$$\(TESTING\) -KTESTING=$(TESTING) -DINET_IMPORT -KINET_PROJ=../../inet
 
 checkmakefiles:
 	@if [ ! -f src/Makefile ]; then \

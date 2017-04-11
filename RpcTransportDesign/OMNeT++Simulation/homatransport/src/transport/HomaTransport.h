@@ -23,13 +23,20 @@
 #include <unordered_set>
 #include <omnetpp.h>
 #include "common/Minimal.h"
-#include "inet/transportlayer/contract/udp/UDPSocket.h"
 #include "application/AppMessage_m.h"
 #include "transport/HomaPkt.h"
 #include "transport/UnschedByteAllocator.h"
 #include "transport/WorkloadEstimator.h"
 #include "common/Util.h"
 #include "transport/HomaConfigDepot.h"
+#include "mocks/MockUdpSocket.h"
+#include "inet/transportlayer/contract/udp/UDPSocket.h"
+
+#if TESTING
+typedef MockUdpSocket UDPSocket;
+#else
+typedef inet::UDPSocket UDPSocket;
+#endif
 
 // forward decalration to enable mutual header include
 class TrafficPacer;
@@ -814,7 +821,7 @@ class HomaTransport : public cSimpleModule
   PROTECTED:
 
     // UDP socket through which this transport send and receive packets.
-    inet::UDPSocket socket;
+    UDPSocket socket;
 
     // IpAddress of sender host (local host). This parameter is lazily
     // intialized first time an outbound message is arrvied from application or

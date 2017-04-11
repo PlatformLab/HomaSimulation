@@ -76,6 +76,7 @@ HomaTransport::HomaTransport()
  */
 HomaTransport::~HomaTransport()
 {
+    //std::cout << "destructor called" << std::endl;
     delete prioResolver;
     delete distEstimator;
     delete homaConfig;
@@ -116,10 +117,13 @@ HomaTransport::registerTemplatedStats()
 void
 HomaTransport::initialize()
 {
+    //std::cout << "HomaTransport::initialize() invoked." << std::endl;
     // Read in config parameters for HomaTransport from config files and store
     // the parameters in a depot container.
     homaConfig = new HomaConfigDepot(this);
+    //std::cout << homaConfig->destPort << std::endl;
 
+    //std::cout << "transport ptr " << static_cast<void*>(homaConfig) << std::endl;
     // If grantMaxBytes is given too large in the config file, we should correct
     // for it.
     HomaPkt dataPkt = HomaPkt();
@@ -148,6 +152,7 @@ HomaTransport::initialize()
     // setup is complete.)
     sendTimer->setKind(SelfMsgKind::START);
     scheduleAt(simTime(), sendTimer);
+    //std::cout << "transport ptr " << static_cast<void*>(homaConfig) << std::endl;
 }
 
 /**
@@ -1073,13 +1078,13 @@ HomaTransport::OutboundMessage::OutbndPktSorter::operator()(const HomaPkt* pkt1,
     switch (txScheme) {
         case HomaConfigDepot::SenderScheme::OBSERVE_PKT_PRIOS:
         case HomaConfigDepot::SenderScheme::SRBF:
-            return (pkt1->getPriority() > pkt2->getPriority()) ||
-                (pkt1->getPriority() == pkt2->getPriority() &&
-                pkt1->getCreationTime() > pkt2->getCreationTime()) ||
-                (pkt1->getPriority() == pkt2->getPriority() &&
+            return (
+                pkt1->getFirstByte() > pkt2->getFirstByte() ||
+                (pkt1->getFirstByte() == pkt2->getFirstByte() &&
+                    pkt1->getCreationTime() > pkt2->getCreationTime()) ||
+                (pkt1->getFirstByte() == pkt2->getFirstByte() &&
                 pkt1->getCreationTime() == pkt2->getCreationTime() &&
-                pkt1->getUnschedFields().firstByte >
-                pkt2->getUnschedFields().firstByte);
+                pkt1->getPriority() > pkt2->getPriority()));
         default:
                 throw cRuntimeError("Undefined SenderScheme parameter");
     }

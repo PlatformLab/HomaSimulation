@@ -47,7 +47,8 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     cbfCapMsgSize = std::stoul(
         ownerTransport->par("cbfCapMsgSize").stdstringValue(), nullptr, 16);
     boostTailBytesPrio = std::stoul(
-        ownerTransport->par("boostTailBytesPrio").stdstringValue(),nullptr, 16);
+        ownerTransport->par("boostTailBytesPrio").stdstringValue(),
+        nullptr, 16);
     defaultReqBytes = (uint32_t) ownerTransport->par("defaultReqBytes");
     defaultUnschedBytes = (uint32_t) ownerTransport->par("defaultUnschedBytes");
     useUnschRateInScheduler =
@@ -64,6 +65,7 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     while (ss >> cutoffSize) {
         explicitUnschedPrioCutoff.push_back(cutoffSize);
     }
+    //std::cout << "In HomaConfigDepot: " << destPort << "\t" << defaultUnschedBytes << std::endl;
 }
 
 void
