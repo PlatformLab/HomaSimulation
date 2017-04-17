@@ -28,7 +28,7 @@ SOURCE=TestMain.cc \
 	../../src/transport/HomaPkt_m.cc \
 	$(GTEST_DIR)/src/gtest-all.cc
 
-## source directories other than current directory 
+## source directories other than current directory
 SRC_DIR=../../src/transport
 SRC_DIR1=../../src/application
 SRC_DIR2=../../src/common
@@ -52,7 +52,7 @@ LFLAGS=-L../../../omnetpp-4.6/lib \
 	-L../../../inet/src
 
 ## library .a or .so file names are added here
-## drop trailing extension and word "lib" from the begining of file name and 
+## drop trailing extension and word "lib" from the begining of file name and
 ## add -l flag to remaining part
 LIBS = -lm -loppcmdenvd -loppcommond -loppenvird \
 	-loppeventlogd -lopplayoutd \
@@ -64,7 +64,7 @@ LIBS = -lm -loppcmdenvd -loppcommond -loppenvird \
 ## obj directory in the source directory will contain the object files
 OBJS=$(join $(addsuffix obj/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cc=.o)))
 
-## .dep dependency directory in source directory will contain make .h 
+## .dep dependency directory in source directory will contain make .h
 ## dependencies information
 DEPENDS = $(join $(addsuffix .dep/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cc=.d)))
 
@@ -76,7 +76,7 @@ all: $(TARGET)
 	@true
 
 ## Linking rule for making the target
-$(TARGET): $(OBJS) 
+$(TARGET): $(OBJS)
 	@echo "====================="
 	@echo "Linking the target $@"
 	@echo "====================="
@@ -89,9 +89,9 @@ $(TARGET): $(OBJS)
 	@mkdir -p $(dir $@)
 	@echo "============"
 	@echo "compiling $@"
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(IFLAGS) -c $< -o $@  
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(IFLAGS) -c $< -o $@
 
-## Rule for object files in the current source directory 
+## Rule for object files in the current source directory
 ## object files are located in obj directory under the source directory
 obj/%.o: %.cc
 	@mkdir -p $(dir $@)
@@ -130,7 +130,7 @@ $(GTEST_SRC_DIR)/obj/%.o: $(GTEST_SRC_DIR)/%.cc
 
 
 ## Make dependancy rules for current source directory
-## dependency .d files are stored under .dep directory in 
+## dependency .d files are stored under .dep directory in
 ## source directory
 .dep/%.d: %.cc
 	@mkdir -p $(dir $@)
@@ -139,7 +139,7 @@ $(GTEST_SRC_DIR)/obj/%.o: $(GTEST_SRC_DIR)/%.cc
 	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^obj/$*.o^" > $@'
 
 ## Dependency rule for "other" directory
-## dependency .d files are stored under .dep directory in 
+## dependency .d files are stored under .dep directory in
 ## the "other" source directory
 $(SRC_DIR)/.dep/%.d: $(SRC_DIR)/%.cc
 	@mkdir -p $(dir $@)

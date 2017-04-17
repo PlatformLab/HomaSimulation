@@ -14,7 +14,7 @@ class UnschedByteAllocatorTest : public ::testing::Test {
     DISALLOW_COPY_AND_ASSIGN(UnschedByteAllocatorTest);
 };
 
-TEST_F(UnschedByteAllocatorTest, basic) {
+TEST_F (UnschedByteAllocatorTest, basic) {
     EXPECT_EQ(unschedBytesAllocator.rxAddrReqbyteMap.size(), 0);
 }
 

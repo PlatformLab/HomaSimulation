@@ -20,28 +20,32 @@ cModule* netModule;
     [General]
     network = Test
     cmdenv-express-mode = false
+    **.result-recording-modes = - # record nothind
+    **.scalar-recording = false
+    **.vector-recording = false
 
     **.transportSchemeType = "${transportSchemeType = HomaTransport}"
     **.nicLinkSpeed = 10Gbps
     **.isRoundRobinScheduler = false
     **.useUnschRateInScheduler = false
-    **.prioLevels = 16
-    **.prioResolverPrioLevels = 8
-    **.adaptiveSchedPrioLevels = 8 
-    **.numSendersToKeepGranted = 8
+    **.prioLevels = 8
+    **.prioResolverPrioLevels = 4
+    **.adaptiveSchedPrioLevels = 4
+    **.numSendersToKeepGranted = 3
     **.localPort = 2222
     **.destPort = 2222
     **.transportType = "HomaTransport"
+    **.signalEmitPeriod = ${signalEmitPeriod=100} s
 
     **.RTT = ${RTT=0x2710} ##10000B is the min RTT in bytes
     **.maxOutstandingRecvBytes = ${maxOutstandingRecvBytes = $RTT} B
     **.unschedPrioResolutionMode = "${unschedPrioResolutionMode = STATIC_CBF_GRADUATED}"
     **.unschedPrioUsageWeight = ${unschedPrioUsageWeight = 1}
     **.cbfCapMsgSize = "${cbfCapMsgSize = $RTT}"
-    **.boostTailBytesPrio = "${boostTailBytesPrio = $RTT}"
+    **.boostTailBytesPrio = "${boostTailBytesPrio = 0}"
     **.defaultReqBytes = ${defaultReqBytes = 1442 }B
     **.defaultUnschedBytes = ${defaultUnschedBytes = 7886 }B
-    **.senderScheme = "${senderScheme = SRBF}" 
+    **.senderScheme = "${senderScheme = SRBF}"
     **.accountForGrantTraffic = ${accountForGrantTraffic = true}
     **.linkCheckBytes = 1600B
     **.workloadType = "${workloadType = GOOGLE_ALL_RPC}"

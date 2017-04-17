@@ -460,6 +460,9 @@ class HomaTransport : public cSimpleModule
                 ReceiveScheduler* rxScheduler, cMessage* grantTimer,
                 HomaConfigDepot* homaConfig);
             ~SenderState(){}
+            const inet::IPv4Address& getSenderAddr() {
+                return senderAddr;
+            }
             simtime_t getNextGrantTime(simtime_t currentTime,
                 uint32_t grantSize);
             int sendAndScheduleGrant(uint32_t grantPrio);
@@ -489,8 +492,8 @@ class HomaTransport : public cSimpleModule
             // Priority of last sent grant for this sender
             uint32_t lastGrantPrio;
 
-            // Index of this sender in SchedSenders as of the last time
-            // a grant was sent for this sender
+            // Index of this sender in SchedSenders as of the last time its been
+            // removed from SchedSender.
             uint32_t lastIdx;
 
             friend class HomaTransport::ReceiveScheduler;
@@ -506,7 +509,7 @@ class HomaTransport : public cSimpleModule
           PUBLIC:
             SchedSenders(HomaConfigDepot* homaConfig, HomaTransport* transport,
                 ReceiveScheduler* rxScheduler);
-            ~SchedSenders();
+            ~SchedSenders() {}
             class CompSched {
               PUBLIC:
                 CompSched(){}
@@ -555,6 +558,15 @@ class HomaTransport : public cSimpleModule
                     this->s = s;
                     this->sInd = sInd;
                 }
+
+                friend std::ostream& operator<< (std::ostream& os,
+                        const SchedState& ss) {
+                    os << "Sender: " << ss.s->getSenderAddr().str() <<
+                    ", senderInd: " << ss.sInd << ", headInd: " << ss.headIdx <<
+                    ", numToGrant: " << ss.numToGrant << ", numSenders: " <<
+                    ss.numSenders;
+                    return os;
+                }
             };
 
             std::tuple<int, int, int> insPoint(SenderState* s);
@@ -573,7 +585,7 @@ class HomaTransport : public cSimpleModule
             void handleGrantTimerEvent(SenderState* s);
 
           PROTECTED:
-            // Back pointer to the transport module. 
+            // Back pointer to the transport module.
             HomaTransport* transport;
 
             // Back pointer to the ReceiveScheduler managing this container
@@ -596,8 +608,6 @@ class HomaTransport : public cSimpleModule
 
             // Total number of senders in the list.
             uint32_t numSenders;
-
-            //
 
             //Collection of user provided config parameters for the transport.
             HomaConfigDepot* homaConfig;

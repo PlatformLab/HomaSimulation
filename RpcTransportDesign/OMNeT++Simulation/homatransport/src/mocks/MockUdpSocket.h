@@ -8,5 +8,3 @@ class MockUdpSocket {
         delete pkt;
     }
 };
-
-

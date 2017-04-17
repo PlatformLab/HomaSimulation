@@ -6,6 +6,10 @@
 
 MAKE=make
 
+# in parent directory (homatransport), compile homa with TESTING flag set
+(cd ../../; make TESTING=1 makefiles; make -j8 MODE=debug) || exit 1
+
+echo "*******\n\n"
 # make clean and complie gtest test cases
 make -j8
 
@@ -42,8 +46,9 @@ OBJS=\
 
 GTEST_DIR=../../../../../../share/googletest/googletest
 
-(cd work; opp_makemake -f --deep -L../../../../inet/src -lINET -L./obj -lTestMain -P . -I$GTEST_DIR -I$GTEST_DIR/include -I.. -I../../../src -I../../../../inet/src $OBJS; $MAKE) || exit 1
+(cd work; opp_makemake -f --deep -L../../../../inet/src -lINET -L./obj -lTestMain -P . -I$GTEST_DIR -I$GTEST_DIR/include -I.. -I../../../src -I../../../../inet/src $OBJS; $MAKE -j8) || exit 1
 echo
-opp_test run $OPT -v $TESTFILES || exit 1
+#opp_test run $OPT -v $TESTFILES || exit 1
+(cd work/SetupTests;../work -u Cmdenv -n.:../../../../src:../../../../../inet/src:../../../../../inet/examples -l../../../../../inet/src/INET homaTransportConfig.ini)
 echo
 echo Results can be found in ./work
