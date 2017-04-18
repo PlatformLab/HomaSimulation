@@ -1042,7 +1042,7 @@ HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t numBytes,
  * \return outPkt
  *      The packet to be transmitted for this message
  * \return
- *      True if if the returned pkt is not the last ready for transmission
+ *      True if the returned pkt is not the last ready for transmission
  *      packet for this msg and this message hase more pkts queue up and ready
  *      for transmission.
  */
@@ -1658,7 +1658,12 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
 
         // this message is complete, so send it to the application
         AppMessage* rxMsg = inboundMesg->prepareRxMsgForApp();
+
+#if TESTING
+        delete rxMsg;
+#else
         rxScheduler->transport->send(rxMsg, "appOut", 0);
+#endif
 
         // remove this message from the incompleteRxMsgs
         incompleteMesgs.erase(inboundMesg->msgIdAtSender);

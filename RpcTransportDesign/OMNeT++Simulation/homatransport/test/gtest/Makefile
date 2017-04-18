@@ -17,6 +17,7 @@ SOURCE=TestMain.cc \
 	../../src/common/GlobalSignalListener.cc \
 	../../src/common/Lagger.cc \
 	../../src/common/Util.cc \
+	../../src/mocks/MockUdpSocket.cc \
     ../../src/transport/HomaConfigDepot.cc \
 	../../src/transport/HomaPkt.cc \
 	../../src/transport/HomaTransport.cc \
@@ -32,6 +33,7 @@ SOURCE=TestMain.cc \
 SRC_DIR=../../src/transport
 SRC_DIR1=../../src/application
 SRC_DIR2=../../src/common
+SRC_DIR3=../../src/mocks
 GTEST_SRC_DIR=$(GTEST_DIR)/src
 
 ## All include directories
@@ -122,6 +124,12 @@ $(SRC_DIR2)/obj/%.o: $(SRC_DIR2)/%.cc
 	@echo "compiling $@"
 	$(CC) $(IFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
+$(SRC_DIR3)/obj/%.o: $(SRC_DIR3)/%.cc
+	@mkdir -p $(dir $@)
+	@echo "============"
+	@echo "compiling $@"
+	$(CC) $(IFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
 $(GTEST_SRC_DIR)/obj/%.o: $(GTEST_SRC_DIR)/%.cc
 	@mkdir -p $(dir $@)
 	@echo "============"
@@ -158,6 +166,12 @@ $(SRC_DIR2)/.dep/%.d: $(SRC_DIR2)/%.cc
 	@echo "============"
 	@echo "Building dependencies file for $*.o"
 	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(SRC_DIR2)/obj/$*.o^" > $@'
+
+$(SRC_DIR3)/.dep/%.d: $(SRC_DIR3)/%.cc
+	@mkdir -p $(dir $@)
+	@echo "============"
+	@echo "Building dependencies file for $*.o"
+	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(SRC_DIR3)/obj/$*.o^" > $@'
 
 $(GTEST_SRC_DIR)/.dep/%.d: $(GTEST_SRC_DIR)/%.cc
 	@mkdir -p $(dir $@)

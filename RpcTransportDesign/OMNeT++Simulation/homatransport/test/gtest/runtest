@@ -37,6 +37,7 @@ OBJS=\
 "$O/transport/HomaConfigDepot.o "\
 "$O/transport/HomaPkt.o "\
 "$O/transport/HomaTransport.o "\
+"$O/mocks/MockUdpSocket.o "\
 "$O/transport/PriorityResolver.o "\
 "$O/transport/PseudoIdealPriorityTransport.o "\
 "$O/transport/UnschedByteAllocator.o "\

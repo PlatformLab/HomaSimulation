@@ -8,6 +8,7 @@
 class HomaTransportTest : public ::testing::Test {
   public:
     HomaTransport* transport;
+    MockUdpSocket* socket;
     HomaTransport::SendController* sxController;
     HomaTransport::ReceiveScheduler* rxScheduler;
     UnschedByteAllocator* unschedByteAllocator;
@@ -35,6 +36,7 @@ class HomaTransportTest : public ::testing::Test {
         unschedByteAllocator = sxController->unschedByteAllocator;
         homaConfig = rxScheduler->homaConfig;
         schedSenders = rxScheduler->schedSenders;
+        socket = (MockUdpSocket*)(&(transport->socket));
         //std::cout << "transport config addr " << static_cast<void*>(transport->homaConfig) << std::endl;
         //std::cout << "transport config addr " << static_cast<void*>(transport->rxScheduler.homaConfig) << std::endl;
         //std::cout << "transport config addr " << static_cast<void*>(transport->sxController.homaConfig) << std::endl;
@@ -115,6 +117,15 @@ TEST_F (HomaTransportTest, basic) {
         inbMesg1->lastGrantTime == timeNow);
     ASSERT_EQ(inbMesg1->bytesToReceive,
         appMsg1->getByteLength() - cpyPkt1.getDataBytes());
+
+    // retrieve sent grant and add scheduled pkt corresponding to that
+    // grant to the txPkts queue.
+    HomaPkt* grantPkt = socket->getGrantPkt(srcAddr, mesgId);
+    ASSERT_TRUE(grantPkt);
+    outMsg1->prepareSchedPkt(grantPkt->getGrantFields().grantBytes,
+        grantPkt->getGrantFields().schedPrio);
+    ASSERT_EQ(outMsg1->txSchedPkts.size(), 1);
+    delete grantPkt;
 
     // wait for a packet time and receive a new mesg 2 from a different sender
     ((cSimpleModule*)netModule)->wait(pktDuration);
@@ -198,28 +209,112 @@ TEST_F (HomaTransportTest, basic) {
     ASSERT_TRUE(inbMesg5->msgIdAtSender == mesgId &&
         inbMesg5->bytesGrantedInFlight == 0);
 
-    // From this point on, for every packet received from each top numToGrant
-    // sender, the receiver sends a new grant at the right priority.
-    uint32_t bytesGrantedInFlightOld = inbMesg1->bytesGrantedInFlight;
-    outMsg1->getTransmitReadyPkt(&pkt);
-    pktDuration = pktTimeLen(pkt);
-    cpyPkt1 = *pkt;
-    ((cSimpleModule*)netModule)->wait(pktDuration);
+    uint16_t txPktsNum = 1;
+    uint32_t bytesGrantedInFlightOld;
+    while (inbMesg1->bytesToReceive > 0) {
+        // From this point on, for every packet received from each top
+        // numToGrant sender, the receiver sends a new grant at the right
+        // priority.
+        bytesGrantedInFlightOld = inbMesg1->bytesGrantedInFlight;
+        outMsg1->getTransmitReadyPkt(&pkt);
+        pktDuration = pktTimeLen(pkt);
+        cpyPkt1 = *pkt;
+        ((cSimpleModule*)netModule)->wait(pktDuration);
+        timeNow = simTime();
+        if (inbMesg1->bytesToGrant > 0) {
+            transport->handleRecvdPkt(pkt);
+            ASSERT_EQ(ss1->lastGrantPrio, homaConfig->allPrio-3);
+            ASSERT_TRUE(inbMesg1->lastGrantTime == timeNow &&
+                inbMesg1->bytesGrantedInFlight - bytesGrantedInFlightOld > 0);
+
+            // retrieve sent grant and add scheduled pkt corresponding to that
+            // grant to the txPkts queue.
+            grantPkt = socket->getGrantPkt(inbMesg1->srcAddr,
+                inbMesg1->msgIdAtSender);
+            ASSERT_TRUE(grantPkt);
+            outMsg1->prepareSchedPkt(grantPkt->getGrantFields().grantBytes,
+                grantPkt->getGrantFields().schedPrio);
+
+            if (cpyPkt1.getPktType() == PktType::UNSCHED_DATA) {
+                // As long as there are unsched pkts to be transmitted, schedPkt
+                // queue length keeps increasing since unscheduled packets are
+                // prioritiezed for transmission over sched packets. We test
+                // this here
+                txPktsNum++;
+            }
+            ASSERT_EQ(outMsg1->txSchedPkts.size(), txPktsNum);
+            delete grantPkt;
+        } else {
+            transport->handleRecvdPkt(pkt);
+            grantPkt = socket->getGrantPkt(inbMesg1->srcAddr,
+                inbMesg1->msgIdAtSender);
+            ASSERT_FALSE(grantPkt);
+        }
+    }
+
+    // Create a new mesg from a different sender and check no grant is sent for
+    // this message
+    srcAddr = inet::L3Address("10.0.0.7");
+    mesgId = 5;
     timeNow = simTime();
+    mesgPair = newMesg(70000, timeNow, mesgId, srcAddr, localAddr);
+    auto appMsg6 = mesgPair.first;
+    auto outMsg6 = mesgPair.second;
+    outMsg6->getTransmitReadyPkt(&pkt);
+    HomaPkt cpyPkt6 = *pkt;
+    pktDuration = pktTimeLen(pkt);
+    ((cSimpleModule*)netModule)->wait(pktDuration);
     transport->handleRecvdPkt(pkt);
 
-    ASSERT_EQ(ss1->lastGrantPrio, homaConfig->allPrio-3);
-    ASSERT_TRUE(inbMesg1->lastGrantTime == timeNow &&
-        inbMesg1->bytesGrantedInFlight - bytesGrantedInFlightOld > 0);
+    // check no grant is sent for this last message since it's beyond the number
+    // of schedPrioLevels
+    HomaTransport::InboundMessage* inbMesg6 =
+        rxScheduler->lookupInboundMesg(&cpyPkt6);
+    ASSERT_TRUE(inbMesg6->msgIdAtSender == mesgId &&
+        inbMesg6->bytesGrantedInFlight == 0);
+
+    // get a packet from next highest prio message and check grant at second
+    // highest sched prio is sent for that message
+    outMsg3->getTransmitReadyPkt(&pkt);
+    cpyPkt3 = *pkt;
+    pktDuration = pktTimeLen(pkt);
+    ((cSimpleModule*)netModule)->wait(pktDuration);
+    timeNow = simTime();
+    bytesGrantedInFlightOld = inbMesg3->bytesGrantedInFlight;
+    transport->handleRecvdPkt(pkt);
+    ASSERT_EQ(ss3->lastGrantPrio, homaConfig->allPrio-3);
+    ASSERT_TRUE(inbMesg3->lastGrantTime == timeNow &&
+        inbMesg3->bytesGrantedInFlight - bytesGrantedInFlightOld > 0);
+
+    // get a packet from second highest prio message and check grant at second
+    // second highest sched prio is sent for that message
+    outMsg2->getTransmitReadyPkt(&pkt);
+    cpyPkt2 = *pkt;
+    pktDuration = pktTimeLen(pkt);
+    ((cSimpleModule*)netModule)->wait(pktDuration);
+    timeNow = simTime();
+    bytesGrantedInFlightOld = inbMesg2->bytesGrantedInFlight;
+    transport->handleRecvdPkt(pkt);
+    ASSERT_EQ(ss2->lastGrantPrio, homaConfig->allPrio-2);
+    ASSERT_TRUE(inbMesg2->lastGrantTime == timeNow &&
+        inbMesg2->bytesGrantedInFlight - bytesGrantedInFlightOld > 0);
+
+    // wait for 1.5 pkt time, and check that a non granting sender is introduced
+    // into set of granting senders.
+    //((cSimpleModule*)netModule)->wait(pktDuration*1.5);
+
 
     delete appMsg1;
     delete appMsg2;
     delete appMsg3;
     delete appMsg4;
     delete appMsg5;
+    delete appMsg6;
+
     delete outMsg1;
     delete outMsg2;
     delete outMsg3;
     delete outMsg4;
     delete outMsg5;
+    delete outMsg6;
 }
