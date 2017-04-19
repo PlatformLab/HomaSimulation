@@ -222,6 +222,7 @@ HomaTransport::testAndEmitStabilitySignal()
 void
 HomaTransport::handleMessage(cMessage *msg)
 {
+    Enter_Method_Silent();
     if (msg->isSelfMessage()) {
         switch (msg->getKind()) {
             case SelfMsgKind::START:
@@ -1775,6 +1776,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
         HomaConfigDepot* homaConfig, HomaTransport* transport,
         ReceiveScheduler* rxScheduler)
     : transport(transport)
+    , rxScheduler(rxScheduler)
     , senders()
     , schedPrios(homaConfig->adaptiveSchedPrioLevels)
     , numToGrant(homaConfig->numSendersToKeepGranted)
@@ -2022,7 +2024,7 @@ void
 HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
         cMessage* timer) {
 
-    EV << "\n\n###############Process BwUtil Timer################\n\n" << endl;
+    EV << "\n\n################Process BwUtil Timer###############\n\n" << endl;
     simtime_t timeNow = simTime();
     if (numSenders < numToGrant) {
         return;
@@ -2031,7 +2033,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
     int indToGrant = headIdx + numToGrant - 1;
     SenderState* lowPrioSx = senders[indToGrant];
 
-    // Runtime testing with asserts
+    // Runtime checks with assert
     auto topMesgIt = lowPrioSx->mesgsToGrant.begin();
     ASSERT(topMesgIt != lowPrioSx->mesgsToGrant.end());
     InboundMessage* topMesg = *topMesgIt;
@@ -2063,7 +2065,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
     }
     numToGrant++;
     if (headIdx) {
-        // Runtime testing with asserts
+        // Runtime checks with assert
         for (size_t i = 0; i < headIdx; i++) {
             ASSERT(!senders[i]);
         } // End testing
@@ -2078,7 +2080,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
     indToGrant = headIdx + numToGrant - 1;
     lowPrioSx = senders[indToGrant];
 
-    // Runtime testing with asserts
+    // Runtime checks with assert
     topMesgIt = lowPrioSx->mesgsToGrant.begin();
     ASSERT(topMesgIt != lowPrioSx->mesgsToGrant.end());
     topMesg = *topMesgIt;

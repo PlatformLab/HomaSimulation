@@ -37,13 +37,6 @@ class HomaTransportTest : public ::testing::Test {
         homaConfig = rxScheduler->homaConfig;
         schedSenders = rxScheduler->schedSenders;
         socket = (MockUdpSocket*)(&(transport->socket));
-        //std::cout << "transport config addr " << static_cast<void*>(transport->homaConfig) << std::endl;
-        //std::cout << "transport config addr " << static_cast<void*>(transport->rxScheduler.homaConfig) << std::endl;
-        //std::cout << "transport config addr " << static_cast<void*>(transport->sxController.homaConfig) << std::endl;
-        //std::cout << "Homa instance created." << std::endl;
-        //std::cout << transport->rxScheduler.homaConfig->destPort << std::endl;
-        //std::cout << transport->rxScheduler.homaConfig->destPort << "\t" <<
-        //    transport->rxScheduler.homaConfig->defaultUnschedBytes << std::endl;
     }
 
     ~HomaTransportTest()
@@ -301,7 +294,7 @@ TEST_F (HomaTransportTest, basic) {
 
     // wait for 1.5 pkt time, and check that a non granting sender is introduced
     // into set of granting senders.
-    //((cSimpleModule*)netModule)->wait(pktDuration*1.5);
+    ((cSimpleModule*)netModule)->wait(rxScheduler->bwCheckInterval);
 
 
     delete appMsg1;
