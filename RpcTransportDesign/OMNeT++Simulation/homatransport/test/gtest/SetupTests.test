@@ -37,7 +37,7 @@ cModule* netModule;
     **.transportType = "HomaTransport"
     **.signalEmitPeriod = ${signalEmitPeriod=100} s
 
-    **.RTT = ${RTT=0x2710} ##10000B is the min RTT in bytes
+    **.rttBytes = ${RTT=0x2710} B ##10000B is the min RTT in bytes
     **.maxOutstandingRecvBytes = ${maxOutstandingRecvBytes = $RTT} B
     **.unschedPrioResolutionMode = "${unschedPrioResolutionMode = STATIC_CBF_GRADUATED}"
     **.unschedPrioUsageWeight = ${unschedPrioUsageWeight = 1}

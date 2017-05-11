@@ -46,10 +46,16 @@ class HomaConfigDepot {
     // read from the omnetpp.ini config file.
     int nicLinkSpeed;
 
+    // RTT is computed as travel time of a full ethernet frame in one way and a
+    // short grant packet in the other way, on the longest path in the topology.
+    simtime_t rtt;
+    // RTT in bytes for the topology, given as a configuration parameter.
+    uint16_t rttBytes;
+
     // This parameter is read from the omnetpp.ini config file and provides an
-    // upper bound on the total allowed outstanding bytes. It is necessary (BUT
-    // NOT ENOUGH) for the rxScheduler to check that the total outstanding bytes
-    // is smaller than this value every time a new grant is to be sent.
+    // upper bound on the total allowed outstanding bytes. It is necessary for
+    // the rxScheduler to check that the total outstanding bytes is smaller than
+    // this value every time a new grant is to be sent.
     uint32_t maxOutstandingRecvBytes;
 
     // udp ports assigned to this transprt

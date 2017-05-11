@@ -478,10 +478,6 @@ class HomaTransport : public cSimpleModule
             // for the top mesg of this sender is less than RTT.
             cMessage* grantTimer;
 
-            // Only if ture, receiver uses grantTimer to pace grants for sender.
-            // True by default.
-            bool timePaceGrants;
-
             // A sorted list of sched messages that need grants from the sender.
             std::set<InboundMessage*, InboundMessage::CompareBytesToGrant>
                 mesgsToGrant;
@@ -567,7 +563,7 @@ class HomaTransport : public cSimpleModule
                     ss.numSenders;
                     return os;
                 }
-            };
+            }; //end SchedState
 
             std::tuple<int, int, int> insPoint(SenderState* s);
             void insert(SenderState* s);
@@ -612,7 +608,7 @@ class HomaTransport : public cSimpleModule
             //Collection of user provided config parameters for the transport.
             HomaConfigDepot* homaConfig;
             friend class HomaTransport::ReceiveScheduler;
-        };
+        }; //end SchedSenders
 
       PROTECTED:
 
