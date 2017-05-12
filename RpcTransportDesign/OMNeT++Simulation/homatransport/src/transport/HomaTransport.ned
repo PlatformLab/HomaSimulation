@@ -77,8 +77,8 @@ simple HomaTransport like ITransportScheme
         // priorites. The default is 0 bytes.
         string boostTailBytesPrio = default("0x0");    
 
-        // If receiver inbound link is idle for longer than (link speed X             
-        // bwCheckInterval), while there are senders waiting for grants, we consider  
+        // If receiver inbound link is idle for longer than "linkCheckBytes /
+        // linkSpeed", while there are senders waiting for grants, we consider  
         // receiver bw is wasted.                                                     
         int linkCheckBytes @unit(byte);
 

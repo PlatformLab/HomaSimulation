@@ -1191,6 +1191,7 @@ HomaTransport::ReceiveScheduler::~ReceiveScheduler()
     }
     delete unschRateComp;
     delete schedSenders;
+    transport->cancelAndDelete(schedBwUtilTimer);
 }
 
 /**
@@ -1996,9 +1997,13 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
     }
 
     numSxAfterIns++;
-    int leftShift = (int)std::min(numSxAfterIns, (uint32_t)numToGrant) -
-        (schedPrios - hIdx);
-    EV << "insIdx: " << insIdx << ", hIdx: " << hIdx << ", Left shift: " << leftShift << endl;
+    int leftShift = (int)std::min(numSxAfterIns,
+        (uint32_t)std::min(numToGrant, schedPrios)) - (schedPrios - hIdx);
+
+    EV << "numSenders: " << numSxAfterIns << ", numToGrant: " << numToGrant <<
+        ", insIdx: " << insIdx << ", hIdx: " << hIdx << ", Left shift: " <<
+        leftShift << endl;
+
     if (leftShift > 0) {
         ASSERT(!senders[hIdx - leftShift] && (int)hIdx >= leftShift);
         hIdx -= leftShift;

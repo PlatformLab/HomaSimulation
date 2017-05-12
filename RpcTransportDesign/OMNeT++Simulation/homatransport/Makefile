@@ -1,4 +1,4 @@
-TESTINTG=0
+TESTING=0
 all: checkmakefiles
 	cd src && $(MAKE)
 
