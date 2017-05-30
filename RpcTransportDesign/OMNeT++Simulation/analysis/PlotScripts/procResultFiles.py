@@ -44,7 +44,7 @@ if __name__ == '__main__':
         if char=='w':
             outputType.wastedBw = True
             hasValidType = True
-            wastedBwFile = 'wastedBw_prio2.txt'
+            wastedBwFile = 'wastedBw.txt'
         if char=='p':
             hasValidType = True
             outputType.prioUsage = True
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     resultFiles = [line.rstrip('\n') for line in f]
     f.close()
 
-    
+
     # compute output for result files
     wastedBw = []
     prioTimeUsagesPct = []
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         filename = os.path.join(absDir, dirFile)
         print filename
         xmlConfigFile = os.environ['HOME'] + '/Research/RpcTransportDesign/'\
-            'OMNeT++Simulation/homatransport/src/dcntopo/config.xml'        
+            'OMNeT++Simulation/homatransport/src/dcntopo/config.xml'
 
         sp = ScalarParser(filename)
         parsedStats = AttrDict()
@@ -89,7 +89,7 @@ if __name__ == '__main__':
             trafficDic.rxHostsTraffic.nics.rx.trafficDigest.avgRate /\
             int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
         prioLevels = int(eval(parsedStats.generalInfo.prioLevels))
-      
+
         if outputType.prioUsage:
             prioUsageStatsDigest = []
             computePrioUsageStats(parsedStats.hosts, parsedStats.generalInfo,
@@ -110,11 +110,12 @@ if __name__ == '__main__':
         if outputType.wastedBw:
             activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
             wastedBw.append(('Homa', workloadType, prioLevels, redundancyFactor,
-            loadFactor, nominalLoadFactor, activeAndWasted.rx.fracTotalTime,
+            loadFactor, nominalLoadFactor, activeAndWasted.sx.fracTotalTime,
+            activeAndWasted.sx.fracActiveTime, activeAndWasted.rx.fracTotalTime,
             activeAndWasted.rx.fracActiveTime,
             activeAndWasted.rx.oversubWastedFracTotalTime,
             activeAndWasted.rx.oversubWastedFracOversubTime))
-                                                                      
+
     tw_h = 40
     tw_l = 40
 
@@ -147,9 +148,10 @@ if __name__ == '__main__':
         # create output file
         fdWasted = open(os.environ['HOME'] + "/Research/RpcTransportDesign" +
             "/OMNeT++Simulation/analysis/PlotScripts/" + wastedBwFile, 'w')
-        fdWasted.write('transport' + 'workload'.center(tw_h) +
+        fdWasted.write('transport'.center(tw_h) + 'workload'.center(tw_h) +
             'prioLevels'.center(tw_l) + 'redundancyFactor'.center(tw_l) +
             'loadFactor'.center(tw_l) + 'nominalLoadFactor'.center(tw_l) +
+            'sxWastedBw'.center(tw_l) + 'sxActiveWastedBw'.center(tw_l) +
             'wastedBw'.center(tw_l) + 'activeWastedBw'.center(tw_l) +
             'totalWastedOversubBw'.center(tw_l) +
             'oversubWastedOversubBw'.center(tw_l) + '\n')
@@ -165,6 +167,8 @@ if __name__ == '__main__':
                 '{0}'.format(wasteTuple[6]).center(tw_l) +
                 '{0}'.format(wasteTuple[7]).center(tw_l) +
                 '{0}'.format(wasteTuple[8]).center(tw_l) +
-                '{0}'.format(wasteTuple[9]).center(tw_l) + '\n')
+                '{0}'.format(wasteTuple[9]).center(tw_l) +
+                '{0}'.format(wasteTuple[10]).center(tw_l) +
+                '{0}'.format(wasteTuple[11]).center(tw_l) + '\n')
         fdWasted.close()
 
