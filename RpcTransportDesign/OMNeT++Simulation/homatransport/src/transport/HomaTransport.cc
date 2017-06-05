@@ -1785,27 +1785,6 @@ HomaTransport::ReceiveScheduler::SchedSenders::SchedSenders(
     }
 }
 
-/**
- * This function implements the logics of the receiver scheduler for sending
- * grants to a sender. At every event such as packet arrival or grant
- * transmission, that a sender's ranking changes in the view of the receiver,
- * this method is called to check if a grant should be sent for that sender and
- * this function then sends the grant if needed. N.B. the sender must have been
- * removed from schedSenders prior to the call to this method. The side effect
- * of this method invokation is that it also inserts the SenderState into the
- * schedSenders list if it needs more grants.
- *
- * \param s
- *      SenderState corresponding to the sender for which we want to test and
- *      send a grant.
- * \param sInd
- *      The position of the sender in the senders list which determines the
- *      ranking of the sender in the receiver's eye and if a grant should be
- *      sent.
- * \param headInd
- *      The index of the top rank or most preferred sender in the receiver's
- *      senders list.
- */
 /*
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantRequest(
@@ -2012,6 +1991,21 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
     return std::make_tuple(insIdx, hIdx, numSxAfterIns);
 }
 
+/**
+ * This function implements receiver's logic for the scheduler in reaction of
+ * message completions, when a packet arrives. Based on the current logic, every
+ * time a message completes, the overcommittment level will be decremented if
+ * it's been incremented in the past.
+ *
+ * \param msgCompHandle
+ *      Handle as returned from the SchedSenders::handleInboundPkt method.
+ * \param old
+ *      The state prior to arrival of the packet that triggered the call to this
+ *      function.
+ * \param cur
+ *      The state variable after the packet arrival event that triggered the
+ *      call to this method.
+ */
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleMesgRecvCompletionEvent(
     const std::pair<bool, int>& msgCompHandle, SchedState& old, SchedState& cur)
@@ -2035,6 +2029,24 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleMesgRecvCompletionEvent(
     cur.numToGrant--;
     return;
 }
+
+/**
+ * This function implements the logics of the receiver scheduler for reacting
+ * to the received packets. At every packet arrival the state (sender's ranking,
+ * etc.) can changes in the view of the receiver. So, this method is called to
+ * check if a grant should be sent for that sender or any other senderand this
+ * function then sends the grant if needed.  N.B. the sender must have been
+ * removed from schedSenders prior to the call to this method. The side effect
+ * of this method invokation is that it also inserts the SenderState into the
+ * schedSenders list if it needs more grants.
+ *
+ * \param old
+ *      The receiver scheduler state before arrival of the packet.
+ *
+ * \param cur
+ *      The receiver scheduler state after arrival of the packet.
+ */
+
 
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handlePktArrivalEvent(
@@ -2124,6 +2136,16 @@ HomaTransport::ReceiveScheduler::SchedSenders::handlePktArrivalEvent(
         "preference list.");
 }
 
+/**
+ * Sending a grant is an event that can change the state of a receive scheduler
+ * and should be handled. This function is called every time a grant is sent to
+ * handle the state change and react to it.
+ *
+ * \param old
+ *      The receive scheduler state prior to grant transmission.
+ * \param cur
+ *      The receive scheduler state after grant transmission.
+ */
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantSentEvent(
     SchedState& old, SchedState& cur)
@@ -2172,6 +2194,10 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantSentEvent(
     return;
 }
 
+/**
+ * This method process per sender timers for sending grants. If a grant timer was scheduled for
+ * a sender
+ */
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantTimerEvent(
     SenderState* s)
@@ -2271,7 +2297,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
     cur.setVar(numToGrant, std::get<1>(ret), std::get<2>(ret),
         lowPrioSx, std::get<0>(ret));
     handleGrantSentEvent(old, cur);
- 
+
     // Enable timer for the next bubble detection. The next timer should be set
     // for at least one RTT later because we don't expect to receive any packet
     // from the newly inducted sender anytime earlier than one RTT later.

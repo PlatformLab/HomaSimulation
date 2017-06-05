@@ -14,27 +14,34 @@
 //
 
 #include "GlobalSignalListener.h"
+#include "WorkloadSynthesizer.h"
 
 Define_Module(GlobalSignalListener);
 
 GlobalSignalListener::GlobalSignalListener()
     : stabilityRecorder(NULL)
+    , appStatsListener(NULL)
 {}
 
 GlobalSignalListener::~GlobalSignalListener()
 {
     delete stabilityRecorder;
+    delete appStatsListener;
 }
 
 void
 GlobalSignalListener::initialize()
 {
     stabilityRecorder = new StabilityRecorder(this);
+    appStatsListener = new AppStatsListener(this);
+
 }
 
 void
 GlobalSignalListener::handleMessage(cMessage *msg)
-{}
+{
+    throw cRuntimeError("GlobalSignalListener shouldn't receive any message!");
+}
 
 GlobalSignalListener::StabilityRecorder::StabilityRecorder(
         GlobalSignalListener* parentModule)
@@ -44,7 +51,7 @@ GlobalSignalListener::StabilityRecorder::StabilityRecorder(
     , lastSampleTime(SIMTIME_ZERO)
     , sendBacklog()
 {
-    // register this object as a listner to stabilitySignal defined in
+    // Register this object as a listner to stabilitySignal defined in
     // HomaTransport.
     simulation.getSystemModule()->subscribe("stabilitySignal", this);
     sendBacklog.setName("backlogged transmit messages");
@@ -52,8 +59,8 @@ GlobalSignalListener::StabilityRecorder::StabilityRecorder(
 
 /**
  * Every time stabilitySignal is emitted, this function is called. It aggregates
- * number of incomplete transmit messages over all transport instances in the
- * simulation and record the total number in the vector result file.
+ * number of the incomplete transmit messages over all transport instances in
+ * the simulation and records the total number in the vector result file.
  */
 void
 GlobalSignalListener::StabilityRecorder::receiveSignal(cComponent* src,
@@ -69,3 +76,36 @@ GlobalSignalListener::StabilityRecorder::receiveSignal(cComponent* src,
         totalSendBacklog = 0;
     }
 }
+
+/**
+ *
+ */
+GlobalSignalListener::AppStatsListener::AppStatsListener(
+        GlobalSignalListener* parentMod)
+    : parentModule(parentMod)
+{
+    // Register this object as a listener to the "msgStats" singal
+    // WorkloadSynthesizer fire. This signal contains the end-to-end stats
+    // collected at "WorkloadSynthesizer" instances.
+    simulation.getSystemModule()->subscribe("mesgStats", this);
+}
+
+/**
+ *
+ */
+void
+GlobalSignalListener::AppStatsListener::receiveSignal(cComponent* src,
+    simsignal_t id, cObject* obj)
+{
+    auto* mesgStats = dynamic_cast<MesgStats*>(obj);
+    auto* srcMod = dynamic_cast<cModule*>(src);
+
+    std::cout << "Received MesgStats signal from: " << srcMod->getFullPath() <<
+        ", mesg size: " << mesgStats->mesgSize << ", SizeOnWire: " <<
+        mesgStats->mesgSizeOnWire << ", size bin: " << mesgStats->mesgSizeBin <<
+        ", latency: " << mesgStats->latency << ", stretch: " <<
+        mesgStats->stretch << ", queueDelay: " << mesgStats->queuingDelay <<
+        ", transportSchedDelay: " << mesgStats->transportSchedDelay << std::endl;
+
+
+ }

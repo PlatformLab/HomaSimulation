@@ -52,15 +52,35 @@ class GlobalSignalListener : public cSimpleModule
         uint64_t callCount;
         simtime_t lastSampleTime;
         cOutVector sendBacklog;
-        
+
     };
 
+    /**
+     * This subclass subscribes to one of end-to-end application stats signal
+     * like WorkloadSynthesizer::msgStatsSignal and receives the signal from
+     * all instances of WorkloadSynthesizer. It aggregates the stats signals for
+     * diferent ranges of message sizes across all those instances and records
+     * the results in a histogram for each range. The message ranges are
+     * conveyed in the object that this lister receives with the signal.
+     */
+    class AppStatsListener : public cListener
+    {
+      PUBLIC:
+        AppStatsListener(GlobalSignalListener* parentMod);
+        ~AppStatsListener(){}
+        virtual void receiveSignal(cComponent* src, simsignal_t id,
+            cObject* obj);
+      PUBLIC:
+        GlobalSignalListener* parentModule;
+    };
+
+  PUBLIC:
     StabilityRecorder* stabilityRecorder;
+    AppStatsListener* appStatsListener;
 
   PROTECTED:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
-
 };
 
 #endif

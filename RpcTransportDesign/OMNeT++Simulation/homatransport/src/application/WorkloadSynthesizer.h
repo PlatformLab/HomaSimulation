@@ -94,6 +94,12 @@ class WorkloadSynthesizer : public cSimpleModule
     std::vector<simsignal_t> msgQueueDelaySignalVec;
     std::vector<simsignal_t> msgTransprotSchedDelaySignalVec;
 
+    // This signal is emitted with a pointer to an object of type MesgStats.
+    // The object contains all end-to-end stats for a message that is just
+    // completed. The GlobalSignalListener is listener to this signal and
+    // consumer of the object.
+    static simsignal_t mesgStatsSignal;
+
   PROTECTED:
     virtual void initialize();
     virtual void handleMessage(cMessage* msg);
@@ -109,6 +115,21 @@ class WorkloadSynthesizer : public cSimpleModule
     void parseAndProcessXMLConfig();
     void registerTemplatedStats(const char* msgSizeRanges);
     double idealMsgEndToEndDelay(AppMessage* rcvdMsg);
+};
+
+class MesgStats : public cObject, noncopyable
+{
+  PUBLIC:
+    MesgStats(){}
+
+  PUBLIC:
+    uint64_t mesgSize;
+    uint64_t mesgSizeOnWire;
+    uint64_t mesgSizeBin;
+    simtime_t latency;
+    double stretch;
+    double queuingDelay;
+    simtime_t transportSchedDelay;
 };
 
 #endif //__HOMATRANSPORT_WORKLOADSYNTHESIZER_H_

@@ -61,7 +61,6 @@ if __name__ == '__main__':
     resultFiles = [line.rstrip('\n') for line in f]
     f.close()
 
-
     # compute output for result files
     wastedBw = []
     prioTimeUsagesPct = []

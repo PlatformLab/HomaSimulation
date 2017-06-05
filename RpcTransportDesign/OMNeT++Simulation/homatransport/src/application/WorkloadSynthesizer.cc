@@ -27,7 +27,8 @@ Define_Module(WorkloadSynthesizer);
 simsignal_t WorkloadSynthesizer::sentMsgSignal = registerSignal("sentMsg");
 simsignal_t WorkloadSynthesizer::rcvdMsgSignal = registerSignal("rcvdMsg");
 simsignal_t WorkloadSynthesizer::msgE2EDelaySignal =
-        registerSignal("msgE2EDelay");
+    registerSignal("msgE2EDelay");
+simsignal_t WorkloadSynthesizer::mesgStatsSignal = registerSignal("mesgStats");
 
 WorkloadSynthesizer::WorkloadSynthesizer()
 {
@@ -492,6 +493,7 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
     double stretchFactor =
             (idealDelay == 0.0 ? 1.0 : completionTime.dbl()/idealDelay);
 
+    MesgStats mesgStats;
     if (msgByteLen > msgSizeRangeUpperBounds.back())  {
         // if messages size doesn't fit in any bins, then it should be assigned
         // to the last overflow (HugeSize) bin
@@ -502,7 +504,7 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
             rcvdMsg->getTransportSchedDelay());
         emit(msgBytesOnWireSignalVec.back(),
             rcvdMsg->getMsgBytesOnWire());
-
+        mesgStats.mesgSizeBin = UINT64_MAX;
     } else {
         size_t mid, high, low;
         high = msgSizeRangeUpperBounds.size() - 1;
@@ -522,7 +524,16 @@ WorkloadSynthesizer::processRcvdMsg(cPacket* msg)
             rcvdMsg->getTransportSchedDelay());
         emit(msgBytesOnWireSignalVec[high],
             rcvdMsg->getMsgBytesOnWire());
+        mesgStats.mesgSizeBin = msgSizeRangeUpperBounds[high];
     }
+    mesgStats.mesgSize = msgByteLen;
+    mesgStats.mesgSizeOnWire =  rcvdMsg->getMsgBytesOnWire();
+    mesgStats.latency =  completionTime;
+    mesgStats.stretch =  stretchFactor;
+    mesgStats.queuingDelay =  queuingDelay;
+    mesgStats.transportSchedDelay =  rcvdMsg->getTransportSchedDelay();
+    emit(mesgStatsSignal, &mesgStats);
+
     delete rcvdMsg;
     numReceived++;
 }

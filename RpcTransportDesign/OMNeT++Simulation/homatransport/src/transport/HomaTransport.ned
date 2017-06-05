@@ -46,9 +46,9 @@ simple HomaTransport like ITransportScheme
         // collected by GlobalSignalListener.
         double signalEmitPeriod @unit(s) = default(0.001s);
 
-        // If true, network traffic bytes from grant packets will be accounted in                   
-        // when computing CBF and unscheduled priority cutoff sizes.        
-        bool accountForGrantTraffic = default(true);  
+        // If true, network traffic bytes from grant packets will be accounted in
+        // when computing CBF and unscheduled priority cutoff sizes.
+        bool accountForGrantTraffic = default(true);
 
         // Coulde be any of PrioResolutionMode values in PriorityResolver.h
         string unschedPrioResolutionMode;
@@ -75,11 +75,11 @@ simple HomaTransport like ITransportScheme
         // This value is in bytes and determines that this number of last scheduled
         // bytes of the message will be send at priority equal to unscheduled
         // priorites. The default is 0 bytes.
-        string boostTailBytesPrio = default("0x0");    
+        string boostTailBytesPrio = default("0x0");
 
         // If receiver inbound link is idle for longer than "linkCheckBytes /
-        // linkSpeed", while there are senders waiting for grants, we consider  
-        // receiver bw is wasted.                                                     
+        // linkSpeed", while there are senders waiting for grants, we consider
+        // receiver bw is wasted.
         int linkCheckBytes @unit(byte);
 
         // Only for simulation purpose, we allow the transport to be aware of

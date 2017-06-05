@@ -63,6 +63,10 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         @signal[msg*QueuingDelay](type=simtime_t);
         @signal[msg*TransportSchedDelay](type=simtime_t);
         @signal[msg*BytesOnWire](type=AppMessage);
+        // This singal is emitted with a pointer to an object that contains
+        // values of all other msg** signals above and the message size those
+        // values correspoond to.
+        @signal[mesgStats];
 
         @statisticTemplate[msgRangesE2EDelay](title="msg lifetime"; unit=s; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesE2EStretch](title="msg stretch"; record=count,stats,histogram; interpolationmode=none);

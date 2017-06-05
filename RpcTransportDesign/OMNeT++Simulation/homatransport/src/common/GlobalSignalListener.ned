@@ -19,11 +19,11 @@ package homatransport.common;
 // This module is intended as place at the top simulation level that collects
 // signals and record statistics over the whole simulation. For example, you
 // can define a new listener in this module that receives signals from
-// all transport modules and aggregate some statistic over those signals and 
+// all transport modules and aggregate some statistic over those signals and
 // and record the statistics in vector result files.
 //
 
-simple GlobalSignalListener 
+simple GlobalSignalListener
 {
     parameters:
         @display("i=status/lightning");
