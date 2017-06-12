@@ -18,9 +18,16 @@
 
 Define_Module(GlobalSignalListener);
 
+simsignal_t GlobalSignalListener::mesgBytesOnWireSignal =
+    registerSignal("mesgBytesOnWire");
+
 GlobalSignalListener::GlobalSignalListener()
     : stabilityRecorder(NULL)
     , appStatsListener(NULL)
+    , mesgLatencySignals()
+    , mesgStretchSignals()
+    , mesgQueueDelaySignals()
+    , mesgTransportSchedDelaySignals()
 {}
 
 GlobalSignalListener::~GlobalSignalListener()
@@ -34,13 +41,90 @@ GlobalSignalListener::initialize()
 {
     stabilityRecorder = new StabilityRecorder(this);
     appStatsListener = new AppStatsListener(this);
-
 }
 
 void
 GlobalSignalListener::handleMessage(cMessage *msg)
 {
     throw cRuntimeError("GlobalSignalListener shouldn't receive any message!");
+}
+
+void
+GlobalSignalListener::handleMesgStatsObj(cObject* obj)
+{
+    auto* mesgStats = dynamic_cast<MesgStats*>(obj);
+    uint64_t mesgSizeBin = mesgStats->mesgSizeBin;
+
+    simtime_t latency = mesgStats->latency;
+    double stretch = mesgStats->stretch;
+    double queueDelay = mesgStats->queuingDelay;
+    simtime_t transptSchedDelay = mesgStats->transportSchedDelay;
+    uint64_t mesgSizeOnWire  = mesgStats->mesgSizeOnWire;
+    emit(mesgBytesOnWireSignal, mesgSizeOnWire);
+
+    if (mesgLatencySignals.find(mesgSizeBin) == mesgLatencySignals.end()) {
+        std::string sizeUpperBound;
+        if (mesgSizeBin != UINT64_MAX) {
+            sizeUpperBound = std::to_string(mesgSizeBin);
+        } else {
+            sizeUpperBound = "Huge";
+        }
+
+        char latencySignalName[50];
+        sprintf(latencySignalName, "mesg%sDelay", sizeUpperBound.c_str());
+        simsignal_t latencySignal = registerSignal(latencySignalName);
+        mesgLatencySignals[mesgSizeBin] = latencySignal;
+        char latencyStatsName[50];
+        sprintf(latencyStatsName, "mesg%sDelay", sizeUpperBound.c_str());
+        cProperty *statisticTemplate =
+            getProperties()->get("statisticTemplate", "mesgDelay");
+        ev.addResultRecorders(this, latencySignal, latencyStatsName,
+            statisticTemplate);
+
+        char stretchSignalName[50];
+        sprintf(stretchSignalName, "mesg%sStretch", sizeUpperBound.c_str());
+        simsignal_t stretchSignal = registerSignal(stretchSignalName);
+        mesgStretchSignals[mesgSizeBin] = stretchSignal;
+        char stretchStatsName[50];
+        sprintf(stretchStatsName, "mesg%sStretch", sizeUpperBound.c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+            "mesgStretch");
+        ev.addResultRecorders(this, stretchSignal, stretchStatsName,
+            statisticTemplate);
+
+        char queueDelaySignalName[50];
+        sprintf(queueDelaySignalName, "mesg%sQueueDelay",
+                sizeUpperBound.c_str());
+        simsignal_t queueDelaySignal = registerSignal(queueDelaySignalName);
+        mesgQueueDelaySignals[mesgSizeBin] = queueDelaySignal;
+        char queueDelayStatsName[50];
+        sprintf(queueDelayStatsName, "mesg%sQueueDelay",
+                sizeUpperBound.c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+                "mesgQueueDelay");
+        ev.addResultRecorders(this, queueDelaySignal, queueDelayStatsName,
+                statisticTemplate);
+
+        char transportSchedDelaySignalName[50];
+        sprintf(transportSchedDelaySignalName, "mesg%sTransportSchedDelay",
+            sizeUpperBound.c_str());
+        simsignal_t transportSchedDelaySignal =
+            registerSignal(transportSchedDelaySignalName);
+        mesgTransportSchedDelaySignals[mesgSizeBin] =
+            transportSchedDelaySignal;
+        char transportSchedDelayStatsName[50];
+        sprintf(transportSchedDelayStatsName, "mesg%sTransportSchedDelay",
+            sizeUpperBound.c_str());
+        statisticTemplate = getProperties()->get("statisticTemplate",
+                "mesgTransportSchedDelay");
+        ev.addResultRecorders(this, transportSchedDelaySignal,
+            transportSchedDelayStatsName, statisticTemplate);
+    }
+
+    emit(mesgLatencySignals.at(mesgSizeBin), latency);
+    emit(mesgStretchSignals.at(mesgSizeBin), stretch);
+    emit(mesgQueueDelaySignals.at(mesgSizeBin), queueDelay);
+    emit(mesgTransportSchedDelaySignals.at(mesgSizeBin), transptSchedDelay);
 }
 
 GlobalSignalListener::StabilityRecorder::StabilityRecorder(
@@ -97,15 +181,13 @@ void
 GlobalSignalListener::AppStatsListener::receiveSignal(cComponent* src,
     simsignal_t id, cObject* obj)
 {
-    auto* mesgStats = dynamic_cast<MesgStats*>(obj);
-    auto* srcMod = dynamic_cast<cModule*>(src);
-
-    std::cout << "Received MesgStats signal from: " << srcMod->getFullPath() <<
-        ", mesg size: " << mesgStats->mesgSize << ", SizeOnWire: " <<
-        mesgStats->mesgSizeOnWire << ", size bin: " << mesgStats->mesgSizeBin <<
-        ", latency: " << mesgStats->latency << ", stretch: " <<
-        mesgStats->stretch << ", queueDelay: " << mesgStats->queuingDelay <<
-        ", transportSchedDelay: " << mesgStats->transportSchedDelay << std::endl;
-
-
- }
+//  auto* mesgStats = dynamic_cast<MesgStats*>(obj);
+//  auto* srcMod = dynamic_cast<cModule*>(src);
+//  std::cout << "Received MesgStats signal from: " << srcMod->getFullPath() <<
+//      ", mesg size: " << mesgStats->mesgSize << ", SizeOnWire: " <<
+//      mesgStats->mesgSizeOnWire << ", size bin: " << mesgStats->mesgSizeBin <<
+//      ", latency: " << mesgStats->latency << ", stretch: " <<
+//      mesgStats->stretch << ", queueDelay: " << mesgStats->queuingDelay <<
+//      ", transportSchedDelay: " << mesgStats->transportSchedDelay << std::endl;
+    parentModule->handleMesgStatsObj(obj);
+}

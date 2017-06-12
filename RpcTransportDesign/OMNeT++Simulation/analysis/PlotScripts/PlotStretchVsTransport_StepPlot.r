@@ -22,7 +22,7 @@ avgStretchVsSize <- subset(stretchVsSize,
 
 avgStretchVsSize <- ddply(avgStretchVsSize,
     .(TransportType, LoadFactor, WorkLoad, UnschedBytes), transform,
-    SizeCumPercent = round(cumsum(SizeCntPercent), 2), 
+    SizeCumPercent = round(cumsum(SizeCntPercent), 2),
     BytesCumPercent = round(cumsum(BytesPercent), 2))
 
 avgStretchVsSize$MsgSizeRange <- as.numeric(as.character(
@@ -54,8 +54,8 @@ tailStretchVsSize <- ddply(tailStretchVsSize,
 tailStretchVsSize$MsgSizeRange <- as.numeric(
     as.character(tailStretchVsSize$MsgSizeRange))
 
-textSize <- 55 
-titleSize <- 55 
+textSize <- 55
+titleSize <- 55
 yLimit <- 15
 workloads <- c(
     levels(avgStretchVsSize$WorkLoad)[3], levels(avgStretchVsSize$WorkLoad)[5],
@@ -156,7 +156,7 @@ for (rho in unique(medianStretchVsSize$LoadFactor)) {
 
         plotTitle <- paste(append(unlist(strsplit(plotTitle, split='')), '\n',
             as.integer(nchar(plotTitle)/2)), sep='', collapse='')
-        
+
         xIntervals <- findInterval(c(0)+seq(2,102,10),
             tmp[tmp$TransportType=='homa',]$SizeCumPercent)
 

@@ -46,7 +46,7 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         '99PercentStretch'.center(tw_l) + '\n')
     for filename in glob(os.path.join(resultDir, '*.sca')):
 
-        sp = ScalarParser(filename) 
+        sp = ScalarParser(filename)
         parsedStats = AttrDict()
         parsedStats.hosts = sp.hosts
         parsedStats.tors = sp.tors
@@ -61,7 +61,7 @@ def prepE2EStretchVsSizeAndUnsched(resultDir = ''):
         msgBytesOnWireDigest = AttrDict()
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
-        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
+        e2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
         loadFactor = float(parsedStats.generalInfo.rlf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
         workLoad = parsedStats.generalInfo.workloadType
         avgStretch = 0.0
@@ -118,7 +118,7 @@ def prepE2EStretchVsTransport(resultDir, outputFileName, resultFiles=[]):
         transport = match.group(1)
         filename = resultDir + '/' + dirFile
 
-        sp = ScalarParser(filename) 
+        sp = ScalarParser(filename)
         parsedStats = AttrDict()
         parsedStats.hosts = sp.hosts
         parsedStats.tors = sp.tors
@@ -133,7 +133,7 @@ def prepE2EStretchVsTransport(resultDir, outputFileName, resultFiles=[]):
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelayDigest = AttrDict()
-        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
+        e2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
         loadFactor = float(parsedStats.generalInfo.rlf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
         workLoad = parsedStats.generalInfo.workloadType
         avgStretch = 0.0
@@ -189,7 +189,7 @@ def prepQueueDigest(resultDir, outputFileName, resultFiles=[]):
         filename = resultDir + '/' + dirFile
         print(filename)
 
-        sp = ScalarParser(filename) 
+        sp = ScalarParser(filename)
         parsedStats = AttrDict()
         parsedStats.hosts = sp.hosts
         parsedStats.tors = sp.tors
@@ -255,7 +255,7 @@ def prepE2EStretchVsPrioCutoff(resultDir, outputFileName, resultFiles=[]):
         transport = "Homa"
         filename = resultDir + '/' + dirFile
 
-        sp = ScalarParser(filename) 
+        sp = ScalarParser(filename)
         parsedStats = AttrDict()
         parsedStats.hosts = sp.hosts
         parsedStats.tors = sp.tors
@@ -270,7 +270,7 @@ def prepE2EStretchVsPrioCutoff(resultDir, outputFileName, resultFiles=[]):
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelayDigest = AttrDict()
-        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
+        e2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
         loadFactor = float(parsedStats.generalInfo.rlf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
         schedPrios = int(eval(parsedStats.generalInfo.adaptiveSchedPrioLevels))
         prioLevels = int(eval(parsedStats.generalInfo.prioLevels))
@@ -331,7 +331,7 @@ def prepE2EStretchVsUnschedPrioMode(resultDir, outputFileName, resultFiles=[]):
         transport = 'Homa'
         filename = resultDir + '/' + dirFile
 
-        sp = ScalarParser(filename) 
+        sp = ScalarParser(filename)
         parsedStats = AttrDict()
         parsedStats.hosts = sp.hosts
         parsedStats.tors = sp.tors
@@ -346,7 +346,7 @@ def prepE2EStretchVsUnschedPrioMode(resultDir, outputFileName, resultFiles=[]):
         msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
         e2eStretchAndDelayDigest = AttrDict()
         e2eStretchAndDelayDigest = AttrDict()
-        e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
+        e2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
         loadFactor = float(parsedStats.generalInfo.rlf) * len(xmlParsedDic.senderIds) / len(xmlParsedDic.receiverIds)
         unschedPrioCutoffMode = parsedStats.generalInfo.unschedPrioResolutionMode
         exponentIncFac = parsedStats.generalInfo.unschedPrioUsageWeight

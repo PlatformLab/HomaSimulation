@@ -11,6 +11,12 @@
 #include <omnetpp.h>
 #include "common/Minimal.h"
 
+
+/**
+ * Following filters are defined for collecting statistics from packets of type
+ * HomaPkt. They are used to collect stats at the HomaTransport instances.
+ */
+
 class SIM_API HomaMsgSizeFilter : public cObjectResultFilter
 {
   PUBLIC:

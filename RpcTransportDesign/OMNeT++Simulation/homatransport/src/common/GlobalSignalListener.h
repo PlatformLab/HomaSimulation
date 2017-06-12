@@ -16,6 +16,7 @@
 #ifndef __HOMATRANSPORT_GLOBAL_SIGNAL_LISTENER_H_
 #define __HOMATRANSPORT_GLOBAL_SIGNAL_LISTENER_H_
 
+#include <unordered_map>
 #include <omnetpp.h>
 #include "common/Minimal.h"
 
@@ -31,6 +32,7 @@ class GlobalSignalListener : public cSimpleModule
   PUBLIC:
     GlobalSignalListener();
     ~GlobalSignalListener();
+    void handleMesgStatsObj(cObject* obj);
 
     /**
      * This subclass subscribes to HomaTransport::stabilitySignal and receives
@@ -52,16 +54,16 @@ class GlobalSignalListener : public cSimpleModule
         uint64_t callCount;
         simtime_t lastSampleTime;
         cOutVector sendBacklog;
-
     };
 
     /**
-     * This subclass subscribes to one of end-to-end application stats signal
-     * like WorkloadSynthesizer::msgStatsSignal and receives the signal from
-     * all instances of WorkloadSynthesizer. It aggregates the stats signals for
-     * diferent ranges of message sizes across all those instances and records
-     * the results in a histogram for each range. The message ranges are
-     * conveyed in the object that this lister receives with the signal.
+     * This subclass subscribes to end-to-end application stats signal
+     * WorkloadSynthesizer::mesgStatsSignal and receives the signal from all
+     * instances of WorkloadSynthesizer.  The signal conveys an object that
+     * contains end-to-end stats value for different range of message sizes.  It
+     * then aggregates the stats values carried by this signal, for diferent
+     * ranges of message sizes, across all those workload synthesizer instances.
+     * Furthermore, it records the results in a histogram for each range.
      */
     class AppStatsListener : public cListener
     {
@@ -77,6 +79,15 @@ class GlobalSignalListener : public cSimpleModule
   PUBLIC:
     StabilityRecorder* stabilityRecorder;
     AppStatsListener* appStatsListener;
+
+    static simsignal_t mesgBytesOnWireSignal;
+    // HashMap from message size range to signals ids. For each range of message
+    // size, there is a signal defined to record statistics of that message size
+    // range.
+    std::unordered_map<uint64_t, simsignal_t> mesgLatencySignals;
+    std::unordered_map<uint64_t, simsignal_t> mesgStretchSignals;
+    std::unordered_map<uint64_t, simsignal_t> mesgQueueDelaySignals;
+    std::unordered_map<uint64_t, simsignal_t> mesgTransportSchedDelaySignals;
 
   PROTECTED:
     virtual void initialize();

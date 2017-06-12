@@ -446,7 +446,14 @@ def msgBytesOnWire(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest):
         msgBytesOnWireDigest[size].bytesPercent = 100 * msgBytesOnWireDigest[size].bytes / totalBytes
     return
 
-def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest):
+def e2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest):
+    if 'globalListener' in parsedStats:
+        return globalE2eStretchAndDelay(parsedStats, xmlParsedDic,
+            msgBytesOnWireDigest, e2eStretchAndDelayDigest)
+
+    hosts = parsedStats.hosts
+    generalInfo = parsedStats.generalInfo
+
     # For the hosts that are receivers, find the stretch and endToend stats and
     # return them.
     receiverHostIds = xmlParsedDic.receiverIds
@@ -507,6 +514,51 @@ def e2eStretchAndDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, e
 
     return e2eStretchAndDelayDigest
 
+def globalE2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest):
+    if not('globalListener' in parsedStats):
+        e2eStretchAndDelayDigest.clear()
+        return e2eStretchAndDelayDigest
+
+    sizes = parsedStats.generalInfo.msgSizeRanges.strip('\"').split(' ')[:]
+    #sizes.append('Huge')
+    e2eStretchAndDelayDigest.delay = []
+    e2eStretchAndDelayDigest.latency = []
+    e2eStretchAndDelayDigest.stretch = []
+
+    for size in sizes:
+        e2eDelayHistogramKey = 'globalListener.mesg{0}Delay:histogram.bins'.format(size)
+        e2eDelayStatsKey = 'globalListener.mesg{0}Delay:histogram'.format(size)
+        queuingDelayHistogramKey = 'globalListener.mesg{0}QueueDelay:histogram.bins'.format(size)
+        queuingDelayStatsKey = 'globalListener.mesg{0}QueueDelay:histogram'.format(size)
+        e2eStretchHistogramKey = 'globalListener.mesg{0}Stretch:histogram.bins'.format(size)
+        e2eStretchStatsKey = 'globalListener.mesg{0}Stretch:histogram'.format(size)
+        e2eDelay = getInterestingModuleStats(parsedStats, e2eDelayStatsKey, e2eDelayHistogramKey)
+        queuingDelay = getInterestingModuleStats(parsedStats, queuingDelayStatsKey, queuingDelayHistogramKey)
+        e2eStretch = getInterestingModuleStats(parsedStats, e2eStretchStatsKey, e2eStretchHistogramKey)
+
+        e2eDelay.sizeUpBound = '{0}'.format(size)
+        e2eDelay.bytesPercent = msgBytesOnWireDigest[size].bytesPercent
+        e2eDelay.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
+        e2eStretchAndDelayDigest.latency.append(e2eDelay)
+        queuingDelay.sizeUpBound = '{0}'.format(size)
+        queuingDelay.bytesPercent = msgBytesOnWireDigest[size].bytesPercent
+        queuingDelay.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
+        e2eStretchAndDelayDigest.delay.append(queuingDelay)
+        e2eStretch.sizeUpBound = '{0}'.format(size)
+        e2eStretch.bytesPercent = msgBytesOnWireDigest[size].bytesPercent
+        e2eStretch.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
+        e2eStretchAndDelayDigest.stretch.append(e2eStretch)
+
+    totalDelayCnt = sum([delay.count for delay in e2eStretchAndDelayDigest.delay])
+    totalStretchCnt = sum([stretch.count for stretch in e2eStretchAndDelayDigest.stretch])
+    totalLatencyCnt = sum([latency.count for latency in e2eStretchAndDelayDigest.latency])
+    for sizedDelay, sizedStretch, sizedLatency in zip(e2eStretchAndDelayDigest.delay, e2eStretchAndDelayDigest.stretch, e2eStretchAndDelayDigest.latency):
+        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt
+        sizedStretch.cntPercent = sizedStretch.count * 100.0 / totalStretchCnt
+        sizedLatency.cntPercent = sizedLatency.count * 100.0 / totalLatencyCnt
+
+    return e2eStretchAndDelayDigest
+
 def printTransportSchedDelay(transportSchedDelayDigest, unit):
     printKeys = ['mean', 'meanFrac', 'stddev', 'min', 'median', 'threeQuartile', 'ninety9Percentile', 'max', 'count', 'cntPercent', 'bytes', 'bytesPercent']
     tw = 19
@@ -531,7 +583,14 @@ def printTransportSchedDelay(transportSchedDelayDigest, unit):
         printStatsLine(delay, '({0}, {1}]'.format(sizeLowBound[i], delay.sizeUpBound), tw, fw, 'us', printKeys)
 
 
-def transportSchedDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest):
+def transportSchedDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest):
+    if not('globalListener' in parsedStats):
+        e2eStretchAndDelayDigest.clear()
+        return globalTransportSchedDelay(parsedStats, xmlParsedDic,
+            msgBytesOnWireDigest, transportSchedDelayDigest)
+
+    hosts = parsedStats.hosts
+    generalInfo = parsedStats.generalInfo
     receiverHostIds = xmlParsedDic.receiverIds
     sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:]
     sizes.append('Huge')
@@ -548,6 +607,30 @@ def transportSchedDelay(hosts, generalInfo, xmlParsedDic, msgBytesOnWireDigest, 
 
         delayDigest = AttrDict()
         delayDigest = digestModulesStats(delayList)
+        delayDigest.sizeUpBound = '{0}'.format(size)
+        delayDigest.bytesPercent = msgBytesOnWireDigest[size].bytesPercent
+        delayDigest.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
+        transportSchedDelayDigest.totalDelay.append(delayDigest)
+
+    totalDelayCnt = sum([delay.count for delay in transportSchedDelayDigest.totalDelay])
+    for sizedDelay in transportSchedDelayDigest.totalDelay:
+        sizedDelay.cntPercent = sizedDelay.count * 100.0 / totalDelayCnt
+
+    return transportSchedDelayDigest
+
+def globalTransportSchedDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest):
+    if not('globalListener' in parsedStats):
+        e2eStretchAndDelayDigest.clear()
+        return e2eStretchAndDelayDigest
+    globalListener = parsedStats.globalListener
+    generalInfo = parsedStats.generalInfo
+    sizes = generalInfo.msgSizeRanges.strip('\"').split(' ')[:]
+    transportSchedDelayDigest.totalDelay = []
+
+    for size in sizes:
+        delayHistogramKey = 'globalListener.mesg{0}TransportSchedDelay:histogram.bins'.format(size)
+        delayStatsKey = 'globalListener.mesg{0}TransportSchedDelay'.format(size)
+        delaysDigest = getInterestingModuleStats(parsedStats, delayStatsKey, delayHistogramKey)
         delayDigest.sizeUpBound = '{0}'.format(size)
         delayDigest.bytesPercent = msgBytesOnWireDigest[size].bytesPercent
         delayDigest.bytes = msgBytesOnWireDigest[size].bytes * 2**-10 #in KB
@@ -1045,7 +1128,7 @@ def computePrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest
             grantPktByteStats = hosts.access(grantPktBytesStatsKey)
             grantBytes += grantPktByteStats.sum
 
-        allBytesList.append((receivedBytesStats.sum, allBytes)) #for debugging and verification 
+        allBytesList.append((receivedBytesStats.sum, allBytes)) #for debugging and verification
         grantBytesAll += grantBytes  #for debugging and verification
         schedBytes = allBytes - unschedBytes - grantBytes
         rxTimes[i].activelyRecvSchedTime = 8.0 * schedBytes / (nicLinkSpeed*1e9)
@@ -1056,10 +1139,10 @@ def computePrioUsageStats(hosts, generalInfo, xmlParsedDic, prioUsageStatsDigest
         rxTimes.total.activeTime += activeTime
         rxTimes.total.activelyRecvTime += activelyRecvTime
         rxTimes.total.activelyRecvSchedTime += rxTimes[i].activelyRecvSchedTime
-        rxTimes.total.activelyRecvUnschedTime += rxTimes[i].activelyRecvUnschedTime 
+        rxTimes.total.activelyRecvUnschedTime += rxTimes[i].activelyRecvUnschedTime
         rxTimes.total.activelyRecvGrantTime += rxTimes[i].activelyRecvGrantTime
 
-    #print(allBytesList) #for debugging and verification 
+    #print(allBytesList) #for debugging and verification
     #print(grantBytesAll)
 
     totalBytes = 0
@@ -1130,7 +1213,7 @@ def printPrioUsageStats(prioUsageStatsDigest):
 
     printKeys = ['total', 'active', 'activelyRecv', 'activelyRecvSched']
     tw = 12
-    fw = 18 
+    fw = 18
     lineMax = 85
     title = 'Time Usage Percentages Of Different Priority Levels '
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
@@ -1409,6 +1492,7 @@ def main():
     parsedStats.aggrs = sp.aggrs
     parsedStats.cores = sp.cores
     parsedStats.generalInfo = sp.generalInfo
+    parsedStats.globalListener = sp.globalListener
 
     xmlParsedDic = AttrDict()
     xmlParsedDic = parseXmlFile(xmlConfigFile, parsedStats.generalInfo)
@@ -1436,11 +1520,13 @@ def main():
     printQueueTimeStats(queueWaitTimeDigest, 'us')
     msgBytesOnWireDigest = AttrDict()
     msgBytesOnWire(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest)
+
     transportSchedDelayDigest = AttrDict()
-    transportSchedDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest)
+    transportSchedDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, transportSchedDelayDigest)
     printTransportSchedDelay(transportSchedDelayDigest, 'us')
+
     e2eStretchAndDelayDigest = AttrDict()
-    e2eStretchAndDelay(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
+    e2eStretchAndDelay(parsedStats, xmlParsedDic, msgBytesOnWireDigest, e2eStretchAndDelayDigest)
     printE2EStretchAndDelay(e2eStretchAndDelayDigest, 'us')
 
 if __name__ == '__main__':

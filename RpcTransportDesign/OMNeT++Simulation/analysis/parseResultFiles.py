@@ -257,6 +257,7 @@ class ScalarParser():
         self.aggrs = AttrDict()
         self.cores = AttrDict()
         self.generalInfo = AttrDict()
+        self.globalListener = AttrDict()
         self.parse()
 
 
@@ -266,6 +267,7 @@ class ScalarParser():
         self.aggrs = AttrDict()
         self.cores = AttrDict()
         self.generalInfo = AttrDict()
+        self.globalListener = AttrDict()
         net = ""
         scaFd = open(self.scaFile)
         for line in scaFd:
@@ -306,6 +308,27 @@ class ScalarParser():
                 else:
                     raise Exception, '{0}: not defined for this parser'.format(match.group(1))
                 continue
+
+            match = re.match('(\S+)\s+{0}\.([a-zA-Z]+)\s+(".+"|\S+)\s*(\S*)'.format(net), line)
+            if match:
+                topLevelModule = match.group(2)
+                if topLevelModule == 'globalListener':
+                    currDict = self.globalListener
+                else:
+                    raise Exception, 'no such module defined for parser: {0}'.format(topLevelModule)
+                entryType = match.group(1)
+                if entryType == 'statistic':
+                    var = match.group(3)
+                    currDict.assign(var+'.bins', [])
+                elif entryType == 'scalar':
+                    var = match.group(3)
+                    subVar = var + '.value'
+                    value = float(match.group(4))
+                    currDict.assign(subVar, value)
+                else:
+                    raise Exception, '{0}: not defined for this parser'.format(match.group(1))
+                continue
+
             match = re.match('(\S+)\s+(".+"|\S+)\s+(".+"|\S+)', line)
             if not match and not line.isspace():
                 warnings.warn('Parser cant find a match for line: {0}'.format(line), RuntimeWarning)
