@@ -300,7 +300,7 @@ HomaTransport::handleRecvdPkt(cPacket* pkt)
     }
     rxScheduler.rcvdBytesPerActivePeriod += pktLenOnWire;
 
-    // handle data or grant grant packets appropriately
+    // handle data or grant packets appropriately
     switch (rxPkt->getPktType()) {
         case PktType::REQUEST:
         case PktType::UNSCHED_DATA:
@@ -313,8 +313,7 @@ HomaTransport::handleRecvdPkt(cPacket* pkt)
             break;
 
         default:
-            throw cRuntimeError(
-                "Received packet type(%d) is not valid.",
+            throw cRuntimeError("Received packet type(%d) is not valid.",
                 rxPkt->getPktType());
     }
 
@@ -1165,8 +1164,12 @@ HomaTransport::ReceiveScheduler::initialize(HomaConfigDepot* homaConfig,
     std::fill(unschedToRecvPerPrio.begin(), unschedToRecvPerPrio.end(), 0);
     schedBwUtilTimer = new cMessage("bwUtilChecker");
     schedBwUtilTimer->setKind(SelfMsgKind::BW_CHECK);
-    bwCheckInterval = SimTime(homaConfig->linkCheckBytes * 8.0 /
-        (homaConfig->nicLinkSpeed * 1e9));
+    if (homaConfig->linkCheckBytes < 0) {
+        bwCheckInterval = SimTime::getMaxTime();
+    } else {
+        bwCheckInterval = SimTime(homaConfig->linkCheckBytes * 8.0 /
+            (homaConfig->nicLinkSpeed * 1e9));
+    }
 }
 
 /**
@@ -1320,7 +1323,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     // check and update states for oversubscription time and bytes.
     if (schedSenders->numSenders <= schedSenders->numToGrant) {
         if (inOversubPeriod) {
-            // oversubscription period ended. emit signals and record stats.
+            // Oversubscription period ended. Emit signals and record stats.
             transport->emit(oversubTimeSignal, timeNow - oversubPeriodStart);
             transport->emit(oversubBytesSignal, rcvdBytesPerOversubPeriod);
         }
@@ -1345,6 +1348,12 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     // Each new data packet arrival is a hint that recieve link is being
     // utilized and we need to cancel/reset the schedBwUtilTimer. The code block
     // below does this job.
+    if (bwCheckInterval == SimTime::getMaxTime()) {
+        // bw-waste detection is disabled in the config file. No need to set
+        // schedBwUtilTimer for checking wasted bandwidth.
+        return;
+    }
+
     if (!schedSenders->numSenders) {
         // If no sender is waiting for grants, then there's no point to
         // track sched bw utilization.
@@ -1353,7 +1362,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     }
 
     if (!schedBwUtilTimer->isScheduled()) {
-        transport->scheduleAt(timeNow + bwCheckInterval,
+        transport->scheduleAt(bwCheckInterval + timeNow,
             schedBwUtilTimer);
         EV << "Scheduled schedBwUtilTimer at " <<
             schedBwUtilTimer->getArrivalTime() << endl;
@@ -1362,7 +1371,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 
     simtime_t schedTime = schedBwUtilTimer->getArrivalTime();
     transport->cancelEvent(schedBwUtilTimer);
-    transport->scheduleAt(std::max(schedTime, timeNow + bwCheckInterval),
+    transport->scheduleAt(std::max(schedTime, bwCheckInterval + timeNow),
         schedBwUtilTimer);
     EV << "scheduled schedBwUtilTimer at " <<
             schedBwUtilTimer->getArrivalTime() << endl;
@@ -1907,11 +1916,11 @@ HomaTransport::ReceiveScheduler::SchedSenders::removeAt(uint32_t rmIdx)
 }
 
 /**
- * Insert a SenderState into the senders list. The caller must make sure that the
- * SenderState is not already in the list (ie. by calling remove) and s infact
- * belong to the senders list (ie. sender of s has messages that need grant).
- * Element s then will be inserted at the position insId returned from insPoint
- * method and headIdx will be updated.
+ * Insert a SenderState into the senders list. The caller must make sure that
+ * the SenderState is not already in the list (ie. by calling remove) and s
+ * infact belong to the senders list (ie. sender of s has messages that need
+ * grant).  Element s then will be inserted at the position insId returned from
+ * insPoint method and headIdx will be updated.
  *
  * \param s
  *      SenderState to be inserted in the senders list.
@@ -2150,8 +2159,6 @@ void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantSentEvent(
     SchedState& old, SchedState& cur)
 {
-
-
     ASSERT(old.sInd >= old.headIdx && old.sInd < old.headIdx + old.numToGrant);
     if (old.sInd == cur.sInd) {
         ASSERT (cur.sInd < cur.headIdx + cur.numToGrant);
@@ -2195,8 +2202,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantSentEvent(
 }
 
 /**
- * This method process per sender timers for sending grants. If a grant timer was scheduled for
- * a sender
+ * This method process per sender timers for sending grants. If a grant timer
+ * was scheduled for a sender
  */
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handleGrantTimerEvent(
@@ -2250,19 +2257,23 @@ void
 HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
         cMessage* timer) {
 
-    EV << "\n\n################Process BwUtil Timer###############\n\n" << endl;
-    simtime_t timeNow = simTime();
-    if (numSenders < numToGrant) {
-        return;
+    // if bwCheckInterval is set to max, it means schedBwUtilTimer is disabled
+    // and the timer should never fire and this method should never have been
+    // invoked.
+    if (rxScheduler->bwCheckInterval == SimTime::getMaxTime()) {
+        cRuntimeError("Error: Func handleBwUtilTimerEvent is called while"
+            " schedBwUtilTimer is disabled!");
     }
 
+    EV << "\n\n################Process BwUtil Timer###############\n\n" << endl;
+    simtime_t timeNow = simTime();
     SchedState old;
     SchedState cur;
 
     // Bubble detected and no sender has been previously promoted, so promote
     // next ungranted sched sender and send grants for it.
     if (numSenders <= numToGrant) {
-        // all sched senders are currently being granted. No need to increament
+        // All sched senders are currently being granted. No need to increament
         // numToGrant
         return;
     }

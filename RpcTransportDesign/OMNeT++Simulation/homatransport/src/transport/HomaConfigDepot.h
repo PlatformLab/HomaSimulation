@@ -112,8 +112,8 @@ class HomaConfigDepot {
 
     // If receiver inbound link is idle for longer than (link speed X
     // bwCheckInterval), while there are senders waiting for grants, we consider
-    // receiver bw is wasted.
-    uint32_t linkCheckBytes;
+    // receiver bw is wasted. -1 means don't check for the bw-waste.
+    int linkCheckBytes;
 
     // Specifies that only first cbfCapMsgSize bytes of a message must be used
     // in computing the cbf function.

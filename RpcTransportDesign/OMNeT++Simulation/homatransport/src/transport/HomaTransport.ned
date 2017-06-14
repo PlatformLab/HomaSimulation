@@ -79,8 +79,9 @@ simple HomaTransport like ITransportScheme
 
         // If receiver inbound link is idle for longer than "linkCheckBytes /
         // linkSpeed", while there are senders waiting for grants, we consider
-        // receiver bw is wasted.
-        int linkCheckBytes @unit(byte);
+        // receiver bw is wasted. -1 is reserved to disable bw-waste detection
+        //with this mechanism.
+        int linkCheckBytes @unit(byte) = default(-1B);
 
         // Only for simulation purpose, we allow the transport to be aware of
         // workload type. The value must be similar to WorkloadSynthesizer
@@ -101,6 +102,7 @@ simple HomaTransport like ITransportScheme
         @signal[sxActiveBytes](type=long);
         @signal[sxSchedPktDelay](type=simtime_t);
         @signal[sxUnschedPktDelay](type=simtime_t);
+        @signal[activeSchedMesgs];
 
         @statistic[msgsLeftToSend](title="num msgs left to send"; source=msgsLeftToSend; record=stats, histogram; interpolationmode=none);
         @statistic[bytesLeftToSend](title="num total bytes left to send"; source=bytesLeftToSend; record=stats, histogram; interpolationmode=none);

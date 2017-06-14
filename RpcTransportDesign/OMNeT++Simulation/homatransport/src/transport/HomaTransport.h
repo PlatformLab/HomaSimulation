@@ -524,6 +524,11 @@ class HomaTransport : public cSimpleModule
                 }
             };
 
+            /**
+             * This class is a container to keep a copy of scheduled state of
+             * the receiver scheduler. This is used to track state changes after
+             * each new event arrives at the ReceiveScheduler.
+             */
             class SchedState {
               PUBLIC:
                 // Total number of senders we allow to be scheduled and granted
