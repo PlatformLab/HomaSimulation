@@ -81,8 +81,9 @@ uint16_t
 PriorityResolver::getSchedPktPrio(const InboundMessage* inbndMsg)
 {
     uint32_t msgSize = inbndMsg->msgSize;
-    uint32_t bytesToGrantOnWire = inbndMsg->bytesToGrantOnWire;
     uint32_t bytesToGrant = inbndMsg->bytesToGrant;
+    uint32_t bytesToGrantOnWire = HomaPkt::getBytesOnWire(bytesToGrant,
+        PktType::SCHED_DATA);                                 
     uint32_t bytesTreatedUnsched = homaConfig->boostTailBytesPrio;
     switch (prioResMode) {
         case PrioResolutionMode::EXPLICIT:

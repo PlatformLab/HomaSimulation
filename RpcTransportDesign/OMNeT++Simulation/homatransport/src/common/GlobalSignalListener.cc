@@ -13,8 +13,10 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
+#include <algorithm>
 #include "GlobalSignalListener.h"
 #include "WorkloadSynthesizer.h"
+#include "HomaTransport.h"
 
 Define_Module(GlobalSignalListener);
 
@@ -24,6 +26,7 @@ simsignal_t GlobalSignalListener::mesgBytesOnWireSignal =
 GlobalSignalListener::GlobalSignalListener()
     : stabilityRecorder(NULL)
     , appStatsListener(NULL)
+    , activeSchedsListener(NULL)
     , mesgLatencySignals()
     , mesgStretchSignals()
     , mesgQueueDelaySignals()
@@ -34,6 +37,7 @@ GlobalSignalListener::~GlobalSignalListener()
 {
     delete stabilityRecorder;
     delete appStatsListener;
+    delete activeSchedsListener;
 }
 
 void
@@ -41,6 +45,13 @@ GlobalSignalListener::initialize()
 {
     stabilityRecorder = new StabilityRecorder(this);
     appStatsListener = new AppStatsListener(this);
+    activeSchedsListener = new ActiveSchedsListener(this);
+}
+
+void
+GlobalSignalListener::finish()
+{
+    activeSchedsListener->dumpStats();
 }
 
 void
@@ -162,7 +173,9 @@ GlobalSignalListener::StabilityRecorder::receiveSignal(cComponent* src,
 }
 
 /**
- *
+ * Listener for the WorkloadSynthesizer::mesgStatsSignal. This listener collect
+ * the end-to-end message stats carried in the signal and record the aggregated
+ * stats for all instances of WorkloadSynthesizer.
  */
 GlobalSignalListener::AppStatsListener::AppStatsListener(
         GlobalSignalListener* parentMod)
@@ -175,7 +188,7 @@ GlobalSignalListener::AppStatsListener::AppStatsListener(
 }
 
 /**
- *
+ * Signal receiver implementation.
  */
 void
 GlobalSignalListener::AppStatsListener::receiveSignal(cComponent* src,
@@ -187,7 +200,81 @@ GlobalSignalListener::AppStatsListener::receiveSignal(cComponent* src,
 //      ", mesg size: " << mesgStats->mesgSize << ", SizeOnWire: " <<
 //      mesgStats->mesgSizeOnWire << ", size bin: " << mesgStats->mesgSizeBin <<
 //      ", latency: " << mesgStats->latency << ", stretch: " <<
-//      mesgStats->stretch << ", queueDelay: " << mesgStats->queuingDelay <<
-//      ", transportSchedDelay: " << mesgStats->transportSchedDelay << std::endl;
+//      mesgStats->stretch << ", queueDelay: " <<
+//      mesgStats->queuingDelay << //      ", transportSchedDelay: " <<
+//      mesgStats->transportSchedDelay << std::endl;
     parentModule->handleMesgStatsObj(obj);
+}
+
+/**
+ * This listener receives signals of type HomaTransport::activeSchedsSignal
+ * which carries time
+ */
+GlobalSignalListener::ActiveSchedsListener::ActiveSchedsListener(
+        GlobalSignalListener* parentMod)
+    : parentMod(parentMod)
+    , activeSxTimes()
+    , activeSenders()
+    , srcComponents()
+    , numEmitterTransport(0)
+{
+    // Register this object as a listener to the "activeScheds" singal that
+    // HomaTransport fires. This signal carries a pointer to an object of type
+    // HomaTransport::ReceiveScheduler::ActiveScheds.
+    simulation.getSystemModule()->subscribe("activeScheds", this);
+    activeSenders.setName("Time division of num active sched senders");
+}
+
+/**
+ * Signal receiver implementation
+ */
+void
+GlobalSignalListener::ActiveSchedsListener::receiveSignal(cComponent* src,
+        simsignal_t id, cObject* obj)
+{
+    // record time division stats of number of active scheduled in the
+    // activeSxTimes map
+    auto activeSxObj =
+        dynamic_cast<ActiveScheds*>(obj);
+    uint32_t numActiveSenders = activeSxObj->numActiveSenders;
+    simtime_t duration = activeSxObj->duration;
+    auto search = activeSxTimes.find(numActiveSenders);
+    if (search != activeSxTimes.end()) {
+        search->second += duration.dbl();
+    } else {
+        activeSxTimes[numActiveSenders] = duration.dbl();
+    }
+
+    // check if the emitter source of the signal is transport instance we
+    // haven't heard from before. If yes, increment the numEmitterTransport.  
+    auto ret = srcComponents.insert(src);
+    if (ret.second) {
+        // The src wasn't in the set and is inserted now
+        numEmitterTransport++;
+    }
+}
+
+/**
+ * Write the recorded numActiveSenders and their time durations into the output
+ * vector "activeSenders". The numActiveSenders are asceingly sorted and the
+ * time duration for each numActiveSenders value is cumulative time durations
+ * correspondingly to all smaller numActiveSenders values.
+ */
+void
+GlobalSignalListener::ActiveSchedsListener::dumpStats()
+{
+    // Read the hash table in a vector of key-value pairs and sort the vector
+    // by the key. 
+    std::vector<std::pair<uint32_t, double>> activeCumTimes(
+        activeSxTimes.begin(), activeSxTimes.end());
+    std::sort(activeCumTimes.begin(), activeCumTimes.end(),
+        std::less<std::pair<uint32_t, double>>());
+
+    // iterate over all recorded numActiveSenders and the cumulative time
+    // durations and dmup them in the vector output.
+    double cumTimes = 0;
+    for (auto it = activeCumTimes.begin(); it != activeCumTimes.end(); it++) {
+        cumTimes += (it->second / numEmitterTransport);
+        activeSenders.recordWithTimestamp(cumTimes, it->first);
+    }
 }

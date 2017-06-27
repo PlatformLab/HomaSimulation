@@ -67,6 +67,10 @@ simple WorkloadSynthesizer like ITrafficGeneratorApp
         // values of all other msg** signals above and the message size those
         // values correspoond to.
         @signal[mesgStats];
+        // This signal is meant to track the changes in number of senders
+        // actively receive  grant from the receiver and time duration during
+        // which that number was maintained
+        @signal[activeScheds];
 
         @statisticTemplate[msgRangesE2EDelay](title="msg lifetime"; unit=s; record=count,stats,histogram; interpolationmode=none);
         @statisticTemplate[msgRangesE2EStretch](title="msg stretch"; record=count,stats,histogram; interpolationmode=none);

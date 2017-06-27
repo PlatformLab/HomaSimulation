@@ -17,6 +17,9 @@
 #define __HOMATRANSPORT_GLOBAL_SIGNAL_LISTENER_H_
 
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <utility>
 #include <omnetpp.h>
 #include "common/Minimal.h"
 
@@ -76,9 +79,45 @@ class GlobalSignalListener : public cSimpleModule
         GlobalSignalListener* parentModule;
     };
 
+    /**
+     * This class subscribes to HomaTransport::activeSchedsSignal and collects
+     * time duration during which the number of active scheduled senders
+     * (ie. senders that actively receive grants from the receiver) stays
+     * constant.
+     */
+    class ActiveSchedsListener : public cListener
+    {
+      PUBLIC:
+        ActiveSchedsListener(GlobalSignalListener* parentMod);
+        ~ActiveSchedsListener(){}
+        virtual void receiveSignal(cComponent* src, simsignal_t id,
+            cObject* obj);
+        void dumpStats();
+
+      PUBLIC:
+        GlobalSignalListener* parentMod;
+        // Hash-map from key numActiveSenders to time duration during which the
+        // key was maintained as the number of active scheduled senders in the
+        // receiver schedulers.
+        std::unordered_map<uint32_t, double> activeSxTimes;
+
+        // This output vector records pairs of time value and activeSchedSender
+        // value. The pairs are ascending sorted by the activeSchedSender value
+        // and the time values are recorded as "cumulative time durations" of
+        // the activeSchedSender values.
+        cOutVector activeSenders;
+
+        // Below members are used to track number number of transports emmit
+        // activeSchedsSignal. This number is used to normalize the time
+        // durations to avoid overflow of the precision of simtime_t.
+        std::unordered_set<cComponent*> srcComponents;
+        uint32_t numEmitterTransport;
+    };
+
   PUBLIC:
     StabilityRecorder* stabilityRecorder;
     AppStatsListener* appStatsListener;
+    ActiveSchedsListener* activeSchedsListener;
 
     static simsignal_t mesgBytesOnWireSignal;
     // HashMap from message size range to signals ids. For each range of message
@@ -91,6 +130,7 @@ class GlobalSignalListener : public cSimpleModule
 
   PROTECTED:
     virtual void initialize();
+    virtual void finish();
     virtual void handleMessage(cMessage *msg);
 };
 

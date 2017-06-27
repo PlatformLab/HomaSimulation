@@ -345,9 +345,6 @@ class HomaTransport : public cSimpleModule
         // send for this message.
         uint32_t bytesToGrant;
 
-        // Adds the scheduled packet overhead header bytes to bytesToGrant.
-        uint32_t bytesToGrantOnWire;
-
         // Tracks the total number of data bytes scheduled (granted) for this
         // messages but has not yet been received.
         uint32_t bytesGrantedInFlight;
@@ -363,6 +360,10 @@ class HomaTransport : public cSimpleModule
 
         // The total size of the message as indicated in the req. packet.
         uint32_t msgSize;
+
+        // Tracks the number of scheduled data bytes plus header bytes, as the
+        // receiver sends grants for this message.
+        uint32_t schedBytesOnWire;
 
         // Total bytes transmitted on wire for this message
         uint32_t totalBytesOnWire;
@@ -574,6 +575,7 @@ class HomaTransport : public cSimpleModule
             void insert(SenderState* s);
             int remove(SenderState* s);
             SenderState* removeAt(uint32_t rmInd);
+            uint32_t numActiveSenders();
 
             //void handleGrantRequest(SenderState* s, int sInd, int headInd);
             uint16_t getPrioForMesg(SchedState& cur);
@@ -612,6 +614,7 @@ class HomaTransport : public cSimpleModule
 
             //Collection of user provided config parameters for the transport.
             HomaConfigDepot* homaConfig;
+
             friend class HomaTransport::ReceiveScheduler;
         }; //end SchedSenders
 
@@ -701,6 +704,17 @@ class HomaTransport : public cSimpleModule
 
         // Tracks the bytes received during each over subscription period.
         uint64_t rcvdBytesPerOversubPeriod;
+
+        // In Homa, number of scheduled senders that receiver is granting
+        // at any point of time changes depending on the number of senders and
+        // numToGrant and the receiver's bandwidth that is being wasted. This
+        // varible tracks the current number sched senders that  receiver is
+        // actively granting. The value of this variable is obtained through
+        // calling SchedSenders::numActiveSenders() method.
+        uint16_t numActiveScheds;
+
+        // Tracks the last simulation time at which numActiveScheds has changed.
+        simtime_t schedChangeTime;
 
       PROTECTED:
         void initialize(HomaConfigDepot* homaConfig,
@@ -819,6 +833,12 @@ class HomaTransport : public cSimpleModule
     // might translate to bubbles in receiver's link.
     static simsignal_t sxUnschedPktDelaySignal;
 
+    // When the number of active scheduled sender (ie. number of sender actively
+    // receiving grants from the receiver) change, this signal is emitted and
+    // carries the last value of active scheduled senders and time duration that
+    // value was maintained.
+    static simsignal_t activeSchedsSignal;
+
     // Templated signals for tracking priority usage statistics.
     std::vector<simsignal_t> priorityStatsSignals;
 
@@ -866,6 +886,24 @@ class HomaTransport : public cSimpleModule
     int outstandingGrantBytes;
 
     friend class ReceiveScheduler;
-};
+};//End HomaTransport
+
+/**
+ * To create cumulative-time-percent statistics of active scheduled
+ * senders, we send activeSchedsSignal to GlobalSignalListener which
+ * dumps that stats. Thise signal carries a pointer to object of type
+ * ActiveScheds class and this object contais the last value of
+ * numActiveSenders and time duration that the scheduler was keeping
+ * that many active scheduled senders.
+ */
+class ActiveScheds : public cObject, noncopyable
+{
+  PUBLIC:
+    ActiveScheds(){}
+    
+  PUBLIC:
+    uint32_t numActiveSenders;
+    simtime_t duration;
+};//end ActiveScheds
 
 #endif

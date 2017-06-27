@@ -1,6 +1,7 @@
 TESTING=0
 all: checkmakefiles
 	cd src && $(MAKE)
+	cd ../inet && $(MAKE)
 
 clean: checkmakefiles
 	cd src && $(MAKE) clean

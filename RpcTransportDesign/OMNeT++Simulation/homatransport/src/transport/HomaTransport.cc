@@ -54,6 +54,8 @@ simsignal_t HomaTransport::sxSchedPktDelaySignal =
         registerSignal("sxSchedPktDelay");
 simsignal_t HomaTransport::sxUnschedPktDelaySignal =
         registerSignal("sxUnschedPktDelay");
+simsignal_t HomaTransport::activeSchedsSignal =
+        registerSignal("activeScheds");
 
 /**
  * Contstructor for the HomaTransport.
@@ -123,7 +125,8 @@ HomaTransport::initialize()
     homaConfig = new HomaConfigDepot(this);
     //std::cout << homaConfig->destPort << std::endl;
 
-    //std::cout << "transport ptr " << static_cast<void*>(homaConfig) << std::endl;
+    //std::cout << "transport ptr " << static_cast<void*>(homaConfig) <<
+    //    std::endl;
     // If grantMaxBytes is given too large in the config file, we should correct
     // for it.
     HomaPkt dataPkt = HomaPkt();
@@ -152,7 +155,8 @@ HomaTransport::initialize()
     // setup is complete.)
     sendTimer->setKind(SelfMsgKind::START);
     scheduleAt(simTime(), sendTimer);
-    //std::cout << "transport ptr " << static_cast<void*>(homaConfig) << std::endl;
+    //std::cout << "transport ptr " << static_cast<void*>(homaConfig) <<
+    //    std::endl;
 }
 
 /**
@@ -1130,6 +1134,9 @@ HomaTransport::ReceiveScheduler::ReceiveScheduler(HomaTransport* transport)
     , oversubPeriodStop(SIMTIME_ZERO)
     , inOversubPeriod(false)
     , rcvdBytesPerOversubPeriod(0)
+    , numActiveScheds(0)
+    , schedChangeTime(simTime())
+
 {}
 
 /**
@@ -1320,6 +1327,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     EV << "SchedState before handlePktArrival:\n\t" << old << endl;
     EV << "SchedState after handlePktArrival:\n\t" << cur << endl;
 
+
     // check and update states for oversubscription time and bytes.
     if (schedSenders->numSenders <= schedSenders->numToGrant) {
         if (inOversubPeriod) {
@@ -1344,6 +1352,20 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 
     }
     delete rxPkt;
+
+    // check if number of active sched senders has changed and we should emit
+    // signal for activeSenders
+    uint16_t newActiveSx = schedSenders->numActiveSenders();
+    if (newActiveSx != numActiveScheds) {
+        ActiveScheds activeScheds;
+        activeScheds.numActiveSenders = numActiveScheds;
+        activeScheds.duration = timeNow - schedChangeTime;
+        transport->emit(activeSchedsSignal, &activeScheds);
+
+        // update the tracker variables
+        numActiveScheds = newActiveSx;
+        schedChangeTime = timeNow;
+    }
 
     // Each new data packet arrival is a hint that recieve link is being
     // utilized and we need to cancel/reset the schedBwUtilTimer. The code block
@@ -1393,6 +1415,7 @@ HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
     EV << "\n\n################Process Grant Timer################\n\n" << endl;
     SenderState* s = grantTimersMap[grantTimer];
     schedSenders->handleGrantTimerEvent(s);
+    simtime_t timeNow = simTime();
 
     //schedSenders->remove(s);
     //auto ret = schedSenders->insPoint(s);
@@ -1406,7 +1429,21 @@ HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
         // period. Later we dump the statistics in the next packet arrival
         // event.
         inOversubPeriod = false;
-        oversubPeriodStop = simTime();
+        oversubPeriodStop = timeNow;
+    }
+
+    // check if number of active sched senders has changed and we should emit
+    // signal for activeSenders.
+    uint16_t newActiveSx = schedSenders->numActiveSenders();
+    if (newActiveSx != numActiveScheds) {
+        ActiveScheds activeScheds;
+        activeScheds.numActiveSenders = numActiveScheds;
+        activeScheds.duration = timeNow - schedChangeTime;
+        transport->emit(activeSchedsSignal, &activeScheds);
+
+        // update the tracker variables
+        numActiveScheds = newActiveSx;
+        schedChangeTime = timeNow;
     }
 }
 
@@ -1703,11 +1740,11 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
  * \param grantPrio
  *      Priority of the scheduled packet that sender will send for this grant.
  * \return
- *      1) Return 0 if a grant cannot be sent (ie. the outstanding bytes for this
- *      sender are more than one RTTBytes or a grant timer is scheduled for the
- *      future.). 2) Sends a grant and returns remaining bytes to grant for the
- *      most preferred message of the sender. 3) Sends a grant and returns -1 if
- *      the sender has no more outstanding messages that need grants.
+ *      1) Return 0 if a grant cannot be sent (ie. the outstanding bytes for
+ *      this sender are more than one RTTBytes or a grant timer is scheduled for
+ *      the future.). 2) Sends a grant and returns remaining bytes to grant for
+ *      the most preferred message of the sender. 3) Sends a grant and returns
+ *      -1 if the sender has no more outstanding messages that need grants.
  */
 int
 HomaTransport::ReceiveScheduler::SenderState::sendAndScheduleGrant(
@@ -2001,6 +2038,39 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
 }
 
 /**
+ * Depending on the numToGrant and numSenders, the number of senders that
+ * are actively getting grants changes. Call to function returns exactly how
+ * many senders are being granted at this point.
+ *
+ * \return
+ *    Returns the number of scheduled senders that are currently receiving
+ *    grants.
+ */
+uint32_t
+HomaTransport::ReceiveScheduler::SchedSenders::numActiveSenders()
+{
+    if (numSenders >= schedPrios && headIdx) {
+        cRuntimeError("num sched senders gt. schedPrios but receiver not"
+            " granting on all sched prios!");
+    }
+
+    // Runtime check to verify senders data-struct is flawless 
+    for (auto i = headIdx; i < headIdx + numSenders - 1; i++) {
+        ASSERT(senders[i]);
+    }
+
+    if (numToGrant >= numSenders) {
+        for (int i = 0; i < (int)headIdx - 1; i++) {
+            ASSERT(!senders[i]);
+        }
+        return numSenders;
+    }
+    
+    ASSERT(!headIdx);
+    return numToGrant;
+}
+
+/**
  * This function implements receiver's logic for the scheduler in reaction of
  * message completions, when a packet arrives. Based on the current logic, every
  * time a message completes, the overcommittment level will be decremented if
@@ -2055,8 +2125,6 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleMesgRecvCompletionEvent(
  * \param cur
  *      The receiver scheduler state after arrival of the packet.
  */
-
-
 void
 HomaTransport::ReceiveScheduler::SchedSenders::handlePktArrivalEvent(
     SchedState& old, SchedState& cur)
@@ -2466,11 +2534,11 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
     , destAddr(rxPkt->getDestAddr())
     , msgIdAtSender(rxPkt->getMsgId())
     , bytesToGrant(0)
-    , bytesToGrantOnWire(0)
     , bytesGrantedInFlight(0)
     , totalBytesInFlight(0)
     , bytesToReceive(0)
     , msgSize(0)
+    , schedBytesOnWire(0)
     , totalBytesOnWire(0)
     , totalUnschedBytes(0)
     , msgCreationTime(SIMTIME_ZERO)
@@ -2485,10 +2553,7 @@ HomaTransport::InboundMessage::InboundMessage(HomaPkt* rxPkt,
         case PktType::UNSCHED_DATA:
             bytesToGrant = rxPkt->getUnschedFields().msgByteLen -
                 rxPkt->getUnschedFields().totalUnschedBytes;
-            if (bytesToGrant > 0) {
-                bytesToGrantOnWire = HomaPkt::getBytesOnWire(bytesToGrant,
-                    PktType::SCHED_DATA);
-            }
+
             bytesToReceive = rxPkt->getUnschedFields().msgByteLen;
             msgSize = rxPkt->getUnschedFields().msgByteLen;
             totalUnschedBytes = rxPkt->getUnschedFields().totalUnschedBytes;
@@ -2571,8 +2636,7 @@ HomaTransport::InboundMessage::prepareGrant(uint32_t grantSize,
 
     // update internal structure
     this->bytesToGrant -= grantSize;
-    this->bytesToGrantOnWire -= grantedBytesOnWire;
-    ASSERT(bytesToGrantOnWire >= 0);
+    this->schedBytesOnWire += grantedBytesOnWire;
     this->bytesGrantedInFlight += grantSize;
     this->lastGrantTime = simTime();
     this->totalBytesInFlight += grantedBytesOnWire;
@@ -2606,25 +2670,20 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
         ASSERT(reqArrivalTime <= lastGrantTime && bytesToGrant == 0 &&
             bytesToReceive == 0);
         simtime_t totalSchedTime = lastGrantTime - reqArrivalTime;
-        simtime_t minPossibleSchedTime;
+        simtime_t minSchedulingTime;
         uint32_t bytesGranted = msgSize - totalUnschedBytes;
         uint32_t bytesGrantedOnWire = HomaPkt::getBytesOnWire(bytesGranted,
             PktType::SCHED_DATA);
         uint32_t maxPktSizeOnWire = ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
             MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE + INTER_PKT_GAP;
-
-        if (bytesGrantedOnWire <= maxPktSizeOnWire) {
-            minPossibleSchedTime = SIMTIME_ZERO;
-        } else {
-            uint32_t lastPktSize = bytesGrantedOnWire % maxPktSizeOnWire;
-            if (lastPktSize == 0) {
-                lastPktSize = maxPktSizeOnWire;
-            }
-            minPossibleSchedTime =
-                SimTime(1e-9 * (bytesGrantedOnWire-lastPktSize) * 8.0 /
-                homaConfig->nicLinkSpeed) ;
+        
+        int minSchedTimeInBytes = (int)bytesGrantedOnWire - maxPktSizeOnWire;
+        minSchedulingTime = SIMTIME_ZERO;
+        if (minSchedTimeInBytes > 0) {
+            minSchedulingTime = SimTime(
+                1e-9 * minSchedTimeInBytes * 8.0 / homaConfig->nicLinkSpeed);
         }
-        simtime_t schedDelay = totalSchedTime - minPossibleSchedTime;
+        simtime_t schedDelay = totalSchedTime - minSchedulingTime;
         rxMsg->setTransportSchedDelay(schedDelay);
     }
     return rxMsg;
@@ -2680,7 +2739,7 @@ HomaTransport::InboundMessage::copy(const InboundMessage& other)
     this->destAddr = other.destAddr;
     this->msgIdAtSender = other.msgIdAtSender;
     this->bytesToGrant = other.bytesToGrant;
-    this->bytesToGrantOnWire = other.bytesToGrantOnWire;
+    this->schedBytesOnWire = other.schedBytesOnWire;
     this->bytesGrantedInFlight = other.bytesGrantedInFlight;
     this->totalBytesInFlight = other.totalBytesInFlight;
     this->bytesToReceive = other.bytesToReceive;
