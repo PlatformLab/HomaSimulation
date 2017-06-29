@@ -80,9 +80,10 @@ class VectorParser():
         vecPath = ""
         for line in vciFd:
             if not(paramListEnd):
-                # At the top of the index file, the general information about parameter list
-                # of the simulation is expected. This list is expected to be
-                # separated by a blank line from the rest of the file
+                # At the top of the index file, the general information about
+                # parameter list of the simulation is expected. This list is
+                # expected to be separated by a blank line from the rest of the
+                # file
                 if not line or line.isspace():
                     paramListEnd = True
 
@@ -103,9 +104,13 @@ class VectorParser():
                 #    stores the location and stats of blocks for that vector in
                 #    the vectror result file
 
-                match1 = re.match('{0}\s+(\d+)\s+{1}\.(\S+)\s+(\S+)\s*(\S*)'.format('vector', net), line)
+                match1 = re.match(
+                    '{0}\s+(\d+)\s+{1}\.(\S+)\s+("(.+)"|\S+)\s*(\S*)'.format(
+                    'vector', net), line)
                 match2 = re.match('attr\s+(\S+)\s+("(.+)"|\S+)', line)
-                match3 = re.match('(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+)\s+(\d+\.*\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*e?\+?\d*)', line)
+                match3 = re.match('(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+'
+                    '(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+\.?\d*)\s+'
+                    '(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*e?\+?\d*)', line)
                 if match1:
                     vecId = int(match1.group(1))
                     moduleName = match1.group(2)

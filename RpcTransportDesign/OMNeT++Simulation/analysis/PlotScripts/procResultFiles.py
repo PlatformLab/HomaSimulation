@@ -13,8 +13,10 @@ import random
 import re
 import sys
 import warnings
-sys.path.insert(0, os.environ['HOME'] +\
-    '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
+#sys.path.insert(0, os.environ['HOME'] +\
+#    '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/..')
+
 from parseResultFiles import *
 from MetricsDashBoard import *
 
@@ -102,9 +104,9 @@ if __name__ == '__main__':
                 #    continue
                 usageTimePct = prioStats.usageTimePct
                 prioTimeUsagesPct.append((prioLevels, adaptiveSchedPrioLevels,
-                    workloadType, redundancyFactor, loadFactor, nominalLoadFactor,
-                    prioLevels-priority, usageTimePct.activelyRecv,
-                    usageTimePct.activelyRecvSched))
+                    workloadType, redundancyFactor, loadFactor,
+                    nominalLoadFactor, prioLevels-priority,
+                    usageTimePct.activelyRecv, usageTimePct.activelyRecvSched))
 
         if outputType.wastedBw:
             activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
