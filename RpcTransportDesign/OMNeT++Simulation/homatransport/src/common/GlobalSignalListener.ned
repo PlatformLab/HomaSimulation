@@ -28,13 +28,16 @@ simple GlobalSignalListener
     parameters:
         @display("i=status/lightning");
 
-    @signal[mesgBytesOnWire](type=double);
+    @signal[bytesOnWire](type=double);
+    @signal[mesg*BytesOnWire](type=double);
     @signal[mesg*Delay](type=simtime_t);
     @signal[mesg*Stretch](type=double);
     @signal[mesg*QueueDelay](type=simtime_t);
     @signal[mesg*TransportSchedDelay](type=simtime_t);
 
-    @statistic[mesgBytesOnWire](title="total bytes on wire";record=histogram; interpolationmode=none);
+    @statistic[bytesOnWire](title="cumulative total bytes on wire";record=histogram; interpolationmode=none);
+    @statisticTemplate[mesgBytesOnWire](title="per mesg-size, total bytes on wire"; record=histogram; interpolationmode=none);
+    @statisticTemplate[mesgTransportSchedDelay](title="transport scheduling delay";unit=s; record=histogram; interpolationmode=none);
     @statisticTemplate[mesgDelay](title="msg lifetime"; unit=s; record=histogram; interpolationmode=none);
     @statisticTemplate[mesgStretch](title="msg stretch"; record=histogram; interpolationmode=none);
     @statisticTemplate[mesgQueueDelay](title="msg queuing delay";unit=s; record=histogram; interpolationmode=none);

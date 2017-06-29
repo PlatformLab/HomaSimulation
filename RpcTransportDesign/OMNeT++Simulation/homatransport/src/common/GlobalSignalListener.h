@@ -119,10 +119,11 @@ class GlobalSignalListener : public cSimpleModule
     AppStatsListener* appStatsListener;
     ActiveSchedsListener* activeSchedsListener;
 
-    static simsignal_t mesgBytesOnWireSignal;
+    static simsignal_t bytesOnWireSignal;
     // HashMap from message size range to signals ids. For each range of message
     // size, there is a signal defined to record statistics of that message size
     // range.
+    std::unordered_map<uint64_t, simsignal_t> mesgBytesOnWireSignals;
     std::unordered_map<uint64_t, simsignal_t> mesgLatencySignals;
     std::unordered_map<uint64_t, simsignal_t> mesgStretchSignals;
     std::unordered_map<uint64_t, simsignal_t> mesgQueueDelaySignals;
