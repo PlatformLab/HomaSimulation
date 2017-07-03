@@ -1355,17 +1355,7 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
 
     // check if number of active sched senders has changed and we should emit
     // signal for activeSenders
-    uint16_t newActiveSx = schedSenders->numActiveSenders();
-    if (newActiveSx != numActiveScheds) {
-        ActiveScheds activeScheds;
-        activeScheds.numActiveSenders = numActiveScheds;
-        activeScheds.duration = timeNow - schedChangeTime;
-        transport->emit(activeSchedsSignal, &activeScheds);
-
-        // update the tracker variables
-        numActiveScheds = newActiveSx;
-        schedChangeTime = timeNow;
-    }
+    tryRecordActiveMesgStats(timeNow);
 
     // Each new data packet arrival is a hint that recieve link is being
     // utilized and we need to cancel/reset the schedBwUtilTimer. The code block
@@ -1434,17 +1424,7 @@ HomaTransport::ReceiveScheduler::processGrantTimers(cMessage* grantTimer)
 
     // check if number of active sched senders has changed and we should emit
     // signal for activeSenders.
-    uint16_t newActiveSx = schedSenders->numActiveSenders();
-    if (newActiveSx != numActiveScheds) {
-        ActiveScheds activeScheds;
-        activeScheds.numActiveSenders = numActiveScheds;
-        activeScheds.duration = timeNow - schedChangeTime;
-        transport->emit(activeSchedsSignal, &activeScheds);
-
-        // update the tracker variables
-        numActiveScheds = newActiveSx;
-        schedChangeTime = timeNow;
-    }
+    tryRecordActiveMesgStats(timeNow);
 }
 
 /**
@@ -1551,6 +1531,21 @@ HomaTransport::ReceiveScheduler::pendingBytesArrived(PktType pktType,
     }
 }
 
+void
+HomaTransport::ReceiveScheduler::tryRecordActiveMesgStats(simtime_t timeNow)
+{
+    uint16_t newActiveSx = schedSenders->numActiveSenders();
+    if (newActiveSx != numActiveScheds) {
+        ActiveScheds activeScheds;
+        activeScheds.numActiveSenders = numActiveScheds;
+        activeScheds.duration = timeNow - schedChangeTime;
+        transport->emit(activeSchedsSignal, &activeScheds);
+
+        // update the tracker variables
+        numActiveScheds = newActiveSx;
+        schedChangeTime = timeNow;
+    }
+}
 
 /**
  * Constructor of HomaTransport::ReceiveScheduler::SenderState.
@@ -2382,6 +2377,10 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
     // from the newly inducted sender anytime earlier than one RTT later.
     transport->scheduleAt(timeNow + homaConfig->rtt,
         rxScheduler->schedBwUtilTimer);
+
+    // check if number of active sched senders has changed and we should emit
+    // signal for activeSenders
+    rxScheduler->tryRecordActiveMesgStats(timeNow);
 }
 
 uint16_t

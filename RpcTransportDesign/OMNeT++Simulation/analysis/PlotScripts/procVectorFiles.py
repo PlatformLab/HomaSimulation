@@ -13,12 +13,49 @@ import random
 import re
 import sys
 import warnings
-#sys.path.insert(0, os.environ['HOME'] +\
-#    '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) +\
-    '/..')
+import matplotlib.pyplot as plt
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/..')
 from parseResultFiles import *
 from MetricsDashBoard import *
+
+def plotActiveScheds(activeSchedsFile, activeSchedsData=[]):
+    def typeCastInput(line):
+         return [int(line[0]), int(line[1]), line[2], int(line[3]),
+            float(line[4]), int(line[5]), int(line[6]), float(line[7])]
+
+    if activeSchedsData == []:
+        # read the data from activeSchedsFile
+        fd = open(activeSchedsFile)
+        for line in fd:
+            try:
+                data = typeCastInput(line.split())
+                activeSchedsData.append(data)
+            except:
+                print line
+
+    pprint(activeSchedsData)
+
+    linkCheckBytes = {data[5] : AttrDict() for data in activeSchedsData}
+    pltData = {}
+    for data in activeSchedsData:
+        linkCheckBytes = data[5]
+        if not(pltData.has_key(linkCheckBytes)):
+            pltData[linkCheckBytes] = AttrDict()
+            pltData[linkCheckBytes].x = []
+            pltData[linkCheckBytes].y = []
+
+        pltData[linkCheckBytes].x.append(data[6])
+        pltData[linkCheckBytes].y.append(data[7])
+
+    for linkCheckBytes in pltData.keys():
+        plt.step(pltData[linkCheckBytes].x, pltData[linkCheckBytes].y,
+            label=linkCheckBytes)
+
+    plt.xlabel("# active messages")
+    plt.ylabel("Cumulative % of time")
+    plt.legend()
+    plt.show()
 
 if __name__ == '__main__':
     parser = OptionParser(description = 'This script is meant to post-process '
@@ -90,17 +127,18 @@ if __name__ == '__main__':
             for result in data:
                 cumTimePct = result[1]/data[-1][1]
                 activeMesgs = int(result[2])
-                activeScheds.append((prioLevels, schedPrioLevels, workloadType,
+                activeScheds.append([prioLevels, schedPrioLevels, workloadType,
                     redundancy, nominalLoad, linkCheckBytes, activeMesgs,
-                    cumTimePct))
+                    cumTimePct])
 
     # dump the results in outputfiles
     scriptPath = os.path.dirname(os.path.realpath(__file__))
     tw_h = 40
-    tw_l = 15 
+    tw_l = 20
     if outputType.activeScheds:
         # create output file
-        activeMesgFd = open(os.path.join(scriptPath, "activeMesgs.txt"), 'w')
+        activeSchedsFile = os.path.join(scriptPath, "activeMesgs.txt")
+        activeMesgFd = open(activeSchedsFile, 'w')
         activeMesgFd.write('prioLevels'.ljust(tw_l) +
             'schedPrioLevels'.center(tw_l) + 'workload'.center(tw_h) +
             'initialRedundancy'.center(tw_l) +
@@ -117,6 +155,7 @@ if __name__ == '__main__':
                 '{0}'.format(activeMesgStat[4]).center(tw_l) +
                 '{0}'.format(activeMesgStat[5]).center(tw_l) +
                 '{0}'.format(activeMesgStat[6]).center(tw_l) +
-                '{0}'.format(activeMesgStat[7]).center(tw_l) + '\n')
+                '{0}'.format(activeMesgStat[7]*100).center(tw_l) + '\n')
         activeMesgFd.close()
 
+    plotActiveScheds(activeSchedsFile)

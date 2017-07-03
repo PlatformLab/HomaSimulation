@@ -744,10 +744,11 @@ class HomaTransport : public cSimpleModule
             uint32_t bytesToArrive);
         void pendingBytesArrived(PktType pktType, uint16_t prio,
             uint32_t dataBytesInPkt);
+        void tryRecordActiveMesgStats(simtime_t timeNow);
         friend class HomaTransport;
         friend class SchedSenders;
         friend class InboundMessage;
-    };
+    }; //end ReceiveScheduler
 
   PUBLIC:
     virtual void initialize();
