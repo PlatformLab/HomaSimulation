@@ -27,6 +27,7 @@ GlobalSignalListener::GlobalSignalListener()
     : stabilityRecorder(NULL)
     , appStatsListener(NULL)
     , activeSchedsListener(NULL)
+    , selfWastedBwListeners()
     , mesgBytesOnWireSignals()
     , mesgLatencySignals()
     , mesgStretchSignals()
@@ -39,6 +40,9 @@ GlobalSignalListener::~GlobalSignalListener()
     delete stabilityRecorder;
     delete appStatsListener;
     delete activeSchedsListener;
+    for (auto iter : selfWastedBwListeners) {
+        delete iter;
+    }
 }
 
 void
@@ -47,6 +51,10 @@ GlobalSignalListener::initialize()
     stabilityRecorder = new StabilityRecorder(this);
     appStatsListener = new AppStatsListener(this);
     activeSchedsListener = new ActiveSchedsListener(this);
+    selfWastedBwListeners.push_back(new SelfWastedBandwidthListener(this,
+      "higherRxSelfWasteTime", "highrSelfBwWaste"));
+    selfWastedBwListeners.push_back(new SelfWastedBandwidthListener(this,
+      "lowerRxSelfWasteTime", "lowerSelfBwWaste"));
 }
 
 void
@@ -261,7 +269,7 @@ GlobalSignalListener::ActiveSchedsListener::receiveSignal(cComponent* src,
     }
 
     // check if the emitter source of the signal is transport instance we
-    // haven't heard from before. If yes, increment the numEmitterTransport.  
+    // haven't heard from before. If yes, increment the numEmitterTransport.
     auto ret = srcComponents.insert(src);
     if (ret.second) {
         // The src wasn't in the set and is inserted now
@@ -279,7 +287,7 @@ void
 GlobalSignalListener::ActiveSchedsListener::dumpStats()
 {
     // Read the hash table in a vector of key-value pairs and sort the vector
-    // by the key. 
+    // by the key.
     std::vector<std::pair<uint32_t, double>> activeCumTimes(
         activeSxTimes.begin(), activeSxTimes.end());
     std::sort(activeCumTimes.begin(), activeCumTimes.end(),
@@ -292,4 +300,40 @@ GlobalSignalListener::ActiveSchedsListener::dumpStats()
         cumTimes += (it->second / numEmitterTransport);
         activeSenders.recordWithTimestamp(cumTimes, it->first);
     }
+}
+
+/**
+ * Constructor for SelfWastedBandwidthListener.
+ * \param parentMod
+ *      pointer to the GlobalSignalListener instance that owns this listener
+ * \param srcSigName
+ *      name of one of the HomaTransport::lowerSelfWasteSignal or
+ *      HomaTransport::highrSelfWasteSignal that this listener receives.
+ * \param destSigName
+ *      signal name of the corresponding lowerSelfWasteSignal or
+ *      highrSelfWasteSignal that this listener fires value for, every time it
+ *      receives signal from srcSigName.
+ */
+GlobalSignalListener::SelfWastedBandwidthListener::SelfWastedBandwidthListener(
+        GlobalSignalListener* parentMod, const char* srcSigName,
+        const char* destSigName)
+    : parentMod(parentMod)
+    , srcSigName(srcSigName)
+    , destSigName(destSigName)
+    , destSigId(0)
+
+{
+    simulation.getSystemModule()->subscribe(srcSigName, this);
+    destSigId = registerSignal(destSigName);
+}
+
+/**
+ * Signal receiver implementation for self inflicted bandwidht wastage.
+ * Receives the signal and
+ */
+void
+GlobalSignalListener::SelfWastedBandwidthListener::receiveSignal(
+        cComponent *src, simsignal_t id, const SimTime& v)
+{
+    parentMod->emit(destSigId, v);
 }

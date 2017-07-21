@@ -76,6 +76,7 @@ HomaPkt::headerSize()
             break;
         case PktType::GRANT:
             size += (sizeof(getGrantFields().grantBytes) +
+                sizeof(getGrantFields().offset) +
                 sizeof(getGrantFields().schedPrio) +
                 getGrantFields().sizeReqBytesPrio.size() *
                 sizeof(decltype(getGrantFields().sizeReqBytesPrio)::value_type)+

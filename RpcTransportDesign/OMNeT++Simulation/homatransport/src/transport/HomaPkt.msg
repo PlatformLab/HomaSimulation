@@ -53,7 +53,8 @@ struct UnschedFields
 
 struct GrantFields
 {
-    uint32_t grantBytes;
+    uint16_t grantBytes;
+    uint32_t offset;
     uint16_t schedPrio;
 
     // [(uint32_t size_upper_bound, uint16_t req_byte, uint16_t prio)]

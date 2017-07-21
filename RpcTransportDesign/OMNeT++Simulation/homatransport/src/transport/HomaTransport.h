@@ -75,7 +75,8 @@ class HomaTransport : public cSimpleModule
         ~OutboundMessage();
         OutboundMessage& operator=(const OutboundMessage& other);
         void prepareRequestAndUnsched();
-        uint32_t prepareSchedPkt(uint32_t numBytes, uint16_t schedPrio);
+        uint32_t prepareSchedPkt(uint32_t offset, uint16_t numBytes,
+            uint16_t schedPrio);
 
       PUBLIC:
         /**
@@ -112,15 +113,13 @@ class HomaTransport : public cSimpleModule
         // Total byte size of the message received from application
         uint32_t msgSize;
 
-        // Total num bytes remained to be scheduled for transmission in this msg
+        // Total num bytes that need grants from the receiver for transmission
+        // in this mesg.
         uint32_t bytesToSched;
 
-        // Index of the next byte to be transmitted for this msg. Always
-        // initialized to zero.
-        uint32_t nextByteToSched;
-
         // Total num bytes left to be transmitted for this messge, including
-        // bytes that are scheduled but not yet sent to the network.
+        // bytes that are packetized and queued in the transport, but not yet
+        // sent to the network interface for transmission.
         uint32_t bytesLeft;
 
         // Total unsched bytes left to be transmitted for this messge.
@@ -268,15 +267,22 @@ class HomaTransport : public cSimpleModule
         // Tracks the bytes received during each active period.
         uint64_t sentBytesPerActivePeriod;
 
+        // Tracks sum of grant pkts received between two respective received
+        // data pkts.  SendController cumulates grant packets to this variable
+        // and ReceiveScheduler zeros it out whenever a new data packet has
+        // arrived.
+        uint64_t sumGrantsInGap;
+
         friend class OutboundMessage;
         friend class HomaTransport;
-    };
+    }; // End SendController
 
     /**
      * Handles reception of an incoming message by concatanations of data
      * fragments in received packets and keeping track of reception progress.
      */
-    class InboundMessage {
+    class InboundMessage
+    {
       PUBLIC:
         explicit InboundMessage();
         explicit InboundMessage(const InboundMessage& other);
@@ -285,6 +291,8 @@ class HomaTransport : public cSimpleModule
         ~InboundMessage();
 
       PUBLIC:
+        typedef std::list<std::tuple<uint32_t, uint16_t, simtime_t>> GrantList;
+
         /**
          * A predicate functor that compares the remaining required grants
          * to be sent for two inbound message.
@@ -345,6 +353,13 @@ class HomaTransport : public cSimpleModule
         // send for this message.
         uint32_t bytesToGrant;
 
+        // Tracks the next for this messaage that is to be scheduled for
+        // transmission by next grant packet. This value is monotonically
+        // increasing and together with next grantSize, uinquely identifies the
+        // nest chunck of data bytes in the message will be tranmitted by the
+        // sender.
+        uint32_t offset;
+
         // Tracks the total number of data bytes scheduled (granted) for this
         // messages but has not yet been received.
         uint32_t bytesGrantedInFlight;
@@ -389,6 +404,14 @@ class HomaTransport : public cSimpleModule
         // method.
         simtime_t lastGrantTime;
 
+        // list to keep track of the outstanding grant pkts. Each tuple in the
+        // list has the offset byte scheduled by a grant, and the size of the
+        // grant and time at which the receiver scheduled that grant. The
+        // unscheduled bytes are also added to this list as hypothetical grant
+        // pkts that receiver sent one RTT before the first packet arrived and
+        // for zero offset byte.
+        GrantList inflightGrants;
+
         //***************************************************************//
         //****Below variables are snapshots, first after construction****//
         //****and then at grant times, of the corresponding variables****//
@@ -417,7 +440,7 @@ class HomaTransport : public cSimpleModule
             PktType pktType);
         uint32_t schedBytesInFlight();
         uint32_t unschedBytesInFlight();
-        HomaPkt* prepareGrant(uint32_t grantSize, uint16_t schedPrio);
+        HomaPkt* prepareGrant(uint16_t grantSize, uint16_t schedPrio);
         AppMessage* prepareRxMsgForApp();
         void updatePerPrioStats();
     };
@@ -646,7 +669,7 @@ class HomaTransport : public cSimpleModule
         cMessage* schedBwUtilTimer;
 
         // The lenght of time interval during which if we don't receive a
-        // packet, receive bw is considered wasted.
+        // packet, receiver inbound bw is considered wasted.
         simtime_t bwCheckInterval;
 
         //*******************************************************//
@@ -715,6 +738,9 @@ class HomaTransport : public cSimpleModule
 
         // Tracks the last simulation time at which numActiveScheds has changed.
         simtime_t schedChangeTime;
+
+        // Tracks the time at which we received the last data packet
+        simtime_t lastRecvTime;
 
       PROTECTED:
         void initialize(HomaConfigDepot* homaConfig,
@@ -817,6 +843,14 @@ class HomaTransport : public cSimpleModule
     // result of not scheduling all the possible senders.
     static simsignal_t oversubBytesSignal;
 
+    // Singals for recording time durations that receiver's inbound bw is wasted
+    // and that wasted bw may have been avoided if the receiver granted more
+    // senders than the number it currently granted. The higher and lower
+    // prefixes are for "Higher Overestimate" and "Lower Overestimate" of this
+    // metric.
+    static simsignal_t higherRxSelfWasteSignal;
+    static simsignal_t lowerRxSelfWasteSignal;
+
     // Signal for recording time periods during which sender has bytes awaiting
     // tranmission.
     static simsignal_t sxActiveTimeSignal;
@@ -901,7 +935,7 @@ class ActiveScheds : public cObject, noncopyable
 {
   PUBLIC:
     ActiveScheds(){}
-    
+
   PUBLIC:
     uint32_t numActiveSenders;
     simtime_t duration;

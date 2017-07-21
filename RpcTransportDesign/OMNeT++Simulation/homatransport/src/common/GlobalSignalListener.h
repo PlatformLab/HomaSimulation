@@ -114,12 +114,36 @@ class GlobalSignalListener : public cSimpleModule
         uint32_t numEmitterTransport;
     };
 
+    /**
+     * This subclass subscribes to "HomaTransport::lowerRxSelfWasteTime" and
+     * "HomaTransport::higherRxSelfWasteTime" signals. It takes in these signals
+     * from the transport instances and records aggregate statistics of self
+     * inflicted wasted inbound bandwidth in scalar result files.
+     */
+    class SelfWastedBandwidthListener : public cListener
+    {
+      PUBLIC:
+        SelfWastedBandwidthListener(GlobalSignalListener* parentMod,
+            const char* srcSigName, const char* destSigName);
+        ~SelfWastedBandwidthListener(){}
+        virtual void receiveSignal(cComponent *src, simsignal_t id,
+            const SimTime& v);
+
+      PUBLIC:
+        GlobalSignalListener* parentMod;
+        const char* srcSigName;
+        const char* destSigName;
+        simsignal_t destSigId;
+    };
+
   PUBLIC:
     StabilityRecorder* stabilityRecorder;
     AppStatsListener* appStatsListener;
     ActiveSchedsListener* activeSchedsListener;
+    std::list<SelfWastedBandwidthListener*> selfWastedBwListeners;
 
     static simsignal_t bytesOnWireSignal;
+
     // HashMap from message size range to signals ids. For each range of message
     // size, there is a signal defined to record statistics of that message size
     // range.

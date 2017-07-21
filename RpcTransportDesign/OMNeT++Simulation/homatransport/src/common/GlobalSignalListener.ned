@@ -34,8 +34,12 @@ simple GlobalSignalListener
     @signal[mesg*Stretch](type=double);
     @signal[mesg*QueueDelay](type=simtime_t);
     @signal[mesg*TransportSchedDelay](type=simtime_t);
+    @signal[highrSelfBwWaste](type=simtime_t);
+    @signal[lowerSelfBwWaste](type=simtime_t);
 
     @statistic[bytesOnWire](title="cumulative total bytes on wire";record=histogram; interpolationmode=none);
+    @statistic[highrSelfBwWaste](title="Higher upperbound on receivers self-inflicted wasted-bw";record=histogram; interpolationmode=none);
+    @statistic[lowerSelfBwWaste](title="Lower upperbound on receivers self-inflicted wasted-bw";record=histogram; interpolationmode=none);
     @statisticTemplate[mesgBytesOnWire](title="per mesg-size, total bytes on wire"; record=histogram; interpolationmode=none);
     @statisticTemplate[mesgTransportSchedDelay](title="transport scheduling delay";unit=s; record=histogram; interpolationmode=none);
     @statisticTemplate[mesgDelay](title="msg lifetime"; unit=s; record=histogram; interpolationmode=none);

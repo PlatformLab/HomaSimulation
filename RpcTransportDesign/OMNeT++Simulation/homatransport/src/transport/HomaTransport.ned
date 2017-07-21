@@ -95,6 +95,8 @@ simple HomaTransport like ITransportScheme
         @signal[totalOutstandingBytes](type=long);
         @singal[homaPktPrio*Signal](type=HomaPkt);
         @signal[rxActiveTime](type=simtime_t);
+        @signal[higherRxSelfWasteTime](type=simtime_t);
+        @signal[lowerRxSelfWasteTime](type=simtime_t);
         @signal[rxActiveBytes](type=long);
         @signal[oversubscriptionTime](type=simtime_t);
         @signal[oversubscriptionBytes](type=long);
