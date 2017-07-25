@@ -383,8 +383,8 @@ class HomaTransport : public cSimpleModule
         // Total bytes transmitted on wire for this message
         uint32_t totalBytesOnWire;
 
-        // All unscheduled bytes that comes in req. pkts and following unsched.
-        // packets for this message.
+        // All unscheduled bytes that come in req. pkt and the following
+        // unsched packets for this message.
         uint16_t totalUnschedBytes;
 
         // simulation time at which this message was created in the sender side.
@@ -404,7 +404,7 @@ class HomaTransport : public cSimpleModule
         // method.
         simtime_t lastGrantTime;
 
-        // list to keep track of the outstanding grant pkts. Each tuple in the
+        // List to keep track of the outstanding grant pkts. Each tuple in the
         // list has the offset byte scheduled by a grant, and the size of the
         // grant and time at which the receiver scheduled that grant. The
         // unscheduled bytes are also added to this list as hypothetical grant

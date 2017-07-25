@@ -1265,12 +1265,10 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
     // Check if receiver bw is wasted may have been as a result receiver not
     // sending enough timely grants to some sched messages
     simtime_t sinceLastPkt = simTime() - lastRecvTime;
-    //std::cout << (sinceLastPkt - pktDuration).dbl() << ", " <<
-    //    -pow(10, SimTime::getScaleExp()) << std::endl;
     ASSERT((sinceLastPkt - pktDuration).dbl() >= -pow(10, SimTime::getScaleExp()));
-    uint64_t& sumGrantsInGap = transport->sxController.sumGrantsInGap;
+    uint64_t* sumGrantsInGap = &(transport->sxController.sumGrantsInGap);
     simtime_t rxGrantsTime =
-            SimTime(1e-9 * sumGrantsInGap * 8.0 / homaConfig->nicLinkSpeed);
+            SimTime(1e-9 * (*sumGrantsInGap) * 8.0 / homaConfig->nicLinkSpeed);
     if (sinceLastPkt > (pktDuration + rxGrantsTime) &&
             schedSenders->numSenders) {
         // find the eraliest grant time
@@ -1295,10 +1293,10 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
         simtime_t lowrOverEst;
         simtime_t wastedGap = sinceLastPkt - pktDuration;
 
-        if (maxEarliestGrant <= lastRecvTime-homaConfig->rtt) {
+        if (maxEarliestGrant <= lastRecvTime - homaConfig->rtt) {
             highOverEst = SIMTIME_ZERO;
             lowrOverEst = SIMTIME_ZERO;
-        } else if (maxEarliestGrant <= lastRecvTime){
+        } else if (maxEarliestGrant <= lastRecvTime) {
             highOverEst = std::min(wastedGap,
                 maxEarliestGrant + homaConfig->rtt - lastRecvTime);
             lowrOverEst = highOverEst;
@@ -1308,13 +1306,14 @@ HomaTransport::ReceiveScheduler::processReceivedPkt(HomaPkt* rxPkt)
                 maxEarliestGrant - lastRecvTime + homaConfig->rtt, wastedGap);
         }
         ASSERT(rxGrantsTime <= wastedGap);
+        // prorate the grants received in the wastedGap
         highOverEst -= (rxGrantsTime/wastedGap*highOverEst);
         lowrOverEst -= (rxGrantsTime/wastedGap*lowrOverEst);
         transport->emit(higherRxSelfWasteSignal, highOverEst);
         transport->emit(lowerRxSelfWasteSignal, lowrOverEst);
     }
     lastRecvTime = simTime();
-    sumGrantsInGap = 0;
+    *sumGrantsInGap = 0;
 
     // check and update states for oversubscription time and bytes.
     if (schedSenders->numSenders > schedSenders->numToGrant) {
@@ -1759,6 +1758,7 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
 
     if (inboundMesg->bytesToReceive == 0) {
         ASSERT(inboundMesg->bytesToGrant == 0);
+        ASSERT(inboundMesg->inflightGrants.empty());
 
         // this message is complete, so send it to the application
         AppMessage* rxMsg = inboundMesg->prepareRxMsgForApp();
@@ -2679,7 +2679,6 @@ HomaTransport::InboundMessage::fillinRxBytes(uint32_t byteStart,
         GrantList::iterator grant;
         for (grant = inflightGrants.begin(); grant != inflightGrants.end();
                 grant++) {
-
 
             //std::cout << "grant offset: " << std::get<0>(*grant) << std::endl;
             if (std::get<0>(*grant) == byteStart) {

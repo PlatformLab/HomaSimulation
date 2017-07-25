@@ -1081,10 +1081,39 @@ def computeWastedTimesAndBw(parsedStats, xmlParsedDic):
     activeAndWasted.simTime = totalSimTime / len(parsedStats.hosts.keys())
     return activeAndWasted
 
-def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
+def computeSelfInflictedWastedBw(parsedStats, xmlParsedDic):
+    nicLinkSpeed = int(parsedStats.generalInfo.nicLinkSpeed.strip('Gbps'))
+    receiverHostIds = xmlParsedDic.receiverIds
+    simTime = 0
+    totalSimTime = 0
+    for host in parsedStats.hosts.keys():
+        hostId = int(re.match('host\[([0-9]+)]', host).group(1))
+        if hostId in receiverHostIds:
+            hostStats = parsedStats.hosts[host]
+            simTime = float(hostStats.access('eth[0].mac.\"last reception time\".value'))
+            totalSimTime += simTime
+
+    selfWasteTime = AttrDict()
+    selfWasteTime.totalTime = totalSimTime
+
+    highrWasteBwKey = 'globalListener.highrSelfBwWaste:histogram'
+    selfWasteTime.highrOverEst.sum = float(parsedStats.access(highrWasteBwKey + '.sum'))
+
+    lowerWasteBwKey = 'globalListener.lowerSelfBwWaste:histogram'
+    selfWasteTime.lowerOverEst.sum = float(parsedStats.access(lowerWasteBwKey + '.sum'))
+
+    selfWasteTime.highrOverEst.fracTotalTime = selfWasteTime.highrOverEst.sum /\
+        selfWasteTime.totalTime
+
+    selfWasteTime.lowerOverEst.fracTotalTime = selfWasteTime.lowerOverEst.sum /\
+        selfWasteTime.totalTime
+
+    return selfWasteTime
+
+def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted, selfWasteTime):
     lineMax = 90
-    tw = 22
-    fw = 22
+    tw = 12
+    fw = 20
     title = 'Average Wasted Time and Bandwidth at Receivers'
 
     print('\n'*2 + ('-'*len(title)).center(lineMax,' ') + '\n' + ('|' + title + '|').center(lineMax, ' ') +
@@ -1097,6 +1126,14 @@ def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted):
     print('{0:.2f}'.format(activeAndWasted.rx.fracActiveTime).ljust(tw) + '{0:.2f}'.format(activeAndWasted.rx.fracTotalTime).center(fw) +
           '{0:.2f}'.format(activeAndWasted.rx.oversubWastedFracOversubTime).center(fw) +
           '{0:.2f}'.format(activeAndWasted.rx.oversubWastedFracTotalTime).center(fw))
+
+    print('\n'*2 + "="*lineMax)
+    print("Lower Self".ljust(tw) + 'Higher Self'.center(fw))
+    print("Wasted BW %".ljust(tw) + 'Wasted BW %'.center(fw))
+    print("_"*lineMax)
+    print('{0:.2f}'.format(selfWasteTime.highrOverEst.fracTotalTime * 100.0).ljust(tw) +\
+        '{0:.2f}'.format(selfWasteTime.lowerOverEst.fracTotalTime * 100.0).center(fw))
+
 
     tw = 14
     fw = 14
@@ -1542,7 +1579,8 @@ def main():
     printHomaRates(trafficDic)
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
-        printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted)
+        selfWasteTime = computeSelfInflictedWastedBw(parsedStats, xmlParsedDic)
+        printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted, selfWasteTime)
     if parsedStats.generalInfo.transportSchemeType == 'HomaTransport':
         prioUsageStatsDigest = list()
         computePrioUsageStats(parsedStats.hosts, parsedStats.generalInfo, xmlParsedDic, prioUsageStatsDigest)
