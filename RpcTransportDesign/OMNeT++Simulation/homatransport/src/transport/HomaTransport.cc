@@ -76,6 +76,7 @@ HomaTransport::HomaTransport()
     , emitSignalTimer(NULL)
     , nextEmitSignalTime(SIMTIME_ZERO)
     , outstandingGrantBytes(0)
+    , trackRTTs(this)
 {}
 
 /**
@@ -2687,6 +2688,10 @@ HomaTransport::InboundMessage::fillinRxBytes(uint32_t byteStart,
         }
         ASSERT(grant != inflightGrants.end());
         ASSERT(std::get<1>(*grant) == bytesReceived);
+        if (bytesReceivedOnWire == HomaPkt::maxEthFrameSize()) {
+            rxScheduler->transport->trackRTTs.updateRTTSample(srcAddr.toIPv4().getInt(),
+                simTime() - std::get<2>(*grant));
+        }
         inflightGrants.erase(grant);
 
         bytesGrantedInFlight -= bytesReceived;
@@ -2780,10 +2785,7 @@ HomaTransport::InboundMessage::prepareRxMsgForApp()
         uint32_t bytesGranted = msgSize - totalUnschedBytes;
         uint32_t bytesGrantedOnWire = HomaPkt::getBytesOnWire(bytesGranted,
             PktType::SCHED_DATA);
-        uint32_t maxPktSizeOnWire = ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
-            MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE + INTER_PKT_GAP;
-
-        int minSchedTimeInBytes = (int)bytesGrantedOnWire - maxPktSizeOnWire;
+        int minSchedTimeInBytes = (int)bytesGrantedOnWire - HomaPkt::maxEthFrameSize();
         minSchedulingTime = SIMTIME_ZERO;
         if (minSchedTimeInBytes > 0) {
             minSchedulingTime = SimTime(
@@ -2862,4 +2864,71 @@ HomaTransport::InboundMessage::copy(const InboundMessage& other)
     this->unschedToRecvPerPrio = other.unschedToRecvPerPrio;
     this->sumInflightUnschedPerPrio = other.sumInflightUnschedPerPrio;
     this->sumInflightSchedPerPrio = other.sumInflightSchedPerPrio;
+}
+
+/**
+ * Constructor for HomaTransport::TrackRTTs
+ */
+HomaTransport::TrackRTTs::TrackRTTs(HomaTransport* transport)
+    : sendersRTT()
+    , maxRTT()
+    , transport(transport)
+{
+    maxRTT = std::make_pair(0, 0);
+}
+
+/**
+ * The rxScheduler calls this method for every new updated RTT value for a
+ * specific sender. This function in turn, updates its internal datastruct and
+ * also updates HomaConfigDepot::rtt with the max over the minimum RTT
+ * observation of all senders.
+ */
+void
+HomaTransport::TrackRTTs::updateRTTSample(uint32_t senderIP, simtime_t rttVal)
+{
+    auto it = sendersRTT.find(senderIP);
+    if (it == sendersRTT.end()) {
+        sendersRTT[senderIP] = rttVal;
+        if (rttVal > maxRTT.second) {
+            maxRTT.first = senderIP;
+            maxRTT.second = rttVal;
+            //if (transport->localAddr.toIPv4().getInt() == 167774009) {
+            //    std::cout << "rxAddr: " << transport->localAddr.toIPv4().getInt() <<
+            //        ", sxAddr: " << senderIP << ", RTT val updated: " <<
+            //        rttVal.dbl() << std::endl; 
+            //}
+            //transport->homaConfig->rtt = rttVal;
+        }
+        return;
+    }
+
+    if (rttVal >= it->second) {
+        // When the rtt observation is greater than the recorded value, no
+        // action is necessary.
+        return;
+    }
+
+    if (it->first != maxRTT.first) {
+        // The rtt observation is different and smaller than recorded maxRTT.
+        // So, we only need to update the rttVal for senderIP and return;
+        ASSERT(rttVal <= maxRTT.second);
+        it->second = rttVal;
+        return;
+    }
+
+    // Update the maxRTT datastruct and find the new max.
+    it->second = rttVal;
+    maxRTT.second = rttVal;
+    for (auto ipRTT : sendersRTT) {
+        if (ipRTT.second > maxRTT.second) {
+            maxRTT.first = ipRTT.first;
+            maxRTT.second = ipRTT.second;
+            //transport->homaConfig->rtt = rttVal;
+        }
+    }
+    //if (transport->localAddr.toIPv4().getInt() == 167774009) {
+    //    std::cout << "rxAddr: " << transport->localAddr.toIPv4().getInt() <<
+    //        ", sxAddr: " << senderIP << ", RTT val updated: " <<
+    //        rttVal.dbl() << std::endl; 
+    //}
 }

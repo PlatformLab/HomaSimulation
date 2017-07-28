@@ -1127,8 +1127,10 @@ def printWastedTimeAndBw(parsedStats, xmlParsedDic, activeAndWasted, selfWasteTi
           '{0:.2f}'.format(activeAndWasted.rx.oversubWastedFracOversubTime).center(fw) +
           '{0:.2f}'.format(activeAndWasted.rx.oversubWastedFracTotalTime).center(fw))
 
+    tw = 15
+    fw = 30
     print('\n'*2 + "="*lineMax)
-    print("Lower Self".ljust(tw) + 'Higher Self'.center(fw))
+    print("Lower Self-inflicted".ljust(tw) + 'Higher Self-inflicted'.center(fw))
     print("Wasted BW %".ljust(tw) + 'Wasted BW %'.center(fw))
     print("_"*lineMax)
     print('{0:.2f}'.format(selfWasteTime.highrOverEst.fracTotalTime * 100.0).ljust(tw) +\

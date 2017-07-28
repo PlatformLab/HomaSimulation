@@ -102,6 +102,10 @@ class HomaPkt : public HomaPkt_Base
     static int compareSizeAndPrios(cObject* obj1, cObject* obj2);
 
     static uint32_t getBytesOnWire(uint32_t numDataBytes, PktType homaPktType);
+    static uint32_t maxEthFrameSize() {
+        return ETHERNET_PREAMBLE_SIZE + ETHERNET_HDR_SIZE +
+            MAX_ETHERNET_PAYLOAD_BYTES + ETHERNET_CRC_SIZE + INTER_PKT_GAP;
+    }
 };
 
 

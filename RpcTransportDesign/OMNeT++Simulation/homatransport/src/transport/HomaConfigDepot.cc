@@ -67,7 +67,6 @@ HomaConfigDepot::HomaConfigDepot(cComponent* ownerTransport)
     while (ss >> cutoffSize) {
         explicitUnschedPrioCutoff.push_back(cutoffSize);
     }
-    //std::cout << "In HomaConfigDepot: " << destPort << "\t" << defaultUnschedBytes << std::endl;
 }
 
 void

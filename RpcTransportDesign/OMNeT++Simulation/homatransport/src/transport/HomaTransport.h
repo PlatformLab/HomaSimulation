@@ -776,6 +776,31 @@ class HomaTransport : public cSimpleModule
         friend class InboundMessage;
     }; //end ReceiveScheduler
 
+    /**
+     * Keeps record of the reported rtt samples for each sender and provides max
+     * value of RTT among between all senders, ie. RTT on the longest path in
+     * the network.
+     */
+    class TrackRTTs
+    {
+      PUBLIC:
+        TrackRTTs(HomaTransport* transport);
+        ~TrackRTTs(){}
+        void updateRTTSample(uint32_t senderIP, simtime_t rttVal);
+
+      PUBLIC:
+        // For each sender, keeps track of the max of reported observed RTT for
+        // that sender.
+        std::unordered_map<uint32_t, simtime_t> sendersRTT;
+
+        // This is the largest of minimum RTT value observed from senders so
+        // far. It will track
+        std::pair<uint32_t, simtime_t> maxRTT;
+
+        // The transport module that owns the instanace of this class.
+        HomaTransport* transport;
+    };
+
   PUBLIC:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
@@ -920,7 +945,12 @@ class HomaTransport : public cSimpleModule
     // collection and recording.
     int outstandingGrantBytes;
 
+    // Keeps records of the smallest rtt observed from different senders and the
+    // max of those observations as the RTT of the network.
+    TrackRTTs trackRTTs;
+
     friend class ReceiveScheduler;
+    friend class SendController;
 };//End HomaTransport
 
 /**
