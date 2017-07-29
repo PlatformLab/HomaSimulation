@@ -15,8 +15,8 @@
 
 #include <algorithm>
 #include "GlobalSignalListener.h"
-#include "WorkloadSynthesizer.h"
-#include "HomaTransport.h"
+#include "application/WorkloadSynthesizer.h"
+#include "transport/HomaTransport.h"
 
 Define_Module(GlobalSignalListener);
 

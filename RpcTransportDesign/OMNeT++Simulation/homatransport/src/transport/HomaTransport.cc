@@ -2892,11 +2892,6 @@ HomaTransport::TrackRTTs::updateRTTSample(uint32_t senderIP, simtime_t rttVal)
         if (rttVal > maxRTT.second) {
             maxRTT.first = senderIP;
             maxRTT.second = rttVal;
-            //if (transport->localAddr.toIPv4().getInt() == 167774009) {
-            //    std::cout << "rxAddr: " << transport->localAddr.toIPv4().getInt() <<
-            //        ", sxAddr: " << senderIP << ", RTT val updated: " <<
-            //        rttVal.dbl() << std::endl; 
-            //}
             //transport->homaConfig->rtt = rttVal;
         }
         return;
@@ -2909,7 +2904,7 @@ HomaTransport::TrackRTTs::updateRTTSample(uint32_t senderIP, simtime_t rttVal)
     }
 
     if (it->first != maxRTT.first) {
-        // The rtt observation is different and smaller than recorded maxRTT.
+        // The RTT observation is different and smaller than recorded maxRTT.
         // So, we only need to update the rttVal for senderIP and return;
         ASSERT(rttVal <= maxRTT.second);
         it->second = rttVal;
@@ -2926,9 +2921,4 @@ HomaTransport::TrackRTTs::updateRTTSample(uint32_t senderIP, simtime_t rttVal)
             //transport->homaConfig->rtt = rttVal;
         }
     }
-    //if (transport->localAddr.toIPv4().getInt() == 167774009) {
-    //    std::cout << "rxAddr: " << transport->localAddr.toIPv4().getInt() <<
-    //        ", sxAddr: " << senderIP << ", RTT val updated: " <<
-    //        rttVal.dbl() << std::endl; 
-    //}
 }

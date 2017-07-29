@@ -778,8 +778,8 @@ class HomaTransport : public cSimpleModule
 
     /**
      * Keeps record of the reported rtt samples for each sender and provides max
-     * value of RTT among between all senders, ie. RTT on the longest path in
-     * the network.
+     * value of RTT between all senders, ie. RTT on the longest path in the
+     * network.
      */
     class TrackRTTs
     {

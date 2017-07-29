@@ -124,7 +124,8 @@ TEST_F (HomaTransportTest, basic) {
     // grant to the txPkts queue.
     HomaPkt* grantPkt = socket->getGrantPkt(srcAddr, mesgId);
     ASSERT_TRUE(grantPkt);
-    outMsg1->prepareSchedPkt(grantPkt->getGrantFields().grantBytes,
+    outMsg1->prepareSchedPkt(grantPkt->getGrantFields().offset,
+        grantPkt->getGrantFields().grantBytes,
         grantPkt->getGrantFields().schedPrio);
     ASSERT_EQ(outMsg1->txSchedPkts.size(), 1);
     delete grantPkt;
@@ -234,7 +235,8 @@ TEST_F (HomaTransportTest, basic) {
             grantPkt = socket->getGrantPkt(inbMesg1->srcAddr,
                 inbMesg1->msgIdAtSender);
             ASSERT_TRUE(grantPkt);
-            outMsg1->prepareSchedPkt(grantPkt->getGrantFields().grantBytes,
+            outMsg1->prepareSchedPkt(grantPkt->getGrantFields().offset,
+                grantPkt->getGrantFields().grantBytes,
                 grantPkt->getGrantFields().schedPrio);
 
             if (cpyPkt1.getPktType() == PktType::UNSCHED_DATA) {
@@ -344,7 +346,8 @@ TEST_F (HomaTransportTest, basic) {
         ASSERT_TRUE(grantPkt);
         uint16_t grantBytes = grantPkt->getGrantFields().grantBytes;
         pktDuration = grantIntervalTime(grantBytes);
-        outMsg5->prepareSchedPkt(grantBytes, grantPkt->getGrantFields().schedPrio);
+        outMsg5->prepareSchedPkt(grantPkt->getGrantFields().offset,
+            grantBytes, grantPkt->getGrantFields().schedPrio);
 
         // wait for a pktDuration, and check a new grant is sent for sender 5
         bytesGrantedInFlightOld = inbMesg5->schedBytesInFlight();
@@ -389,7 +392,8 @@ TEST_F (HomaTransportTest, basic) {
             ASSERT_TRUE(inbMesg3->lastGrantTime == timeNow &&
                 inbMesg3->schedBytesInFlight() - bytesGrantedInFlightOld > 0);
             ASSERT_TRUE(grantPkt);
-            outMsg3->prepareSchedPkt(grantPkt->getGrantFields().grantBytes,
+            outMsg3->prepareSchedPkt(grantPkt->getGrantFields().offset,
+                grantPkt->getGrantFields().grantBytes,
                 grantPkt->getGrantFields().schedPrio);
 
             if (cpyPkt3.getPktType() == PktType::UNSCHED_DATA) {
@@ -401,7 +405,8 @@ TEST_F (HomaTransportTest, basic) {
             }
             ASSERT_EQ(outMsg3->txSchedPkts.size(), txPktsNum);
         } else if (grantPkt) {
-            outMsg3->prepareSchedPkt(grantPkt->getGrantFields().grantBytes,
+            outMsg3->prepareSchedPkt(grantPkt->getGrantFields().offset,
+                grantPkt->getGrantFields().grantBytes,
                 grantPkt->getGrantFields().schedPrio);
         }
         delete grantPkt;
