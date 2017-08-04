@@ -67,6 +67,8 @@ simsignal_t HomaTransport::activeSchedsSignal =
 HomaTransport::HomaTransport()
     : sxController(this)
     , rxScheduler(this)
+    , trackRTTs(this)
+    , priorityStatsSignals()
     , socket()
     , localAddr()
     , homaConfig(NULL)
@@ -76,8 +78,10 @@ HomaTransport::HomaTransport()
     , emitSignalTimer(NULL)
     , nextEmitSignalTime(SIMTIME_ZERO)
     , outstandingGrantBytes(0)
-    , trackRTTs(this)
-{}
+{
+    //ev << "Test HomaTransport constructor called" << endl;
+    //ev << "HomaTransport size in bytes: " << sizeof(HomaTransport) << endl;
+}
 
 /**
  * Destructor of HomaTransport.
@@ -1747,7 +1751,8 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
             rxPkt->getSchedDataFields().lastByte, pktType);
 
     } else {
-        cRuntimeError("PktType %d is not recongnized", rxPkt->getPktType());
+        throw cRuntimeError("PktType %d is not recongnized",
+            rxPkt->getPktType());
     }
 
     bool isMesgSched =
@@ -2110,24 +2115,26 @@ HomaTransport::ReceiveScheduler::SchedSenders::insPoint(SenderState* s)
 uint32_t
 HomaTransport::ReceiveScheduler::SchedSenders::numActiveSenders()
 {
-    if (numSenders >= schedPrios && headIdx) {
-        cRuntimeError("num sched senders gt. schedPrios but receiver not"
-            " granting on all sched prios!");
-    }
-
     // Runtime check to verify senders data-struct is flawless
     for (auto i = headIdx; i < headIdx + numSenders - 1; i++) {
         ASSERT(senders[i]);
     }
 
     if (numToGrant >= numSenders) {
+        // Runtime check to verify senders data-struct is flawless
         for (int i = 0; i < (int)headIdx - 1; i++) {
             ASSERT(!senders[i]);
         }
         return numSenders;
     }
 
-    ASSERT(!headIdx);
+    if (numSenders >= schedPrios && headIdx) {
+        if (numToGrant >= schedPrios) {
+            throw cRuntimeError("num sched senders gt. schedPrios but receiver not"
+                " granting on all sched prios! This can only happen if numToGrant is"
+                " lt. schedPrios.");
+        }
+    }
     return numToGrant;
 }
 
@@ -2390,7 +2397,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleBwUtilTimerEvent(
     // and the timer should never fire and this method should never have been
     // invoked.
     if (rxScheduler->bwCheckInterval == SimTime::getMaxTime()) {
-        cRuntimeError("Error: Func handleBwUtilTimerEvent is called while"
+        throw cRuntimeError("Error: Func handleBwUtilTimerEvent is called while"
             " schedBwUtilTimer is disabled!");
     }
 
@@ -2874,7 +2881,7 @@ HomaTransport::TrackRTTs::TrackRTTs(HomaTransport* transport)
     , maxRTT()
     , transport(transport)
 {
-    maxRTT = std::make_pair(0, 0);
+    maxRTT = std::make_pair(0, SIMTIME_ZERO);
 }
 
 /**

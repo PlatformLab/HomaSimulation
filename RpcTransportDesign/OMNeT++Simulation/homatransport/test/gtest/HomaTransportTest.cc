@@ -19,10 +19,9 @@ class HomaTransportTest : public ::testing::Test {
     {
         cModuleType* transType =
             cModuleType::get("homatransport.transport.HomaTransport");
-        std::cout << "HomaTransport size in bytes: " << sizeof(HomaTransport)
-            << std::endl;
 
         /***********************
+        ev << "HomaTransport size in bytes: " <<  sizeof(HomaTransport) << endl;
         transport = (HomaTransport*)transType->create("transport", NULL);
         transport->finalizeParameters();
         transport->buildInside();
@@ -90,7 +89,7 @@ class HomaTransportTest : public ::testing::Test {
 
 
 TEST_F (HomaTransportTest, basic) {
-    ((cSimpleModule*)netModule)->wait(SimTime(1e-15));
+    ((cSimpleModule*)netModule)->wait(SimTime(5e-6));
     simtime_t timeNow = simTime();
 
     // Conctruct a mesg from sender 2 destined to test transport

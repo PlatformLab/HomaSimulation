@@ -454,7 +454,7 @@ class HomaTransport : public cSimpleModule
     class ReceiveScheduler
     {
       PUBLIC:
-        explicit ReceiveScheduler(HomaTransport* transport);
+        ReceiveScheduler(HomaTransport* transport);
         ~ReceiveScheduler();
         InboundMessage* lookupInboundMesg(HomaPkt* rxPkt) const;
 
@@ -825,6 +825,62 @@ class HomaTransport : public cSimpleModule
         STOP  = 6    // When trasnport shutting down and in the cleaning phase.
     };
 
+  PUBLIC:
+
+    // Handles the transmission of outbound messages based on the logic of
+    // HomaProtocol.
+    SendController sxController;
+
+    // Manages the reception of all inbound messages.
+    ReceiveScheduler rxScheduler;
+
+    // Keeps records of the smallest rtt observed from different senders and the
+    // max of those observations as the RTT of the network.
+    TrackRTTs trackRTTs;
+
+    // Templated signals for tracking priority usage statistics.
+    std::vector<simsignal_t> priorityStatsSignals;
+
+  PROTECTED:
+
+    // UDP socket through which this transport send and receive packets.
+    UDPSocket socket;
+
+    // IpAddress of sender host (local host). This parameter is lazily
+    // intialized first time an outbound message is arrvied from application or
+    // a packet has arrived from outside world.
+    inet::L3Address localAddr;
+
+    // The object that keeps the configuration parameters for this transport
+    HomaConfigDepot *homaConfig;
+
+    // Determine priority of packets that are to be sent
+    PriorityResolver *prioResolver;
+
+    // Keeps track of the message size distribution that this transport is
+    // seeing.
+    WorkloadEstimator *distEstimator;
+
+    // Timer object for send side packet pacing. At every packet transmission at
+    // sender this will be used to schedule next send after the current send is
+    // completed.
+    cMessage* sendTimer;
+
+    // This timer is used to priodically emit signals that are received at the
+    // global simulation level by the GlobalSignalListener.
+    cMessage* emitSignalTimer;
+
+    // Tracks the next schedule time for emitSignalTimer and initialized to zero
+    simtime_t nextEmitSignalTime;
+
+    // Tracks the total outstanding grant bytes which will be used for stats
+    // collection and recording.
+    int outstandingGrantBytes;
+
+    friend class ReceiveScheduler;
+    friend class SendController;
+
+  PUBLIC:
     /**
      * C++ declration of signals defined in .ned file.
      */
@@ -898,59 +954,6 @@ class HomaTransport : public cSimpleModule
     // carries the last value of active scheduled senders and time duration that
     // value was maintained.
     static simsignal_t activeSchedsSignal;
-
-    // Templated signals for tracking priority usage statistics.
-    std::vector<simsignal_t> priorityStatsSignals;
-
-    // Handles the transmission of outbound messages based on the logic of
-    // HomaProtocol.
-    SendController sxController;
-
-    // Manages the reception of all inbound messages.
-    ReceiveScheduler rxScheduler;
-
-  PROTECTED:
-
-    // UDP socket through which this transport send and receive packets.
-    UDPSocket socket;
-
-    // IpAddress of sender host (local host). This parameter is lazily
-    // intialized first time an outbound message is arrvied from application or
-    // a packet has arrived from outside world.
-    inet::L3Address localAddr;
-
-    // The object that keeps the configuration parameters for this transport
-    HomaConfigDepot *homaConfig;
-
-    // Determine priority of packets that are to be sent
-    PriorityResolver *prioResolver;
-
-    // Keeps track of the message size distribution that this transport is
-    // seeing.
-    WorkloadEstimator *distEstimator;
-
-    // Timer object for send side packet pacing. At every packet transmission at
-    // sender this will be used to schedule next send after the current send is
-    // completed.
-    cMessage* sendTimer;
-
-    // This timer is used to priodically emit signals that are received at the
-    // global simulation level by the GlobalSignalListener.
-    cMessage* emitSignalTimer;
-
-    // Tracks the next schedule time for emitSignalTimer and initialized to zero
-    simtime_t nextEmitSignalTime;
-
-    // Tracks the total outstanding grant bytes which will be used for stats
-    // collection and recording.
-    int outstandingGrantBytes;
-
-    // Keeps records of the smallest rtt observed from different senders and the
-    // max of those observations as the RTT of the network.
-    TrackRTTs trackRTTs;
-
-    friend class ReceiveScheduler;
-    friend class SendController;
 };//End HomaTransport
 
 /**
