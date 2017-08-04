@@ -37,6 +37,7 @@ $(error Config file '$(CONFIGFILE)' does not exist -- add the OMNeT++ bin direct
 endif
 
 include $(CONFIGFILE)
+#This includes the CFLAGS from omnet++ CONFIGFILE
 #------------------------------------------------------------------------------
 
 ## All include directories
@@ -48,6 +49,7 @@ IFLAGS=-I. \
 
 ##preporcessor flags
 CPPFLAGS += -isystem $(GTEST_DIR)/include -pthread
+CPPFLAGS += $(CXXFLAGS)
 
 ## obj directory in the source directory will contain the object files
 OBJS=$(join $(addsuffix obj/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cc=.o)))
