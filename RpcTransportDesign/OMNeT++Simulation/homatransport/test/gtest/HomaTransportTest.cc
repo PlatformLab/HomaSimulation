@@ -19,6 +19,8 @@ class HomaTransportTest : public ::testing::Test {
     {
         cModuleType* transType =
             cModuleType::get("homatransport.transport.HomaTransport");
+        std::cout << "HomaTransport size in bytes: " << sizeof(HomaTransport)
+            << std::endl;
 
         /***********************
         transport = (HomaTransport*)transType->create("transport", NULL);
@@ -75,7 +77,8 @@ class HomaTransportTest : public ::testing::Test {
     simtime_t
     grantIntervalTime(uint32_t grantSize)
     {
-        uint32_t grantedPktSizeOnWire = HomaPkt::getBytesOnWire(grantSize, PktType::SCHED_DATA);
+        uint32_t grantedPktSizeOnWire = HomaPkt::getBytesOnWire(grantSize,
+            PktType::SCHED_DATA);
         simtime_t intervalTime = SimTime(1e-9 * (grantedPktSizeOnWire * 8.0 /
             homaConfig->nicLinkSpeed));
         return intervalTime;

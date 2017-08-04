@@ -12,29 +12,32 @@ GTEST_DIR = ../../../../../share/googletest/googletest
 SOURCE=TestMain.cc \
 	UnschedByteAllocatorTest.cc \
 	HomaTransportTest.cc \
-	../../src/application/MsgSizeDistributions.cc \
-	../../src/application/WorkloadSynthesizer.cc \
-	../../src/common/GlobalSignalListener.cc \
-	../../src/common/Lagger.cc \
-	../../src/common/Util.cc \
-	../../src/mocks/MockUdpSocket.cc \
-    ../../src/transport/HomaConfigDepot.cc \
-	../../src/transport/HomaPkt.cc \
-	../../src/transport/HomaTransport.cc \
-	../../src/transport/PriorityResolver.cc \
-	../../src/transport/PseudoIdealPriorityTransport.cc \
-	../../src/transport/UnschedByteAllocator.cc \
-	../../src/transport/WorkloadEstimator.cc \
-	../../src/application/AppMessage_m.cc \
-	../../src/transport/HomaPkt_m.cc \
 	$(GTEST_DIR)/src/gtest-all.cc
 
 ## source directories other than current directory
-SRC_DIR=../../src/transport
-SRC_DIR1=../../src/application
-SRC_DIR2=../../src/common
-SRC_DIR3=../../src/mocks
 GTEST_SRC_DIR=$(GTEST_DIR)/src
+
+#------------------------------------------------------------------------------
+############## Copied from the omnet++ auto-generated makefiles# ##############
+
+# Pull in OMNeT++ configuration (Makefile.inc or configuser.vc)
+
+ifneq ("$(OMNETPP_CONFIGFILE)","")
+CONFIGFILE = $(OMNETPP_CONFIGFILE)
+else
+ifneq ("$(OMNETPP_ROOT)","")
+CONFIGFILE = $(OMNETPP_ROOT)/Makefile.inc
+else
+CONFIGFILE = $(shell opp_configfilepath)
+endif
+endif
+
+ifeq ("$(wildcard $(CONFIGFILE))","")
+$(error Config file '$(CONFIGFILE)' does not exist -- add the OMNeT++ bin directory to the path so that opp_configfilepath can be found, or set the OMNETPP_CONFIGFILE variable to point to Makefile.inc)
+endif
+
+include $(CONFIGFILE)
+#------------------------------------------------------------------------------
 
 ## All include directories
 IFLAGS=-I. \
@@ -43,25 +46,8 @@ IFLAGS=-I. \
 	-I$(GTEST_DIR) \
 	-I../../../inet/src
 
-## compiler flags
-CFLAGS += -Wall -g -std=c++0x -fpic -pthread
-
 ##preporcessor flags
-CPPFLAGS += -isystem $(GTEST_DIR)/include
-
-## contains all library paths in -LPATH format
-LFLAGS=-L../../../omnetpp-4.6/lib \
-	-L../../../inet/src
-
-## library .a or .so file names are added here
-## drop trailing extension and word "lib" from the begining of file name and
-## add -l flag to remaining part
-LIBS = -lm -loppcmdenvd -loppcommond -loppenvird \
-	-loppeventlogd -lopplayoutd \
-	-loppnedxmld -loppscaved -loppsimd \
-	-lopptkenvd \
-	-lINET
-
+CPPFLAGS += -isystem $(GTEST_DIR)/include -pthread
 
 ## obj directory in the source directory will contain the object files
 OBJS=$(join $(addsuffix obj/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cc=.o)))
@@ -79,12 +65,10 @@ all: $(TARGET)
 
 ## Linking rule for making the target
 $(TARGET): $(OBJS)
-	@echo "====================="
-	@echo "Linking the target $@"
-	@echo "====================="
-	@mkdir -p $(dir $(TARGET))
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(IFLAGS) $(LFLAGS) $(LIBS) -shared -o $@ $^
-	@echo "-----Finished Linking-----"
+	@echo "======================"
+	@echo "Object files generated"
+	@echo "======================"
+	@echo "\"$(OBJS)\""
 
 ## Generic compiling rule
 %.o: %.cc
@@ -99,36 +83,7 @@ obj/%.o: %.cc
 	@mkdir -p $(dir $@)
 	@echo "============"
 	@echo "compiling $@"
-	@echo "\"$(OBJS)\""
-	@echo "\"$(SRC_DIR)/obj/\""
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(IFLAGS) -c $< -o $@
-
-## Rule for object in other source directory. object files are compiled into
-## obj directory under the other source directory.
-## you will need one rule like this per "other" directories
-$(SRC_DIR)/obj/%.o: $(SRC_DIR)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "compiling $@"
-	$(CC) $(IFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(SRC_DIR1)/obj/%.o: $(SRC_DIR1)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "compiling $@"
-	$(CC) $(IFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(SRC_DIR2)/obj/%.o: $(SRC_DIR2)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "compiling $@"
-	$(CC) $(IFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(SRC_DIR3)/obj/%.o: $(SRC_DIR3)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "compiling $@"
-	$(CC) $(IFLAGS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(GTEST_SRC_DIR)/obj/%.o: $(GTEST_SRC_DIR)/%.cc
 	@mkdir -p $(dir $@)
@@ -146,39 +101,11 @@ $(GTEST_SRC_DIR)/obj/%.o: $(GTEST_SRC_DIR)/%.cc
 	@echo "Building dependencies file for $*.o"
 	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^obj/$*.o^" > $@'
 
-## Dependency rule for "other" directory
-## dependency .d files are stored under .dep directory in
-## the "other" source directory
-$(SRC_DIR)/.dep/%.d: $(SRC_DIR)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "Building dependencies file for $*.o"
-	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(SRC_DIR)/obj/$*.o^" > $@'
-
-$(SRC_DIR1)/.dep/%.d: $(SRC_DIR1)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "Building dependencies file for $*.o"
-	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(SRC_DIR1)/obj/$*.o^" > $@'
-
-$(SRC_DIR2)/.dep/%.d: $(SRC_DIR2)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "Building dependencies file for $*.o"
-	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(SRC_DIR2)/obj/$*.o^" > $@'
-
-$(SRC_DIR3)/.dep/%.d: $(SRC_DIR3)/%.cc
-	@mkdir -p $(dir $@)
-	@echo "============"
-	@echo "Building dependencies file for $*.o"
-	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(SRC_DIR3)/obj/$*.o^" > $@'
-
 $(GTEST_SRC_DIR)/.dep/%.d: $(GTEST_SRC_DIR)/%.cc
 	@mkdir -p $(dir $@)
 	@echo "============"
 	@echo "Building dependencies file for $*.o"
 	@$(SHELL) -ec '$(CC) -M $(IFLAGS) $(CFLAGS) $(CPPFLAGS) $< | sed "s^$*.o^$(GTEST_SRC_DIR)/obj/$*.o^" > $@'
-
 
 ## Include the dependency files
 -include $(DEPENDS)

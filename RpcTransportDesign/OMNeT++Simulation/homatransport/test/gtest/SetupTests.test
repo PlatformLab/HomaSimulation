@@ -19,8 +19,10 @@ cModule* netModule;
 %inifile: homaTransportConfig.ini
     [General]
     network = Test
+    num-rngs = 1
+    simtime-scale = -15
     cmdenv-express-mode = false
-    **.result-recording-modes = - # record nothind
+    **.result-recording-modes = - # record nothing
     **.scalar-recording = false
     **.vector-recording = false
 

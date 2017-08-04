@@ -43,13 +43,22 @@ OBJS=\
 "$O/transport/UnschedByteAllocator.o "\
 "$O/transport/WorkloadEstimator.o "\
 "$O/application/AppMessage_m.o "\
-"$O/transport/HomaPkt_m.o "
+"$O/transport/HomaPkt_m.o "\
+"../obj/TestMain.o "\
+"../obj/UnschedByteAllocatorTest.o "\
+"../obj/HomaTransportTest.o "\
+"../../../../../../share/googletest/googletest/src/obj/gtest-all.o "
+echo $OBJS
 
 GTEST_DIR=../../../../../../share/googletest/googletest
 
-(cd work; opp_makemake -f --deep -L../../../../inet/src -lINET -L./obj -lTestMain -P . -I$GTEST_DIR -I$GTEST_DIR/include -I.. -I../../../src -I../../../../inet/src $OBJS; $MAKE -j8) || exit 1
+(cd work; opp_makemake -f --deep -L../../../../inet/src -lINET -lm -lpthread \
+-P . -I$GTEST_DIR -I$GTEST_DIR/include -I.. -I../../../src \
+-I../../../../inet/src $OBJS; $MAKE -j8) || exit 1
 echo
 #opp_test run $OPT -v $TESTFILES || exit 1
-(cd work/SetupTests;../work -u Cmdenv -n.:../../../../src:../../../../../inet/src:../../../../../inet/examples -l../../../../../inet/src/INET homaTransportConfig.ini)
+(cd work/SetupTests;../work -u Cmdenv \
+-n.:../../../../src:../../../../../inet/src:../../../../../inet/examples \
+-l../../../../../inet/src/INET homaTransportConfig.ini)
 echo
 echo Results can be found in ./work
