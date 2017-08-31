@@ -41,25 +41,36 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     // state
     int packetRequested;
 
-    // keep the total byte size of the last packet sent out from this queue on
-    // wire (ethernet frame total byteSize + INTERFRAME_GAP_BITS + SFD_BYTES +
-    // PREAMBLE_BYTES) and the time at which we expect the serialization of this
-    // packet on to the wire will be compeleted by the MAC layer.
-    std::pair<int, simtime_t> lastTxPktDuration;
+    struct TxHomaPktInfo
+    {
+        // Size of the message this pkt belongs to;
+        uint32_t msgByteLen;
+
+        // Remaining size of the message this pkt belongs to.
+        uint32_t msgBytesLeft;
+
+        // Total byte size of the last packet sent out from this queue on wire
+        // (ethernet frame total byteSize + INTERFRAME_GAP_BITS + SFD_BYTES +
+        // PREAMBLE_BYTES)
+        uint16_t pktLen;
     
+        // Time at which we expect the serialization of this packet on to the
+        // wire will be compeleted by the MAC layer.
+        simtime_t serializationEndTime; 
+    };
+    TxHomaPktInfo lastTxPkt;
+   
     /**
      * When this queue module is a part of a network interface where the next
      * module is a MAC layer, this variable points to that MAC layer.  
      */
     cModule* mac;
 
-
     // statistics
     int numQueueReceived;
     int numQueueDropped;
     int queueEmpty;
     int queueLenOne;
-
 
     /** Signal with packet when received it */
     static simsignal_t rcvdPkSignal;
@@ -108,10 +119,10 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
   protected:
 
     /**
-     * Takes in the current transmitting pkt byte size and updates the
-     * lastTxPktDuration pair for this transmitting packet.
+     * Takes in the current transmitting pkt and updates the lastTxPkt pair for
+     * this transmitting packet.
      */
-    virtual void setTxPktDuration(int txPktBytes)
+    virtual void setTxPkt(cPacket* pkt)
     {
         return;
     }

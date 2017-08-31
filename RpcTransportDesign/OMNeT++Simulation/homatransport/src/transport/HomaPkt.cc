@@ -38,6 +38,7 @@ void
 HomaPkt::copy(const HomaPkt& other)
 {
     this->ownerTransport = other.ownerTransport;
+    this->queuedAheadTimes = other.queuedAheadTimes;
 }
 
 HomaPkt*
@@ -113,6 +114,31 @@ HomaPkt::getDataBytes()
     }
     return 0;
 }
+
+std::pair<uint32_t, uint32_t>
+HomaPkt::getMesgSize()
+{
+    uint32_t msgSize;
+    uint32_t bytesLeft;
+    switch (this->getPktType()) {
+        case PktType::REQUEST:
+        case PktType::UNSCHED_DATA:
+            msgSize =  this->getUnschedFields().msgByteLen;
+            bytesLeft = msgSize - this->getUnschedFields().firstByte;
+            return std::make_pair(msgSize, bytesLeft);
+        case PktType::SCHED_DATA:
+            msgSize =  this->getSchedDataFields().msgByteLen;
+            bytesLeft = msgSize - this->getSchedDataFields().firstByte;
+            return std::make_pair(msgSize, bytesLeft);
+        case PktType::GRANT:
+            return std::make_pair(0,0);
+        default:
+            throw cRuntimeError("PktType %d not defined", this->getPktType());
+    }
+    return std::make_pair(0,0);
+}
+
+
 
 cPacket*
 HomaPkt::searchEncapHomaPkt(cPacket* pkt)
@@ -286,4 +312,15 @@ operator>(const HomaPkt& lhs, const HomaPkt& rhs)
     } else {
         return false;
     }
+}
+
+void
+HomaPkt::printQueueTimes()
+{
+    for (auto elem : queuedAheadTimes) {
+        std::cout << elem.queueTimes.dbl() << ", " <<
+            elem.largerMesgPrmtLag.dbl() << ", " <<
+            elem.shorterMesgPrmtLag.dbl() << ", " << std::endl;
+    }
+    return;
 }

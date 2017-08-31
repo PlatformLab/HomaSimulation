@@ -49,7 +49,7 @@ void PassiveQueueBase::initialize()
     numQueueDropped = 0;
     queueEmpty = 0;
     queueLenOne = 0;
-    lastTxPktDuration = std::make_pair(0, SIMTIME_ZERO);
+    lastTxPkt = TxHomaPktInfo();
     WATCH(numQueueReceived);
     WATCH(numQueueDropped);
 
@@ -74,9 +74,9 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
         emit(queueLengthSignal, 0);
         emit(queueByteLengthSignal, 0);
 
-        pkt = HomaPkt::searchEncapHomaPkt(pkt);
-        if (pkt) {
-            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(pkt);
+        cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
+        if (encapPkt) {
+            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
             switch (homaPkt->getPktType()) {
                 case PktType::REQUEST:
                     emit(requestQueueingTimeSignal, SIMTIME_ZERO);
@@ -93,8 +93,11 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
             }
+            HomaPkt::QueueWaitTimes queueWaitTime = {0, 0, 0};
+            homaPkt->queuedAheadTimes.push_back(queueWaitTime);
         }
-        setTxPktDuration(pkt->getByteLength());
+
+        setTxPkt(pkt);
         sendOut(msg);
     }
     else {
@@ -126,7 +129,7 @@ void PassiveQueueBase::requestPacket()
     cMessage *msg = dequeue();
     if (msg == NULL) {
         packetRequested++;
-        setTxPktDuration(0);
+        setTxPkt(NULL);
     }
     else {
         cPacket* pkt = dynamic_cast<cPacket*>(msg);
@@ -136,7 +139,8 @@ void PassiveQueueBase::requestPacket()
 
         cPacket* encapedHomaPkt = HomaPkt::searchEncapHomaPkt(pkt);
         if (encapedHomaPkt) {
-            switch (check_and_cast<HomaPkt*>(encapedHomaPkt)->getPktType()) {
+            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapedHomaPkt);
+            switch (homaPkt->getPktType()) {
                 case PktType::REQUEST:
                     emit(requestQueueingTimeSignal, simTime() - msg->getArrivalTime());
                     break;
@@ -152,8 +156,14 @@ void PassiveQueueBase::requestPacket()
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
             }
+
+            HomaPkt::QueueWaitTimes& queueWaitTime =
+                homaPkt->queuedAheadTimes.back();
+            queueWaitTime.queueTimes = pktWaitTime - queueWaitTime.largerMesgPrmtLag -
+                queueWaitTime.shorterMesgPrmtLag;
+
         }
-        setTxPktDuration(pkt->getByteLength());
+        setTxPkt(pkt);
         sendOut(msg);
     }
 }

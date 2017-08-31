@@ -72,9 +72,11 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
     // with current queue length and the remainder of that packet.
     int pktOnWire = 0;
     int txPktBitsRemained = 0; 
+    simtime_t pktWaitTime = SIMTIME_ZERO;
 
-    if (lastTxPktDuration.second > simTime()) {
-        txPktBitsRemained =  (int)((lastTxPktDuration.second - simTime()).dbl() * txRate);
+    if (lastTxPkt.serializationEndTime > simTime()) {
+        pktWaitTime = lastTxPkt.serializationEndTime - simTime();
+        txPktBitsRemained =  (int)(pktWaitTime.dbl() * txRate);
         pktOnWire = 1;
     }
 
@@ -96,6 +98,22 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
     emit(queueByteLengthSignal, queue.getByteLength() + (txPktBitsRemained >> 3));
     cPacket* pkt = check_and_cast<cPacket*>(msg);
     queue.insert(pkt);
+
+    HomaPkt::QueueWaitTimes queueWaitTime;
+    if (queue.front() == pkt) {
+        cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
+        if (encapPkt) {
+            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
+            auto msgSizeAndLeftBytes = homaPkt->getMesgSize();
+            if (msgSizeAndLeftBytes.second < lastTxPkt.msgBytesLeft) {
+                queueWaitTime = {0, pktWaitTime, 0};
+                homaPkt->queuedAheadTimes.push_back(queueWaitTime);
+            } else {
+                queueWaitTime = {0, 0, pktWaitTime};
+                homaPkt->queuedAheadTimes.push_back(queueWaitTime);
+            }
+        }
+    }
 
     //emit(queueLengthSignal, queue.length());
     //emit(queueByteLengthSignal, queue.getByteLength());
@@ -127,31 +145,43 @@ bool DropTailQueue::isEmpty()
 }
 
 void
-DropTailQueue::setTxPktDuration(int txPktBytes)
+DropTailQueue::setTxPkt(cPacket* pkt)
 {
     double txRate = 0.0; // transmit speed of the next mac layer
 
-    if (txPktBytes == 0) {
-        lastTxPktDuration.first = 0;
-        lastTxPktDuration.second = simTime();
+    if (!pkt) {
+        lastTxPkt.msgByteLen = 0;
+        lastTxPkt.msgBytesLeft = 0;
+        lastTxPkt.pktLen = 0;
+        lastTxPkt.serializationEndTime = simTime();
         return;
     }
     
-    lastTxPktDuration.first = txPktBytes + (INTERFRAME_GAP_BITS >> 3) +
+    lastTxPkt.pktLen = pkt->getByteLength() + (INTERFRAME_GAP_BITS >> 3) +
             PREAMBLE_BYTES + SFD_BYTES;
     double lastTxBits = 0.0;
-    lastTxBits = lastTxPktDuration.first * 8.0;
+    lastTxBits = lastTxPkt.pktLen * 8.0;
 
     if (mac) {
         txRate = dynamic_cast<EtherMACBase*>(mac)->getTxRate();
     }
 
     if (txRate <= 0.0) {
-        lastTxPktDuration.second = simTime();
+        lastTxPkt.serializationEndTime = simTime();
         return;
     }
 
-    lastTxPktDuration.second = simTime() + lastTxBits / txRate;
+    lastTxPkt.serializationEndTime = simTime() + lastTxBits / txRate;
+
+    cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
+    if (encapPkt) {
+        HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
+        auto msgSizeAndLeftBytes = homaPkt->getMesgSize();
+        lastTxPkt.msgByteLen = msgSizeAndLeftBytes.first;
+        lastTxPkt.msgBytesLeft = msgSizeAndLeftBytes.second;
+    }
+
+
     return;
 }
 

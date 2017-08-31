@@ -66,7 +66,7 @@ class INET_API DropTailQueue : public PassiveQueueBase
      * Throws an exceptions when called for a packet not already queued or if
      * called more than once for the same queued packet.
      */
-    virtual void setTxPktDuration(int txPktBytes);
+    virtual void setTxPkt(cPacket* pkt);
 
     /**
      * Redefined from IPassiveQueue.

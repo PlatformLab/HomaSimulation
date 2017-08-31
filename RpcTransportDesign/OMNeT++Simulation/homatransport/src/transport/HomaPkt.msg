@@ -70,6 +70,10 @@ struct SchedDataFields
     // data packet.
     uint32_t firstByte;
     uint32_t lastByte;
+
+    // This field is only needed for some stats we want to collect in switches.
+    // This is not considered in header-size computation of scheduled packets.
+    uint32_t msgByteLen;
 };
 
 //

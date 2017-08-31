@@ -636,12 +636,24 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     // When a data packet has become ready and we should check if we can send it
     // out.
     ASSERT(!msg);
+    OutboundMessage* highPrioMsg = *(outbndMsgSet.begin());
+    HomaPkt* head = highPrioMsg->txPkts.top();
     if (transport->sendTimer->isScheduled()) {
+        if (outGrantQueue.empty() && head->getCreationTime() == simTime()) {
+            HomaPkt::QueueWaitTimes& queuedAheadTimes =
+                head->queuedAheadTimes.back();
+            simtime_t waitTime =
+                transport->sendTimer->getArrivalTime() - simTime();
+            if (head->getMesgSize().second > sentPkt.getMesgSize().second) {
+                queuedAheadTimes.shorterMesgPrmtLag = waitTime;
+            } else {
+                queuedAheadTimes.largerMesgPrmtLag = waitTime;
+            }
+        }
         return;
     }
 
     ASSERT(outGrantQueue.empty() && outbndMsgSet.size() == 1);
-    OutboundMessage* highPrioMsg = *(outbndMsgSet.begin());
     size_t numRemoved =  outbndMsgSet.erase(highPrioMsg);
     ASSERT(numRemoved == 1); // check that the message is removed
     bool hasMoreReadyPkt = highPrioMsg->getTransmitReadyPkt(&sxPkt);
@@ -714,6 +726,12 @@ HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
             throw cRuntimeError("SendController::sendPktAndScheduleNext: "
                 "packet to send has unknown pktType %d.", pktType);
     }
+
+    HomaPkt::QueueWaitTimes& queueWaitTime = sxPkt->queuedAheadTimes.back();
+    simtime_t pktWaitTime =  currentTime - sxPkt->getCreationTime();
+    queueWaitTime.queueTimes = pktWaitTime - queueWaitTime.largerMesgPrmtLag -
+        queueWaitTime.shorterMesgPrmtLag;
+    ASSERT(queueWaitTime.queueTimes >= 0);
 
     simtime_t nextSendTime = sxPktDuration + currentTime;
     sentPkt = *sxPkt;
@@ -958,6 +976,7 @@ HomaTransport::OutboundMessage::prepareRequestAndUnsched()
     size_t i = 0;
     do {
         HomaPkt* unschedPkt = new HomaPkt(sxController->transport);
+        unschedPkt->queuedAheadTimes.push_back({0 , 0, 0});
         unschedPkt->setPktType(pktType);
 
         // set homa fields
@@ -1032,6 +1051,7 @@ HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t offset,
 
     // create a data pkt and push it txPkts queue for
     HomaPkt* dataPkt = new HomaPkt(sxController->transport);
+    dataPkt->queuedAheadTimes.push_back({0 , 0, 0});
     dataPkt->setPktType(PktType::SCHED_DATA);
     dataPkt->setSrcAddr(this->srcAddr);
     dataPkt->setDestAddr(this->destAddr);
@@ -1040,6 +1060,7 @@ HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t offset,
     SchedDataFields dataFields;
     dataFields.firstByte = offset;
     dataFields.lastByte = dataFields.firstByte + bytesToSend - 1;
+    dataFields.msgByteLen = msgSize; 
     dataPkt->setSchedDataFields(dataFields);
     dataPkt->setByteLength(bytesToSend + dataPkt->headerSize());
     txPkts.push(dataPkt);
@@ -1767,6 +1788,12 @@ HomaTransport::ReceiveScheduler::SenderState::handleInboundPkt(HomaPkt* rxPkt)
         ASSERT(inboundMesg->inflightGrants.empty());
 
         // this message is complete, so send it to the application
+        double msgDelay = (simTime()- inboundMesg->msgCreationTime).dbl();
+        if (inboundMesg->msgSize > 490 && inboundMesg->msgSize < 513 && msgDelay > 6.4e-6 && msgDelay < 6.5e-6) {
+            std::cout << "delay 99\%ile : " << msgDelay << ", mesg size: " <<
+                inboundMesg->msgSize << std::endl;
+            rxPkt->printQueueTimes();
+        }
         AppMessage* rxMsg = inboundMesg->prepareRxMsgForApp();
 
 #if TESTING
@@ -2130,9 +2157,9 @@ HomaTransport::ReceiveScheduler::SchedSenders::numActiveSenders()
 
     if (numSenders >= schedPrios && headIdx) {
         if (numToGrant >= schedPrios) {
-            throw cRuntimeError("num sched senders gt. schedPrios but receiver not"
-                " granting on all sched prios! This can only happen if numToGrant is"
-                " lt. schedPrios.");
+            throw cRuntimeError("num sched senders gt. schedPrios but receiver "
+            "not granting on all sched prios! This can only happen if "
+            "numToGrant is lt. schedPrios.");
         }
     }
     return numToGrant;
@@ -2181,7 +2208,7 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleMesgRecvCompletionEvent(
  * This function implements the logics of the receiver scheduler for reacting
  * to the received packets. At every packet arrival the state (sender's ranking,
  * etc.) can changes in the view of the receiver. So, this method is called to
- * check if a grant should be sent for that sender or any other senderand this
+ * check if a grant should be sent for that sender or any other sender and this
  * function then sends the grant if needed.  N.B. the sender must have been
  * removed from schedSenders prior to the call to this method. The side effect
  * of this method invokation is that it also inserts the SenderState into the
@@ -2222,11 +2249,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::handlePktArrivalEvent(
             sToGrant->sendAndScheduleGrant(getPrioForMesg(old));
 
             auto ret = insPoint(sToGrant);
-            cur.numToGrant = numToGrant;
-            cur.sInd = std::get<0>(ret);
-            cur.headIdx = std::get<1>(ret);
-            cur.numSenders = std::get<2>(ret);
-            cur.s = sToGrant;
+            cur.setVar(numToGrant, std::get<1>(ret), std::get<2>(ret), sToGrant,
+                std::get<0>(ret));
             handleGrantSentEvent(old, cur);
 
             return;
@@ -2253,11 +2277,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::handlePktArrivalEvent(
             sToGrant->sendAndScheduleGrant(getPrioForMesg(old));
 
             auto ret = insPoint(sToGrant);
-            cur.numToGrant = numToGrant;
-            cur.sInd = std::get<0>(ret);
-            cur.headIdx = std::get<1>(ret);
-            cur.numSenders = std::get<2>(ret);
-            cur.s = sToGrant;
+            cur.setVar(numToGrant, std::get<1>(ret), std::get<2>(ret), sToGrant,
+                std::get<0>(ret));
             handleGrantSentEvent(old, cur);
             return;
         }
@@ -2325,11 +2346,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantSentEvent(
         sToGrant->sendAndScheduleGrant(getPrioForMesg(old));
 
         auto ret = insPoint(sToGrant);
-        cur.numToGrant = numToGrant;
-        cur.sInd = std::get<0>(ret);
-        cur.headIdx = std::get<1>(ret);
-        cur.numSenders = std::get<2>(ret);
-        cur.s = sToGrant;
+        cur.setVar(numToGrant, std::get<1>(ret), std::get<2>(ret), sToGrant,
+            std::get<0>(ret));
         handleGrantSentEvent(old, cur);
     }
     EV << "SchedState before handleGrantSent:\n\t" << old << endl;
@@ -2371,11 +2389,8 @@ HomaTransport::ReceiveScheduler::SchedSenders::handleGrantTimerEvent(
     s->sendAndScheduleGrant(getPrioForMesg(old));
 
     ret = insPoint(s);
-    cur.numToGrant = numToGrant;
-    cur.s = s;
-    cur.sInd = std::get<0>(ret);
-    cur.headIdx = std::get<1>(ret);
-    cur.numSenders = std::get<2>(ret);
+    cur.setVar(numToGrant, std::get<1>(ret), std::get<2>(ret), s,
+        std::get<0>(ret));
     handleGrantSentEvent(old, cur);
     return;
 }
@@ -2696,8 +2711,8 @@ HomaTransport::InboundMessage::fillinRxBytes(uint32_t byteStart,
         ASSERT(grant != inflightGrants.end());
         ASSERT(std::get<1>(*grant) == bytesReceived);
         if (bytesReceivedOnWire == HomaPkt::maxEthFrameSize()) {
-            rxScheduler->transport->trackRTTs.updateRTTSample(srcAddr.toIPv4().getInt(),
-                simTime() - std::get<2>(*grant));
+            rxScheduler->transport->trackRTTs.updateRTTSample(
+                srcAddr.toIPv4().getInt(), simTime() - std::get<2>(*grant));
         }
         inflightGrants.erase(grant);
 
@@ -2729,6 +2744,7 @@ HomaTransport::InboundMessage::prepareGrant(uint16_t grantSize,
 
     // prepare a grant
     HomaPkt* grantPkt = new HomaPkt(rxScheduler->transport);
+    grantPkt->queuedAheadTimes.push_back({0 , 0, 0});
     grantPkt->setPktType(PktType::GRANT);
     GrantFields grantFields;
     grantFields.offset = offset;

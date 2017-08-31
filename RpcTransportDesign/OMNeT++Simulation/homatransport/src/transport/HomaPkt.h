@@ -36,6 +36,16 @@ class HomaPkt : public HomaPkt_Base
     // homatransport as soon as it arrives at the transport.
     HomaTransport* ownerTransport;
 
+    // Meta data on the packet to keep track of preemption lag and queuing
+    // times the packet experiences at each hop.
+    struct QueueWaitTimes {
+        simtime_t queueTimes;
+        simtime_t largerMesgPrmtLag;
+        simtime_t shorterMesgPrmtLag;
+    };
+    std::vector< QueueWaitTimes> queuedAheadTimes;
+    void printQueueTimes();
+
   PRIVATE:
     void copy(const HomaPkt& other);
 
@@ -84,6 +94,12 @@ class HomaPkt : public HomaPkt_Base
      * returns number of data bytes carried in the packet (if any)
      */
     uint32_t getDataBytes();
+
+    /**
+     * returns size and remaining size of the message this pkt bleongs to. For
+     * grants, it retuns zero.
+     */
+    std::pair<uint32_t, uint32_t> getMesgSize();
 
     /**
      * This function checks if there is a HomaPkt packet encapsulated in the
