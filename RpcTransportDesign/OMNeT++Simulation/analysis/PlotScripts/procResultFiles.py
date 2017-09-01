@@ -79,6 +79,7 @@ if __name__ == '__main__':
         parsedStats.aggrs = sp.aggrs
         parsedStats.cores = sp.cores
         parsedStats.generalInfo = sp.generalInfo
+        parsedStats.globalListener = sp.globalListener
         xmlParsedDic = parseXmlFile(xmlConfigFile, parsedStats.generalInfo)
         trafficDic = computeBytesAndRates(parsedStats, xmlParsedDic)
         digestTrafficInfo(trafficDic.rxHostsTraffic.nics.rx, 'RX NICs Recv:')
@@ -110,12 +111,15 @@ if __name__ == '__main__':
 
         if outputType.wastedBw:
             activeAndWasted = computeWastedTimesAndBw(parsedStats, xmlParsedDic)
+            selfWasteTime = computeSelfInflictedWastedBw(parsedStats, xmlParsedDic)
             wastedBw.append(('Homa', workloadType, prioLevels, redundancyFactor,
             loadFactor, nominalLoadFactor, activeAndWasted.sx.fracTotalTime,
             activeAndWasted.sx.fracActiveTime, activeAndWasted.rx.fracTotalTime,
             activeAndWasted.rx.fracActiveTime,
             activeAndWasted.rx.oversubWastedFracTotalTime,
-            activeAndWasted.rx.oversubWastedFracOversubTime))
+            activeAndWasted.rx.oversubWastedFracOversubTime,
+            selfWasteTime.highrOverEst.fracTotalTime*100.0))
+
 
     tw_h = 40
     tw_l = 40
@@ -155,7 +159,8 @@ if __name__ == '__main__':
             'sxWastedBw'.center(tw_l) + 'sxActiveWastedBw'.center(tw_l) +
             'wastedBw'.center(tw_l) + 'activeWastedBw'.center(tw_l) +
             'totalWastedOversubBw'.center(tw_l) +
-            'oversubWastedOversubBw'.center(tw_l) + '\n')
+            'oversubWastedOversubBw'.center(tw_l) +
+            'selfInflictedWasteBw' + '\n')
         # dump the results in outputfiles
         for wasteTuple in wastedBw:
             fdWasted.write(
@@ -170,6 +175,7 @@ if __name__ == '__main__':
                 '{0}'.format(wasteTuple[8]).center(tw_l) +
                 '{0}'.format(wasteTuple[9]).center(tw_l) +
                 '{0}'.format(wasteTuple[10]).center(tw_l) +
-                '{0}'.format(wasteTuple[11]).center(tw_l) + '\n')
+                '{0}'.format(wasteTuple[11]).center(tw_l) +
+                '{0}'.format(wasteTuple[12]).center(tw_l) + '\n')
         fdWasted.close()
 
