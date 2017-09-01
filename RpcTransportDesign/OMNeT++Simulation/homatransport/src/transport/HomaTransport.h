@@ -190,7 +190,7 @@ class HomaTransport : public cSimpleModule
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
         void sendOrQueue(cMessage* msg = NULL);
         void handlePktTransmitEnd();
-        std::pair<uint64_t, uint64_t> sentBytesAndPkts();
+        std::tuple<uint64_t, uint64_t, int, double> sentBytesAndPkts();
 
       PUBLIC:
         /**

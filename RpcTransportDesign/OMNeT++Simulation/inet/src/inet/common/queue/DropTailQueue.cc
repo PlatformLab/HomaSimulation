@@ -103,17 +103,12 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
     cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
     if (encapPkt) {
         HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
-        if (queue.front() == pkt) {
-            auto msgSizeAndLeftBytes = homaPkt->getMesgSize();
-            if (msgSizeAndLeftBytes.second < lastTxPkt.msgBytesLeft) {
-                queueWaitTime = {0, pktWaitTime, 0, cumSentPkts-pktOnWire,
-                    cumSentBytes-(txPktBitsRemained >> 3)};
-            } else {
-                queueWaitTime = {0, 0, pktWaitTime, cumSentPkts-pktOnWire,
-                    cumSentBytes-(txPktBitsRemained >> 3)};
-            }
+        auto msgSizeAndLeftBytes = homaPkt->getMesgSize();
+        if (msgSizeAndLeftBytes.second < lastTxPkt.msgBytesLeft) {
+            queueWaitTime = {0, pktWaitTime, 0, cumSentPkts-pktOnWire,
+                cumSentBytes-(txPktBitsRemained >> 3)};
         } else {
-            queueWaitTime = {0, 0, 0, cumSentPkts-pktOnWire,
+            queueWaitTime = {0, 0, pktWaitTime, cumSentPkts-pktOnWire,
                 cumSentBytes-(txPktBitsRemained >> 3)};
         }
         homaPkt->queuedAheadTimes.push_back(queueWaitTime);

@@ -641,17 +641,6 @@ HomaTransport::SendController::sendOrQueue(cMessage* msg)
     OutboundMessage* highPrioMsg = *(outbndMsgSet.begin());
     HomaPkt* head = highPrioMsg->txPkts.top();
     if (transport->sendTimer->isScheduled()) {
-        if (outGrantQueue.empty() && head->getCreationTime() == simTime()) {
-            HomaPkt::QueueWaitTimes& queuedAheadTimes =
-                head->queuedAheadTimes.back();
-            simtime_t waitTime =
-                transport->sendTimer->getArrivalTime() - simTime();
-            if (head->getMesgSize().second > sentPkt.getMesgSize().second) {
-                queuedAheadTimes.shorterMesgPrmtLag = waitTime;
-            } else {
-                queuedAheadTimes.largerMesgPrmtLag = waitTime;
-            }
-        }
         return;
     }
 
@@ -730,12 +719,14 @@ HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
     }
 
     HomaPkt::QueueWaitTimes& queueWaitTime = sxPkt->queuedAheadTimes.back();
-    simtime_t pktWaitTime =  currentTime - sxPkt->getCreationTime();
+    simtime_t pktWaitTime = currentTime - sxPkt->getCreationTime();
     queueWaitTime.queueTimes = pktWaitTime - queueWaitTime.largerMesgPrmtLag -
         queueWaitTime.shorterMesgPrmtLag;
-    std::pair<uint64_t, uint64_t> sxPktsBytes = sentBytesAndPkts();
-    queueWaitTime.pktsAhead = sxPktsBytes.first - queueWaitTime.pktsAhead;
-    queueWaitTime.bytesAhead = sxPktsBytes.second - queueWaitTime.bytesAhead;
+    auto sxPktsBytes = sentBytesAndPkts();
+    queueWaitTime.pktsAhead =
+        std::get<0>(sxPktsBytes) - queueWaitTime.pktsAhead;
+    queueWaitTime.bytesAhead =
+        std::get<1>(sxPktsBytes) - queueWaitTime.bytesAhead;
     ASSERT(queueWaitTime.queueTimes >= 0);
 
     simtime_t nextSendTime = sxPktDuration + currentTime;
@@ -748,20 +739,23 @@ HomaTransport::SendController::sendPktAndScheduleNext(HomaPkt* sxPkt)
 }
 
 /**
- * returns a pair of two numbers that are the number packets and bytes sent on
- * the wire since the begining of the simulation
+ * returns a tuple of four numbers that are the number packets and bytes sent on
+ * the wire since the begining of the simulation and number bytes remained from
+ * the last sentPkt to be serialized and time it takes to serialize that.
  */
-std::pair<uint64_t, uint64_t>
+std::tuple<uint64_t, uint64_t, int, double>
 HomaTransport::SendController::sentBytesAndPkts()
 {
     if (!transport->sendTimer->isScheduled()) {
-        return std::make_pair(cumSentPkts, cumSentBytes);
+        return std::make_tuple(cumSentPkts, cumSentBytes, 0, 0);
     }
 
     simtime_t bytesWaitTime = transport->sendTimer->getArrivalTime() - simTime();
-    int sxBitRemained = (int)(bytesWaitTime.dbl() * homaConfig->nicLinkSpeed * 1e9);
+    int sxBitRemained =
+        (int)(bytesWaitTime.dbl() * homaConfig->nicLinkSpeed * 1e9);
     int sxBytesRemained = (sxBitRemained >> 3);
-    return std::make_pair(cumSentPkts-1, cumSentBytes-sxBytesRemained);
+    return std::make_tuple(cumSentPkts-1, cumSentBytes-sxBytesRemained,
+        sxBytesRemained, bytesWaitTime.dbl());
 }
 
 /**
@@ -975,7 +969,6 @@ HomaTransport::OutboundMessage::prepareRequestAndUnsched()
 {
     std::vector<uint16_t> unschedPrioVec =
         sxController->prioResolver->getUnschedPktsPrio(this);
-
     uint32_t totalUnschedBytes = 0;
     std::vector<uint32_t> prioUnschedBytes = {};
     uint32_t prio = UINT16_MAX;
@@ -998,12 +991,9 @@ HomaTransport::OutboundMessage::prepareRequestAndUnsched()
     //First pkt, always request
     PktType pktType = PktType::REQUEST;
     size_t i = 0;
+    HomaPkt::QueueWaitTimes queueWaitTime;
     do {
         HomaPkt* unschedPkt = new HomaPkt(sxController->transport);
-        std::pair<uint64_t, uint64_t> sxPktsBytes =
-            sxController->sentBytesAndPkts();
-        unschedPkt->queuedAheadTimes.push_back({0 , 0, 0, sxPktsBytes.first,
-            sxPktsBytes.second});
         unschedPkt->setPktType(pktType);
 
         // set homa fields
@@ -1041,6 +1031,21 @@ HomaTransport::OutboundMessage::prepareRequestAndUnsched()
         unschedPkt->setUnschedFields(unschedFields);
         unschedPkt->setByteLength(unschedPkt->headerSize() +
             unschedPkt->getDataBytes());
+        if (pktType == PktType::REQUEST) {
+            auto sxPktsBytes = sxController->sentBytesAndPkts();
+            queueWaitTime = {0, 0, 0, std::get<0>(sxPktsBytes),
+                std::get<1>(sxPktsBytes)};
+            if (std::get<2>(sxPktsBytes) > 0) {
+                if (unschedPkt->getMesgSize().second <
+                        sxController->sentPkt.getMesgSize().second) {
+                    queueWaitTime.largerMesgPrmtLag = std::get<3>(sxPktsBytes);
+                } else {
+                    queueWaitTime.shorterMesgPrmtLag = std::get<3>(sxPktsBytes);
+                }
+            }
+        }
+        unschedPkt->queuedAheadTimes.push_back(queueWaitTime);
+
         txPkts.push(unschedPkt);
         /**
         EV << "Unsched pkt with msgId " << this->msgId << " ready for"
@@ -1078,10 +1083,6 @@ HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t offset,
 
     // create a data pkt and push it txPkts queue for
     HomaPkt* dataPkt = new HomaPkt(sxController->transport);
-    std::pair<uint64_t, uint64_t> sxPktsBytes =
-        sxController->sentBytesAndPkts();
-    dataPkt->queuedAheadTimes.push_back({0 , 0, 0,
-        sxPktsBytes.first, sxPktsBytes.second});
     dataPkt->setPktType(PktType::SCHED_DATA);
     dataPkt->setSrcAddr(this->srcAddr);
     dataPkt->setDestAddr(this->destAddr);
@@ -1093,6 +1094,20 @@ HomaTransport::OutboundMessage::prepareSchedPkt(uint32_t offset,
     dataFields.msgByteLen = msgSize; 
     dataPkt->setSchedDataFields(dataFields);
     dataPkt->setByteLength(bytesToSend + dataPkt->headerSize());
+
+    auto sxPktsBytes = sxController->sentBytesAndPkts();
+    HomaPkt::QueueWaitTimes queueWaitTime = {0, 0, 0, std::get<0>(sxPktsBytes),
+        std::get<1>(sxPktsBytes)};
+    if (std::get<2>(sxPktsBytes) > 0) {
+        if (dataPkt->getMesgSize().second <
+                sxController->sentPkt.getMesgSize().second) {
+            queueWaitTime.largerMesgPrmtLag = std::get<3>(sxPktsBytes);
+        } else {
+            queueWaitTime.shorterMesgPrmtLag = std::get<3>(sxPktsBytes);
+        }
+    }
+    dataPkt->queuedAheadTimes.push_back(queueWaitTime);
+
     txPkts.push(dataPkt);
     txSchedPkts.insert(dataPkt);
 
@@ -2777,10 +2792,6 @@ HomaTransport::InboundMessage::prepareGrant(uint16_t grantSize,
 
     // prepare a grant
     HomaPkt* grantPkt = new HomaPkt(rxScheduler->transport);
-    std::pair<uint64_t, uint64_t> sxPktsBytes =
-        rxScheduler->transport->sxController.sentBytesAndPkts();
-    grantPkt->queuedAheadTimes.push_back({0, 0, 0,
-        sxPktsBytes.first, sxPktsBytes.second});
     grantPkt->setPktType(PktType::GRANT);
     GrantFields grantFields;
     grantFields.offset = offset;
@@ -2805,11 +2816,26 @@ HomaTransport::InboundMessage::prepareGrant(uint16_t grantSize,
     this->schedBytesOnWire += grantedBytesOnWire;
     this->bytesGrantedInFlight += grantSize;
     this->lastGrantTime = simTime();
-
     this->totalBytesInFlight += grantedBytesOnWire;
 
     // Check updated offset value agrees with the bytesToGrant update.
     ASSERT(this->offset == this->msgSize - this->bytesToGrant);
+
+    HomaTransport::SendController* sxController = 
+        &(rxScheduler->transport->sxController);
+    auto sxPktsBytes = sxController->sentBytesAndPkts();
+    HomaPkt::QueueWaitTimes queueWaitTime = {0, 0, 0, std::get<0>(sxPktsBytes),
+        std::get<1>(sxPktsBytes)};
+    if (std::get<2>(sxPktsBytes) > 0) {
+        if (grantPkt->getMesgSize().second <
+                sxController->sentPkt.getMesgSize().second) {
+            queueWaitTime.largerMesgPrmtLag = std::get<3>(sxPktsBytes);
+        } else {
+            queueWaitTime.shorterMesgPrmtLag = std::get<3>(sxPktsBytes);
+        }
+    }
+    grantPkt->queuedAheadTimes.push_back(queueWaitTime);
+
     return grantPkt;
 }
 
