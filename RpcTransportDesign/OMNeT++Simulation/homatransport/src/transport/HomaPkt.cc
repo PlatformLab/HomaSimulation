@@ -318,9 +318,11 @@ void
 HomaPkt::printQueueTimes()
 {
     for (auto elem : queuedAheadTimes) {
-        std::cout << elem.queueTimes.dbl() << ", " <<
-            elem.largerMesgPrmtLag.dbl() << ", " <<
-            elem.shorterMesgPrmtLag.dbl() << ", " << std::endl;
+        std::cout << fabs(elem.queueTimes).dbl() << ", " <<
+            fabs(elem.largerMesgPrmtLag).dbl() << ", " <<
+            fabs(elem.shorterMesgPrmtLag).dbl() << ", " <<
+            elem.bytesAhead << ", " <<
+            elem.pktsAhead << ", " << std::endl;
     }
     return;
 }

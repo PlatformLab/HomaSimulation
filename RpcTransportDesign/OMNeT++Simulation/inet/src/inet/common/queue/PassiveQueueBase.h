@@ -72,6 +72,12 @@ class INET_API PassiveQueueBase : public cSimpleModule, public IPassiveQueue
     int queueEmpty;
     int queueLenOne;
 
+    // Cumulative number of packets and bytes transmitted. These variables
+    // monotonically increase every time a packet is sent out and never
+    // decrease. cumQueuedBytes also includes the SFD, IFG, and Preamble bits.
+    uint64_t cumSentPkts;
+    uint64_t cumSentBytes;
+
     /** Signal with packet when received it */
     static simsignal_t rcvdPkSignal;
     /** Signal with packet when enqueued it */

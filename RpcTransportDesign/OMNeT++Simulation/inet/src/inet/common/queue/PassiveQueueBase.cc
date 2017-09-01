@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "inet/common/queue/PassiveQueueBase.h"
+#include "inet/linklayer/ethernet/Ethernet.h"
 #include "transport/HomaPkt.h"
 
 namespace inet {
@@ -49,6 +50,8 @@ void PassiveQueueBase::initialize()
     numQueueDropped = 0;
     queueEmpty = 0;
     queueLenOne = 0;
+    cumSentPkts = 0;
+    cumSentBytes = 0;
     lastTxPkt = TxHomaPktInfo();
     WATCH(numQueueReceived);
     WATCH(numQueueDropped);
@@ -59,6 +62,8 @@ void PassiveQueueBase::initialize()
 void PassiveQueueBase::handleMessage(cMessage *msg)
 {
     cPacket* pkt = dynamic_cast<cPacket*>(msg);
+    uint32_t frameBytes = pkt->getByteLength() + (INTERFRAME_GAP_BITS >> 3) +
+            PREAMBLE_BYTES + SFD_BYTES;
     numQueueReceived++;
     emit(rcvdPkSignal, msg);
 
@@ -73,7 +78,6 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
 
         emit(queueLengthSignal, 0);
         emit(queueByteLengthSignal, 0);
-
         cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
         if (encapPkt) {
             HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
@@ -93,12 +97,15 @@ void PassiveQueueBase::handleMessage(cMessage *msg)
                 default:
                     throw cRuntimeError("HomaPkt arrived at the queue has unknown type.");
             }
-            HomaPkt::QueueWaitTimes queueWaitTime = {0, 0, 0};
+            HomaPkt::QueueWaitTimes queueWaitTime = {0, 0, 0, 0, 0};
             homaPkt->queuedAheadTimes.push_back(queueWaitTime);
         }
 
         setTxPkt(pkt);
         sendOut(msg);
+
+        cumSentPkts++;
+        cumSentBytes += frameBytes;
     }
     else {
         msg->setArrivalTime(simTime());
@@ -133,6 +140,9 @@ void PassiveQueueBase::requestPacket()
     }
     else {
         cPacket* pkt = dynamic_cast<cPacket*>(msg);
+        uint32_t frameBytes = pkt->getByteLength() + (INTERFRAME_GAP_BITS >> 3) +
+                PREAMBLE_BYTES + SFD_BYTES;
+
         emit(dequeuePkSignal, msg);
         simtime_t pktWaitTime =  simTime() - msg->getArrivalTime();
         emit(queueingTimeSignal, pktWaitTime);
@@ -161,10 +171,13 @@ void PassiveQueueBase::requestPacket()
                 homaPkt->queuedAheadTimes.back();
             queueWaitTime.queueTimes = pktWaitTime - queueWaitTime.largerMesgPrmtLag -
                 queueWaitTime.shorterMesgPrmtLag;
-
+            queueWaitTime.pktsAhead = cumSentPkts - queueWaitTime.pktsAhead;
+            queueWaitTime.bytesAhead = cumSentBytes - queueWaitTime.bytesAhead;
         }
         setTxPkt(pkt);
         sendOut(msg);
+        cumSentPkts++;
+        cumSentBytes += frameBytes;
     }
 }
 

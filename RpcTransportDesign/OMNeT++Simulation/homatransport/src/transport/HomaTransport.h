@@ -190,6 +190,7 @@ class HomaTransport : public cSimpleModule
         OutboundMsgMap* getOutboundMsgMap() {return &outboundMsgMap;}
         void sendOrQueue(cMessage* msg = NULL);
         void handlePktTransmitEnd();
+        std::pair<uint64_t, uint64_t> sentBytesAndPkts();
 
       PUBLIC:
         /**
@@ -272,6 +273,12 @@ class HomaTransport : public cSimpleModule
         // and ReceiveScheduler zeros it out whenever a new data packet has
         // arrived.
         uint64_t sumGrantsInGap;
+
+        // Total number of bytes and packets sent on wire so far. These
+        // variables are monotonically increasing as we this transport sends
+        // more packets and will never decrease.
+        uint64_t cumSentPkts;
+        uint64_t cumSentBytes;
 
         friend class OutboundMessage;
         friend class HomaTransport;

@@ -100,19 +100,23 @@ cMessage *DropTailQueue::enqueue(cMessage *msg)
     queue.insert(pkt);
 
     HomaPkt::QueueWaitTimes queueWaitTime;
-    if (queue.front() == pkt) {
-        cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
-        if (encapPkt) {
-            HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
+    cPacket* encapPkt = HomaPkt::searchEncapHomaPkt(pkt);
+    if (encapPkt) {
+        HomaPkt* homaPkt = check_and_cast<HomaPkt*>(encapPkt);
+        if (queue.front() == pkt) {
             auto msgSizeAndLeftBytes = homaPkt->getMesgSize();
             if (msgSizeAndLeftBytes.second < lastTxPkt.msgBytesLeft) {
-                queueWaitTime = {0, pktWaitTime, 0};
-                homaPkt->queuedAheadTimes.push_back(queueWaitTime);
+                queueWaitTime = {0, pktWaitTime, 0, cumSentPkts-pktOnWire,
+                    cumSentBytes-(txPktBitsRemained >> 3)};
             } else {
-                queueWaitTime = {0, 0, pktWaitTime};
-                homaPkt->queuedAheadTimes.push_back(queueWaitTime);
+                queueWaitTime = {0, 0, pktWaitTime, cumSentPkts-pktOnWire,
+                    cumSentBytes-(txPktBitsRemained >> 3)};
             }
+        } else {
+            queueWaitTime = {0, 0, 0, cumSentPkts-pktOnWire,
+                cumSentBytes-(txPktBitsRemained >> 3)};
         }
+        homaPkt->queuedAheadTimes.push_back(queueWaitTime);
     }
 
     //emit(queueLengthSignal, queue.length());

@@ -42,6 +42,8 @@ class HomaPkt : public HomaPkt_Base
         simtime_t queueTimes;
         simtime_t largerMesgPrmtLag;
         simtime_t shorterMesgPrmtLag;
+        uint64_t pktsAhead; 
+        uint64_t bytesAhead;
     };
     std::vector< QueueWaitTimes> queuedAheadTimes;
     void printQueueTimes();
