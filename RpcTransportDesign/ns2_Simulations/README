@@ -90,6 +90,28 @@ to
 
 void eraseAll() { this->erase(baseMap::begin(), baseMap::end()); }
 
+6.
+In file included from common/tkAppInit.cc:57:0:
+./bitmap/play.xbm:5:74: error: narrowing conversion of ‘252’ from ‘int’ to ‘char’ inside { } [-Wnarrowing]
+    0xfc, 0x0f, 0xfc, 0x03, 0xfc, 0x00, 0x3c, 0x00, 0x0c, 0x00, 0x00, 0x00};
+                                                                          ^
+./bitmap/play.xbm:5:74: error: narrowing conversion of ‘252’ from ‘int’ to ‘char’ inside { } [-Wnarrowing]
+
+Solution:
+In ns-2.32/bitmap/play.xbm, pragmatically disable the -Wnarrowing error around
+line 5:
+
+@@ -1,5 +1,9 @@
+ #define play_width 15
+ #define play_height 12
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wnarrowing"
+ static char play_bits[] = {
+    0x00, 0x00, 0x0c, 0x00, 0x3c, 0x00, 0xfc, 0x00, 0xfc, 0x03, 0xfc, 0x0f,
+    0xfc, 0x0f, 0xfc, 0x03, 0xfc, 0x00, 0x3c, 0x00, 0x0c, 0x00, 0x00, 0x00};
++#pragma GCC diagnostic pop
+
 
 ################################################################################
 Path Setup:
