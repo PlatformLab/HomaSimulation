@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 1997 Regents of the University of California.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -18,7 +18,7 @@
  * 4. Neither the name of the University nor of the Research Group may be
  *    used to endorse or promote products derived from this software without
  *    specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -47,7 +47,7 @@
 
 // The following undef is to suppress warnings on systems were
 // IP_BROADCAST is defined.
-#ifdef IP_BROADCAST		
+#ifdef IP_BROADCAST
 #undef IP_BROADCAST
 #endif
 
@@ -61,13 +61,22 @@ struct hdr_ip {
 	ns_addr_t	dst_;
 	int		ttl_;
 
+	/* Mohammad: flag to indicate
+	 * the last TCP ack for this flow
+	 * had EcnEcho set. This is used by
+	 * TBF to determin if flow should be
+	 *paced. */
+	int             gotecnecho;
+	//abd
+
 	/* Monarch extn */
 // 	u_int16_t	sport_;
 // 	u_int16_t	dport_;
-	
+
 	/* IPv6 */
 	int		fid_;	/* flow id */
 	int		prio_;
+	int 	prio_type_; //Shuang
 
 	static int offset_;
 	inline static int& offset() { return offset_; }
@@ -87,6 +96,7 @@ struct hdr_ip {
 	/* ipv6 fields */
 	int& flowid() { return (fid_); }
 	int& prio() { return (prio_); }
+	int& prio_type() {return (prio_type_); }
 };
 
 #endif

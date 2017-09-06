@@ -31,7 +31,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
- 
+
 /* 8/02 Tom Kelly - Dynamic resizing of seen buffer */
 
 #include "flags.h"
@@ -47,41 +47,41 @@ public:
 	}
 } class_tcpsink;
 
-Acker::Acker() : next_(0), maxseen_(0), wndmask_(MWM), ecn_unacked_(0), 
+Acker::Acker() : next_(0), maxseen_(0), wndmask_(MWM), ecn_unacked_(0),
 	ts_to_echo_(0), last_ack_sent_(0)
 {
 	seen_ = new int[MWS];
 	memset(seen_, 0, (sizeof(int) * (MWS)));
 }
 
-void Acker::reset() 
+void Acker::reset()
 {
 	next_ = 0;
 	maxseen_ = 0;
 	memset(seen_, 0, (sizeof(int) * (wndmask_ + 1)));
-}	
+}
 
 // dynamically increase the seen buffer as needed
 // size must be a factor of two for the wndmask_ to work...
-void Acker::resize_buffers(int sz) { 
+void Acker::resize_buffers(int sz) {
 	int* new_seen = new int[sz];
 	int new_wndmask = sz - 1;
-	
+
 	if(!new_seen){
 		fprintf(stderr, "Unable to allocate buffer seen_[%i]\n", sz);
 		exit(1);
 	}
-	
+
 	memset(new_seen, 0, (sizeof(int) * (sz)));
-	
+
 	for(int i = next_; i <= maxseen_+1; i++){
 		new_seen[i & new_wndmask] = seen_[i&wndmask_];
 	}
-	
+
 	delete[] seen_;
-	seen_ = new_seen;      
+	seen_ = new_seen;
 	wndmask_ = new_wndmask;
-	return; 
+	return;
 }
 
 void Acker::update_ts(int seqno, double ts, int rfc1323)
@@ -179,7 +179,7 @@ int Acker::update(int seq, int numBytes)
 TcpSink::TcpSink(Acker* acker) : Agent(PT_ACK), acker_(acker), save_(NULL),
 	lastreset_(0.0)
 {
-	bytes_ = 0; 
+	bytes_ = 0;
 	bind("bytes_", &bytes_);
 
 	/*
@@ -189,6 +189,7 @@ TcpSink::TcpSink(Acker* acker) : Agent(PT_ACK), acker_(acker), save_(NULL),
 #if defined(TCP_DELAY_BIND_ALL) && 0
 #else /* ! TCP_DELAY_BIND_ALL */
 	bind("maxSackBlocks_", &max_sack_blocks_); // used only by sack
+	bind("ecnhat_", &ecnhat_);
 #endif /* TCP_DELAY_BIND_ALL */
 }
 
@@ -203,6 +204,7 @@ TcpSink::delay_bind_init_all()
 	delay_bind_init_one("qs_enabled_");
 	delay_bind_init_one("RFC2581_immediate_ack_");
 	delay_bind_init_one("ecn_syn_");
+	delay_bind_init_one("ecnhat_");
 #if defined(TCP_DELAY_BIND_ALL) && 0
         delay_bind_init_one("maxSackBlocks_");
 #endif /* TCP_DELAY_BIND_ALL */
@@ -220,6 +222,7 @@ TcpSink::delay_bind_dispatch(const char *varName, const char *localName, TclObje
         if (delay_bind_bool(varName, localName, "qs_enabled_", &qs_enabled_, tracer)) return TCL_OK;
         if (delay_bind_bool(varName, localName, "RFC2581_immediate_ack_", &RFC2581_immediate_ack_, tracer)) return TCL_OK;
 	if (delay_bind_bool(varName, localName, "ecn_syn_", &ecn_syn_ ,tracer)) return TCL_OK;
+	if (delay_bind_bool(varName, localName, "ecnhat_", &ecnhat_ ,tracer)) return TCL_OK;
 #if defined(TCP_DELAY_BIND_ALL) && 0
         if (delay_bind(varName, localName, "maxSackBlocks_", &max_sack_blocks_, tracer)) return TCL_OK;
 #endif /* TCP_DELAY_BIND_ALL */
@@ -253,9 +256,9 @@ int TcpSink::command(int argc, const char*const* argv)
 	return (Agent::command(argc, argv));
 }
 
-void TcpSink::reset() 
+void TcpSink::reset()
 {
-	acker_->reset();	
+	acker_->reset();
 	save_ = NULL;
 	lastreset_ = Scheduler::instance().clock(); /* W.N. - for detecting */
 				/* packets from previous incarnations */
@@ -279,7 +282,7 @@ void TcpSink::ack(Packet* opkt)
 	        if (otcp->seqno() == 0 && oqsh->flag() == QS_REQUEST) {
 	                nqsh->flag() = QS_RESPONSE;
 	                nqsh->ttl() = (oiph->ttl() - oqsh->ttl()) % 256;
-	                nqsh->rate() = oqsh->rate(); 
+	                nqsh->rate() = oqsh->rate();
 	        }
 	        else {
 	                nqsh->flag() = QS_DISABLE;
@@ -305,33 +308,40 @@ void TcpSink::ack(Packet* opkt)
 	// get the ip headers
 	nip->flowid() = oip->flowid();
 	// copy the flow id
-	
+
 	hdr_flags* of = hdr_flags::access(opkt);
 	hdr_flags* nf = hdr_flags::access(npkt);
 	hdr_flags* sf;
 	if (save_ != NULL)
 		sf = hdr_flags::access(save_);
-	else 
+	else
 		sf = 0;
-		// Look at delayed packet being acked. 
-	if ( (sf != 0 && sf->cong_action()) || of->cong_action() ) 
-		// Sender has responsed to congestion. 
+		// Look at delayed packet being acked.
+	if ( (sf != 0 && sf->cong_action()) || of->cong_action() )
+		// Sender has responsed to congestion.
 		acker_->update_ecn_unacked(0);
-	if ( (sf != 0 && sf->ect() && sf->ce())  || 
+	if ( (sf != 0 && sf->ect() && sf->ce())  ||
 			(of->ect() && of->ce()) )
-		// New report of congestion.  
+		// New report of congestion.
 		acker_->update_ecn_unacked(1);
-	if ( (sf != 0 && sf->ect()) || of->ect() )
-		// Set EcnEcho bit.  
-		nf->ecnecho() = acker_->ecn_unacked();
+	if ( (sf != 0 && sf->ect()) || of->ect() ) {
+		// Set EcnEcho bit.
+		if (ecnhat_) {
+			if ( (sf != 0 && sf->ect() && sf->ce()) ||
+			     (of->ect() && of->ce()) )
+			     nf->ecnecho() = 1;
+			else
+			     nf->ecnecho() = 0;
+		} else nf->ecnecho() = acker_->ecn_unacked();
+	}
 	if (!of->ect() && of->ecnecho() ||
 		(sf != 0 && !sf->ect() && sf->ecnecho()) ) {
 		 // This is the negotiation for ECN-capability.
-		 // We are not checking for of->cong_action() also. 
-		 // In this respect, this does not conform to the 
-		 // specifications in the internet draft 
+		 // We are not checking for of->cong_action() also.
+		 // In this respect, this does not conform to the
+		 // specifications in the internet draft
 		nf->ecnecho() = 1;
-		if (ecn_syn_) 
+		if (ecn_syn_)
 			nf->ect() = 1;
 	}
 	acker_->append_ack(hdr_cmn::access(npkt),
@@ -342,7 +352,7 @@ void TcpSink::ack(Packet* opkt)
         // Andrei Gurtov
         acker_->last_ack_sent_ = ntcp->seqno();
         // printf("ACK %d ts %f\n", ntcp->seqno(), ntcp->ts_echo());
-	
+
 	send(npkt, 0);
 	// send it
 }
@@ -367,7 +377,7 @@ void TcpSink::recv(Packet* pkt, Handler*)
 	}
 	acker_->update_ts(th->seqno(),th->ts(),ts_echo_rfc1323_);
 	// update the timestamp to echo
-	
+
       	numToDeliver = acker_->update(th->seqno(), numBytes);
 	// update the recv window; figure out how many in-order-bytes
 	// (if any) can be removed from the window and handed to the
@@ -421,7 +431,7 @@ void DelAckSink::recv(Packet* pkt, Handler*)
                 bytes_ += numToDeliver; // for JOBS
                 recvBytes(numToDeliver);
         }
-	
+
         // If there's no timer and the packet is in sequence, set a timer.
         // Otherwise, send the ack and update the timer.
         if (delay_timer_.status() != TIMER_PENDING &&
@@ -434,7 +444,7 @@ void DelAckSink::recv(Packet* pkt, Handler*)
 		// Since this is a change to previous ns behaviour,
 		// it's controlled by an optional bound flag.
 		// discussed April 2000 in the ns-users list archives.
-		if (RFC2581_immediate_ack_ && 
+		if (RFC2581_immediate_ack_ &&
 			(th->seqno() < acker_->Maxseen())) {
 			// don't delay the ACK since
 			// we're filling in a gap
@@ -446,7 +456,7 @@ void DelAckSink::recv(Packet* pkt, Handler*)
 		}
         }
         // If there was a timer, turn it off.
-	if (delay_timer_.status() == TIMER_PENDING) 
+	if (delay_timer_.status() == TIMER_PENDING)
 		delay_timer_.cancel();
 	ack(pkt);
         if (save_ != NULL) {
@@ -585,7 +595,7 @@ Sacker::trace(TracedVar *v)
 	base_nblocks_ = newval;
 }
 
-void Sacker::reset() 
+void Sacker::reset()
 {
 	sf_->reset();
 	Acker::reset();
@@ -600,10 +610,10 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 {
 	// ch and h are the common and tcp headers of the Ack being constructed
 	// old_seqno is the sequence # of the packet we just got
-	
+
         int sack_index, i, sack_right, sack_left;
 	int recent_sack_left, recent_sack_right;
-          
+
 	int seqno = Seqno();
 	// the last in-order packet seen (i.e. the cumulative ACK # - 1)
 
@@ -636,7 +646,7 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 			printf("%f\t Generating D-SACK for packet %d\n", Scheduler::instance().clock(),old_seqno);
 #endif
 
-			
+
 		}
 
 		//  Build FIRST (traditional) SACK block
@@ -654,8 +664,8 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 		} else {
                 sack_right=-1;
 
-		// look rightward for first hole 
-		// start at the current packet 
+		// look rightward for first hole
+		// start at the current packet
                 for (i=old_seqno; i<=maxseen_; i++) {
 			if (!seen_[i & wndmask_]) {
 				sack_right=i;
@@ -675,7 +685,7 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 			sack_left = 0;
 			// don't record/send the block
 		} else {
-			// look leftward from right edge for first hole 
+			// look leftward from right edge for first hole
 	                for (i = sack_right-1; i > seqno; i--) {
 				if (!seen_[i & wndmask_]) {
 					sack_left = i+1;
@@ -684,7 +694,7 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 	                }
 			h->sa_left(sack_index) = sack_left;
 			h->sa_right(sack_index) = sack_right;
-			
+
 			// printf("pkt_seqno: %i cuml_seqno: %i sa_idx: %i sa_left: %i sa_right: %i\n" ,old_seqno, seqno, sack_index, sack_left, sack_right);
 			// record the block
 			sack_index++;
@@ -693,7 +703,7 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 		recent_sack_left = sack_left;
 		recent_sack_right = sack_right;
 
-		// first sack block is built, check the others 
+		// first sack block is built, check the others
 		// make sure that if max_sack_blocks has been made
 		// large from tcl we don't over-run the stuff we
 		// allocated in Sacker::Sacker()
@@ -703,12 +713,12 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 			sack_left = sf_->head_left(k);
 			sack_right = sf_->head_right(k);
 
-			// no more history 
+			// no more history
 			if (sack_left < 0 || sack_right < 0 ||
 				sack_right > maxseen_ + 1)
 				break;
 
-			// newest ack "covers up" this one 
+			// newest ack "covers up" this one
 
 			if (recent_sack_left <= sack_left &&
 			    recent_sack_right >= sack_right) {
@@ -718,9 +728,9 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 
 			h->sa_left(sack_index) = sack_left;
 			h->sa_right(sack_index) = sack_right;
-			
+
 			// printf("pkt_seqno: %i cuml_seqno: %i sa_idx: %i sa_left: %i sa_right: %i\n" ,old_seqno, seqno, sack_index, sack_left, sack_right);
-			
+
 			// store the old sack (i.e. move it down one)
 			sack_index++;
 			k++;
@@ -740,9 +750,9 @@ void Sacker::append_ack(hdr_cmn* ch, hdr_tcp* h, int old_seqno) const
 		}
 
 		} // this '}' is for the DSACK base_nblocks_ >= test;
-		  // (didn't feel like re-indenting all the code and 
+		  // (didn't feel like re-indenting all the code and
 		  // causing a large diff)
-		
+
         }
 	h->sa_length() = sack_index;
 	// set the Length of the sack stack in the header

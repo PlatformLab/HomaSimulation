@@ -1,38 +1,3 @@
-/* -*-	Mode:C++; c-basic-offset:8; tab-width:8; indent-tabs-mode:t -*- */
-/*
- * Copyright (c) 1997, 2001 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *  This product includes software developed by the Network Research
- *  Group at Lawrence Berkeley National Laboratory.
- * 4. Neither the name of the University nor of the Laboratory may be used
- *    to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * @(#) $Header: /cvsroot/nsnam/ns-2/tcp/tcp-full.h,v 1.60 2008/10/14 17:42:52 sallyfloyd Exp $ (LBL)
- */
 
 #ifndef ns_tcp_full_h
 #define ns_tcp_full_h
@@ -83,7 +48,7 @@
 
 #define TCPIP_BASE_PKTSIZE      40      /* base TCP/IP header in real life */
 /* these are used to mark packets as to why we xmitted them */
-#define REASON_NORMAL   0  
+#define REASON_NORMAL   0
 #define REASON_TIMEOUT  1
 #define REASON_DUPACK   2
 #define	REASON_RBP	3	/* if ever implemented */
@@ -92,7 +57,7 @@
 /* bits for the tcp_flags field below */
 /* from tcp.h in the "real" implementation */
 /* RST and URG are not used in the simulator */
- 
+
 #define TH_FIN  0x01        /* FIN: closing a connection */
 #define TH_SYN  0x02        /* SYN: starting a connection */
 #define TH_PUSH 0x08        /* PUSH: used here to "deliver" data */
@@ -116,18 +81,21 @@ protected:
 class FullTcpAgent : public TcpAgent {
 public:
 	FullTcpAgent() :
+		prio_scheme_(0), prio_num_(0), startseq_(0), last_prio_(0), seq_bound_(0),
 		closed_(0), pipe_(-1), rtxbytes_(0), fastrecov_(FALSE),
         	last_send_time_(-1.0), infinite_send_(FALSE), irs_(-1),
         	delack_timer_(this), flags_(0),
         	state_(TCPS_CLOSED), recent_ce_(FALSE),
-        	last_state_(TCPS_CLOSED), rq_(rcv_nxt_), last_ack_sent_(-1) { }
+		  last_state_(TCPS_CLOSED), rq_(rcv_nxt_), last_ack_sent_(-1),
+		  informpacer(0) { }
+		// Mohammad: added informpacer
 
 	~FullTcpAgent() { cancel_timers(); rq_.clear(); }
 	virtual void recv(Packet *pkt, Handler*);
 	virtual void timeout(int tno); 	// tcp_timers() in real code
 	virtual void close() { usrclosed(); }
 	void advanceby(int);	// over-rides tcp base version
-	void advance_bytes(int);	// unique to full-tcp
+	virtual void advance_bytes(int);	// unique to full-tcp
         virtual void sendmsg(int nbytes, const char *flags = 0);
         virtual int& size() { return maxseg_; } //FullTcp uses maxseg_ for size_
 	virtual int command(int argc, const char*const* argv);
@@ -135,6 +103,25 @@ public:
 protected:
 	virtual void delay_bind_init_all();
 	virtual int delay_bind_dispatch(const char *varName, const char *localName, TclObject *tracer);
+	/* Shuang: priority dropping */
+	virtual int set_prio(int seq, int maxseq);
+	virtual int calPrio(int prio);
+	virtual int byterm();
+	int prio_scheme_;
+	int prio_num_; //number of priorities; 0: unlimited
+	int prio_cap_[7];
+	int startseq_;
+	int last_prio_;
+	int seq_bound_;
+	int prob_cap_;  //change to prob mode after #prob_cap_ timeout
+	int prob_count_; //current #timeouts
+	bool prob_mode_;
+	int last_sqtotal_;
+	int cur_sqtotal_;
+	int deadline; // time remain in us at the beginning
+	double start_time; //start time
+	int early_terminated_; //early terminated
+
 	int closed_;
 	int ts_option_size_;	// header bytes in a ts option
 	int pipe_;		// estimate of pipe occupancy (for Sack)
@@ -148,6 +135,26 @@ protected:
 	int deflate_on_pack_;	// deflate on partial acks (reno:yes)
 	int data_on_syn_;   // send data on initial SYN?
 	double last_send_time_;	// time of last send
+
+
+	/* Mohammad: state-variable for robust
+	   FCT measurement.
+	*/
+	int flow_remaining_; /* Number of bytes yet to be received from
+			       the current flow (at the receiver). This is
+			       set by TCL when starting a flow. Receiver will
+			       set immediate ACKs when nothing remains to
+			       notify sender of flow completion. */
+
+	/* Mohammad: state-variable to inform
+	 * pacer (TBF) of receiving ecnecho for the flow
+	 */
+	int informpacer;
+	//abd
+
+	// Mohammad: if non-zero, set dupack threshold to max(3, dynamic_dupack_ * cwnd)_
+	double dynamic_dupack_;
+
 	int close_on_empty_;	// close conn when buffer empty
 	int signal_on_empty_;	// signal when buffer is empty
 	int reno_fastrecov_;	// do reno-style fast recovery?
@@ -215,8 +222,8 @@ protected:
 	void connect();     		// do active open
 	void listen();      		// do passive open
 	void usrclosed();   		// user requested a close
-	int need_send();    		// send ACK/win-update now?
-	int foutput(int seqno, int reason = 0); // output 1 packet
+	virtual int need_send();    		// send ACK/win-update now?
+	virtual int foutput(int seqno, int reason = 0); // output 1 packet
 	void newack(Packet* pkt);	// process an ACK
 	int pack(Packet* pkt);		// is this a partial ack?
 	void dooptions(Packet*);	// process option(s)
@@ -226,6 +233,7 @@ protected:
 	char *flagstr(int);		// print header flags as symbols
 	char *statestr(int);		// print states as symbols
 
+
 	/*
 	* the following are part of a tcpcb in "real" RFC793 TCP
 	*/
@@ -233,13 +241,18 @@ protected:
 	int flags_;     /* controls next output() call */
 	int state_;     /* enumerated type: FSM state */
 	int recent_ce_;	/* last ce bit we saw */
+	int ce_transition_; /* Mohammad: was there a transition in
+			       recent_ce by last ACK. for DCTCP receiver
+			       state machine. */
 	int last_state_; /* FSM state at last pkt recv */
 	int rcv_nxt_;       /* next sequence number expected */
+
 	ReassemblyQueue rq_;    /* TCP reassembly queue */
 	/*
 	* the following are part of a tcpcb in "real" RFC1323 TCP
 	*/
 	int last_ack_sent_; /* ackno field from last segment we sent */
+
 	double recent_;		// ts on SYN written by peer
 	double recent_age_;	// my time when recent_ was set
 
@@ -272,7 +285,6 @@ public:
 		sq_(sack_min_), sack_min_(-1), h_seqno_(-1) { }
 	~SackFullTcpAgent() { rq_.clear(); }
 protected:
-
 	virtual void delay_bind_init_all();
 	virtual int delay_bind_dispatch(const char *varName, const char *localName, TclObject *tracer);
 
@@ -281,6 +293,7 @@ protected:
 	virtual void dupack_action();
 	virtual void process_sack(hdr_tcp*);
 	virtual void timeout_action();
+	virtual int set_prio(int seq, int maxseq);
 	virtual int nxt_tseq();
 	virtual int hdrsize(int nblks);
 	virtual int send_allowed(int);
@@ -289,6 +302,7 @@ protected:
 			h_seqno_ += amt;
 		FullTcpAgent::sent(seq, amt);
 	}
+	virtual int byterm();
 
 	int build_options(hdr_tcp*);	// insert opts, return len
 	int clear_on_timeout_;	// clear sender's SACK queue on RTX timeout?
@@ -307,6 +321,22 @@ protected:
 	ReassemblyQueue sq_;	// SACK queue, used by sender
 	int sack_min_;		// first seq# in sack queue, initializes sq_
 	int h_seqno_;		// next seq# to hole-fill
+};
+
+class MinTcpAgent : public SackFullTcpAgent {
+public:
+   virtual void timeout_action();
+   virtual double rtt_timeout();
+//   virtual void advance_bytes(int nb);
+};
+
+class DDTcpAgent : public SackFullTcpAgent {
+
+	virtual void slowdown(int how);			/* reduce cwnd/ssthresh */
+	virtual int byterm();
+	virtual int foutput(int seqno, int reason = 0); // output 1 packet
+	virtual int need_send();    		// send ACK/win-update now?
+
 };
 
 #endif

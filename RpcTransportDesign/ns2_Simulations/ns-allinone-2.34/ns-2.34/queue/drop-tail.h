@@ -37,32 +37,62 @@
 #ifndef ns_drop_tail_h
 #define ns_drop_tail_h
 
-#include <string.h>
+/*#ifdef __GNUC__
+#include <ext/hash_map>
+#else
+#include <hash_map>
+#endif
+
+
+namespace std
+{
+ using namespace __gnu_cxx;
+}
+*/
+#include <tr1/unordered_map>
+#include <tr1/functional>
+#include <queue>
+
+using std::queue;
+using std::tr1::unordered_map;
+//using std::tr1::functional;
+
+#include <string>
 #include "queue.h"
 #include "config.h"
+
+typedef struct flowkey {
+	nsaddr_t src, dst;
+	int fid;
+} FlowKey;
 
 /*
  * A bounded, drop-tail queue
  */
 class DropTail : public Queue {
   public:
-	DropTail() { 
-		q_ = new PacketQueue; 
+	DropTail() {
+		q_ = new PacketQueue;
 		pq_ = q_;
 		bind_bool("drop_front_", &drop_front_);
+		bind_bool("drop_smart_", &drop_smart_);
+		bind_bool("drop_prio_", &drop_prio_);
+		bind_bool("deque_prio_", &deque_prio_);
+		bind_bool("keep_order_", &keep_order_);
 		bind_bool("summarystats_", &summarystats);
 		bind_bool("queue_in_bytes_", &qib_);  // boolean: q in bytes?
 		bind("mean_pktsize_", &mean_pktsize_);
+		bind("sq_limit_", &sq_limit_);
 		//		_RENAMED("drop-front_", "drop_front_");
 	}
 	~DropTail() {
 		delete q_;
 	}
-  protected:
 	void reset();
-	int command(int argc, const char*const* argv); 
+	int command(int argc, const char*const* argv);
 	void enque(Packet*);
 	Packet* deque();
+  protected:
 	void shrink_queue();	// To shrink queue and drop excessive packets.
 
 	PacketQueue *q_;	/* underlying FIFO queue */
@@ -71,6 +101,18 @@ class DropTail : public Queue {
 	void print_summarystats();
 	int qib_;       	/* bool: queue measured in bytes? */
 	int mean_pktsize_;	/* configured mean packet size in bytes */
+	// Mohammad: for smart dropping
+	int drop_smart_;
+	// Shuang: for priority dropping
+	int drop_prio_;
+	int deque_prio_;
+	int keep_order_;
+
+
+	unsigned int sq_limit_;
+	unordered_map<size_t, int> sq_counts_;
+	std::queue<size_t> sq_queue_;
+
 };
 
 #endif
