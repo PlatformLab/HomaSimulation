@@ -87,8 +87,9 @@ public:
         	delack_timer_(this), flags_(0),
         	state_(TCPS_CLOSED), recent_ce_(FALSE),
 		  last_state_(TCPS_CLOSED), rq_(rcv_nxt_), last_ack_sent_(-1),
-		  informpacer(0) { }
+		  informpacer(0), enable_pias_(0), pias_prio_num_(0), pias_debug_(0) { }
 		// Mohammad: added informpacer
+		//Wei: add enable_pias_
 
 	~FullTcpAgent() { cancel_timers(); rq_.clear(); }
 	virtual void recv(Packet *pkt, Handler*);
@@ -107,9 +108,16 @@ protected:
 	virtual int set_prio(int seq, int maxseq);
 	virtual int calPrio(int prio);
 	virtual int byterm();
+	/* Wei: PIAS priority */
+	virtual int piasPrio(int bytes_sent);
+
 	int prio_scheme_;
 	int prio_num_; //number of priorities; 0: unlimited
 	int prio_cap_[7];
+    int enable_pias_;   //wei: enable PIAS or not
+	int pias_prio_num_;	//wei: number of priorities used by PIAS (no more than 8)
+    int pias_thresh_[7];    //wei: demotion thresholds of PIAS
+	int pias_debug_;	//wei: debug mode for PIAS
 	int startseq_;
 	int last_prio_;
 	int seq_bound_;

@@ -418,6 +418,14 @@ virtual void output(int seqno, int reason = 0);
 
 	void update_ecnhat_alpha(Packet *pkt); /* updates the ecnhat alpha value */
 
+	/* Wei: added for LLDCT (low latency data center transport) */
+	int lldct_;
+	double lldct_w_min_; //0.125 by default
+	double lldct_w_max_; //2.5 by default
+	double lldct_size_min_;	//200KB by default
+	double lldct_size_max_; //1MB by default
+	double lldct_w_c_;
+
 	int cong_action_;	/* Congestion Action.  True to indicate
 				   that the sender responded to congestion. */
         int ecn_burst_;		/* True when the previous ACK packet

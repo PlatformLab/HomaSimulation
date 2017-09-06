@@ -161,6 +161,17 @@ FullTcpAgent::delay_bind_init_all()
 	delay_bind_init_one("deadline"); //Shuang
 	delay_bind_init_one("early_terminated_"); //Shuang
 
+    delay_bind_init_one("enable_pias_"); //wei
+    delay_bind_init_one("pias_prio_num_"); //wei
+    delay_bind_init_one("pias_thresh_0"); //wei
+    delay_bind_init_one("pias_thresh_1"); //wei
+    delay_bind_init_one("pias_thresh_2"); //wei
+    delay_bind_init_one("pias_thresh_3"); //wei
+    delay_bind_init_one("pias_thresh_4"); //wei
+    delay_bind_init_one("pias_thresh_5"); //wei
+    delay_bind_init_one("pias_thresh_6"); //wei
+    delay_bind_init_one("pias_debug_"); //wei
+
 	TcpAgent::delay_bind_init_all();
 
       	reset();
@@ -204,6 +215,18 @@ FullTcpAgent::delay_bind_dispatch(const char *varName, const char *localName, Tc
 	if (delay_bind(varName, localName, "prob_cap_", &prob_cap_, tracer)) return TCL_OK; //Shuang
 	if (delay_bind(varName, localName, "deadline", &deadline, tracer)) return TCL_OK; //Shuang
 	if (delay_bind(varName, localName, "early_terminated_", &early_terminated_, tracer)) return TCL_OK; //Shuang
+
+    if (delay_bind_bool(varName, localName, "enable_pias_", &enable_pias_, tracer)) return TCL_OK; //wei
+    if (delay_bind(varName, localName, "pias_prio_num_", &pias_prio_num_, tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_0", &pias_thresh_[0], tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_1", &pias_thresh_[1], tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_2", &pias_thresh_[2], tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_3", &pias_thresh_[3], tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_4", &pias_thresh_[4], tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_5", &pias_thresh_[5], tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "pias_thresh_6", &pias_thresh_[6], tracer)) return TCL_OK;
+    if (delay_bind_bool(varName, localName, "pias_debug_", &pias_debug_, tracer)) return TCL_OK;
+
         return TcpAgent::delay_bind_dispatch(varName, localName, tracer);
 }
 
@@ -370,6 +393,8 @@ FullTcpAgent::advance_bytes(int nb)
 		         now(), name(), statestr(state_));
 
 	}
+
+    ndatabytes_=0; //Reset number of data bytes sent back to 0
 
 	if (state_ == TCPS_ESTABLISHED)
 		send_much(0, REASON_NORMAL, maxburst_);
@@ -860,6 +885,24 @@ FullTcpAgent::calPrio(int prio) {
 	return prio_num_ - 1;
 }
 
+int FullTcpAgent::piasPrio(int bytes_sent)
+{
+    if(enable_pias_&&pias_prio_num_>=1)
+    {
+        pias_prio_num_=min(pias_prio_num_,8); //no more than 8 priorities now
+        for(int i=0; i<pias_prio_num_-1; i++) //there are pias_prio_num-1 demotion thresholds in total
+        {
+            if(bytes_sent<=pias_thresh_[i])
+                return i;
+        }
+        return pias_prio_num_-1;    //lowest priority by default
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 /*
  * sendpacket:
  *	allocate a packet, fill in header fields, and send
@@ -1007,6 +1050,21 @@ FullTcpAgent::sendpacket(int seqno, int ackno, int pflags, int datalen, int reas
 		informpacer = 0;
 		//abd
 	}
+
+    /* PIAS packet tagging */
+    if(enable_pias_)
+    {
+        if(datalen>0)
+        {
+            iph->prio()=piasPrio(seqno-startseq_);
+            if(pias_debug_)
+                printf("Packet prio is %d when bytes sent is %d\n", iph->prio(),seqno-startseq_);
+        }
+        else
+        {
+            iph->prio()=0;
+        }
+    }
 
 	send(p, 0);
 

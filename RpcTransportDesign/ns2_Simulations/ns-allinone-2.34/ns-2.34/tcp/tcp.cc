@@ -44,7 +44,8 @@ TcpAgent::TcpAgent()
           cong_action_(0), ecn_burst_(0), ecn_backoff_(0), ect_(0),
           use_rtt_(0), qs_requested_(0), qs_approved_(0),
 	  qs_window_(0), qs_cwnd_(0), frto_(0), ecnhat_recalc_seq(0), ecnhat_num_marked(0),ecnhat_total(0),
-	  ecnhat_maxseq(0), ecnhat_not_marked(0), ecnhat_mark_period(0), target_wnd(0) , ecnhat_tcp_friendly_increase_(1.0)
+	  ecnhat_maxseq(0), ecnhat_not_marked(0), ecnhat_mark_period(0), target_wnd(0) , ecnhat_tcp_friendly_increase_(1.0),
+      lldct_(false), lldct_w_min_(0.125), lldct_w_max_(2.5), lldct_size_min_(200*1024), lldct_size_max_(1024*1024)
 {
 #ifdef TCP_DELAY_BIND_ALL
         // defined since Dec 1999.
@@ -78,6 +79,13 @@ TcpAgent::TcpAgent()
 	bind("ecnhat_beta_", &ecnhat_beta_);
 	bind("ecnhat_quadratic_beta_", &ecnhat_quadratic_beta_);
 	bind("ecnhat_tcp_friendly_", &ecnhat_tcp_friendly_);
+	// Wei
+	bind_bool("lldct_",&lldct_);
+	bind("lldct_w_min_",&lldct_w_min_);
+	bind("lldct_w_max_",&lldct_w_max_);
+	bind("lldct_size_min_",&lldct_size_min_);
+    bind("lldct_size_max_",&lldct_size_max_);
+
 #endif /* TCP_DELAY_BIND_ALL */
 
 }
@@ -109,6 +117,13 @@ TcpAgent::delay_bind_init_all()
 	delay_bind_init_one("ecnhat_enable_beta_");
 	delay_bind_init_one("ecnhat_quadratic_beta_");
 	delay_bind_init_one("ecnhat_tcp_friendly_");
+
+	// Wei
+	delay_bind_init_one("lldct_");
+	delay_bind_init_one("lldct_w_min_");
+	delay_bind_init_one("lldct_w_max_");
+	delay_bind_init_one("lldct_size_min_");
+    delay_bind_init_one("lldct_size_max_");
 
         delay_bind_init_one("SetCWRonRetransmit_");
         delay_bind_init_one("old_ecn_");
@@ -230,6 +245,12 @@ TcpAgent::delay_bind_dispatch(const char *varName, const char *localName, TclObj
 	if (delay_bind(varName, localName, "ecnhat_beta_", &ecnhat_beta_ , tracer)) return TCL_OK;
 	if (delay_bind_bool(varName, localName, "ecnhat_quadratic_beta_", &ecnhat_quadratic_beta_ , tracer)) return TCL_OK;
 	if (delay_bind_bool(varName, localName, "ecnhat_tcp_friendly_", &ecnhat_tcp_friendly_, tracer)) return TCL_OK;
+	// Wei
+	if (delay_bind_bool(varName, localName, "lldct_", &lldct_ , tracer)) return TCL_OK;
+	if (delay_bind(varName, localName, "lldct_w_min_", &lldct_w_min_ , tracer)) return TCL_OK;
+	if (delay_bind(varName, localName, "lldct_w_max_", &lldct_w_max_ , tracer)) return TCL_OK;
+	if (delay_bind(varName, localName, "lldct_size_min_", &lldct_size_min_, tracer)) return TCL_OK;
+    if (delay_bind(varName, localName, "lldct_size_max_", &lldct_size_max_, tracer)) return TCL_OK;
 
 	if (delay_bind_bool(varName, localName, "SetCWRonRetransmit_", &SetCWRonRetransmit_, tracer)) return TCL_OK;
         if (delay_bind_bool(varName, localName, "old_ecn_", &old_ecn_ , tracer)) return TCL_OK;
@@ -1132,9 +1153,30 @@ void TcpAgent::opencwnd()
 	} else {
 		/* linear */
 		double f;
+
+		//If enable LLDCT
+		if(lldct_)
+		{
+            //printf("LLDCT is enabled\n");
+			if(ndatabytes_<=lldct_size_min_)
+				lldct_w_c_=lldct_w_max_;
+			else if(ndatabytes_>=lldct_size_max_)
+				lldct_w_c_=lldct_w_min_;
+			else
+				lldct_w_c_=lldct_w_max_-(ndatabytes_-lldct_size_min_)*(lldct_w_max_-lldct_w_min_)/(lldct_size_max_-lldct_size_min_);
+
+            increase_num_=lldct_w_c_/lldct_w_max_;
+		}
+
 		switch (wnd_option_) {
 		case 0:
-			if (++count_ >= cwnd_) {
+			//If enable LLDCT
+			if(lldct_ && ++count_*lldct_w_c_/lldct_w_max_>=cwnd_)
+			{
+				count_=0;
+				++cwnd_;
+			}
+			else if (++count_ >= cwnd_) {
 				count_ = 0;
 				++cwnd_;
 			}
@@ -1271,6 +1313,22 @@ TcpAgent::slowdown(int how)
 		++ncwndcuts1_;
 	}
 
+	double b=ecnhat_alpha_;
+	//fprintf(stderr,"%d\n",lldct_);
+	//Wei: LLDCT
+	if(lldct_)
+	{
+        if(ndatabytes_<=lldct_size_min_)
+            lldct_w_c_=lldct_w_max_;
+        else if(ndatabytes_>=lldct_size_max_)
+            lldct_w_c_=lldct_w_min_;
+        else
+            lldct_w_c_=lldct_w_max_-(ndatabytes_-lldct_size_min_)*(lldct_w_max_-lldct_w_min_)/(lldct_size_max_-lldct_size_min_);
+
+		b=pow(b,lldct_w_c_);
+		//fprintf(stderr, "LLDCT %f=pow(%f,%f)\n",b,ecnhat_alpha_,lldct_w_c_);
+	}
+
 	//ecnhat_alpha_ = 0.07;
 	// we are in slowstart for sure if cwnd < ssthresh
 	if (cwnd_ < ssthresh_)
@@ -1324,8 +1382,9 @@ TcpAgent::slowdown(int how)
 			ssthresh_ = (int) decreasewin;
 		}
 	else if (how & CLOSE_SSTHRESH_ECNHAT)
-		ssthresh_ = (int) ((1 - ecnhat_alpha_/2.0) * windowd());
-	//ssthresh_ = (int) (windowd() - sqrt(2*windowd())/2.0);
+		ssthresh_ = (int) ((1 - b/2.0) * windowd());
+		//ssthresh_ = (int) ((1 - ecnhat_alpha_/2.0) * windowd());
+		//ssthresh_ = (int) (windowd() - sqrt(2*windowd())/2.0);
         else if (how & THREE_QUARTER_SSTHRESH)
 		if (ssthresh_ < 3*cwnd_/4)
 			ssthresh_  = (int)(3*cwnd_/4);
@@ -1336,8 +1395,13 @@ TcpAgent::slowdown(int how)
 			cwnd_ = halfwin;
 		} else cwnd_ = decreasewin;
         else if (how & CLOSE_CWND_ECNHAT)
-		cwnd_ = (1 - ecnhat_alpha_/2.0) * windowd();
-	//cwnd_ = windowd() - sqrt(2*windowd())/2.0;
+		{
+			cwnd_=(1-b/2.0)*windowd();
+			if (cwnd_ < 1)
+				cwnd_ = 1;
+		}
+		//cwnd_ = (1 - ecnhat_alpha_/2.0) * windowd();
+		//cwnd_ = windowd() - sqrt(2*windowd())/2.0;
 	else if (how & CWND_HALF_WITH_MIN) {
 		// We have not thought about how non-standard TCPs, with
 		// non-standard values of decrease_num_, should respond
@@ -1504,7 +1568,7 @@ void TcpAgent::update_ecnhat_alpha(Packet *pkt)
 		        ecnhat_num_marked += acked_bytes;
 		        ecnhat_beta_ = 1;
 		}
-		if (ackno > ecnhat_recalc_seq) {
+		if (ackno > ecnhat_recalc_seq) { //update roughly per-RTT
 			double temp_alpha;
 			ecnhat_recalc_seq = ecnhat_maxseq;
 			if (ecnhat_total > 0) {
@@ -1518,7 +1582,6 @@ void TcpAgent::update_ecnhat_alpha(Packet *pkt)
 			ecnhat_total = 0;
 		}
 	}
-
 }
 
 
