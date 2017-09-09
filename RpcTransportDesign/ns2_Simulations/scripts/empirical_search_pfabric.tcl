@@ -63,7 +63,6 @@ set flowlog [open [lindex $argv 38] w]
 set pktSize 1460
 #### trace frequency
 set queueSamplingInterval 0.0001
-#set queueSamplingInterval 1
 
 puts "Simulation input:"
 puts "Dynamic Flow - Pareto"
@@ -179,7 +178,7 @@ Queue/DropTail set keep_order_ $keep_order_
 
 Queue/RED set bytes_ false
 Queue/RED set queue_in_bytes_ true
-Queue/RED set mean_pktsize_ [expr $pktSize+40]
+Queue/RED set mean_pktsize_ $pktSize
 Queue/RED set setbit_ true
 Queue/RED set gentle_ false
 Queue/RED set q_weight_ 1.0
@@ -226,7 +225,8 @@ for {set i 0} {$i < $topology_spines} {incr i} {
 ############ Edge links ##############
 for {set i 0} {$i < $S} {incr i} {
     set j [expr $i/$topology_spt]
-    $ns duplex-link $s($i) $n($j) [set link_rate]Gb [expr $host_delay + $mean_link_delay] $switchAlg
+    $ns simplex-link $s($i) $n($j) [set link_rate]Gb [expr 2*$host_delay + $mean_link_delay] $switchAlg
+    $ns simplex-link $n($j) $s($i) [set link_rate]Gb [expr $host_delay] $switchAlg
 }
 
 ############ Core links ##############
@@ -237,8 +237,7 @@ for {set i 0} {$i < $topology_tors} {incr i} {
 }
 
 #############  Agents ################
-set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/1460*1500)]
-#set lambda [expr ($link_rate*$load*1000000000)/($mean_npkts*($pktSize+40)*8.0)]
+set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/2547262*2686844)]
 puts "Arrival: Poisson with inter-arrival [expr 1/$lambda * 1000] ms"
 puts "FlowSize: Pareto with mean = $meanFlowSize, shape = $paretoShape"
 
@@ -246,6 +245,17 @@ puts "Setting up connections ..."; flush stdout
 
 set flow_gen 0
 set flow_fin 0
+
+###############stability metric recording###############
+proc printNumActive {} {
+    global flow_gen flow_fin ns sim_end
+    set tNow [$ns now]
+    puts "## sim time: $tNow, #active flows: [expr $flow_gen-$flow_fin] "
+    set tRecNext [expr $tNow+0.001]
+    if {$flow_gen < $sim_end} {
+        $ns at $tRecNext "printNumActive"
+    }
+}
 
 set init_fid 0
 for {set j 0} {$j < $S } {incr j} {
@@ -267,6 +277,7 @@ for {set j 0} {$j < $S } {incr j} {
         }
 }
 
+$ns at 1 "printNumActive"
 puts "Initial agent creation done";flush stdout
 puts "Simulation started!"
 

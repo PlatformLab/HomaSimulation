@@ -1937,6 +1937,7 @@ FullTcpAgent::recv(Packet *pkt, Handler*)
 			if (flow_remaining_ == 0) {
 			        flags_ |= TF_ACKNOW;
 				flow_remaining_ = -1;
+                Tcl::instance().evalf("%s done_data", this->name());
 			}
 			//printf("flow_remaining after dec = %d\n" , flow_remaining_);
 
@@ -2785,6 +2786,7 @@ step6:
 				if (flow_remaining_ == 0) {
 				      flags_ |= TF_ACKNOW;
 				      flow_remaining_ = -1;
+                      Tcl::instance().evalf("%s done_data", this->name());
 				}
 				//printf("flow_remaining after dec = %d\n" , flow_remaining_);
        			}
@@ -2812,11 +2814,12 @@ step6:
 
 				//printf("flow_remaining before dec = %d\n" , flow_remaining_);
 				if (flow_remaining_ > 0)
-				       flow_remaining_ -= datalen; // Mohammad
+                       flow_remaining_ -= (rcv_nxt_ - rcv_nxt_old_); // Mohammad
 
 				if (flow_remaining_ == 0) {
 				       flags_ |= TF_ACKNOW;
 				       flow_remaining_ = -1;
+                       Tcl::instance().evalf("%s done_data", this->name());
 				}
 
 				//printf("flow_remaining after dec = %d\n" , flow_remaining_);
