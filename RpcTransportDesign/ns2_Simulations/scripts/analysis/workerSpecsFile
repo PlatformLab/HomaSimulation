@@ -1,0 +1,4 @@
+# list of worker machines and cores
+# worker_name   num_available_cores
+
+Avicenna    4

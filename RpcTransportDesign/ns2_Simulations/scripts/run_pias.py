@@ -87,7 +87,7 @@ for prio_num_ in prio_num_arr:
 			sys.exit(0)
 
 		#Directory name: workload_scheme_load_[load]
-		directory_name = 'websearch_%s_%d' % (scheme,int(load_arr[i]*100))
+		directory_name = 'search_%s_%d' % (scheme,int(load_arr[i]*100))
 		directory_name = directory_name.lower()
 		#Simulation command
 		cmd = ns_path+' '+sim_script+' '\
@@ -131,8 +131,8 @@ for prio_num_ in prio_num_arr:
 			+str(topology_x)+' '\
 			+str('./'+directory_name+'/flow.tr')+'  >'\
 			+str('./'+directory_name+'/logFile.tr')
-                print cmd
-		#q.put([cmd, directory_name])
+                #print cmd
+		q.put([cmd, directory_name])
 
 #Create all worker threads
 threads = []

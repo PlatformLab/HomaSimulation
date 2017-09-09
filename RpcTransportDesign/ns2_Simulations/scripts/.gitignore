@@ -1,3 +1,8 @@
 #stop tracking all subfolders under this directory
 */
+**/*.txt
 !originalPias/
+analysis/
+!analysis/workerSpecsFile
+!analysis/ns2FlowTraces
+!analysis/outputParser.py
