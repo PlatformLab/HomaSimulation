@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-This script reads pfabric simulation output file, flow.tr, and calculates
+This script reads pias simulation output file, flow.tr, and calculates
 stretch statistics for different message size ranges from the information
 provided in the flow.tr.
 """
@@ -323,7 +323,7 @@ def getMinMct_simplified(txStart, firstPkt, totalBytes, sendrIntIp, recvrIntIp):
 
 def workerProcessResultFile(flowFile, outputDir, semaphore):
     """
-    process result file from pfabric simulation, compute stretch for different
+    process result file from pias simulation, compute stretch for different
     ranges of message sizes, and record statistics measures of stretch in output
     files.
     """
@@ -341,6 +341,10 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
     B = 0.0
     sumBytes = dict()
     sumStretch = 0.0
+
+    sumStretchShort = 0.0
+    sumLatencyShort = 0.0
+    nShort = 0.0
     for line in fd :
         words = line.split()
         try:
@@ -365,6 +369,10 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
         #    0, mesgPkts[0], sum(mesgPkts), srcIp, destIp)
         stretch = mct/minMct
         sumStretch += stretch
+        if mesgBytes <= 100000:
+            nShort += 1
+            sumStretchShort += stretch
+            sumLatencyShort += mct
         msgrangeInd = bisect.bisect_left(ranges, mesgBytes)
         msgrange = 'inf' if msgrangeInd==len(ranges) else ranges[msgrangeInd]
 
@@ -389,19 +397,19 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
         sizePerc = n / N * 100
         bytesPerc = sumBytes[msgrange] / B * 100
         recordLine = '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t'\
-            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format('pfabric', loadFactor,
+            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format('pias', loadFactor,
             workload, msgrange, sizePerc, bytesPerc, unschedBytes,
             mean(stretch), 'NA', 'NA')
         recordLines.append(recordLine)
 
         recordLine = '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t'\
-            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format('pfabric', loadFactor,
+            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format('pias', loadFactor,
             workload, msgrange, sizePerc, bytesPerc, unschedBytes, 'NA',
             stretch[medianInd], 'NA')
         recordLines.append(recordLine)
 
         recordLine = '{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t'\
-            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format( 'pfabric', loadFactor,
+            '{5}\t\t{6}\t\t{7}\t\t{8}\t\t{9}\n'.format( 'pias', loadFactor,
             workload, msgrange, sizePerc, bytesPerc, unschedBytes, 'NA', 'NA',
             stretch[ninety9Ind])
         recordLines.append(recordLine)
@@ -417,8 +425,9 @@ def workerProcessResultFile(flowFile, outputDir, semaphore):
         'StretchVsTransport%d-%s-%.2f.txt'%(numFiles, wltype, loadFactor))
     resultFd = open(resultFile, 'w')
     [resultFd.write(recordLine) for recordLine in recordLines]
-    resultFd.write("## Average Stretch: {0}, Average Size: {1}".format(
-        sumStretch/N, sum(
+    resultFd.write("## Average Stretch: {0}, Average Stretch Short Mesgs: {1},"\
+        " Average Latency Short(us): {2}, Average Size: {3}".format(
+        sumStretch/N, sumStretchShort/nShort, sumLatencyShort/nShort*1e6, sum(
         [sumbytes for msgrange, sumbytes in sumBytes.iteritems()])/N))
     resultFd.flush()
     resultFd.close()

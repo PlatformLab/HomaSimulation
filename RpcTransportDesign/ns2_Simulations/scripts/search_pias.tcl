@@ -4,7 +4,7 @@ set ns [new Simulator]
 puts "Date: [clock format [clock seconds]]"
 set sim_start [clock seconds]
 
-if {$argc != 39} {
+if {$argc != 40} {
     puts "wrong number of arguments $argc"
     exit 0
 }
@@ -17,47 +17,48 @@ set queueSize [lindex $argv 4]
 set load [lindex $argv 5]
 set connections_per_pair [lindex $argv 6]
 set meanFlowSize [lindex $argv 7]
-set paretoShape [lindex $argv 8]
-set flow_cdf [lindex $argv 9]
+set gptp_ratio [lindex $argv 8]
+set paretoShape [lindex $argv 9]
+set flow_cdf [lindex $argv 10]
 
 #### Multipath
-set enableMultiPath [lindex $argv 10]
-set perflowMP [lindex $argv 11]
+set enableMultiPath [lindex $argv 11]
+set perflowMP [lindex $argv 12]
 
 #### Transport settings options
-set sourceAlg [lindex $argv 12] ; # Sack or DCTCP-Sack
-set initWindow [lindex $argv 13]
-set ackRatio [lindex $argv 14]
-set slowstartrestart [lindex $argv 15]
-set DCTCP_g [lindex $argv 16] ; # DCTCP alpha estimation gain
-set min_rto [lindex $argv 17]
-set prob_cap_ [lindex $argv 18] ; # Threshold of consecutive timeouts to trigger probe mode
+set sourceAlg [lindex $argv 13] ; # Sack or DCTCP-Sack
+set initWindow [lindex $argv 14]
+set ackRatio [lindex $argv 15]
+set slowstartrestart [lindex $argv 16]
+set DCTCP_g [lindex $argv 17] ; # DCTCP alpha estimation gain
+set min_rto [lindex $argv 18]
+set prob_cap_ [lindex $argv 19] ; # Threshold of consecutive timeouts to trigger probe mode
 
 #### Switch side options
-set switchAlg [lindex $argv 19] ; # DropTail (pFabric), RED (DCTCP) or Priority (PIAS)
-set DCTCP_K [lindex $argv 20]
-set drop_prio_ [lindex $argv 21]
-set prio_scheme_ [lindex $argv 22]
-set deque_prio_ [lindex $argv 23]
-set keep_order_ [lindex $argv 24]
-set prio_num_ [lindex $argv 25]
-set ECN_scheme_ [lindex $argv 26]
-set pias_thresh_0 [lindex $argv 27]
-set pias_thresh_1 [lindex $argv 28]
-set pias_thresh_2 [lindex $argv 29]
-set pias_thresh_3 [lindex $argv 30]
-set pias_thresh_4 [lindex $argv 31]
-set pias_thresh_5 [lindex $argv 32]
-set pias_thresh_6 [lindex $argv 33]
+set switchAlg [lindex $argv 20] ; # DropTail (pFabric), RED (DCTCP) or Priority (PIAS)
+set DCTCP_K [lindex $argv 21]
+set drop_prio_ [lindex $argv 22]
+set prio_scheme_ [lindex $argv 23]
+set deque_prio_ [lindex $argv 24]
+set keep_order_ [lindex $argv 25]
+set prio_num_ [lindex $argv 26]
+set ECN_scheme_ [lindex $argv 27]
+set pias_thresh_0 [lindex $argv 28]
+set pias_thresh_1 [lindex $argv 29]
+set pias_thresh_2 [lindex $argv 30]
+set pias_thresh_3 [lindex $argv 31]
+set pias_thresh_4 [lindex $argv 32]
+set pias_thresh_5 [lindex $argv 33]
+set pias_thresh_6 [lindex $argv 34]
 
 #### topology
-set topology_spt [lindex $argv 34]
-set topology_tors [lindex $argv 35]
-set topology_spines [lindex $argv 36]
-set topology_x [lindex $argv 37]
+set topology_spt [lindex $argv 35]
+set topology_tors [lindex $argv 36]
+set topology_spines [lindex $argv 37]
+set topology_x [lindex $argv 38]
 
 ### result file
-set flowlog [open [lindex $argv 38] w]
+set flowlog [open [lindex $argv 39] w]
 
 #### Packet size is in bytes.
 set pktSize 1460
@@ -237,7 +238,7 @@ for {set i 0} {$i < $topology_tors} {incr i} {
 }
 
 #############  Agents ################
-set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/2547262*2686844)]
+set lambda [expr ($link_rate*$load*1000000000)/($meanFlowSize*8.0/$gptp_ratio)]
 puts "Arrival: Poisson with inter-arrival [expr 1/$lambda * 1000] ms"
 puts "FlowSize: Pareto with mean = $meanFlowSize, shape = $paretoShape"
 

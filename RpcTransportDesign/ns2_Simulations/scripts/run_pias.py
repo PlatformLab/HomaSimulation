@@ -1,6 +1,7 @@
 import threading
 import os
 import Queue
+import time 
 
 def worker():
 	while True:
@@ -9,7 +10,7 @@ def worker():
 		except Queue.Empty:
 			return
 		#Make directory to save results
-		os.system('mkdir '+j[1])
+		os.system('mkdir -p '+j[1])
 		os.system(j[0])
 
 q = Queue.Queue()
@@ -23,6 +24,8 @@ queueSize = 240
 load_arr = [0.8, 0.5]
 connections_per_pair = 10
 meanFlowSize = 1745 * 1460 
+gptp_ratio = 2547262.0/2686844.0 # ratio of goodput over throughput. Throughput
+                                 # will include pkt headers and acks
 paretoShape = 1
 flow_cdf = 'CDF_search.tcl'
 
@@ -35,7 +38,7 @@ initWindow = 70
 ackRatio = 1
 slowstartrestart = 'true'
 DCTCP_g = 0.0625
-min_rto = 0.0002
+min_rto = 0.002
 prob_cap_ = 5
 
 switchAlg = 'Priority'
@@ -67,14 +70,16 @@ topology_tors = 9
 topology_spines = 4
 topology_x = 1
 
-ns_path = '/home/neverhood/Research/RpcTransportDesign/ns2_Simulations/ns-allinone-2.34/bin/ns'
-sim_script = 'empirical_search_pfabric.tcl'
+ns_path = '/home/neverhood/Research/RpcTransportDesign/'\
+    'ns2_Simulations/ns-allinone-2.34/bin/ns'
+sim_script = 'search_pias.tcl'
 
 for prio_num_ in prio_num_arr:
 	for i in range(len(load_arr)):
 
 		scheme = 'unknown'
-		if switchAlg == 'Priority' and prio_num_ > 1 and sourceAlg == 'DCTCP-Sack':
+		if switchAlg == 'Priority' and prio_num_ > 1 and\
+                            sourceAlg == 'DCTCP-Sack':
 			scheme = 'pias'
 		elif switchAlg == 'Priority' and prio_num_ == 1:
 			if sourceAlg == 'DCTCP-Sack':
@@ -89,6 +94,11 @@ for prio_num_ in prio_num_arr:
 		#Directory name: workload_scheme_load_[load]
 		directory_name = 'search_%s_%d' % (scheme,int(load_arr[i]*100))
 		directory_name = directory_name.lower()
+                localtime = time.localtime()
+                directory_name = 'traces'+ '/' + '%.4d%.2d%.2d_%.2d%.2d' % (
+                    localtime.tm_year, localtime.tm_mon, localtime.tm_mday, 
+                    localtime.tm_hour,localtime.tm_min) + '/' + directory_name
+
 		#Simulation command
 		cmd = ns_path+' '+sim_script+' '\
 			+str(sim_end)+' '\
@@ -99,6 +109,7 @@ for prio_num_ in prio_num_arr:
 			+str(load_arr[i])+' '\
 			+str(connections_per_pair)+' '\
 			+str(meanFlowSize)+' '\
+			+str(gptp_ratio)+' '\
 			+str(paretoShape)+' '\
 			+str(flow_cdf)+' '\
 			+str(enableMultiPath)+' '\
@@ -131,7 +142,7 @@ for prio_num_ in prio_num_arr:
 			+str(topology_x)+' '\
 			+str('./'+directory_name+'/flow.tr')+'  >'\
 			+str('./'+directory_name+'/logFile.tr')
-                #print cmd
+                print cmd
 		q.put([cmd, directory_name])
 
 #Create all worker threads
