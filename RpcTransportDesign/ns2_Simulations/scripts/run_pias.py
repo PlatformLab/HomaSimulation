@@ -19,7 +19,7 @@ sim_end = 100000
 link_rate = 10
 mean_link_delay = 0.000000250
 host_delay = 0.0000005
-queueSize = 240
+queueSize = 150
 #load_arr = [0.9, 0.8, 0.7, 0.6, 0.5]
 load_arr = [0.8, 0.5]
 connections_per_pair = 10
@@ -34,15 +34,15 @@ perflowMP = 0
 
 sourceAlg = 'DCTCP-Sack'
 #sourceAlg='LLDCT-Sack'
-initWindow = 70
+initWindow = 7
 ackRatio = 1
 slowstartrestart = 'true'
 DCTCP_g = 0.0625
-min_rto = 0.002
+min_rto = 0.000200
 prob_cap_ = 5
 
 switchAlg = 'Priority'
-DCTCP_K = 65.0
+DCTCP_K = 15
 drop_prio_ = 'true'
 prio_scheme_ = 2
 deque_prio_ = 'true'
