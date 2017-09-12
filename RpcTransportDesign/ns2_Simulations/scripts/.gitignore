@@ -1,6 +1,7 @@
 #stop tracking all subfolders under this directory
 */
 **/*.txt
+**/*.pyc
 !originalPias/
 analysis/
 !analysis/workerSpecsFile
