@@ -11,8 +11,8 @@ lf = 0.5
 lambdaIn = lf*rate
 mu = rate
 K = 8
-learnRate = 0.01
-thetas_init = [0.8]
+learnRate = 1
+thetas_init = [0.75]
 for i in range(K-1):
     thetas_init.append((1-sum(thetas_init))/3)
 
@@ -113,9 +113,11 @@ def lambdas(thetas, cdfInvSumThetas):
     global weightedBytes
     allLambdas = []
     prevInv = 0.0
+    sumThetas = 0.0
     for i, theta in enumerate(thetas):
         inv = cdfInvSumThetas[i]
-        lamda = theta * (inv - prevInv)
+        lamda = (1 - sumThetas) * (inv - prevInv)
+        sumThetas += theta
         prevInv = inv
         allLambdas.append(lamda)
     weightedBytes = sum(allLambdas)
@@ -134,12 +136,11 @@ def lambdaPrime(m, n, thetas, cdfInvSumThetas):
     t = [0.0] + thetas
     cdfInv = [0.0] + cdfInvSumThetas
     if m == n:
-        ret = (cdfInv[m] - cdfInv[m-1]) + divide(t[m], getPdf(cdfInv[m]))
-        return ret * lambdaIn / weightedBytes
+        ret = (1 - sum(t[0:m])) * divide(1, getPdf(cdfInv[m]))
     else:
-        ret = t[m] * divide(1, getPdf(cdfInv[m])) - \
-            t[m] * divide(1, getPdf(cdfInv[m-1]))
-        return ret * lambdaIn / weightedBytes
+        ret = (1 - sum(t[0:m])) * (divide(1, getPdf(cdfInv[m])) -\
+            divide(1, getPdf(cdfInv[m-1]))) - (cdfInv[m] - cdfInv[m-1])
+    return ret * lambdaIn / weightedBytes
 
 def gradient(n, thetas, cdfInvSumThetas, allLambdas):
     """
@@ -177,7 +178,7 @@ def tau(thetas, allLambdas):
     return tau_
 
 def main():
-    iters = 1000
+    iters = 1000000
     thetas = thetas_init
 
     alphas = cdfInvOfSumThetas(thetas)
@@ -202,8 +203,8 @@ def main():
         thetas = [thetas[i] - learnRate * gradients[i] for i in range(K)]
         for i in range(K):
             thetas[i] = max(thetas[i], 0)
-        thetas[-1] = max(1 - sum(thetas[0:-1]), 0)
-        #thetas = [theta/sum(thetas) for theta in thetas]
+        #thetas[-1] = max(1 - sum(thetas[0:-1]), 0)
+        thetas = [theta/sum(thetas) for theta in thetas]
 
 
     print thetas
@@ -214,10 +215,12 @@ def main():
     thetasOpt = []
     prevAlphaCdf = 0.0
     for alpha in alphasOpt:
+        alpha = alpha/1460*1442
         alphaCdf = getCdf(alpha)
         thetasOpt.append(alphaCdf - prevAlphaCdf)
         prevAlphaCdf = alphaCdf
     thetasOpt.append(1-alphaCdf)
+    print "-"*100
     print "optimum thetas:"
     print thetasOpt
     print "optimum tau:"
