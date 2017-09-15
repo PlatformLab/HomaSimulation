@@ -4,56 +4,69 @@ from numpy import *
 
 #cdfFile = 'originalPias/CDF_dctcp.tcl'
 cdfFile = 'CDF_search.tcl'
+#cdfFile = 'FacebookKeyValueMsgSizeDist.tcl'
 #avgFlowSize = 1744.70*1442.0 #in bytes
 #rate = 1e10/8.0/avgFlowSize # in flows per seconds
-rate = 1e10/8.0 # in bytes per seconds
+rate = 1e6/8.0 # in bytes per seconds
 lf = 0.5
 lambdaIn = lf*rate
 mu = rate
 K = 8
-learnRate = 1
-thetas_init = [0.75]
+learnRate = .1
+thetas_init = [0.8]
 for i in range(K-1):
-    thetas_init.append((1-sum(thetas_init))/3)
+    thetas_init.append((1-sum(thetas_init))/2)
 
 thetas_init[-1] = 1-sum(thetas_init[0:-1])
 #thetas_init = [1.0/8.0]*8
 
 alphasOpt = [1059*1460, 1412*1460, 1643*1460, 1869*1460,\
     2008*1460, 2115*1460, 2184*1460]
+#alphasOpt =[909*1460 ,1329*1460 ,1648*1460 ,1960*1460 ,\
+#    2143*1460 ,2337*1460 ,2484*1460]
 
-cdfFileFd = open(cdfFile)
-cdf = [[0.0], [0.0]]
-pdf = [[0.0], [0.0]] # = derivative of cdf = dF/d(size)
-cdfInverse = [[0.0], [0.0]]
-prevProb = 0.0
-prevSize = 0.0
-for line in cdfFileFd:
-    elem = line.split()
-    if elem == []:
-        continue
-    size = float(elem[0])
-    #size /= 1442.0
-    #size *= 1460.0
-    prob = float(elem[2])
-    if prob == prevProb:
-        continue
-    cdf[0].append(size)
-    cdf[1].append(prob)
-    cdfInverse[0].append(prob)
-    cdfInverse[1].append(size)
-    pdf[0].append(size)
-    pdf[1].append((prob-prevProb) / (size-prevSize))
-    prevProb = prob
-    prevSize = size
 
-cdfFileFd.close()
-
+cdf = list()
+pdf = list()
+cdfInverse = list()
 weightedBytes = 1.0
-#lastSize = pdf[0][0]
-#for (size,prob) in zip(pdf[0][1:], pdf[1][1:]):
-#    weightedBytes += 0.5 * (size**2 - lastSize**2) * prob
-#    lastSize = size
+
+def readCdfFile(cdfFile):
+    global cdf
+    global pdf
+    global cdfInverse
+    global weightedBytes
+    cdfFileFd = open(cdfFile)
+    cdf = [[0.0], [0.0]]
+    pdf = [[0.0], [0.0]] # = derivative of cdf = dF/d(size)
+    cdfInverse = [[0.0], [0.0]]
+    prevProb = 0.0
+    prevSize = 0.0
+    for line in cdfFileFd:
+        elem = line.split()
+        if elem == []:
+            continue
+        size = float(elem[0])
+        #size /= 1442.0
+        #size *= 1460.0
+        prob = float(elem[2])
+        if prob == prevProb:
+            continue
+        cdf[0].append(size)
+        cdf[1].append(prob)
+        cdfInverse[0].append(prob)
+        cdfInverse[1].append(size)
+        pdf[0].append(size)
+        pdf[1].append((prob-prevProb) / (size-prevSize))
+        prevProb = prob
+        prevSize = size
+
+    cdfFileFd.close()
+
+    #lastSize = pdf[0][0]
+    #for (size,prob) in zip(pdf[0][1:], pdf[1][1:]):
+    #    weightedBytes += 0.5 * (size**2 - lastSize**2) * prob
+    #    lastSize = size
 
 def getCdf(size):
     sizes = cdf[0]
@@ -62,7 +75,7 @@ def getCdf(size):
     if index==len(sizes):
         return probs[index-1]
     if index == 0:
-        return probs[0] 
+        return probs[0]
     return probs[index-1] +  (size - sizes[index-1]) * (probs[index] -\
         probs[index-1]) / (sizes[index] - sizes[index-1])
 
@@ -88,7 +101,7 @@ def getCdfPrime(size):
     if index==len(sizes):
         return probs[index-1]
     if index == 0:
-        return probs[0] 
+        return probs[0]
     return probs[index-1] +  (size - sizes[index-1]) * (probs[index] -\
         probs[index-1]) / (sizes[index] - sizes[index-1])
 
@@ -177,7 +190,31 @@ def tau(thetas, allLambdas):
         tau_ += subTau * thetas[l-1]
     return tau_
 
+def tau_2ndForm(thetas):
+    allLambdas = lambdas(thetas, cdfInvOfSumThetas(thetas))
+    sumT = 0.0
+    for l in range(1, K+1):
+        t = 1.0 / (mu - sum(allLambdas[0:l]))
+        t *= (1 - sum(thetas[0:l-1]))
+        sumT += t
+    return sumT
+
+def test(thetas):
+    """
+    this test enforces the constraint of sum(thetas) == 1 using the algorithm
+    given in paper: "Projection onto the probability simplex"
+    """
+    #thetas[-1] = max(1 - sum(thetas[0:-1]), 0)
+    #thetas = [theta/sum(thetas) for theta in thetas]
+    U = sorted(thetas)
+    rho = max([j+1 for j,u in enumerate(U) if (u + (1-sum(U[0:j+1]))/(j+1)) > 0])
+    lamda = (1 - sum(U[0:rho]))/rho
+    thetas = [max(theta+lamda, 0) for theta in thetas]
+    return thetas
+
+
 def main():
+    readCdfFile(cdfFile)
     iters = 1000000
     thetas = thetas_init
 
@@ -203,10 +240,12 @@ def main():
         thetas = [thetas[i] - learnRate * gradients[i] for i in range(K)]
         for i in range(K):
             thetas[i] = max(thetas[i], 0)
-        #thetas[-1] = max(1 - sum(thetas[0:-1]), 0)
-        thetas = [theta/sum(thetas) for theta in thetas]
+
+        thetas = test(thetas)
 
 
+    #print tau_2ndForm(thetas)
+    print tau(thetas, lambdas(thetas, cdfInvOfSumThetas(thetas)))
     print thetas
     alphas = cdfInvOfSumThetas(thetas)
     print alphas
@@ -219,6 +258,7 @@ def main():
         alphaCdf = getCdf(alpha)
         thetasOpt.append(alphaCdf - prevAlphaCdf)
         prevAlphaCdf = alphaCdf
+
     thetasOpt.append(1-alphaCdf)
     print "-"*100
     print "optimum thetas:"
