@@ -776,7 +776,6 @@ Agent_Aggr_pair instproc start_notify {} {
 proc finish {} {
     global ns flowlog
     global sim_start
-    global enableNAM namfile
 
     $ns flush-trace
     close $flowlog
@@ -785,9 +784,5 @@ proc finish {} {
     puts "Simulation Finished!"
     puts "Time [expr $t - $sim_start] sec"
     #puts "Date [clock format [clock seconds]]"
-    if {$enableNAM != 0} {
-	close $namfile
-	exec nam out.nam &
-    }
     exit 0
 }
