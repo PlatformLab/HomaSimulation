@@ -1,8 +1,11 @@
-sim_end = 1000000
+import os
+import sys
+
+sim_end = 20000000
 link_rate = 10
 mean_link_delay = 0.000000250
 host_delay = 0.0000005
-queueSize = 150
+queueSize = 250
 #load_arr = [0.9, 0.8, 0.7, 0.6, 0.5]
 load_arr = [0.8, 0.5]
 connections_per_pair = 10
@@ -46,8 +49,8 @@ topology_tors = 9
 topology_spines = 4
 topology_x = 1
 
-ns_path = '/home/neverhood/Research/RpcTransportDesign/'\
-    'ns2_Simulations/ns-allinone-2.34/bin/ns'
+ns_path = os.environ['HOME'] +\
+    '/Research/RpcTransportDesign/ns2_Simulations/ns-allinone-2.34/bin/ns'
 sim_script = 'search_pias.tcl'
 workloadName = 'googlerpc'
 

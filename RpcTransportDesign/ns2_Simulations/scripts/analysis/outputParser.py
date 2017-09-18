@@ -43,8 +43,9 @@ isFabricCutThrough = False
 twoWayStretch = False # if true, stretch is computed by completion at sender
 unschedBytes = 10000
 # directory under which output files of this script will be stored
-targetDir = '/home/neverhood/Research/RpcTransportDesign/'\
-    'ns2_Simulations/scripts/analysis'
+
+targetDir = os.environ['HOME'] +\
+    '/Research/RpcTransportDesign/ns2_Simulations/scripts/analysis'
 
 rangesDic = {\
     "FABRICATED_HEAVY_MIDDLE" : [51, 52, 53, 54, 55, 56, 57, 58, 59, 60,\
