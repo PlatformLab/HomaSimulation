@@ -2,22 +2,23 @@ import bisect
 import sys
 import os
 from numpy import *
+import time
+from multiprocessing import Process, Queue
 
 sys.path.insert(0, os.environ['HOME'] +\
     '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
 from parseResultFiles import *
 
-rate = 1e6/8.0 # in bytes per seconds
+rate = 1e5/8.0 # in bytes per seconds
 mu = rate
 K = 8
 
 conf = AttrDict()
 conf.lf = [0.5, 0.8]
 conf.lambdaIn = [lf*rate for lf in conf.lf]
-conf.cdfFile = ['FacebookKeyValueMsgSizeDist.tcl','Google_AllRPC.tcl',
-    'Google_SearchRPC.tcl', 'Facebook_HadoopDist_All.tcl',
-    'CDF_search.tcl']
-conf.learnRate = [.1,.1,.1,.1,.1] #one for each cdfFile
+conf.cdfFile = ['FacebookKeyValueMsgSizeDist.tcl', 'Google_SearchRPC.tcl',
+    'Google_AllRPC.tcl', 'Facebook_HadoopDist_All.tcl', 'CDF_search.tcl']
+conf.learnRate = [.01,.001,.01,.1,.1] #one for each cdfFile
 conf.thetas_init = [] # one for cdfFile
 
 def geometricThetaInit(start, expStep):
@@ -28,12 +29,13 @@ def geometricThetaInit(start, expStep):
     return thetas_init
 
 #thetas_init = [1.0/8.0]*8
-conf.thetas_init.extend([geometricThetaInit(0.8, 4.0)]*5)
+conf.thetas_init.extend([geometricThetaInit(0.75, 2.0)]*5)
 
-alphasOpt = [1059*1460, 1412*1460, 1643*1460, 1869*1460,\
+# values for CDF_search.tcl workload from pias github repository
+alphasOpt_50 = [1059*1460, 1412*1460, 1643*1460, 1869*1460,\
     2008*1460, 2115*1460, 2184*1460]
-#alphasOpt =[909*1460 ,1329*1460 ,1648*1460 ,1960*1460 ,\
-#    2143*1460 ,2337*1460 ,2484*1460]
+alphasOpt_80 =[909*1460 ,1329*1460 ,1648*1460 ,1960*1460 ,\
+    2143*1460 ,2337*1460 ,2484*1460]
 
 
 cdf = list()
@@ -46,7 +48,7 @@ def readCdfFile(cdfFile):
     global pdf
     global cdfInverse
     global weightedBytes
-    cdfFileFd = open(cdfFile)
+    cdfFileFd = open(cdfFile, 'r')
     cdf = [[0.0], [0.0]]
     pdf = [[0.0], [0.0]] # = derivative of cdf = dF/d(size)
     cdfInverse = [[0.0], [0.0]]
@@ -223,18 +225,10 @@ def test(thetas):
     return thetas
 
 
-def main(lambdaIn, cdfFile, learnRate, thetas_init):
+def main(lambdaIn, cdfFile, learnRate, thetas_init, outQueue=''):
     readCdfFile(cdfFile)
-    iters = 100000
+    iters = 20000
     thetas = thetas_init
-
-    alphas = cdfInvOfSumThetas(thetas)
-    print "initial thetas:"
-    print thetas_init
-    print "initial alphas:"
-    print alphas
-    print [alpha/1442 for alpha in alphas]
-    print"\n"
 
     for it in range(iters):
         cdfInvSumThetas = cdfInvOfSumThetas(thetas)
@@ -242,8 +236,9 @@ def main(lambdaIn, cdfFile, learnRate, thetas_init):
 
         allLambdas = lambdas(thetas, cdfInvSumThetas, lambdaIn)
         #print allLambdas
-        if it % 100 == 0:
-            print 'tau: {0} at iter: {1}'.format(tau(thetas, allLambdas), it)
+        #if it % 100 == 0:
+        #    print 'tau: {0} at iter: {1}, procId: {2}'.format(tau(thetas,
+        #        allLambdas), it, os.getpid())
 
         gradients = []
         for n in range(1,K+1):
@@ -259,39 +254,138 @@ def main(lambdaIn, cdfFile, learnRate, thetas_init):
 
     #allLambdas = lambdas(thetas, cdfInvOfSumThetas(thetas), lambdaIn)
     #print tau_2ndForm(thetas)
-    print "-"*100
-    print "computed thetas:"
-    print thetas
-    print "computed alphas:"
-    alphas = cdfInvOfSumThetas(thetas)
-    print alphas
-    print [alpha/1442 for alpha in alphas]
-    print "computed tau:"
-    print tau(thetas, lambdas(thetas, cdfInvOfSumThetas(thetas), lambdaIn))
+    tau_ = tau(thetas, allLambdas)
+
+    if lambdaIn <= rate*.65:
+        alphasOpt = alphasOpt_50
+    else:
+        alphasOpt = alphasOpt_80
 
     thetasOpt = []
     prevAlphaCdf = 0.0
+    readCdfFile('CDF_search.tcl')
     for alpha in alphasOpt:
         alpha = alpha/1460*1442
         alphaCdf = getCdf(alpha)
         thetasOpt.append(alphaCdf - prevAlphaCdf)
         prevAlphaCdf = alphaCdf
-
     thetasOpt.append(1-alphaCdf)
-    print "-"*100
-    print "optimum thetas:"
-    print thetasOpt
-    print "optimum alphas:"
-    alphas = cdfInvOfSumThetas(thetasOpt)
-    print alphas
-    print [alpha/1442 for alpha in alphas]
-    print "optimum tau:"
-    print tau(thetasOpt, lambdas(thetasOpt, cdfInvOfSumThetas(thetasOpt),
-        lambdaIn))
+    readCdfFile(cdfFile)
+    tauOpt_ = tau(thetasOpt, lambdas(thetasOpt, cdfInvOfSumThetas(thetasOpt),
+            lambdaIn))
+ 
+    if outQueue == '':
+        print "-"*100
+        alphas = cdfInvOfSumThetas(thetas_init)
+        print "initial thetas:"
+        print thetas_init
+        print "initial alphas:"
+        print alphas
+        print [alpha/1442 for alpha in alphas]
+
+        print "-"*100
+        print "computed thetas:"
+        print thetas
+        print "computed alphas:"
+        alphas = cdfInvOfSumThetas(thetas)
+        print alphas
+        print [alpha/1442 for alpha in alphas]
+        print "computed tau:"
+        print tau(thetas, lambdas(thetas, cdfInvOfSumThetas(thetas), lambdaIn))
+
+        print "-"*100
+        print "optimum thetas:"
+        print thetasOpt
+        print "optimum alphas:"
+        alphasOpt = cdfInvOfSumThetas(thetasOpt)
+        print alphasOpt
+        print [alpha/1442 for alpha in alphasOpt]
+        print "optimum tau:"
+        print tau(thetasOpt, lambdas(thetasOpt, cdfInvOfSumThetas(thetasOpt),
+            lambdaIn))
+    else:
+        #assert(isinstance(outQueue, Queue))
+        alphas = cdfInvOfSumThetas(thetas)
+        outQueue.put((cdfFile, lambdaIn/rate, alphas, tau_, tauOpt_))
+
+def worker(qMainArgs, qOut):
+    while not(qMainArgs.empty()):
+        mainArgs = qMainArgs.get(block = 0)
+        lambdaIn = mainArgs[0]
+        cdfFile = mainArgs[1]
+        learnRate = mainArgs[2]
+        thetas_init = mainArgs[3]
+        main(lambdaIn, cdfFile, learnRate, thetas_init, qOut)
+
+    return
 
 if __name__ == '__main__':
-   lambdaIn = conf.lambdaIn[0]
-   cdfFile = conf.cdfFile[4]
-   learnRate = conf.learnRate[4]
-   thetas_init = conf.thetas_init[4]
-   sys.exit(main(lambdaIn, cdfFile, learnRate, thetas_init))
+    parser = OptionParser(description='This script runs gradient descent'
+        'optimizer to compute pias optimal thresholds.')
+    parser.add_option('--mode', metavar='master/slave',
+        default = '', dest='mode', type='string',
+        help='master modes one specific run, slave mode spawns many threads'
+        ' and run many simulations at onces')
+    parser.add_option('--lf', metavar= '0.5', default = 0.5, dest='lf',
+        type='float', help='The average load factor of the network.')
+    parser.add_option('--cdfFile', metavar= "FILENAME", dest='cdfFile',
+        default = "CDF_search.tcl", type='string',
+        help='Name of the file containing distribution of mesg/flow size'
+        ' for which we compute pias thresholds.')
+    parser.add_option('--lr', metavar= '0.1', default = 0.1, dest='lr',
+        type='float', help='The learning rate in gradient-descnet methods.')
+    parser.add_option('--thetas_init', metavar= '0.1,0.2,..,0.01', default =
+        '1,1,1,1,1,1,1,1', dest='thetas_init', type='string',
+        help='a string of 8 comma separated numbers to be used for initial '
+        'point of thetas in gradient descent. If sum of the numbers is not '
+        'one, the number will be normalized to their sum.')
+    options, args = parser.parse_args()
+
+    if options.mode == 'master':
+        #will contain output of python processes that run main()
+        qArgs = Queue()
+        for lambdaIn in conf.lambdaIn:
+            for i,cdfFile in enumerate(conf.cdfFile):
+                qArgs.put((lambdaIn, cdfFile, conf.learnRate[i],
+                    conf.thetas_init[i]))
+
+        #Create all worker processes
+        procs = []
+        number_worker_procs = 4
+
+        #Start to process jobs
+        qOut = Queue()
+        for i in range(number_worker_procs):
+            p = Process(target = worker, args=(qArgs,qOut,))
+            procs.append(p)
+            p.start()
+            time.sleep(1)
+
+        #Join all completed processes
+        for p in procs:
+            p.join()
+
+        while not(qOut.empty()):
+            out = qOut.get()
+            print 'cdf: {0}, load: {1}'.format(out[0], out[1])
+            print '\talphas:' + str(out[2])
+            print '\ttau:' + str(out[3])
+            print '\ttauOpt:' + str(out[4])
+            print "-"*100
+        sys.exit()
+
+    if options.mode == 'slave':
+        lambdaIn = options.lf * rate
+        cdfFile = options.cdfFile
+        learnRate = options.lr
+        thetas_init = [float(theta) for theta in options.thetas_init.split(',')]
+        thetas_init = [theta/sum(thetas_init) for theta in thetas_init]
+        sys.exit(main(lambdaIn, cdfFile, learnRate, thetas_init))
+
+    else:
+        lambdaIn = conf.lambdaIn[1]
+        i=4
+        cdfFile = conf.cdfFile[i]
+        learnRate = conf.learnRate[i]
+        thetas_init = conf.thetas_init[i]
+        sys.exit(main(lambdaIn, cdfFile, learnRate, thetas_init))
