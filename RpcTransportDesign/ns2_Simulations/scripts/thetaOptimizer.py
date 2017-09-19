@@ -3,8 +3,10 @@ from scipy.optimize import basinhopping
 import numpy as np
 from thresholdOptimizer import *
 
-
+readCdfFile("CDF_search.tcl")
 rho = 0.5
+
+"""
 def tauZigon(thetas):
     sumTaus = 0.0
     for l in range(0, len(thetas)):
@@ -42,22 +44,23 @@ thetas.append(1-sum(thetas))
 alphas = cdfInvOfSumThetas(thetas)
 print alphas
 print [alpha/1442 for alpha in alphas]
+"""
 
 
 minimizer_kwargs = {"method":"L-BFGS-B"}
 K = 8
-thetas_init = [0.5]
+thetas_init = [0.8]
 for i in range(K-1):
     thetas_init.append((1-sum(thetas_init))/2)
 
 thetas_init[-1] = 1-sum(thetas_init[0:-1])
 
 def tau_2(thetas):
-    allLambdas = lambdas(thetas, cdfInvOfSumThetas(thetas)) 
+    allLambdas = lambdas(thetas, cdfInvOfSumThetas(thetas))
     sumT = 0.0
-    for l in range(K):
+    for l in range(1, K+1):
         t = 1.0 / (mu - sum(allLambdas[0:l]))
-        t *= sum(thetas[l-1:K])
+        t *= (1 - sum(thetas[0:l-1]))
         sumT += t
     return sumT
 
@@ -67,11 +70,11 @@ class HisBounds(object):
     def __call__(self, **kwargs):
         x = kwargs["x_new"]
         tmin = bool(np.all(x >= self.xmin))
-        return tmin and (sum(x) == 1.0)
+        return tmin and (sum(x[0:K-1]) < 1.0)
 
 hisbounds = HisBounds()
 ret = basinhopping(tau_2, thetas_init,
-    minimizer_kwargs=minimizer_kwargs, niter=200000,
+    minimizer_kwargs=minimizer_kwargs, niter=20000,
     accept_test=hisbounds)
 
 print ret.x

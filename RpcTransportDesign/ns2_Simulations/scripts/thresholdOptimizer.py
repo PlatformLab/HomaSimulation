@@ -18,7 +18,7 @@ conf.lf = [0.5, 0.8]
 conf.lambdaIn = [lf*rate for lf in conf.lf]
 conf.cdfFile = ['FacebookKeyValueMsgSizeDist.tcl', 'Google_SearchRPC.tcl',
     'Google_AllRPC.tcl', 'Facebook_HadoopDist_All.tcl', 'CDF_search.tcl']
-conf.learnRate = [.01,.001,.01,.1,.1] #one for each cdfFile
+conf.learnRate = [.001,.001,.01,.1,.1] #one for each cdfFile
 conf.thetas_init = [] # one for cdfFile
 
 def geometricThetaInit(start, expStep):
@@ -29,7 +29,7 @@ def geometricThetaInit(start, expStep):
     return thetas_init
 
 #thetas_init = [1.0/8.0]*8
-conf.thetas_init.extend([geometricThetaInit(0.75, 2.0)]*5)
+conf.thetas_init.extend([geometricThetaInit(0.5, 2.0)]*5)
 
 # values for CDF_search.tcl workload from pias github repository
 alphasOpt_50 = [1059*1460, 1412*1460, 1643*1460, 1869*1460,\
@@ -227,7 +227,7 @@ def test(thetas):
 
 def main(lambdaIn, cdfFile, learnRate, thetas_init, outQueue=''):
     readCdfFile(cdfFile)
-    iters = 20000
+    iters = 5000
     thetas = thetas_init
 
     for it in range(iters):
