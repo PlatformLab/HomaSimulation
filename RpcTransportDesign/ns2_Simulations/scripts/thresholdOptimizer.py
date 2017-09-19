@@ -1,24 +1,34 @@
 import bisect
 import sys
+import os
 from numpy import *
 
-#cdfFile = 'originalPias/CDF_dctcp.tcl'
-cdfFile = 'CDF_search.tcl'
-#cdfFile = 'FacebookKeyValueMsgSizeDist.tcl'
-#avgFlowSize = 1744.70*1442.0 #in bytes
-#rate = 1e10/8.0/avgFlowSize # in flows per seconds
+sys.path.insert(0, os.environ['HOME'] +\
+    '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
+from parseResultFiles import *
+
 rate = 1e6/8.0 # in bytes per seconds
-lf = 0.5
-lambdaIn = lf*rate
 mu = rate
 K = 8
-learnRate = .1
-thetas_init = [0.8]
-for i in range(K-1):
-    thetas_init.append((1-sum(thetas_init))/2)
 
-thetas_init[-1] = 1-sum(thetas_init[0:-1])
+conf = AttrDict()
+conf.lf = [0.5, 0.8]
+conf.lambdaIn = [lf*rate for lf in conf.lf]
+conf.cdfFile = ['FacebookKeyValueMsgSizeDist.tcl','Google_AllRPC.tcl',
+    'Google_SearchRPC.tcl', 'Facebook_HadoopDist_All.tcl',
+    'CDF_search.tcl']
+conf.learnRate = [.1,.1,.1,.1,.1] #one for each cdfFile
+conf.thetas_init = [] # one for cdfFile
+
+def geometricThetaInit(start, expStep):
+    thetas_init = [start]
+    for i in range(K-1):
+        thetas_init.append((1-sum(thetas_init))/expStep)
+    thetas_init[-1] = 1-sum(thetas_init[0:-1])
+    return thetas_init
+
 #thetas_init = [1.0/8.0]*8
+conf.thetas_init.extend([geometricThetaInit(0.8, 4.0)]*5)
 
 alphasOpt = [1059*1460, 1412*1460, 1643*1460, 1869*1460,\
     2008*1460, 2115*1460, 2184*1460]
@@ -122,7 +132,7 @@ def cdfInvOfSumThetas(thetas):
         cdfInvSumThetas.append(inv)
     return cdfInvSumThetas
 
-def lambdas(thetas, cdfInvSumThetas):
+def lambdas(thetas, cdfInvSumThetas, lambdaIn):
     global weightedBytes
     allLambdas = []
     prevInv = 0.0
@@ -138,7 +148,7 @@ def lambdas(thetas, cdfInvSumThetas):
     allLambdas = [lamda*lambdaIn/weightedBytes for lamda in allLambdas]
     return allLambdas
 
-def lambdaPrime(m, n, thetas, cdfInvSumThetas):
+def lambdaPrime(m, n, thetas, cdfInvSumThetas, lambdaIn):
     """
     find the d(lambda_m)/d(theta_n)
     """
@@ -155,7 +165,7 @@ def lambdaPrime(m, n, thetas, cdfInvSumThetas):
             divide(1, getPdf(cdfInv[m-1]))) - (cdfInv[m] - cdfInv[m-1])
     return ret * lambdaIn / weightedBytes
 
-def gradient(n, thetas, cdfInvSumThetas, allLambdas):
+def gradient(n, thetas, cdfInvSumThetas, allLambdas, lambdaIn):
     """
     compute the derivative of the T with respect to the theta_n
     """
@@ -171,7 +181,7 @@ def gradient(n, thetas, cdfInvSumThetas, allLambdas):
             sumLambdaPrimes = 0.0
             for j in range(n, m+1):
                 sumLambdaPrimes += lambdaPrime(j, n,
-                    thetas, cdfInvSumThetas)
+                    thetas, cdfInvSumThetas, lambdaIn)
             sumLambdaPrimes /= denom
             subGradient += sumLambdaPrimes
         gradient += thetas[l-1] * subGradient
@@ -190,8 +200,7 @@ def tau(thetas, allLambdas):
         tau_ += subTau * thetas[l-1]
     return tau_
 
-def tau_2ndForm(thetas):
-    allLambdas = lambdas(thetas, cdfInvOfSumThetas(thetas))
+def tau_2ndForm(thetas, allLambdas):
     sumT = 0.0
     for l in range(1, K+1):
         t = 1.0 / (mu - sum(allLambdas[0:l]))
@@ -207,34 +216,39 @@ def test(thetas):
     #thetas[-1] = max(1 - sum(thetas[0:-1]), 0)
     #thetas = [theta/sum(thetas) for theta in thetas]
     U = sorted(thetas)
-    rho = max([j+1 for j,u in enumerate(U) if (u + (1-sum(U[0:j+1]))/(j+1)) > 0])
+    rho = max([j+1 for j,u in enumerate(U) if
+        (u + (1-sum(U[0:j+1]))/(j+1)) > 0])
     lamda = (1 - sum(U[0:rho]))/rho
     thetas = [max(theta+lamda, 0) for theta in thetas]
     return thetas
 
 
-def main():
+def main(lambdaIn, cdfFile, learnRate, thetas_init):
     readCdfFile(cdfFile)
-    iters = 1000000
+    iters = 100000
     thetas = thetas_init
 
     alphas = cdfInvOfSumThetas(thetas)
+    print "initial thetas:"
+    print thetas_init
+    print "initial alphas:"
     print alphas
     print [alpha/1442 for alpha in alphas]
-    print"\n\n\n"
+    print"\n"
 
     for it in range(iters):
         cdfInvSumThetas = cdfInvOfSumThetas(thetas)
         #print cdfInvSumThetas
 
-        allLambdas = lambdas(thetas, cdfInvSumThetas)
+        allLambdas = lambdas(thetas, cdfInvSumThetas, lambdaIn)
         #print allLambdas
-        #print tau(thetas, allLambdas)
+        if it % 100 == 0:
+            print 'tau: {0} at iter: {1}'.format(tau(thetas, allLambdas), it)
 
         gradients = []
         for n in range(1,K+1):
             gradients.append(gradient(n, thetas, cdfInvSumThetas,
-                allLambdas))
+                allLambdas, lambdaIn))
         #print gradients
 
         thetas = [thetas[i] - learnRate * gradients[i] for i in range(K)]
@@ -243,13 +257,17 @@ def main():
 
         thetas = test(thetas)
 
-
+    #allLambdas = lambdas(thetas, cdfInvOfSumThetas(thetas), lambdaIn)
     #print tau_2ndForm(thetas)
-    print tau(thetas, lambdas(thetas, cdfInvOfSumThetas(thetas)))
+    print "-"*100
+    print "computed thetas:"
     print thetas
+    print "computed alphas:"
     alphas = cdfInvOfSumThetas(thetas)
     print alphas
     print [alpha/1442 for alpha in alphas]
+    print "computed tau:"
+    print tau(thetas, lambdas(thetas, cdfInvOfSumThetas(thetas), lambdaIn))
 
     thetasOpt = []
     prevAlphaCdf = 0.0
@@ -263,8 +281,17 @@ def main():
     print "-"*100
     print "optimum thetas:"
     print thetasOpt
+    print "optimum alphas:"
+    alphas = cdfInvOfSumThetas(thetasOpt)
+    print alphas
+    print [alpha/1442 for alpha in alphas]
     print "optimum tau:"
-    print tau(thetasOpt, lambdas(thetasOpt, cdfInvOfSumThetas(thetasOpt)))
+    print tau(thetasOpt, lambdas(thetasOpt, cdfInvOfSumThetas(thetasOpt),
+        lambdaIn))
 
 if __name__ == '__main__':
-   sys.exit(main());
+   lambdaIn = conf.lambdaIn[0]
+   cdfFile = conf.cdfFile[4]
+   learnRate = conf.learnRate[4]
+   thetas_init = conf.thetas_init[4]
+   sys.exit(main(lambdaIn, cdfFile, learnRate, thetas_init))
