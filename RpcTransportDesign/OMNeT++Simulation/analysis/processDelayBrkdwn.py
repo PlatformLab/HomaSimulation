@@ -13,17 +13,27 @@ def main(resultFile, workload):
     i = 0
     iters = 0
     sumDelays = 0.0
+    baseLatency = 0.0
     for line in f:
-        match = re.match("^=", line) 
+        match = re.match("^=", line)
         if match:
             inGroup = ~inGroup
             i = 0
             if inGroup:
                 #print(sumDelays)
                 sumDelays = 0.0
+                mesgLatency = 0.0
                 iters += 1
+            else:
+                baseLatency += (mesgLatency - sumDelays)
         elif inGroup:
             try:
+                match = re.match(
+                    'delay 99%ile : ([\d.e-]+), mesg size: ([\d]+)', line)
+                if match:
+                    mesgLatency = float(match.group(1))
+                    mesgSize = float(match.group(2))
+                    continue
                 tmp = [float(elem) for elem in \
                     line.rstrip().rstrip(',').split(',')]
             except:
@@ -64,7 +74,7 @@ def main(resultFile, workload):
     printLine(['Workload', 'Location', 'QueueDelay(%)', 'PrmtLag_LargMesg(%)',
         'PrmtLab_ShortMesg(%)', 'QueuedBytes', 'QueuedPkts'])
     locations = ['SwDelay', 'NIC', 'TorUp', 'CoreDown', 'TorDown']
-    for i in range(len(allDelays)): 
+    for i in range(len(allDelays)):
         printLine([workloadType] + [locations[i]] + allDelays[i])
 
     print('='*100)
@@ -76,8 +86,11 @@ def main(resultFile, workload):
                 sumCol[j] += allDelays[i][j]
     printLine(['Sum Delays'] + [elem for elem in sumCol])
 
-    print("\n\nTotal delays(us): " + str(sumDelays))
-    print("Total Samples: " + str(iters))
+    print("\n\n")
+    tl=30
+    print("All delay overhead(us): {0:.3f}".format(sumDelays).ljust(tl) +
+        "Base latency(us): {0:.3f}".format(baseLatency/iters*1e6).center(tl) +
+        "Total Samples: {0}".format(str(iters)).center(tl))
 
 
 if __name__ == '__main__':
