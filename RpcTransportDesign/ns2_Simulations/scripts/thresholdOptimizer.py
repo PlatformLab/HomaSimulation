@@ -4,6 +4,7 @@ import os
 from numpy import *
 import time
 from multiprocessing import Process, Queue
+from pprint import pprint
 
 sys.path.insert(0, os.environ['HOME'] +\
     '/Research/RpcTransportDesign/OMNeT++Simulation/analysis')
@@ -364,7 +365,8 @@ if __name__ == '__main__':
         #Join all completed processes
         for p in procs:
             p.join()
-
+        
+        outPrnt = AttrDict()
         while not(qOut.empty()):
             out = qOut.get()
             print 'cdf: {0}, load: {1}'.format(out[0], out[1])
@@ -372,6 +374,23 @@ if __name__ == '__main__':
             print '\ttau:' + str(out[3])
             print '\ttauOpt:' + str(out[4])
             print "-"*100
+
+            key = out[0]
+            if key not in outPrnt:
+                outPrnt[key] = AttrDict()
+                tmp = outPrnt[key]
+                tmp.load = []
+                for i in range(K):
+                    tmp['t{0}'.format(i+1)] = []
+
+            tmp = outPrnt[key]
+            tmp.load.append(out[1])
+            for i in range(K):
+                tmp['t{0}'.format(i+1)].append(out[2][i])
+        print '\n\n'+'-'*100
+        print "beautiful printing:"
+        pprint(outPrnt)        
+
         sys.exit()
 
     if options.mode == 'slave':
