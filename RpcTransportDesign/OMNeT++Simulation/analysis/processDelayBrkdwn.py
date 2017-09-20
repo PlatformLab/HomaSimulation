@@ -5,6 +5,7 @@ import re
 from pprint import pprint
 from numpy import *
 from optparse import OptionParser
+import bisect
 
 def main(resultFile, workload):
     f = open(resultFile)
@@ -14,6 +15,8 @@ def main(resultFile, workload):
     iters = 0
     sumDelays = 0.0
     baseLatency = 0.0
+    mesgSizes = []
+    latencies = []
     for line in f:
         match = re.match("^=", line)
         if match:
@@ -33,6 +36,10 @@ def main(resultFile, workload):
                 if match:
                     mesgLatency = float(match.group(1))
                     mesgSize = float(match.group(2))
+                    ind = bisect.bisect_left(latencies, mesgLatency*1e6)
+                    latencies.insert(ind, mesgLatency*1e6)
+                    ind = bisect.bisect_left(mesgSizes, mesgSize)
+                    mesgSizes.insert(ind, mesgSize)
                     continue
                 tmp = [float(elem) for elem in \
                     line.rstrip().rstrip(',').split(',')]
@@ -86,10 +93,15 @@ def main(resultFile, workload):
     printLine([' ']+['Sum Delays'] + [elem for elem in sumCol])
 
     print("\n\n")
-    tl=30
+    tl=35
     print("All delay overhead(us): {0:.3f}".format(sumDelays).ljust(tl) +
         "Base latency(us): {0:.3f}".format(baseLatency/iters*1e6).center(tl) +
+        "Mesg Size Range(B): {0}-{1}".format(
+            int(mesgSizes[0]), int(mesgSizes[-1])).center(tl) +
+        "Latency Range(us): {0:.3f}-{1:.3f}".format(
+            latencies[0], latencies[-1]).center(tl) +
         "Total Samples: {0}".format(str(iters)).center(tl))
+
 
 
 if __name__ == '__main__':
