@@ -6,15 +6,7 @@ from pprint import pprint
 from numpy import *
 from optparse import OptionParser
 
-def main():
-    parser = OptionParser()
-    options, args = parser.parse_args()
-    if len(args) > 0:
-        resultFile = args[0]
-    else:
-        resultFile = 'homatransport/src/dcntopo/results/' +\
-            'tailBreakdown/tailDelayBrkdwn.txt'
-
+def main(resultFile, workload):
     f = open(resultFile)
     inGroup = False
     allDelays = [[0.0]*5]*5
@@ -32,7 +24,8 @@ def main():
                 iters += 1
         elif inGroup:
             try:
-                tmp = [float(elem) for elem in line.rstrip().rstrip(',').split(',')]
+                tmp = [float(elem) for elem in \
+                    line.rstrip().rstrip(',').split(',')]
             except:
                 continue
             sumDelays += sum(tmp[0:3])
@@ -68,11 +61,11 @@ def main():
 
         print l
 
-    printLine(['', 'QueueDelay(%)', 'PrmtLag_LargMesg(%)', 'PrmtLab_ShortMesg(%)',
-        'QueuedBytes', 'QueuedPkts'])
-    rows = ['SwDelay', 'NIC', 'TorUp', 'CoreDown', 'TorDown']
+    printLine(['Workload', 'Location', 'QueueDelay(%)', 'PrmtLag_LargMesg(%)',
+        'PrmtLab_ShortMesg(%)', 'QueuedBytes', 'QueuedPkts'])
+    locations = ['SwDelay', 'NIC', 'TorUp', 'CoreDown', 'TorDown']
     for i in range(len(allDelays)): 
-        printLine([rows[i]] + allDelays[i])
+        printLine([workloadType] + [locations[i]] + allDelays[i])
 
     print('='*100)
 
@@ -88,4 +81,11 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.exit(main());
+    parser = OptionParser('./processDelayBrkdwn RESULT_FILE_NAME WORKLOAD_TYPE')
+    options, args = parser.parse_args()
+    if len(args) != 2:
+        parser.error("incorrect number of arguments")
+    resultFile = args[0]
+    workloadType = args[1]
+
+    sys.exit(main(resultFile, workloadType));
