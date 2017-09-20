@@ -78,13 +78,12 @@ def main(resultFile, workload):
         printLine([workloadType] + [locations[i]] + allDelays[i])
 
     print('='*100)
-
     sumCol = [0.0]*3
     for i in range(len(allDelays)):
         for j in range(len(allDelays[i])):
             if j < 3:
                 sumCol[j] += allDelays[i][j]
-    printLine(['Sum Delays'] + [elem for elem in sumCol])
+    printLine([' ']+['Sum Delays'] + [elem for elem in sumCol])
 
     print("\n\n")
     tl=30
