@@ -2,7 +2,7 @@
 #except the homatransport directory
 !OMNeT++Simulation
 OMNeT++Simulation/*
-!OMNeT++Simulation/README
+!OMNeT++Simulation/README.md
 !OMNeT++Simulation/homatransport
 !OMNeT++Simulation/inet
 !OMNeT++Simulation/analysis
