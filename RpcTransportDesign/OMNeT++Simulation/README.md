@@ -22,7 +22,7 @@ This repository provides the simulation code for Homa. Homa simulation is built
 on top of OMNeT++ event simulator. In order to use Homa simulator, first you
 need to familiarize yourself with OMNeT++ simulator. We suggest that you refer
 to [OMNET++ Documentation](https://www.omnetpp.org/documentation) and [OMNeT++
-TicToc tutorial] to learn about this simulator.
+TicToc tutorial](https://docs.omnetpp.org/) to learn about this simulator.
 
 Once learned how to build and run simulation programs with OMNeT++, clone this
 repository and follow the steps below to build the Homa simulation software: 
