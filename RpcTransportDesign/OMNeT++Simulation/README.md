@@ -1,5 +1,4 @@
-# Homa: A Low Latency, Receiver Driven, Transport Mechanism For Datacenter
-Networks
+# Homa: A Low Latency, Receiver Driven, Transport Mechanism For Datacenter Networks
 
 ## What is Homa?
 Homa is a new datacenter transport protocol that provides low latency for small
