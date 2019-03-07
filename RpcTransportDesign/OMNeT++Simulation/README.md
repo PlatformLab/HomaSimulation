@@ -29,8 +29,8 @@ repository and follow the steps below to build the Homa simulation software:
 
 1. Install omnet++ version 4.6 under the directory ./omnetpp-4.6/
 
-2. Copy the diff patch below into a file and apply it to OMNeT++ directory and
-rebuild OMNeT++ from the directory.
+2. Copy the diff patch below into a file (eg. patch.diff) and apply it to OMNeT++ directory and
+rebuild OMNeT++ from the directory (.../omnetpp-4.6$ patch -p1 < patch.diff)
 
 3. Enter inet/ directory and build inet framework.
 
