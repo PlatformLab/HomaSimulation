@@ -109,3 +109,10 @@ rebuild OMNeT++ from the directory (.../omnetpp-4.6$ patch -p1 < patch.diff)
         +        num_cells = 100; // to allow merging every 2, 3, 5, 6 adjacent cells in post-processing
              cellsize = (rangemax - rangemin) / num_cells;
          }
+
+## Running Experiments
+After you build the simulation package, you need to go to RpcTransportDesign/OMNeT++Simulation/homatransport/src/dcntopo folder and run your simulation scenario from there. 'dcntopo' folder has most of configurations files we've used for simulations. Here is an example on how to run an experiment configurations:
+
+../homatransport -u Cmdenv -c WorkloadHadoop -r 6 -n ..:../../simulations:../../../inet/examples:../../../inet/src -l ../../../inet/src/INET homaTransportConfig.ini
+
+"-u Cmdenv" instructs OMNeT++ to run in cli mode (as opposed to gui mode). homaTransportConfig.ini at the end of the command is the configuration file we use and "-c WorkoaldHadoop" asks omnet to use parameters specified in WorkloadHadoop section of the config file. -r 6 specifies run number 6 within that section to be simulated.
